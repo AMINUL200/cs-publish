@@ -18,23 +18,27 @@ import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
-  import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
+import HomePage from "./pages/landinpage/HomePage";
 
 export default function App() {
   return (
     <>
       <Router>
-        <ToastContainer />
+        <ToastContainer
+          style={{ zIndex: 999999 }}
+        />
         <ScrollToTop />
         <Routes>
 
           {/* Auth Layout */}
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route index path="/" element={<HomePage />} />
 
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
-            <Route index path="/" element={<Home />} />
+            <Route path="/dashboard" element={<Home />} />
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />

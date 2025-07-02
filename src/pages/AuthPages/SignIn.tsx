@@ -5,6 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash, faUserEdit, faUserCheck, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 import { login } from "../../features/auth/AuthSlice";
 import { useDispatch } from "react-redux";
+import axios from 'axios';
+import { toast } from "react-toastify";
+import { Link, useNavigate } from "react-router";
 
 
 // Define types for form data
@@ -21,13 +24,15 @@ interface FocusState {
 }
 
 export default function SignIn() {
+  const navigate = useNavigate()
   const dispatch = useDispatch();
   const [formData, setFormData] = useState<FormData>({
-    email: '',
-    password: '',
+    email: 'admin101@yopmail.com',
+    password: 'password123',
     userRole: 'author',
   });
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isFocused, setIsFocused] = useState<FocusState>({
     email: false,
     password: false
@@ -45,12 +50,37 @@ export default function SignIn() {
     setFormData(prev => ({ ...prev, userRole: role }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(login({
-      user: { email: formData.email },
-      token: "dummy-token"
-    }))
+    setIsLoading(true);
+    try {
+
+      const response = await axios.post('/api/login', {
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (response.data.flag === 1 || response.data) {
+        dispatch(login({ userData: response.data.user, token: response.data.token }))
+        toast.success(response.data.message);
+        navigate('/dashboard')
+      } else {
+        toast.error(response.data.message)
+      }
+
+    } catch (error) {
+
+      console.log(error);
+
+      let errorMessage = "Something went wrong. Please try again.";
+      if (axios.isAxiosError(error) && error.response) {
+        errorMessage = error.response.data.message || errorMessage;
+      }
+
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
 
@@ -266,19 +296,64 @@ export default function SignIn() {
 
                 <motion.button
                   whileHover={{
-                    scale: 1.02,
-                    boxShadow: "0 10px 25px -5px rgba(79, 70, 229, 0.4)"
+                    scale: 1.03,
+                    boxShadow: "0 10px 25px -5px rgba(79, 70, 229, 0.5)",
+                    backgroundPosition: "100% 0"
                   }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-3 px-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                  className={`w-full relative overflow-hidden text-white py-3 px-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 ${isLoading ? "cursor-not-allowed" : ""
+                    }`}
+                  disabled={isLoading}
+                  style={{
+                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%)",
+                    backgroundSize: "200% 100%",
+                    border: "2px solid rgba(255, 255, 255, 0.2)",
+                    backdropFilter: "blur(2px)"
+                  }}
                 >
-                  <motion.span
-                    initial={{ opacity: 0.9 }}
-                    whileHover={{ opacity: 1 }}
-                  >
-                    Sign In
-                  </motion.span>
+                  {isLoading ? (
+                    <motion.div
+                      className="flex items-center justify-center gap-2"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <motion.span
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="block h-5 w-5 border-2 border-white border-t-transparent rounded-full"
+                      />
+                      <span>Processing...</span>
+                    </motion.div>
+                  ) : (
+                    <motion.span
+                      initial={{ opacity: 0.9, textShadow: "0 0 0 rgba(255,255,255,0)" }}
+                      whileHover={{
+                        opacity: 1,
+                        textShadow: "0 0 8px rgba(255,255,255,0.5)"
+                      }}
+                      className="block"
+                    >
+                      Sign In
+                    </motion.span>
+                  )}
+
+                  {/* Border animation */}
+                  {!isLoading && (
+                    <motion.span
+                      className="absolute inset-0 border-2 border-transparent rounded-xl"
+                      initial={{
+                        borderColor: "rgba(255,255,255,0)",
+                        boxShadow: "inset 0 0 0 rgba(255,255,255,0)"
+                      }}
+                      whileHover={{
+                        borderColor: "rgba(255,255,255,0.3)",
+                        boxShadow: "inset 0 0 20px rgba(255,255,255,0.2)",
+                        transition: { delay: 0.2 }
+                      }}
+                    />
+                  )}
                 </motion.button>
               </form>
 
@@ -297,16 +372,13 @@ export default function SignIn() {
                 </motion.a>
                 <p className="text-gray-600 text-sm mt-2">
                   Don't have an account?{' '}
-                  <motion.a
-                    href="#"
+                  <Link
+                    to="/signup"
                     className="text-indigo-600 hover:text-indigo-800 font-medium"
-                    whileHover={{
-                      scale: 1.05,
-                      textShadow: "0px 0px 5px rgba(79, 70, 229, 0.3)"
-                    }}
+                   
                   >
                     Sign up
-                  </motion.a>
+                  </Link>
                 </p>
               </motion.div>
             </div>

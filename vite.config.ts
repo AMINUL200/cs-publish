@@ -15,4 +15,14 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://crm-api.skilledworkerscloud.co.uk',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '/cs-publication/public/api') // ✅ Correct rewrite
+      }
+    }
+  }
 });

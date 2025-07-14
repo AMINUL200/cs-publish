@@ -5,6 +5,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const AddNews = () => {
+      const API_URL = import.meta.env.VITE_API_URL;
     const { token } = useSelector((state) => state.auth);
     const [formData, setFormData] = useState({
         news: '',
@@ -24,7 +25,7 @@ const AddNews = () => {
         e.preventDefault();
         try {
             setLoading(true);
-            const response = await axios.post('/api/admin/news',
+            const response = await axios.post(`${API_URL}api/admin/news`,
                 {
                     news: formData.news,
                     status: formData.status

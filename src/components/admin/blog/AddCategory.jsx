@@ -9,12 +9,13 @@ const AddCategory = () => {
   const [categoryName, setCategoryName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const response = await axios.post('/api/admin/blog-categories',
+      const response = await axios.post(`${API_URL}api/admin/blog-categories`,
         {
           category_name: categoryName
         },

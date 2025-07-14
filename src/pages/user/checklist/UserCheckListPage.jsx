@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 
 const UserCheckListPage = () => {
+  const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   // Array of checklist items
   const checklistItems = [
@@ -55,17 +56,17 @@ const UserCheckListPage = () => {
   // Validate form before submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Check if all items are checked
     const allChecked = Object.values(checkedItems).every(Boolean);
-    
+
     if (!allChecked) {
       toast.error('Please check all the checklist items before proceeding.');
       return;
-    }else{
+    } else {
       navigate('/confirmation/add-new-paper')
     }
-    
+
     // Proceed with submission if all checked
     // You can add your submission logic here
     console.log('All items checked, proceeding...');
@@ -78,7 +79,7 @@ const UserCheckListPage = () => {
         <h1 className="text-xl font-bold text-gray-800">New Manuscript</h1>
       </div>
       <div className="flex min-h-screen gap-4 flex-col lg:flex-row">
-       
+
         {/* Main Content */}
         <div className=" p-8 bg-white border">
           <div className="max-w-6xl mx-auto">
@@ -108,13 +109,13 @@ const UserCheckListPage = () => {
               </div>
 
               <div className="flex gap-4 mb-8">
-                <button 
+                <button
                   type="button"
                   className="px-4 py-2 bg-blue-100 text-orange-400 rounded hover:bg-blue-200 text-sm cursor-pointer transition-all duration-300"
                 >
                   Download Paper Template
                 </button>
-                <button 
+                <button
                   type="button"
                   className="px-4 py-2 bg-blue-100 text-orange-400 rounded hover:bg-blue-200 text-sm cursor-pointer transition-all duration-300"
                 >
@@ -134,12 +135,12 @@ const UserCheckListPage = () => {
               </div>
 
               <div className='flex justify-end'>
-                <button 
+                <button
                   type="submit"
                   className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer flex items-center"
                 >
                   Next
-                  <FontAwesomeIcon icon={faArrowCircleRight} className='ml-2'/>
+                  <FontAwesomeIcon icon={faArrowCircleRight} className='ml-2' />
                 </button>
               </div>
             </form>

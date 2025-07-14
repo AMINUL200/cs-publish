@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Loader from '../../../components/common/Loader';
 
 const UpdateNews = () => {
+    const API_URL = import.meta.env.VITE_API_URL;
     const { id } = useParams();
     const { token } = useSelector((state) => state.auth);
     const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ const UpdateNews = () => {
 
     const fetchNewsData = async () => {
         try {
-            const response = await axios.get(`/api/admin/news/${id}`,
+            const response = await axios.get(`${API_URL}api/admin/news/${id}`,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -38,7 +39,7 @@ const UpdateNews = () => {
                 setFormData(response.data.data);
             } else {
                 toast.error(response.data.message);
-            navigate('/setting/news');
+                navigate('/setting/news');
             }
         } catch (error) {
             console.log(error);
@@ -53,7 +54,7 @@ const UpdateNews = () => {
         e.preventDefault();
         try {
             setUpdateLoading(true);
-            const response = await axios.put(`/api/admin/news/${id}`,
+            const response = await axios.put(`${API_URL}api/admin/news/${id}`,
                 {
                     news: formData.news,  // Using raw content instead of htmlContent
                     status: formData.status

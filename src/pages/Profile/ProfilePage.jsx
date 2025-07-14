@@ -28,7 +28,8 @@ const initialFormData = {
 };
 
 const ProfilePage = () => {
-      const { token } = useSelector((state) => state.auth);
+    const API_URL = import.meta.env.VITE_API_URL;
+    const { token } = useSelector((state) => state.auth);
     const [isEditing, setIsEditing] = useState(false);
     const [tempImage, setTempImage] = useState(null);
     const [tempResume, setTempResume] = useState(null);
@@ -62,20 +63,20 @@ const ProfilePage = () => {
         try {
             // Create FormData for file upload
             const submitData = new FormData();
-            
+
             // Append all regular fields
             Object.keys(formData).forEach(key => {
                 if (key !== 'image' && key !== 'resume') {
                     submitData.append(key, formData[key]);
                 }
             });
-            
+
             // Append files if they exist
             if (tempImage) submitData.append('image', tempImage);
             if (tempResume) submitData.append('resume', tempResume);
 
             const response = await axios.post(
-                '/api/profile',
+                `${API_URL}api/profile`,
                 submitData,
                 {
                     headers: {
@@ -84,12 +85,12 @@ const ProfilePage = () => {
                     }
                 }
             );
-         
-                toast.success(response.data.message);
-                // Refresh profile data after update
-                await getProfileData();
-                setIsEditing(false);
-           
+
+            toast.success(response.data.message);
+            // Refresh profile data after update
+            await getProfileData();
+            setIsEditing(false);
+
         } catch (error) {
             console.error('Error updating profile:', error);
             toast.error(error.response?.data?.message || 'An error occurred while updating profile');
@@ -102,17 +103,17 @@ const ProfilePage = () => {
     const getProfileData = async () => {
         setIsFetching(true);
         try {
-            const response = await axios.get('/api/profile', {
+            const response = await axios.get(`${API_URL}api/profile`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
-            
+
             if (response.data.flag === 1) {
                 const data = response.data.data;
                 console.log(data);
-                
+
                 setFormData({
                     ...initialFormData, // Reset to initial state first
                     ...data // Override with API data
@@ -129,8 +130,8 @@ const ProfilePage = () => {
             setIsFetching(false);
         }
     };
-    
-    
+
+
 
     const handleCancel = () => {
         // Reset to initial data by fetching again

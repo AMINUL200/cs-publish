@@ -8,6 +8,7 @@ import Loader from '../../../components/common/Loader';
 import { Link, useNavigate } from 'react-router-dom';
 
 const LatestNews = () => {
+      const API_URL = import.meta.env.VITE_API_URL;
     const { token } = useSelector((state) => state.auth);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
@@ -22,7 +23,7 @@ const LatestNews = () => {
 
     const fetchNewsData = async () => {
         try {
-            const response = await axios.get('/api/admin/news', {
+            const response = await axios.get(`${API_URL}api/admin/news`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 }
@@ -49,7 +50,7 @@ const LatestNews = () => {
     const handleDelete = async (id) => {
         try {
             setDeleteLoading(true);
-            const response = await axios.delete(`/api/admin/news/${id}`, 
+            const response = await axios.delete(`${API_URL}api/admin/news/${id}`, 
                 {
                 headers: {
                     'Authorization': `Bearer ${token}`,

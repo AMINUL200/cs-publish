@@ -16,6 +16,7 @@ const BlogCategories = () => {
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [currentCategory, setCurrentCategory] = useState({ id: '', category_name: '' });
     const [updateLoading, setUpdateLoading] = useState(false);
+    const API_URL = import.meta.env.VITE_API_URL;
 
     // Filter Category based on search term
     const filteredCategory = categories.filter(cta => {
@@ -28,7 +29,7 @@ const BlogCategories = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get('/api/admin/blog-categories', {
+            const response = await axios.get(`${API_URL}api/admin/blog-categories`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -48,7 +49,7 @@ const BlogCategories = () => {
         setDeleteLoading(true);
         try {
             const response = await axios.delete(
-                `/api/admin/blog-categories/${id}`,
+                `${API_URL}api/admin/blog-categories/${id}`,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -81,7 +82,7 @@ const BlogCategories = () => {
         setUpdateLoading(true);
         try {
             const response = await axios.put(
-                `/api/admin/blog-categories/${currentCategory.id}`,
+                `${API_URL}api/admin/blog-categories/${currentCategory.id}`,
                 { category_name: currentCategory.category_name },
                 {
                     headers: {
@@ -107,6 +108,7 @@ const BlogCategories = () => {
 
     useEffect(() => {
         fetchCategories();
+        
     }, [token]);
 
     if (loading) {

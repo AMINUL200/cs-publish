@@ -16,17 +16,18 @@ const ChecklistPage = () => {
     });
     const [editingItem, setEditingItem] = useState({
         checklist_item: '',
-        status: 1
+        status: "1"
     });
     const [checklistItems, setChecklistItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [addListLoading, setAddListLoading] = useState(false)
     const [deleteLoading, setDeleteLoading] = useState(false)
     const [updateLoading, setUpdateLoading] = useState(false)
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const fetchChecklistItems = async () => {
         try {
-            const response = await axios.get('/api/admin/checklist-settings', {
+            const response = await axios.get(`${API_URL}api/admin/checklist-settings`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -35,6 +36,8 @@ const ChecklistPage = () => {
 
             if (response.data.flag === 1) {
                 setChecklistItems(response.data.data);
+                console.log(response.data);
+                
             } else {
                 toast.error('Failed to fetch checklist items');
             }
@@ -59,7 +62,7 @@ const ChecklistPage = () => {
         try {
             setAddListLoading(true)
             const response = await axios.post(
-                '/api/admin/checklist-settings',
+                `${API_URL}api/admin/checklist-settings`,
                 newItem,
                 {
                     headers: {
@@ -87,7 +90,7 @@ const ChecklistPage = () => {
         try {
             setDeleteLoading(true)
             const response = await axios.delete(
-                `/api/admin/checklist-settings/${id}`,
+                `${API_URL}api/admin/checklist-settings/${id}`,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -113,7 +116,7 @@ const ChecklistPage = () => {
 
     const handleEditItem = async (id) => {
         const response = await axios.get(
-            `/api/admin/checklist-settings/${id}`,
+            `${API_URL}api/admin/checklist-settings/${id}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -133,7 +136,7 @@ const ChecklistPage = () => {
         try {
             setUpdateLoading(true)
             const response = await axios.put(
-                `/api/admin/checklist-settings/${id}`,
+                `${API_URL}api/admin/checklist-settings/${id}`,
                 editingItem,
                 {
                     headers: {
@@ -160,7 +163,7 @@ const ChecklistPage = () => {
             setShowEditModal(false);
             setEditingItem({
                 checklist_item: '',
-                status: 1
+                status: "1"
             });
         }
     };
@@ -222,7 +225,7 @@ const ChecklistPage = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-2">{item.id}</td>
                                     <td className="px-6 py-4 text-sm text-gray-500 border-2">{item.checklist_item}</td>
                                     <td className="px-6 py-4 whitespace-nowrap border-2">
-                                        {item.status === 1 ? (
+                                        {item.status === "1" ? (
                                             <span className="px-2 inline-flex justify-center items-center text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                 <FontAwesomeIcon icon={faCheck} className="mr-1" />
                                                 Enabled
@@ -384,8 +387,8 @@ const ChecklistPage = () => {
                                     <input
                                         type="radio"
                                         className="form-radio h-4 w-4 text-blue-600"
-                                        checked={editingItem.status === 1}
-                                        onChange={() => setEditingItem({ ...editingItem, status: 1 })}
+                                        checked={editingItem.status === "1"}
+                                        onChange={() => setEditingItem({ ...editingItem, status: "1" })}
                                     />
                                     <span className="ml-2">Enabled</span>
                                 </label>
@@ -393,8 +396,8 @@ const ChecklistPage = () => {
                                     <input
                                         type="radio"
                                         className="form-radio h-4 w-4 text-blue-600"
-                                        checked={editingItem.status === 0}
-                                        onChange={() => setEditingItem({ ...editingItem, status: 0 })}
+                                        checked={editingItem.status === "0"}
+                                        onChange={() => setEditingItem({ ...editingItem, status:"0" })}
                                     />
                                     <span className="ml-2">Disabled</span>
                                 </label>

@@ -7,6 +7,7 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 
 const StepperForm = () => {
+      const API_URL = import.meta.env.VITE_API_URL;
     const { token, userData } = useSelector((state) => state.auth);
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
@@ -107,7 +108,7 @@ const StepperForm = () => {
                 console.log(`${key}:`, value);
             }
 
-            const response = await axios.post("/api/manuscript", submissionData, {
+            const response = await axios.post(`${API_URL}/api/manuscript`, submissionData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'

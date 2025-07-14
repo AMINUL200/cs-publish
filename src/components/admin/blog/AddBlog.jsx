@@ -16,13 +16,14 @@ const AddBlog = () => {
   });
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   // Fetch categories on component mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('/api/admin/blog-categories', {
+        const response = await axios.get(`${API_URL}api/admin/blog-categories`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -60,7 +61,7 @@ const AddBlog = () => {
     console.log(formData);
     
     try {
-      const response = await axios.post('/api/admin/blogs', formData,
+      const response = await axios.post(`${API_URL}api/admin/blogs`, formData,
         {
           headers: {
             'Authorization': `Bearer ${token}`

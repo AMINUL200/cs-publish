@@ -5,6 +5,7 @@ import Loader from '../../../components/common/Loader';
 import { toast } from 'react-toastify';
 
 const Contact = () => {
+    const API_URL = import.meta.env.VITE_API_URL;
     const { token } = useSelector((state) => state.auth);
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({});
@@ -13,7 +14,7 @@ const Contact = () => {
 
     const fetchContactDetails = async () => {
         try {
-            const response = await axios.get('/api/admin/contact', {
+            const response = await axios.get(`${API_URL}api/admin/contact`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 }
@@ -50,7 +51,7 @@ const Contact = () => {
         e.preventDefault();
         try {
             setUpdateLoading(true);
-            const response = await axios.put(`/api/admin/contact/${formData.id}`,
+            const response = await axios.put(`${API_URL}api/admin/contact/${formData.id}`,
                 formData,
                 {
                     headers: {
@@ -96,7 +97,7 @@ const Contact = () => {
                             id="app_name"
                             name="app_name"
                             type="text"
-                            value={formData.app_name}
+                            value={formData?.app_name}
                             onChange={handleChange}
                             required
                         />
@@ -112,7 +113,7 @@ const Contact = () => {
                             id="email"
                             name="email"
                             type="email"
-                            value={formData.email}
+                            value={formData?.email}
                             onChange={handleChange}
                             required
                         />
@@ -128,7 +129,7 @@ const Contact = () => {
                             id="support_email"
                             name="support_email"
                             type="email"
-                            value={formData.support_email}
+                            value={formData?.support_email}
                             onChange={handleChange}
                             required
                         />

@@ -14,6 +14,7 @@ const ViewBlog = () => {
     const [blogData, setBlogData] = useState([]);
     const [deleteLoading, setDeleteLoading] = useState(false)
     const navigate = useNavigate();
+    const API_URL = import.meta.env.VITE_API_URL;
 
     // Filter blogs based on search term (title or author)
     const filteredBlogs = blogData.filter(blog => {
@@ -27,7 +28,7 @@ const ViewBlog = () => {
 
     const fetchBlogData = async () => {
         try {
-            const response = await axios.get('/api/admin/blogs', {
+            const response = await axios.get(`${API_URL}api/admin/blogs`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -51,7 +52,7 @@ const ViewBlog = () => {
         if (!id) return;
         setDeleteLoading(true);
         try {
-            const response = await axios.delete(`/api/admin/blogs/${id}`,
+            const response = await axios.delete(`${API_URL}api/admin/blogs/${id}`,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`

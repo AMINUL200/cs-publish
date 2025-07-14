@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import Loader from '../../../components/common/Loader';
 
 const ViewUser = () => {
+      const API_URL = import.meta.env.VITE_API_URL;
     const { token } = useSelector((state) => state.auth);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 const AddUser = () => {
+  const API_URL = import.meta.env.VITE_API_URL;
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -350,7 +351,7 @@ const AddUser = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Description
               </label>
-              
+
               <textarea
                 name="description"
                 value={formData.description}

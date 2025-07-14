@@ -21,13 +21,13 @@ const UpdateBlog = () => {
     const [loading, setLoading] = useState(false);
     const [updateLoading, setUpdateLoading] = useState(false)
     const navigate = useNavigate()
-
+    const API_URL = import.meta.env.VITE_API_URL;
 
 
     const fetchCategories = async () => {
         try {
             setLoading(true);
-            const response = await axios.get('/api/admin/blog-categories', {
+            const response = await axios.get(`${API_URL}api/admin/blog-categories`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -47,7 +47,7 @@ const UpdateBlog = () => {
     const fetchBlogDetails = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`/api/admin/blogs/${id}`, {
+            const response = await axios.get(`${API_URL}api/admin/blogs/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -94,20 +94,20 @@ const UpdateBlog = () => {
         e.preventDefault();
         setUpdateLoading(true);
         try {
-            const response = await axios.put(`/api/admin/blogs/${id}`, 
+            const response = await axios.put(`${API_URL}api/admin/blogs/${id}`,
                 formData,
                 {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
 
             console.log(response);
-            
+
             if (response.status === 200) {
                 toast.success(response.data.message)
                 navigate('/blog/view')
-                
+
             } else {
                 toast.error(response.data.message)
             }

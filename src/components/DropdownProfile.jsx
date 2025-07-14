@@ -16,6 +16,7 @@ function DropdownProfile({
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+   const API_URL = import.meta.env.VITE_API_URL;
 
   const trigger = useRef(null);
   const dropdown = useRef(null);
@@ -43,7 +44,7 @@ function DropdownProfile({
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post('/api/logout', null, {
+      const response = await axios.post(`${API_URL}api/logout`, null, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -56,10 +57,7 @@ function DropdownProfile({
       console.log(error);
       toast.error(error.message)
       
-      // Even if logout API fails, we should still logout the user client-side
-      // dispatch(logout());
-      // toast.info('Logged out successfully');
-      // navigate('/');
+     
     }
   }
 

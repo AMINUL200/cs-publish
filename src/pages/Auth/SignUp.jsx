@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { login } from "../../features/auth/AuthSlice";
 
 const SignUp = () => {
+   const API_URL = import.meta.env.VITE_API_URL;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -43,7 +44,7 @@ const SignUp = () => {
     setError(null);
 
     try {
-      const response = await axios.post('/api/register', formData);
+      const response = await axios.post(`${API_URL}api/register`, formData);
       if (response.data.flag === 1) {
         dispatch(login({ userData: response.data.user, token: response.data.token }));
         toast.success(response.data.message);

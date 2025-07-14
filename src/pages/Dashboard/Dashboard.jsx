@@ -7,7 +7,7 @@ const Dashboard = () => {
   const { userData } = useSelector((state) => state.auth);
   return (
     <>
-      {userData.user_type === 1 ?
+      {userData.user_type === "1" ?
         <AdminDashboard /> :
         <AuthorDashboard />
       }

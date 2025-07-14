@@ -10,14 +10,14 @@ export default defineConfig({
       transformMixedEsModules: true,
     }
   } ,
-   server: {
-    proxy: {
-      '/api': {
-        target: 'https://crm-api.skilledworkerscloud.co.uk',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '/cs-publication/public/api') // ✅ Correct rewrite
-      }
-    }
-  }
+  //  server: {
+  //   proxy: {
+  //     '/api': {
+  //       target: 'https://crm-api.skilledworkerscloud.co.uk',
+  //       changeOrigin: true,
+  //       secure: false,
+  //       rewrite: (path) => path.replace(/^\/api/, '/cs-publication/public/api') // ✅ Correct rewrite
+  //     }
+  //   }
+  // }
 })

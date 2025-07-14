@@ -1,68 +1,46 @@
+import React, { useState } from 'react'
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { login } from "../../features/auth/AuthSlice";
-
-const SignUp = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+const AddUser = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    user_type: 2, // Default: Author
+    user_type: 3, // Default: Author
     first_name: "",
     last_name: "",
     title: "Mr",
     gender: "Male",
     phone: "",
+    university: "",
+    education: "",
+    affiliation: "",
+    awards: "",
+    society: "",
+    speciality: "",
+    description: "",
+    address: "",
     city: "",
     country: ""
   });
-
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-
   const userTypeOptions = [
-    { value: 2, label: "Author" },
-    { value: 3, label: "Reviewer" },
+    { value: 3, label: "Author" },
+    { value: 2, label: "Reviewer" },
     { value: 4, label: "Subscriber" }
   ];
-
   const titleOptions = ["Mr", "Mrs", "Miss", "Dr", "Prof"];
   const genderOptions = ["Male", "Female", "Other"];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError(null);
+    console.log(formData);
 
-    try {
-      const response = await axios.post('/api/register', formData);
-      if (response.data.flag === 1) {
-        dispatch(login({ userData: response.data.user, token: response.data.token }));
-        toast.success(response.data.message);
-        navigate('/dashboard');
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      console.log(error);
-      let errorMessage = "Something went wrong. Please try again.";
-      if (axios.isAxiosError(error) && error.response) {
-        errorMessage = error.response.data.message || errorMessage;
-      }
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  }
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -121,15 +99,35 @@ const SignUp = () => {
             Create Account
           </motion.h2>
 
-          {error && (
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded"
-            >
-              {error}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <motion.div variants={itemVariants}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                First Name *
+              </label>
+              <input
+                type="text"
+                name="first_name"
+                value={formData.first_name}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              />
             </motion.div>
-          )}
+
+            <motion.div variants={itemVariants}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Last Name *
+              </label>
+              <input
+                type="text"
+                name="last_name"
+                value={formData.last_name}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              />
+            </motion.div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <motion.div variants={itemVariants}>
@@ -162,34 +160,45 @@ const SignUp = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <motion.div variants={itemVariants} className="relative">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Password *
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-8 right-0 pr-3 flex items-center text-gray-500 hover:text-indigo-600"
+                  style={{ top: '1.4rem' }}
+                >
+                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                </button>
+              </div>
+            </motion.div>
             <motion.div variants={itemVariants}>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                First Name *
+                Phone *
               </label>
               <input
-                type="text"
-                name="first_name"
-                value={formData.first_name}
+                type="tel"
+                name="phone"
+                value={formData.phone}
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
               />
             </motion.div>
 
-            <motion.div variants={itemVariants}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Last Name *
-              </label>
-              <input
-                type="text"
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-              />
-            </motion.div>
           </div>
+
 
           <motion.div variants={itemVariants}>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -201,11 +210,10 @@ const SignUp = () => {
                   key={type.value}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`flex items-center justify-center p-2 rounded-lg border cursor-pointer transition-all ${
-                    formData.user_type === type.value
-                      ? "bg-indigo-100 border-indigo-500"
-                      : "border-gray-300 hover:border-indigo-300"
-                  }`}
+                  className={`flex items-center justify-center p-2 rounded-lg border cursor-pointer transition-all ${formData.user_type === type.value
+                    ? "bg-indigo-100 border-indigo-500"
+                    : "border-gray-300 hover:border-indigo-300"
+                    }`}
                 >
                   <input
                     type="radio"
@@ -259,19 +267,115 @@ const SignUp = () => {
             </motion.div>
           </div>
 
-          <motion.div variants={itemVariants}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Phone *
-            </label>
-            <input
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-            />
-          </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <motion.div variants={itemVariants}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                University
+              </label>
+              <input
+                type="text"
+                name="university"
+                value={formData.university}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              />
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Education
+              </label>
+              <input
+                type="text"
+                name="education"
+                value={formData.education}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              />
+            </motion.div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <motion.div variants={itemVariants}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Affiliation
+              </label>
+              <input
+                type="text"
+                name="affiliation"
+                value={formData.affiliation}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              />
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Awards
+              </label>
+              <input
+                type="text"
+                name="awards"
+                value={formData.awards}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              />
+            </motion.div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <motion.div variants={itemVariants}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Society Member
+              </label>
+              <input
+                type="text"
+                name="society"
+                value={formData.society}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              />
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Speciality
+              </label>
+              <input
+                type="text"
+                name="speciality"
+                value={formData.speciality}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              />
+            </motion.div>
+          </div>
+          <div className="grid grid-cols-1  gap-4">
+            <motion.div variants={itemVariants}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              ></textarea>
+            </motion.div>
+          </div>
+          <div className="grid grid-cols-1  gap-4">
+            <motion.div variants={itemVariants}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Permanent Address
+              </label>
+
+              <textarea
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              >
+
+              </textarea>
+            </motion.div>
+          </div>
+
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <motion.div variants={itemVariants}>
@@ -301,56 +405,14 @@ const SignUp = () => {
             </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
-            <motion.div variants={itemVariants} className="relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password *
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={togglePasswordVisibility}
-                  className="absolute inset-y-8 right-0 pr-3 flex items-center text-gray-500 hover:text-indigo-600"
-                  style={{ top: '1.4rem' }}
-                >
-                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                </button>
-              </div>
-            </motion.div>
-          </div>
-
-          <motion.div
-            variants={itemVariants}
-            className="text-center mt-4"
-          >
-            <p className="text-gray-600">
-              Already have an account?{' '}
-              <Link
-                to="/signin"
-                className="text-indigo-600 hover:text-indigo-800 font-medium"
-              >
-                Login
-              </Link>
-            </p>
-          </motion.div>
-
           <motion.button
             variants={itemVariants}
             whileHover={{ scale: 1.02, boxShadow: "0 4px 20px rgba(79, 70, 229, 0.3)" }}
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-6 rounded-xl font-semibold text-white bg-blue-500 shadow-lg transition-all ${
-              isLoading ? "opacity-70 cursor-not-allowed" : "hover:shadow-xl"
-            }`}
+            className={`w-full py-3 px-6 rounded-xl font-semibold text-white bg-blue-500 shadow-lg transition-all ${isLoading ? "opacity-70 cursor-not-allowed" : "hover:shadow-xl"
+              }`}
           >
             {isLoading ? (
               <div className="flex items-center justify-center space-x-2">
@@ -359,16 +421,16 @@ const SignUp = () => {
                   transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                   className="block h-5 w-5 border-2 border-white border-t-transparent rounded-full"
                 />
-                <span>Registering...</span>
+                <span>Save...</span>
               </div>
             ) : (
-              "Register Now"
+              "Save User"
             )}
           </motion.button>
         </motion.form>
       </motion.div>
     </div>
-  );
-};
+  )
+}
 
-export default SignUp;
+export default AddUser

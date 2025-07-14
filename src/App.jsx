@@ -26,6 +26,15 @@ import AddBlog from './components/admin/blog/AddBlog';
 import ViewBlog from './components/admin/blog/ViewBlog';
 import BlogCategories from './components/admin/blog/BlogCategories';
 import AddCategory from './components/admin/blog/AddCategory';
+import UpdateBlog from './components/admin/blog/UpdateBlog';
+import AddUser from './pages/admin/userManager/AddUser';
+import LatestNews from './pages/admin/setting/LatestNews';
+import AddNews from './pages/admin/setting/AddNews';
+import UpdateNews from './pages/admin/setting/UpdateNews';
+import Contact from './pages/admin/contact/Contact';
+import UserCheckListPage from './pages/user/checklist/UserCheckListPage';
+import SubmitManuscript from './pages/user/SubmitManuscript/SubmitManuscript';
+import ViewUser from './pages/admin/userManager/ViewUser';
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -64,16 +73,34 @@ function App() {
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/contact" element={<Contact />} />
+
               {/* Add more protected routes here */}
 
 
               {/* Admin */}
               <Route path="/articlemanager/checklist" element={<ChecklistPage />} />
               {/* blog */}
-              <Route path="/blog/add" element={<AddBlog/>} />
+              <Route path="/blog/add" element={<AddBlog />} />
               <Route path="/blog/view" element={<ViewBlog />} />
+              <Route path="/blog/view/:id" element={<UpdateBlog />} />
               <Route path="/blog/categories" element={<BlogCategories />} />
               <Route path="/blog/addCategoryBlogpage" element={<AddCategory />} />
+              {/* setting */}
+              <Route path="/setting/news" element={<LatestNews/> } />
+              <Route path="/setting/add-news" element={<AddNews/> } />
+              <Route path="/setting/news/:id" element={<UpdateNews/> } />
+
+              {/* user manger route */}
+              <Route path='/users/add-user' element={<AddUser/>} />
+              <Route path='/view-users' element={<ViewUser/>} />
+
+
+
+              {/* user */}
+              <Route path='/confirmation/new-paper' element={<UserCheckListPage/>} />
+              <Route path='/confirmation/add-new-paper' element={<SubmitManuscript/>} />
+
             </Route>
           </Route>
         </Routes>

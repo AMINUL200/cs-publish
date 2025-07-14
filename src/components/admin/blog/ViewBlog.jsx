@@ -1,38 +1,19 @@
 import { faEdit, faTrash, faSearch, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import Loader from '../../common/Loader';
 
 const ViewBlog = () => {
+    const { token } = useSelector((state) => state.auth);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedRows, setSelectedRows] = useState([]);
-
-    const blogData = [
-        {
-            id: 1,
-            title: "HI",
-            author: "Shivangi Parhiri",
-            comments: "View Comments"
-        },
-        {
-            id: 2,
-            title: "go ahead",
-            author: "Mr. Pitu KUMAR",
-            comments: "View Comments"
-        },
-        {
-            id: 3,
-            title: "KOLKATA",
-            author: "SAM KUMAR",
-            comments: "View Comments"
-        },
-        {
-            id: 4,
-            title: "TERTT",
-            author: "Mr. Pitu KUMAR",
-            comments: "View Comments"
-        }
-    ];
+    const [loading, setLoading] = useState(true);
+    const [blogData, setBlogData] = useState([]);
+    const [deleteLoading, setDeleteLoading] = useState(false)
+    const navigate = useNavigate();
 
     // Filter blogs based on search term (title or author)
     const filteredBlogs = blogData.filter(blog => {
@@ -43,29 +24,81 @@ const ViewBlog = () => {
         );
     });
 
-    const handleSelectRow = (id) => {
-        if (selectedRows.includes(id)) {
-            setSelectedRows(selectedRows.filter(rowId => rowId !== id));
-        } else {
-            setSelectedRows([...selectedRows, id]);
-        }
-    };
 
-    const handleSelectAll = (e) => {
-        if (e.target.checked) {
-            setSelectedRows(filteredBlogs.map(blog => blog.id));
-        } else {
-            setSelectedRows([]);
+    const fetchBlogData = async () => {
+        try {
+            const response = await axios.get('/api/admin/blogs', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.status === 200) {
+
+                setBlogData(response.data.data)
+            } else {
+                toast.error(response.data.message)
+            }
+
+        } catch (error) {
+            toast.error(error.message);
+        } finally {
+            setLoading(false);
         }
-    };
+    }
+
+    const handleDelete = async (id) => {
+        if (!id) return;
+        setDeleteLoading(true);
+        try {
+            const response = await axios.delete(`/api/admin/blogs/${id}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+            if (response.status === 200) {
+                toast.success(response.data.message)
+                fetchBlogData();
+            } else {
+                toast.error(response.data.message)
+            }
+
+        } catch (error) {
+            toast.error(error.message)
+            console.log(error);
+
+        } finally {
+            setDeleteLoading(false)
+        }
+
+    }
+
+
+    const handleNavigate =(id)=>{
+        if(!id) return;
+
+        navigate(`/blog/view/${id}`)
+    }
+
+
+
+    useEffect(() => {
+        fetchBlogData();
+    }, [token]);
+
+    if (loading) {
+        return <Loader />
+    }
 
     return (
         <div className="p-6 bg-white rounded-lg shadow-sm">
             <div className='flex justify-between items-center mb-4'>
                 <h1 className="text-2xl font-bold text-gray-800">VIEW BLOGS</h1>
-                <Link 
-                to='/blog/add'
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors duration-300">
+                <Link
+                    to='/blog/add'
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors duration-300">
                     <FontAwesomeIcon icon={faPlus} className="mr-2" />
                     Add Blog
                 </Link>
@@ -90,18 +123,7 @@ const ViewBlog = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
-                                <div className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id="selectAll"
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-2"
-                                        onChange={handleSelectAll}
-                                        checked={selectedRows.length === filteredBlogs.length && filteredBlogs.length > 0}
-                                    />
-                                    <label htmlFor="selectAll" className="cursor-pointer">Select All</label>
-                                </div>
-                            </th>
+
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
                                 Title
                             </th>
@@ -120,14 +142,7 @@ const ViewBlog = () => {
                         {filteredBlogs.length > 0 ? (
                             filteredBlogs.map((blog) => (
                                 <tr key={blog.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-2">
-                                        <input
-                                            type="checkbox"
-                                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                            checked={selectedRows.includes(blog.id)}
-                                            onChange={() => handleSelectRow(blog.id)}
-                                        />
-                                    </td>
+
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-2">
                                         {blog.title}
                                     </td>
@@ -135,14 +150,24 @@ const ViewBlog = () => {
                                         {blog.author}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 hover:text-blue-800 cursor-pointer border-2">
-                                        {blog.comments}
+                                        {blog.content}
                                     </td>
                                     <td className="text-center px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                                        <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded mr-2 transition-colors duration-300">
+                                        <button
+                                            onClick={() => {
+                                                handleNavigate(blog.id)
+                                            }}  
+                                            disabled={deleteLoading}
+                                            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded mr-2 transition-colors duration-300 cursor-pointer">
                                             <FontAwesomeIcon icon={faEdit} className='mr-1' />
                                             Edit
                                         </button>
-                                        <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition-colors duration-300">
+                                        <button
+                                            onClick={() => {
+                                                handleDelete(blog.id);
+                                            }}
+                                            disabled={deleteLoading}
+                                            className={` text-white px-3 py-1 rounded transition-colors duration-300  ${deleteLoading ? 'bg-gray-500 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600 cursor-pointer'}`}>
                                             <FontAwesomeIcon icon={faTrash} className='mr-1' />
                                             Delete
                                         </button>
@@ -164,15 +189,7 @@ const ViewBlog = () => {
                 <div>
                     Showing {filteredBlogs.length > 0 ? 1 : 0} to {filteredBlogs.length} of {blogData.length} rows
                 </div>
-                <div className="flex items-center">
-                    <span className="mr-2">Common:</span>
-                    <button
-                        className={`bg-red-500 bg:text-red-700 px-4 py-2 rounded text-white ${selectedRows.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        disabled={selectedRows.length === 0}
-                    >
-                        Delete {selectedRows.length}
-                    </button>
-                </div>
+
             </div>
         </div>
     )

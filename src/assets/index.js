@@ -28,6 +28,8 @@ import research6 from './images/research/research-6.jpg'
 import services1 from './images/services/two-part-1.jpg'
 import services2 from './images/services/authorservice.jpg'
 
+import submitManuscript from './images/icon/sumit-manuscript.png'
+
 export {
     signupBg,
     logo,
@@ -52,7 +54,8 @@ export {
     research5,
     research6,
     services1,
-    services2
+    services2,
+    submitManuscript
 
 
 }

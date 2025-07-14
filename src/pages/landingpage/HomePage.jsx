@@ -7,6 +7,7 @@ import LandingRecentPost from '../../components/LandingComponent/LandingRecentPo
 import LandingResearch from '../../components/LandingComponent/LandingResearch';
 import LandingServices from '../../components/LandingComponent/LandingServices';
 import LandingFooter from '../../components/LandingComponent/LandingFooter';
+import OurPartner from '../../components/LandingComponent/OurPartner';
 
 const HomePage = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -25,6 +26,7 @@ const HomePage = () => {
             <LandingRecentPost/>
             <LandingResearch/>
             <LandingServices/>
+            <OurPartner/>
 
             <LandingFooter/>
         </>

@@ -13,8 +13,8 @@ export default function SignIn() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
-    email: 'admin101@yopmail.com',
-    password: 'password123',
+    email: 'aminul2025@yopmail.com',
+    password: '123456',
     userRole: 'author',
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +23,9 @@ export default function SignIn() {
     email: false,
     password: false
   });
-
+  const API_URL = import.meta.env.VITE_API_URL;
+  console.log(API_URL);
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -40,11 +42,10 @@ export default function SignIn() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await axios.post('/api/login', {
+      const response = await axios.post(`${API_URL}api/login`, {
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       });
-      console.log(response.data);
 
       if (response.data.flag === 1 || response.data) {
         dispatch(login({ userData: response.data.user, token: response.data.token }));
@@ -117,11 +118,10 @@ export default function SignIn() {
                     <motion.label
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`flex flex-col items-center p-3 border-2 rounded-xl cursor-pointer transition-all ${
-                        formData.userRole === 'author'
-                          ? 'border-indigo-500 bg-indigo-50'
-                          : 'border-gray-200 hover:border-indigo-300'
-                      }`}
+                      className={`flex flex-col items-center p-3 border-2 rounded-xl cursor-pointer transition-all ${formData.userRole === 'author'
+                        ? 'border-indigo-500 bg-indigo-50'
+                        : 'border-gray-200 hover:border-indigo-300'
+                        }`}
                     >
                       <input
                         type="radio"
@@ -133,23 +133,20 @@ export default function SignIn() {
                       />
                       <FontAwesomeIcon
                         icon={faUserEdit}
-                        className={`h-6 w-6 mb-2 ${
-                          formData.userRole === 'author' ? 'text-indigo-600' : 'text-gray-500'
-                        }`}
+                        className={`h-6 w-6 mb-2 ${formData.userRole === 'author' ? 'text-indigo-600' : 'text-gray-500'
+                          }`}
                       />
-                      <span className={`text-sm font-medium ${
-                        formData.userRole === 'author' ? 'text-indigo-700' : 'text-gray-700'
-                      }`}>Author</span>
+                      <span className={`text-sm font-medium ${formData.userRole === 'author' ? 'text-indigo-700' : 'text-gray-700'
+                        }`}>Author</span>
                     </motion.label>
 
                     <motion.label
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`flex flex-col items-center p-3 border-2 rounded-xl cursor-pointer transition-all ${
-                        formData.userRole === 'reviewer'
-                          ? 'border-indigo-500 bg-indigo-50'
-                          : 'border-gray-200 hover:border-indigo-300'
-                      }`}
+                      className={`flex flex-col items-center p-3 border-2 rounded-xl cursor-pointer transition-all ${formData.userRole === 'reviewer'
+                        ? 'border-indigo-500 bg-indigo-50'
+                        : 'border-gray-200 hover:border-indigo-300'
+                        }`}
                     >
                       <input
                         type="radio"
@@ -161,23 +158,20 @@ export default function SignIn() {
                       />
                       <FontAwesomeIcon
                         icon={faUserCheck}
-                        className={`h-6 w-6 mb-2 ${
-                          formData.userRole === 'reviewer' ? 'text-indigo-600' : 'text-gray-500'
-                        }`}
+                        className={`h-6 w-6 mb-2 ${formData.userRole === 'reviewer' ? 'text-indigo-600' : 'text-gray-500'
+                          }`}
                       />
-                      <span className={`text-sm font-medium ${
-                        formData.userRole === 'reviewer' ? 'text-indigo-700' : 'text-gray-700'
-                      }`}>Reviewer</span>
+                      <span className={`text-sm font-medium ${formData.userRole === 'reviewer' ? 'text-indigo-700' : 'text-gray-700'
+                        }`}>Reviewer</span>
                     </motion.label>
 
                     <motion.label
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`flex flex-col items-center p-3 border-2 rounded-xl cursor-pointer transition-all ${
-                        formData.userRole === 'subscriber'
-                          ? 'border-indigo-500 bg-indigo-50'
-                          : 'border-gray-200 hover:border-indigo-300'
-                      }`}
+                      className={`flex flex-col items-center p-3 border-2 rounded-xl cursor-pointer transition-all ${formData.userRole === 'subscriber'
+                        ? 'border-indigo-500 bg-indigo-50'
+                        : 'border-gray-200 hover:border-indigo-300'
+                        }`}
                     >
                       <input
                         type="radio"
@@ -189,13 +183,11 @@ export default function SignIn() {
                       />
                       <FontAwesomeIcon
                         icon={faUserAlt}
-                        className={`h-6 w-6 mb-2 ${
-                          formData.userRole === 'subscriber' ? 'text-indigo-600' : 'text-gray-500'
-                        }`}
+                        className={`h-6 w-6 mb-2 ${formData.userRole === 'subscriber' ? 'text-indigo-600' : 'text-gray-500'
+                          }`}
                       />
-                      <span className={`text-sm font-medium ${
-                        formData.userRole === 'subscriber' ? 'text-indigo-700' : 'text-gray-700'
-                      }`}>Subscriber</span>
+                      <span className={`text-sm font-medium ${formData.userRole === 'subscriber' ? 'text-indigo-700' : 'text-gray-700'
+                        }`}>Subscriber</span>
                     </motion.label>
                   </div>
                 </motion.div>
@@ -221,11 +213,10 @@ export default function SignIn() {
                     />
                     <label
                       htmlFor="email"
-                      className={`absolute left-4 transition-all duration-200 pointer-events-none ${
-                        isFocused.email || formData.email
-                          ? '-top-[10px] -translate-y-1/2 bg-white px-2 text-sm text-indigo-600'
-                          : 'top-3 text-gray-400'
-                      }`}
+                      className={`absolute left-4 transition-all duration-200 pointer-events-none ${isFocused.email || formData.email
+                        ? '-top-[10px] -translate-y-1/2 bg-white px-2 text-sm text-indigo-600'
+                        : 'top-3 text-gray-400'
+                        }`}
                     >
                       Email Address
                     </label>
@@ -269,11 +260,10 @@ export default function SignIn() {
                     </motion.span>
                     <label
                       htmlFor="password"
-                      className={`absolute left-4 transition-all duration-200 pointer-events-none ${
-                        isFocused.password || formData.password
-                          ? '-top-[10px] -translate-y-1/2 bg-white px-2 text-sm text-indigo-600'
-                          : 'top-3 text-gray-400'
-                      }`}
+                      className={`absolute left-4 transition-all duration-200 pointer-events-none ${isFocused.password || formData.password
+                        ? '-top-[10px] -translate-y-1/2 bg-white px-2 text-sm text-indigo-600'
+                        : 'top-3 text-gray-400'
+                        }`}
                     >
                       Password
                     </label>
@@ -288,9 +278,8 @@ export default function SignIn() {
                   }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
-                  className={`w-full relative overflow-hidden text-white py-3 px-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 ${
-                    isLoading ? "cursor-not-allowed" : ""
-                  }`}
+                  className={`w-full relative overflow-hidden text-white py-3 px-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 ${isLoading ? "cursor-not-allowed" : ""
+                    }`}
                   disabled={isLoading}
                   style={{
                     background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%)",

@@ -35,6 +35,11 @@ import Contact from './pages/admin/contact/Contact';
 import UserCheckListPage from './pages/user/checklist/UserCheckListPage';
 import SubmitManuscript from './pages/user/SubmitManuscript/SubmitManuscript';
 import ViewUser from './pages/admin/userManager/ViewUser';
+import ViewGroups from './pages/admin/Groups/ViewGroups';
+import AddGroups from './pages/admin/Groups/AddGroups';
+import ViewCategories from './pages/admin/Categories/ViewCategories';
+import AddCategories from './pages/admin/Categories/AddCategories';
+import EditGroups from './pages/admin/Groups/EditGroups';
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -94,6 +99,15 @@ function App() {
               {/* user manger route */}
               <Route path='/users/add-user' element={<AddUser/>} />
               <Route path='/view-users' element={<ViewUser/>} />
+
+              {/* Groups  */}
+              <Route path='/groups/view-groups' element={<ViewGroups/>} />
+              <Route path='/groups/add-groups' element={<AddGroups/>} />
+              <Route path='/groups/edit/:id' element={<EditGroups/>} />
+
+              {/* Categories */}
+               <Route path='/categories/add-categories' element={<AddCategories/>} />
+               <Route path='/categories/view-categories' element={<ViewCategories/>} />
 
 
 

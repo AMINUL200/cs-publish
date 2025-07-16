@@ -1,7 +1,8 @@
 import React from "react";
 import { Editor } from "@tinymce/tinymce-react";
+import ArrayInput from "../../form/ArrayInput";
 
-const StepThree = ({ formData, handleChange }) => {
+const StepThree = ({ formData, setFormData, handleChange }) => {
   const apikey = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
 
   const handleEditorChange = (name, content) => {
@@ -12,8 +13,7 @@ const StepThree = ({ formData, handleChange }) => {
     const { name, files } = e.target;
 
     if (name === "supplementary_files") {
-      // Handle multiple files
-      handleChange({ target: { name, value: Array.from(files) } });
+       handleChange({ target: { name, value: files[0] } });
     } else {
       // Handle single files
       handleChange({ target: { name, value: files[0] } });
@@ -45,12 +45,12 @@ const StepThree = ({ formData, handleChange }) => {
 
       {/* Keywords */}
       <div className="mb-4">
-        <label className="block mb-1 font-medium">Keywords</label>
-        <input
-          type="text"
-          name="keywords"
-          value={formData.keywords}
-          onChange={handleChange}
+        <ArrayInput
+          label='Authors'
+          values={formData.keywords}
+          onChange={(newKeywords) =>
+            setFormData({ ...formData, keywords: newKeywords })
+          }
           placeholder="Enter keywords separated by commas"
           className="w-full p-2 border rounded"
         />
@@ -91,7 +91,6 @@ const StepThree = ({ formData, handleChange }) => {
           type="file"
           name="supplementary_files"
           accept=".zip,.pdf,.doc,.docx"
-          multiple
           onChange={handleFileChange}
           className="w-full p-2 border rounded"
         />

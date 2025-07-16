@@ -1,41 +1,46 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import UserSidebar from '../../../components/user/UserSidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowCircleRight } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../../../components/common/Loader';
+import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 const UserCheckListPage = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const { token } = useSelector((state) => state.auth);
+  const [loading, setLoading] = useState(true)
   const navigate = useNavigate();
   // Array of checklist items
-  const checklistItems = [
-    {
-      id: 1,
-      text: "The submission has not been previously published.",
-    },
-    {
-      id: 2,
-      text: "The text is single-spaced; uses a 12-point font; employs italics, rather than underlining (except with URL addresses); and all illustrations, figures, and tables are placed within the text at the appropriate points, rather than at the end.",
-    },
-    {
-      id: 3,
-      text: "If submitting to a peer-reviewed section of the journal, the instructions in Ensuring a Blind Review have been followed.",
-    },
-    {
-      id: 4,
-      text: "I agreed to pay the prescribed amount for publishing my article in this journal",
-    },
-    {
-      id: 5,
-      text: "accept all terms and condition",
-    },
-    {
-      id: 6,
-      text: "DON'T PUT ANY RED COLOR AND DO A BEST WRITING PR",
+  const [checklistItems, setChecklistItems] = useState([]) 
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`${API_URL}api/manuscript/show-checklist`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        });
+
+      console.log(response.data)
+      if(response.status === 200){
+        setChecklistItems(response.data.data)
+      }
+
+
+
+    } catch (error) {
+      toast.error(error.message)
+      console.log(error);
+    } finally {
+      setLoading(false)
     }
-  ];
+  }
+
 
   // State to track checked items
   const [checkedItems, setCheckedItems] = useState(
@@ -73,6 +78,15 @@ const UserCheckListPage = () => {
     // navigate('/next-page'); // Uncomment if you have navigation
   };
 
+  useEffect(() => {
+    fetchData();
+  }, [])
+
+  if(loading){
+    return <Loader/>
+  }
+
+
   return (
     <>
       <div className="p-4 border-b">
@@ -93,16 +107,17 @@ const UserCheckListPage = () => {
             <form onSubmit={handleSubmit}>
               <div className="space-y-4 mb-8 mt-4">
                 {checklistItems.map((item) => (
-                  <div key={item.id} className="flex items-start">
+                  <div key={item.id} className={`flex items-start ${item?.status === '0' ? 'line-through' :''} `}>
                     <input
                       type="checkbox"
                       id={`check-${item.id}`}
                       className="mt-1 mr-2"
                       checked={checkedItems[item.id]}
                       onChange={() => handleCheckboxChange(item.id)}
+                      disabled={item?.status === '0'}
                     />
                     <label htmlFor={`check-${item.id}`} className="text-sm">
-                      {item.text}
+                      {item.checklist_item}
                     </label>
                   </div>
                 ))}

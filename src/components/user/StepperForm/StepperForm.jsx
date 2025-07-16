@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepThree from "./StepThree";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import Loader from "../../common/Loader";
 
 const StepperForm = () => {
-      const API_URL = import.meta.env.VITE_API_URL;
+    const API_URL = import.meta.env.VITE_API_URL;
     const { token, userData } = useSelector((state) => state.auth);
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
@@ -20,7 +21,7 @@ const StepperForm = () => {
         address: "123 Research Ave, Science City",
         country: "United States",
         add_myself: true, // ✅ boolean
-        add_author: ["Jane Smith", "Michael Johnson"], // Multiple authors comma-separated
+        add_author: ["Jane Smith", "Michael Johnson"],
 
         // Manuscript details
         title: "A Study on the Effects of React Hooks in Modern Web Development",
@@ -40,11 +41,10 @@ const StepperForm = () => {
         // Initialize files as null - you'll replace these with actual File objects
         manuscript_file: null,
         copyright_form: null,
-        supplementary_files: [],
+        supplementary_files: null,
     });
-    const [loading, setLoading] = useState(false);
-
-
+    const [loading, setLoading] = useState(true);
+    const [submitLoading, setSubmitLoading] = useState(false);
 
     const nextStep = () => setStep((prev) => prev + 1);
     const prevStep = () => setStep((prev) => prev - 1);
@@ -53,7 +53,7 @@ const StepperForm = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
 
     const handleSubmit = async () => {
-        setLoading(true);
+        setSubmitLoading(true);
         console.log("Submitting supplementary_files as:", formData.supplementary_files);
         try {
             const submissionData = new FormData();
@@ -97,18 +97,16 @@ const StepperForm = () => {
             if (formData.copyright_form)
                 submissionData.append("copyright_form", formData.copyright_form);
 
-            if (formData.supplementary_files?.length > 0) {
-                formData.supplementary_files.forEach(file => {
-                    submissionData.append("supplementary_files[]", file);
-                });
+            if (formData.supplementary_files) {
+                submissionData.append("supplementary_files", formData.supplementary_files);
             }
 
-            // Debug log
-            for (let [key, value] of submissionData.entries()) {
-                console.log(`${key}:`, value);
-            }
+            // // Debug log
+            // for (let [key, value] of submissionData.entries()) {
+            //     console.log(`${key}:`, value);
+            // }
 
-            const response = await axios.post(`${API_URL}/api/manuscript`, submissionData, {
+            const response = await axios.post(`${API_URL}api/manuscript`, submissionData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
@@ -121,10 +119,40 @@ const StepperForm = () => {
             toast.error("Submission failed. Check console.");
             console.error("Submission error:", error.response?.data || error.message);
         } finally {
-            setLoading(false);
+            setSubmitLoading(false);
         }
     };
 
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`${API_URL}api/manuscript/show-form`, 
+                 {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            console.log(response.data);
+            
+
+
+        } catch (error) {
+            toast.error(error.message)
+            console.log(error);
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(()=>{
+        fetchData();
+    }, [])
+
+
+    if(loading){
+        return <Loader/>
+    }
 
     return (
         <div className="w-full mx-auto p-6 bg-white shadow-md rounded">
@@ -143,14 +171,15 @@ const StepperForm = () => {
                 ))}
             </div>
 
-            {step === 1 && <StepOne formData={formData} handleChange={handleChange} />}
+            {step === 1 && <StepOne formData={formData} setFormData={setFormData} handleChange={handleChange} />}
             {step === 2 && <StepTwo formData={formData} handleChange={handleChange} />}
-            {step === 3 && <StepThree formData={formData} handleChange={handleChange} />}
+            {step === 3 && <StepThree formData={formData} setFormData={setFormData} handleChange={handleChange} />}
 
             <div className="mt-4 flex justify-between">
                 {step > 1 && (
                     <button
                         onClick={prevStep}
+                        disabled={submitLoading}
                         className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 cursor-pointer"
                     >
                         Back
@@ -159,6 +188,7 @@ const StepperForm = () => {
                 {step < 3 ? (
                     <button
                         onClick={nextStep}
+                        disabled={submitLoading}
                         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ml-auto cursor-pointer"
                     >
                         Next
@@ -166,7 +196,8 @@ const StepperForm = () => {
                 ) : (
                     <button
                         onClick={handleSubmit}
-                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ml-auto cursor-pointer"
+                        className={`px-4 py-2 text-white rounded  ml-auto  ${submitLoading ? 'bg-gray-500 cursor-not-allowed' : ' bg-green-500 hover:bg-green-600 cursor-pointer'}`}
+                        disabled={submitLoading}
                     >
                         Submit
                     </button>

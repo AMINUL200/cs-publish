@@ -1,4 +1,7 @@
-const StepOne = ({ formData, handleChange }) => (
+import ArrayInput from "../../form/ArrayInput";
+import AuthorForm from "../../form/AuthorForm";
+
+const StepOne = ({ formData, setFormData, handleChange }) => (
   <>
     <h2 className="text-xl mb-4 font-bold">Step 1: Article Submission Info</h2>
 
@@ -7,7 +10,7 @@ const StepOne = ({ formData, handleChange }) => (
         <label className="block mb-1 font-medium">Type of Article *</label>
         <select
           name=" type_of_article"
-          value={formData. type_of_article}
+          value={formData.type_of_article}
           onChange={handleChange}
           className="w-full p-2 border rounded"
           required
@@ -121,16 +124,22 @@ const StepOne = ({ formData, handleChange }) => (
 
     {/* Full-width input for Add Author */}
     <div className="mt-4">
-      <label className="block mb-1 font-medium">Add Author</label>
-      <input
-        type="text"
-        name="add_author"
-        value={formData.add_author}
-        onChange={handleChange}
+      <ArrayInput
+        label="Add Authors"
+        values={formData.add_author}
+        onChange={(newAuthors) =>
+          setFormData({ ...formData, add_author: newAuthors })
+        }
         placeholder="Enter co-author names"
         className="w-full p-2 border rounded"
       />
     </div>
+
+
+    {/* <div className="py-10">
+      <AuthorForm />
+    </div> */}
+
   </>
 );
 

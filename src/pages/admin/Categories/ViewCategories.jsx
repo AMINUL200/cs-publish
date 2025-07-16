@@ -1,67 +1,86 @@
-import { faEdit, faTrash, faSearch, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import Loader from '../../../components/common/Loader';
+import { faEdit, faTrash, faSearch, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import Loader from "../../../components/common/Loader";
 
 const ViewCategories = () => {
   const navigate = useNavigate();
+  const { token } = useSelector((state) => state.auth);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const [categoryData, setCategoryData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Dummy data for now
-  const fetchCategories = () => {
+  // Fetch categories from API
+  const fetchCategories = async () => {
     try {
-      const dummy = [
-        { id: 1, groupName: 'Developers', categoryName: 'Frontend', enable: true, createdAt: '2024-12-01T10:00:00Z' },
-        { id: 2, groupName: 'Developers', categoryName: 'Backend', enable: true, createdAt: '2024-12-05T09:30:00Z' },
-        { id: 3, groupName: 'Designers', categoryName: 'UI/UX', enable: false, createdAt: '2024-12-10T15:45:00Z' },
-        { id: 4, groupName: 'Marketing Team', categoryName: 'SEO', enable: true, createdAt: '2024-12-15T08:15:00Z' },
-      ];
-      setTimeout(() => {
-        setCategoryData(dummy);
-        setLoading(false);
-      }, 500);
+      const response = await axios.get(`${API_URL}api/admin/categories`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200 && response.data.success) {
+        setCategoryData(response.data.data);
+      } else {
+        toast.error(response.data.message || "Failed to fetch categories");
+      }
     } catch (error) {
       console.error(error);
-      toast.error('Failed to load categories');
+      toast.error("Something went wrong while fetching categories");
+    } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [token]);
 
   // Filter by categoryName or groupName
   const filteredCategories = categoryData.filter((cat) => {
     const term = searchTerm.toLowerCase();
     return (
-      cat.categoryName.toLowerCase().includes(term) ||
-      cat.groupName.toLowerCase().includes(term)
+      cat.category_name.toLowerCase().includes(term) ||
+      (cat.group?.group_name || "").toLowerCase().includes(term)
     );
   });
 
-  const handleDelete = (id) => {
+  // Handle delete
+  const handleDelete = async (id) => {
     if (!id) return;
     setDeleteLoading(true);
-    setTimeout(() => {
-      setCategoryData((prev) => prev.filter((c) => c.id !== id));
-      toast.success('Category deleted successfully (dummy)');
+    try {
+      const res = await axios.delete(`${API_URL}api/admin/categories/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.status === 200) {
+        toast.success(res.data.message || "Category deleted");
+        fetchCategories();
+      } else {
+        toast.error(res.data.message || "Failed to delete");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error while deleting");
+    } finally {
       setDeleteLoading(false);
-    }, 300);
+    }
   };
 
+  // Navigate to edit page
   const handleNavigate = (id) => {
     navigate(`/categories/edit/${id}`);
   };
 
   if (loading) {
-    return<Loader/>
+    return <Loader />;
   }
 
   return (
@@ -114,7 +133,7 @@ const ViewCategories = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
                 Created At
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
                 Action
               </th>
             </tr>
@@ -124,25 +143,25 @@ const ViewCategories = () => {
               filteredCategories.map((cat, index) => (
                 <tr key={cat.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-2">
-                    {index + 1}
+                    {cat.id}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-2">
-                    {cat.groupName}
+                    {cat.group?.group_name || "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-2">
-                    {cat.categoryName}
+                    {cat.category_name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                    {cat.enable ? 'Yes' : 'No'}
+                    {cat.status === "1" ? "Yes" : "No"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                    {new Date(cat.createdAt).toLocaleDateString()}
+                    {cat.created_at.split("T")[0]} 
                   </td>
                   <td className="text-center px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
                     <button
                       onClick={() => handleNavigate(cat.id)}
                       disabled={deleteLoading}
-                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded mr-2 transition-colors duration-300"
+                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded mr-2 cursor-pointer transition-colors duration-300"
                     >
                       <FontAwesomeIcon icon={faEdit} className="mr-1" />
                       Edit
@@ -152,8 +171,8 @@ const ViewCategories = () => {
                       disabled={deleteLoading}
                       className={`text-white px-3 py-1 rounded transition-colors duration-300 ${
                         deleteLoading
-                          ? 'bg-gray-500 cursor-not-allowed'
-                          : 'bg-red-500 hover:bg-red-600 cursor-pointer'
+                          ? "bg-gray-500 cursor-not-allowed"
+                          : "bg-red-500 hover:bg-red-600 cursor-pointer"
                       }`}
                     >
                       <FontAwesomeIcon icon={faTrash} className="mr-1" />
@@ -179,7 +198,8 @@ const ViewCategories = () => {
       {/* Footer */}
       <div className="flex items-center justify-between mt-4 text-sm text-gray-600">
         <div>
-          Showing {filteredCategories.length > 0 ? 1 : 0} to {filteredCategories.length} of {categoryData.length} rows
+          Showing {filteredCategories.length > 0 ? 1 : 0} to {filteredCategories.length} of{" "}
+          {categoryData.length} rows
         </div>
       </div>
     </div>

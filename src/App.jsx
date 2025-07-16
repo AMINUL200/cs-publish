@@ -40,6 +40,7 @@ import AddGroups from './pages/admin/Groups/AddGroups';
 import ViewCategories from './pages/admin/Categories/ViewCategories';
 import AddCategories from './pages/admin/Categories/AddCategories';
 import EditGroups from './pages/admin/Groups/EditGroups';
+import EditCategories from './pages/admin/Categories/EditCategories';
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -108,6 +109,7 @@ function App() {
               {/* Categories */}
                <Route path='/categories/add-categories' element={<AddCategories/>} />
                <Route path='/categories/view-categories' element={<ViewCategories/>} />
+               <Route path='/categories/edit/:id' element={<EditCategories/>} />
 
 
 

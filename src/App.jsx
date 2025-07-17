@@ -41,6 +41,9 @@ import ViewCategories from './pages/admin/Categories/ViewCategories';
 import AddCategories from './pages/admin/Categories/AddCategories';
 import EditGroups from './pages/admin/Groups/EditGroups';
 import EditCategories from './pages/admin/Categories/EditCategories';
+import ViewJournal from './pages/admin/JournalManger/ViewJournal';
+import AddJournal from './pages/admin/JournalManger/AddJournal';
+import EditJournal from './pages/admin/JournalManger/EditJournal';
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -110,6 +113,11 @@ function App() {
                <Route path='/categories/add-categories' element={<AddCategories/>} />
                <Route path='/categories/view-categories' element={<ViewCategories/>} />
                <Route path='/categories/edit/:id' element={<EditCategories/>} />
+
+               {/* Journal Manger */}
+               <Route path='/article-manger/journal' element={<ViewJournal/>} />
+               <Route path='/article-manger/journal/add-journal' element={<AddJournal/>} />
+               <Route path='/article-manger/journal/edit-journal/:id' element={<EditJournal/>} />
 
 
 

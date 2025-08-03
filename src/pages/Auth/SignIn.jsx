@@ -24,7 +24,7 @@ export default function SignIn() {
     password: false
   });
   const API_URL = import.meta.env.VITE_API_URL;
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -86,7 +86,7 @@ export default function SignIn() {
               className="bg-gradient-to-r from-blue-600 to-indigo-700 h-3 w-full"
             />
 
-            <div className="p-8">
+            <div className="p-8 pt-4">
               <motion.h1
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -105,91 +105,50 @@ export default function SignIn() {
                 Organize your thoughts and ideas
               </motion.p>
 
-              <form onSubmit={handleSubmit}>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.45 }}
-                  className="mb-6"
-                >
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Login as:</h3>
-                  <div className="grid grid-cols-3 gap-3">
-                    <motion.label
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`flex flex-col items-center p-3 border-2 rounded-xl cursor-pointer transition-all ${formData.userRole === 'author'
-                        ? 'border-indigo-500 bg-indigo-50'
-                        : 'border-gray-200 hover:border-indigo-300'
-                        }`}
-                    >
-                      <input
-                        type="radio"
-                        name="userRole"
-                        value="author"
-                        checked={formData.userRole === 'author'}
-                        onChange={() => handleRoleChange('author')}
-                        className="hidden"
-                      />
-                      <FontAwesomeIcon
-                        icon={faUserEdit}
-                        className={`h-6 w-6 mb-2 ${formData.userRole === 'author' ? 'text-indigo-600' : 'text-gray-500'
-                          }`}
-                      />
-                      <span className={`text-sm font-medium ${formData.userRole === 'author' ? 'text-indigo-700' : 'text-gray-700'
-                        }`}>Author</span>
-                    </motion.label>
+              {/* here design logo */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4 }}
+                className="flex justify-center mt-10 mb-10"
+              >
+                <div className="relative">
+                  {/* Rounded background container */}
+                  <motion.div
+                    className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center shadow-lg"
+                    whileHover={{ rotate: 2, scale: 1.05 }}
+                  >
+                    {/* Main journal icon */}
+                    <FontAwesomeIcon
+                      icon={faUserEdit}
+                      className="h-10 w-10 text-indigo-600"
+                    />
 
-                    <motion.label
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`flex flex-col items-center p-3 border-2 rounded-xl cursor-pointer transition-all ${formData.userRole === 'reviewer'
-                        ? 'border-indigo-500 bg-indigo-50'
-                        : 'border-gray-200 hover:border-indigo-300'
-                        }`}
+                    {/* Small badge icon in corner */}
+                    <motion.div
+                      className="absolute -bottom-1 -right-1 bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.6, type: 'spring' }}
                     >
-                      <input
-                        type="radio"
-                        name="userRole"
-                        value="reviewer"
-                        checked={formData.userRole === 'reviewer'}
-                        onChange={() => handleRoleChange('reviewer')}
-                        className="hidden"
-                      />
                       <FontAwesomeIcon
                         icon={faUserCheck}
-                        className={`h-6 w-6 mb-2 ${formData.userRole === 'reviewer' ? 'text-indigo-600' : 'text-gray-500'
-                          }`}
+                        className="h-3 w-3"
                       />
-                      <span className={`text-sm font-medium ${formData.userRole === 'reviewer' ? 'text-indigo-700' : 'text-gray-700'
-                        }`}>Reviewer</span>
-                    </motion.label>
+                    </motion.div>
+                  </motion.div>
 
-                    <motion.label
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`flex flex-col items-center p-3 border-2 rounded-xl cursor-pointer transition-all ${formData.userRole === 'subscriber'
-                        ? 'border-indigo-500 bg-indigo-50'
-                        : 'border-gray-200 hover:border-indigo-300'
-                        }`}
-                    >
-                      <input
-                        type="radio"
-                        name="userRole"
-                        value="subscriber"
-                        checked={formData.userRole === 'subscriber'}
-                        onChange={() => handleRoleChange('subscriber')}
-                        className="hidden"
-                      />
-                      <FontAwesomeIcon
-                        icon={faUserAlt}
-                        className={`h-6 w-6 mb-2 ${formData.userRole === 'subscriber' ? 'text-indigo-600' : 'text-gray-500'
-                          }`}
-                      />
-                      <span className={`text-sm font-medium ${formData.userRole === 'subscriber' ? 'text-indigo-700' : 'text-gray-700'
-                        }`}>Subscriber</span>
-                    </motion.label>
-                  </div>
-                </motion.div>
+                  {/* Optional animated rings for decoration */}
+                  <motion.div
+                    className="absolute inset-0 rounded-2xl border-2 border-indigo-200 opacity-0"
+                    animate={{ opacity: [0, 0.3, 0], scale: [1, 1.2, 1.4] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeOut" }}
+                  />
+                </div>
+              </motion.div>
+
+              <form onSubmit={handleSubmit} className="mt-8">
+
 
                 <div className="mb-6">
                   <motion.div

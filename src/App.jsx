@@ -44,9 +44,19 @@ import EditCategories from './pages/admin/Categories/EditCategories';
 import ViewJournal from './pages/admin/JournalManger/ViewJournal';
 import AddJournal from './pages/admin/JournalManger/AddJournal';
 import EditJournal from './pages/admin/JournalManger/EditJournal';
+import ReviewSubmission from './pages/Reviewer/ReviewSubmission ';
+import ReviewerManuscriptView from './pages/Reviewer/ReviewerManuscriptView ';
+import ReviewerDashboard from './pages/Reviewer/ReviewerDashboard';
+import EditorPermission from './pages/admin/permission/EditorPermission';
+import ReviewerPermission from './pages/Editor/permission/ReviewerPermission';
+import ViewSubmittedManuscript from './pages/Articlemanager/ViewSubmittedManuscript';
+import Payment from './pages/admin/payment/Payment';
+import EmailTemplate from './pages/admin/email/EmailTemplate';
+import EditorDashboard from './pages/Editor/dashboard/EditorDashboard';
+import EditorCheckList from './pages/Editor/checklist/EditorCheckList';
 
 function App() {
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated, userData } = useSelector((state) => state.auth);
 
   // Protected Route Component
   const ProtectedRoute = ({ isAuthenticated, redirectPath = '/' }) => {
@@ -63,7 +73,7 @@ function App() {
     }
     return <Outlet />;
   };
-
+  
 
   return (
     <>
@@ -88,7 +98,11 @@ function App() {
 
 
               {/* Admin */}
+              <Route path="/permission/editor" element={<EditorPermission/>} />
               <Route path="/articlemanager/checklist" element={<ChecklistPage />} />
+              <Route path="/articlemanager/view-manuscript" element={<ViewSubmittedManuscript />} />
+              <Route path="/payment" element={<Payment />} />
+              <Route path="/email-setting" element={<EmailTemplate />} />
               {/* blog */}
               <Route path="/blog/add" element={<AddBlog />} />
               <Route path="/blog/view" element={<ViewBlog />} />
@@ -96,34 +110,44 @@ function App() {
               <Route path="/blog/categories" element={<BlogCategories />} />
               <Route path="/blog/addCategoryBlogpage" element={<AddCategory />} />
               {/* setting */}
-              <Route path="/setting/news" element={<LatestNews/> } />
-              <Route path="/setting/add-news" element={<AddNews/> } />
-              <Route path="/setting/news/:id" element={<UpdateNews/> } />
+              <Route path="/setting/news" element={<LatestNews />} />
+              <Route path="/setting/add-news" element={<AddNews />} />
+              <Route path="/setting/news/:id" element={<UpdateNews />} />
 
               {/* user manger route */}
-              <Route path='/users/add-user' element={<AddUser/>} />
-              <Route path='/view-users' element={<ViewUser/>} />
+              <Route path='/users/add-user' element={<AddUser />} />
+              <Route path='/view-users' element={<ViewUser />} />
 
               {/* Groups  */}
-              <Route path='/groups/view-groups' element={<ViewGroups/>} />
-              <Route path='/groups/add-groups' element={<AddGroups/>} />
-              <Route path='/groups/edit/:id' element={<EditGroups/>} />
+              <Route path='/groups/view-groups' element={<ViewGroups />} />
+              <Route path='/groups/add-groups' element={<AddGroups />} />
+              <Route path='/groups/edit/:id' element={<EditGroups />} />
 
               {/* Categories */}
-               <Route path='/categories/add-categories' element={<AddCategories/>} />
-               <Route path='/categories/view-categories' element={<ViewCategories/>} />
-               <Route path='/categories/edit/:id' element={<EditCategories/>} />
+              <Route path='/categories/add-categories' element={<AddCategories />} />
+              <Route path='/categories/view-categories' element={<ViewCategories />} />
+              <Route path='/categories/edit/:id' element={<EditCategories />} />
 
-               {/* Journal Manger */}
-               <Route path='/article-manger/journal' element={<ViewJournal/>} />
-               <Route path='/article-manger/journal/add-journal' element={<AddJournal/>} />
-               <Route path='/article-manger/journal/edit-journal/:id' element={<EditJournal/>} />
+              {/* Journal Manger */}
+              <Route path='/article-manger/journal' element={<ViewJournal />} />
+              <Route path='/article-manger/journal/add-journal' element={<AddJournal />} />
+              <Route path='/article-manger/journal/edit-journal/:id' element={<EditJournal />} />
 
 
+              {/* Editor */}
+              <Route path='/permission/reviewer' element={<ReviewerPermission />} />
+              <Route path='/permission/check-list' element={<EditorCheckList />} />
 
-              {/* user */}
-              <Route path='/confirmation/new-paper' element={<UserCheckListPage/>} />
-              <Route path='/confirmation/add-new-paper' element={<SubmitManuscript/>} />
+
+              {/* Reviewer */}
+              <Route path='/list-journals' element={<ReviewerDashboard />} />
+              <Route path='/view-manuscript/:id' element={<ReviewerManuscriptView />} />
+              <Route path='/submit-review/:id' element={<ReviewSubmission />} />
+
+
+              {/* author */}
+              <Route path='/confirmation/new-paper' element={<UserCheckListPage />} />
+              <Route path='/confirmation/add-new-paper' element={<SubmitManuscript />} />
 
             </Route>
           </Route>

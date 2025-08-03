@@ -6,9 +6,13 @@ import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Loader from '../../../components/common/Loader';
+import { getUserTypeLabel } from '../../../utils/Common';
+import { faEye } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
 const ViewUser = () => {
-      const API_URL = import.meta.env.VITE_API_URL;
+    const API_URL = import.meta.env.VITE_API_URL;
+    const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
     const { token } = useSelector((state) => state.auth);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
@@ -18,12 +22,16 @@ const ViewUser = () => {
     const [recordsPerPage, setRecordsPerPage] = useState(10);
     const navigate = useNavigate();
 
+
+
     // Filter users based on search term (name or email)
     const filteredUsers = userData.filter(user => {
         const searchLower = searchTerm.toLowerCase();
+        const userTypeLabel = getUserTypeLabel(user?.user_type).toLowerCase();
         return (
             user.name && user.name.toLowerCase().includes(searchLower)) ||
-            (user.email && user.email.toLowerCase().includes(searchLower)
+            (user.email && user.email.toLowerCase().includes(searchLower) ||
+             userTypeLabel.includes(searchLower)
             );
     });
     // Get current records
@@ -45,265 +53,22 @@ const ViewUser = () => {
 
     const fetchUserData = async () => {
         try {
-            // const response = await axios.get('/api/admin/users', {
-            //     headers: {
-            //         'Authorization': `Bearer ${token}`
-            //     }
-            // });
+            const response = await axios.get(`${API_URL}api/admin/all-user`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
 
-            // if (response.status === 200) {
-            //     setUserData(response.data.data);
-            // } else {
-            //     toast.error(response.data.message);
-            // }
-            const dummyData = [
-    {
-        id: 1,
-        name: "Alice Johnson",
-        gender: "Female",
-        email: "alice@example.com",
-        contact: "1234567890",
-        role: "Admin",
-        resume: true,
-        address: "123 Main St, New York",
-        country: "USA",
-        date: "2025-07-10",
-    },
-    {
-        id: 2,
-        name: "Bob Smith",
-        gender: "Male",
-        email: "bob@example.com",
-        contact: "9876543210",
-        role: "User",
-        resume: false,
-        address: "456 Elm St, London",
-        country: "UK",
-        date: "2025-07-08",
-    },
-    {
-        id: 3,
-        name: "Charlie Brown",
-        gender: "Male",
-        email: "charlie@example.com",
-        contact: "9988776655",
-        role: "Editor",
-        resume: true,
-        address: "789 Pine Ave, Toronto",
-        country: "Canada",
-        date: "2025-07-05",
-    },
-    {
-        id: 4,
-        name: "Diana Prince",
-        gender: "Female",
-        email: "diana@example.com",
-        contact: "8899776655",
-        role: "Moderator",
-        resume: false,
-        address: "1010 Paradise Island",
-        country: "Themyscira",
-        date: "2025-07-01",
-    },
-    {
-        id: 5,
-        name: "Ethan Hunt",
-        gender: "Male",
-        email: "ethan@example.com",
-        contact: "7788990011",
-        role: "Agent",
-        resume: true,
-        address: "Mission Impossible HQ",
-        country: "Global",
-        date: "2025-06-28",
-    },
-    {
-        id: 6,
-        name: "Fiona Green",
-        gender: "Female",
-        email: "fiona@example.com",
-        contact: "6677889900",
-        role: "Designer",
-        resume: true,
-        address: "22 Art Street, Paris",
-        country: "France",
-        date: "2025-06-25",
-    },
-    {
-        id: 7,
-        name: "George Wilson",
-        gender: "Male",
-        email: "george@example.com",
-        contact: "5566778899",
-        role: "Developer",
-        resume: true,
-        address: "101 Tech Park, Bangalore",
-        country: "India",
-        date: "2025-06-20",
-    },
-    {
-        id: 8,
-        name: "Hannah Baker",
-        gender: "Female",
-        email: "hannah@example.com",
-        contact: "4455667788",
-        role: "Counselor",
-        resume: false,
-        address: "33 Hope Lane, California",
-        country: "USA",
-        date: "2025-06-15",
-    },
-    {
-        id: 9,
-        name: "Ian Cooper",
-        gender: "Male",
-        email: "ian@example.com",
-        contact: "3344556677",
-        role: "Manager",
-        resume: true,
-        address: "404 Corporate Blvd, Chicago",
-        country: "USA",
-        date: "2025-06-10",
-    },
-    {
-        id: 10,
-        name: "Julia Roberts",
-        gender: "Female",
-        email: "julia@example.com",
-        contact: "2233445566",
-        role: "Actor",
-        resume: false,
-        address: "55 Hollywood Blvd, LA",
-        country: "USA",
-        date: "2025-06-05",
-    },
-    {
-        id: 11,
-        name: "Kevin Hart",
-        gender: "Male",
-        email: "kevin@example.com",
-        contact: "1122334455",
-        role: "Comedian",
-        resume: true,
-        address: "66 Laugh Street, Vegas",
-        country: "USA",
-        date: "2025-05-30",
-    },
-    {
-        id: 12,
-        name: "Lily Collins",
-        gender: "Female",
-        email: "lily@example.com",
-        contact: "9988776655",
-        role: "Journalist",
-        resume: true,
-        address: "77 Press Avenue, London",
-        country: "UK",
-        date: "2025-05-25",
-    },
-    {
-        id: 13,
-        name: "Mike Tyson",
-        gender: "Male",
-        email: "mike@example.com",
-        contact: "8877665544",
-        role: "Boxer",
-        resume: false,
-        address: "88 Knockout Street, Nevada",
-        country: "USA",
-        date: "2025-05-20",
-    },
-    {
-        id: 14,
-        name: "Nina Dobrev",
-        gender: "Female",
-        email: "nina@example.com",
-        contact: "7766554433",
-        role: "Actress",
-        resume: true,
-        address: "99 Drama Road, Vancouver",
-        country: "Canada",
-        date: "2025-05-15",
-    },
-    {
-        id: 15,
-        name: "Oliver Queen",
-        gender: "Male",
-        email: "oliver@example.com",
-        contact: "6655443322",
-        role: "Vigilante",
-        resume: false,
-        address: "Arrow Cave, Star City",
-        country: "USA",
-        date: "2025-05-10",
-    },
-    {
-        id: 16,
-        name: "Pam Beesly",
-        gender: "Female",
-        email: "pam@example.com",
-        contact: "5544332211",
-        role: "Receptionist",
-        resume: true,
-        address: "Dunder Mifflin, Scranton",
-        country: "USA",
-        date: "2025-05-05",
-    },
-    {
-        id: 17,
-        name: "Quentin Tarantino",
-        gender: "Male",
-        email: "quentin@example.com",
-        contact: "4433221100",
-        role: "Director",
-        resume: false,
-        address: "Cinema Paradiso, Hollywood",
-        country: "USA",
-        date: "2025-04-30",
-    },
-    {
-        id: 18,
-        name: "Rachel Green",
-        gender: "Female",
-        email: "rachel@example.com",
-        contact: "3322110099",
-        role: "Fashion Buyer",
-        resume: true,
-        address: "Central Perk, New York",
-        country: "USA",
-        date: "2025-04-25",
-    },
-    {
-        id: 19,
-        name: "Steve Rogers",
-        gender: "Male",
-        email: "steve@example.com",
-        contact: "2211009988",
-        role: "Super Soldier",
-        resume: false,
-        address: "Avengers Tower, New York",
-        country: "USA",
-        date: "2025-04-20",
-    },
-    {
-        id: 20,
-        name: "Tina Fey",
-        gender: "Female",
-        email: "tina@example.com",
-        contact: "1100998877",
-        role: "Writer",
-        resume: true,
-        address: "30 Rock, NBC Studios",
-        country: "USA",
-        date: "2025-04-15",
-    }
-];
+            if (response.status === 200) {
+                // setUserData(response.data.data);
+                console.log(response.data);
+                setUserData(response.data.user)
 
+            } else {
+                toast.error(response.data.message);
+            }
 
-            // Simulate delay
-            await new Promise((res) => setTimeout(res, 1000));
-
-            setUserData(dummyData);
         } catch (error) {
             toast.error(error.message);
         } finally {
@@ -360,18 +125,27 @@ const ViewUser = () => {
             </div>
 
             <div className='flex flex-col md:flex-row justify-center items-center md:justify-between  mb-6 gap-4'>
-                <div className="flex items-center">
-                    <span className="mr-2 text-sm text-gray-600">Records per page:</span>
-                    <select
-                        value={recordsPerPage}
-                        onChange={handleRecordsPerPageChange}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                    </select>
+                <div className="flex items-center gap-2 relative">
+                    <span className="text-sm text-gray-700 font-medium">Records per page:</span>
+
+                    <div className="relative w-28">
+                        <select
+                            value={recordsPerPage}
+                            onChange={handleRecordsPerPageChange}
+                            className="appearance-none w-full border border-gray-300 rounded-lg pl-4 pr-10 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+                        >
+                            {[5, 10, 20, 50].map((option) => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+
+                        {/* Custom down arrow */}
+                        <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
+                            <FontAwesomeIcon icon={faChevronDown} />
+                        </div>
+                    </div>
                 </div>
 
 
@@ -381,7 +155,7 @@ const ViewUser = () => {
                     </div>
                     <input
                         type="search"
-                        placeholder="Search by name or email..."
+                        placeholder="Search by name, email or role (e.g. Editor)..."
                         className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64 transition-all duration-300"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -389,7 +163,7 @@ const ViewUser = () => {
                 </div>
             </div>
 
-            <div className="overflow-x-auto custom-scrollbar">
+            <div className="overflow-x-auto custom-scrollbar pb-4">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
@@ -424,7 +198,7 @@ const ViewUser = () => {
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
                                 Resume
                             </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
+                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
                                 Actions
                             </th>
                         </tr>
@@ -437,37 +211,44 @@ const ViewUser = () => {
                                         {user.id || '-'}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-2">
-                                        {user.name || '-'}
+                                        {user?.name || '-'}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                                        {user.gender || '-'}
+                                        {user?.registration?.gender || '-'}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                                        {user.email}
+                                        {user?.email}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                                        {user.contact || '-'}
+                                        {user?.registration?.phone || '-'}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                                        {user.address || '-'}
+                                        {user?.registration?.address || '-'}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                                        {user.country || '-'}
+                                        {user?.registration?.country || '-'}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                                        {user.date || '-'}
+                                        {user?.created_at ? user.created_at.split('T')[0] : '-'}
                                     </td>
 
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                                        {user.role}
+                                        {getUserTypeLabel(user?.user_type)}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                                        {user.resume && (
-                                            <button className="text-blue-600 hover:text-blue-800 flex mx-auto cursor-pointer">
-                                                <FontAwesomeIcon icon={faDownload} />
-                                            </button>
-                                        )}
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2 text-center">
+                                        {user?.registration?.resume ? (
+                                            <a
+                                                href={`${STORAGE_URL}${user.registration.resume}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:text-blue-800 flex justify-center"
+                                                title="View Resume"
+                                            >
+                                                <FontAwesomeIcon icon={faEye} />
+                                            </a>
+                                        ) : 'N/A'}
                                     </td>
+
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
                                         <button
                                             onClick={() => handleNavigate(user.id)}

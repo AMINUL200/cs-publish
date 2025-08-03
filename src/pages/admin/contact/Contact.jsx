@@ -21,8 +21,14 @@ const Contact = () => {
             });
 
             if (response.status === 200) {
-                setFormData(response.data.data[0])
-                console.log(response.data);
+                const contactArray = response.data.data;
+
+                if (Array.isArray(contactArray) && contactArray.length > 0) {
+                    setFormData(contactArray[0]);
+                } else {
+                    toast.info("No contact information found.");
+                    setFormData({}); // Optionally reset the form
+                }
             } else {
                 toast.error(response.data.message)
             }

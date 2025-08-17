@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
+import {
   faArrowLeft,
   faFileAlt,
   faUserEdit,
@@ -11,12 +11,25 @@ import {
   faTimesCircle,
   faEdit
 } from '@fortawesome/free-solid-svg-icons';
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { faTag } from "@fortawesome/free-solid-svg-icons";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import axios from "axios";
+import Loader from "../../components/common/Loader";
 
 const ReviewSubmission = () => {
+  const { token } = useSelector((state) => state.auth);
+  const API_URL = import.meta.env.VITE_API_URL;
+  const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const [loading, setLoading] = useState(true);
+  const [reviewText, setReviewText] = useState("");
+  const [recommendation, setRecommendation] = useState("");
+  const [commentsForEditor, setCommentsForEditor] = useState("");
+  const [commentsForAuthor, setCommentsForAuthor] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const manuscript = location.state?.manuscript || {
     id: 1,
     title: "Novel Approaches to Cancer Treatment",
@@ -30,16 +43,17 @@ const ReviewSubmission = () => {
     abstract: "This study explores innovative methods for treating advanced cancer cases..."
   };
 
-  const [reviewText, setReviewText] = useState("");
-  const [recommendation, setRecommendation] = useState("");
-  const [commentsForEditor, setCommentsForEditor] = useState("");
-  const [commentsForAuthor, setCommentsForAuthor] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  console.log(`token: ${token}`);
+  
+  console.log(`Fetching manuscript details for ID: ${id}`);
+
+
+
 
   const handleSubmitReview = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate API call
     setTimeout(() => {
       console.log("Review submitted:", {
@@ -54,11 +68,15 @@ const ReviewSubmission = () => {
     }, 1500);
   };
 
+  if (loading) {
+    return <Loader/>
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header with back button */}
       <div className="mb-6 flex items-center">
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="flex items-center text-blue-600 hover:text-blue-800 mr-4"
         >

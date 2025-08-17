@@ -233,4 +233,12 @@ export const sidebarRoutes = [
     icon: <FontAwesomeIcon icon={faList} />,
     allowedRoles: ["3"],
   },
+
+  // Editor route
+  {
+    path:"/assigned-manuscript",
+    title: "Assigned Manuscript",
+    icon: <FontAwesomeIcon icon={faCheckCircle} />,
+    allowedRoles: ["1"],
+  }
 ];

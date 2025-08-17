@@ -54,6 +54,7 @@ import Payment from './pages/admin/payment/Payment';
 import EmailTemplate from './pages/admin/email/EmailTemplate';
 import EditorDashboard from './pages/Editor/dashboard/EditorDashboard';
 import EditorCheckList from './pages/Editor/checklist/EditorCheckList';
+import AssignedManuscript from './pages/Editor/assigned manuscript/AssignedManuscript';
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -137,6 +138,7 @@ function App() {
               {/* Editor */}
               <Route path='/permission/reviewer' element={<ReviewerPermission />} />
               <Route path='/permission/check-list' element={<EditorCheckList />} />
+              <Route path='/assigned-manuscript' element={<AssignedManuscript />} />
 
 
               {/* Reviewer */}

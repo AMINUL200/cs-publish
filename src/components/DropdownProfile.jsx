@@ -16,7 +16,7 @@ function DropdownProfile({
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-   const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const trigger = useRef(null);
   const dropdown = useRef(null);
@@ -56,8 +56,8 @@ function DropdownProfile({
     } catch (error) {
       console.log(error);
       toast.error(error.message)
-      
-     
+      dispatch(logout());
+
     }
   }
 

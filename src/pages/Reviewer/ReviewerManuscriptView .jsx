@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faArrowLeft,
@@ -13,72 +13,128 @@ import {
   faCheckSquare,
   faPaperclip
 } from '@fortawesome/free-solid-svg-icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { faLightbulb } from '@fortawesome/free-solid-svg-icons';
 import { faFlask } from '@fortawesome/free-solid-svg-icons';
 import { faChartBar } from '@fortawesome/free-solid-svg-icons';
 import { faComments } from '@fortawesome/free-solid-svg-icons';
+import { toast } from "react-toastify";
+import axios from "axios";
+import { useSelector } from 'react-redux';
+import Loader from '../../components/common/Loader';
 
-const ReviewerManuscriptView = ({ manuscript = {} }) => {
+const ReviewerManuscriptView = () => {
+  const { token } = useSelector((state) => state.auth);
+  const API_URL = import.meta.env.VITE_API_URL;
+  const { id } = useParams();
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [decision, setDecision] = useState('');
   const [reviewText, setReviewText] = useState('');
   const [confidentialComments, setConfidentialComments] = useState('');
   const [reviewFile, setReviewFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [manuscriptDetails, setManuscriptDetails] = useState(null);
 
-  // Checklist state
-  const [checklist, setChecklist] = useState([
-    { id: 1, label: "Minimal spelling/grammar mistakes", checked: false },
-    { id: 2, label: "Clear and concise abstract", checked: false },
-    { id: 3, label: "Appropriate methodology", checked: false },
-    { id: 4, label: "Results properly analyzed", checked: false },
-    { id: 5, label: "Relevant references", checked: false },
-    { id: 6, label: "Original contribution to field", checked: false },
-  ]);
+  // Checklist state initialized with empty array
+  const [checklist, setChecklist] = useState([]);
 
-  // Default manuscript data
-  const defaultManuscript = {
-    title: "A Study on the Effects of React Hooks in Modern Web Development",
-    abstract: "This paper examines how React Hooks have transformed state management in functional components...",
-    introduction: "React Hooks were introduced in version 16.8 to allow functional components to manage state...",
-    materials_and_methods: "We conducted a comparative analysis of 50 projects using both class and functional components...",
-    results: "Our findings show a 40% reduction in code complexity when using Hooks...",
-    discussion: "The results suggest that Hooks improve code maintainability while potentially introducing new learning curves...",
-    conclusion: "React Hooks represent a significant advancement in frontend development paradigms...",
-    author_contributions: "JD designed the study. JS implemented the analysis. MJ performed statistical validation.",
-    conflict_of_interest_statement: "The authors declare no conflicts of interest.",
-    references: "1. React Documentation (2023). Hooks API Reference...",
-    keywords: ["React", "Hooks", "Frontend", "Web Development"],
-    manuscript_file: "manuscript.pdf",
-    supplementary_files: ["data.xlsx", "figures.zip"]
-  };
+  const getManuscriptDetails = async () => {
+    try {
+      const res = await axios.get(`${API_URL}api/review/manuscript-dtl/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (res.data.flag === 1) {
+        setManuscriptDetails(res.data.data);
+        // Transform questions into checklist format
+        if (res.data.data.questions && res.data.data.questions.length > 0) {
+          setChecklist(res.data.data.questions.map((question, index) => ({
+            id: question.id,
+            question: question.name,
+            answer: 0
+          })));
 
-  // Merge incoming manuscript with defaults
-  const data = { ...defaultManuscript, ...manuscript };
+        }
+      } else {
+        toast.error(res.data.message || "Failed to fetch manuscript details");
+        throw new Error("Failed to fetch manuscript details");
+      }
+    } catch (error) {
+      console.error("Error fetching manuscript details:", error);
+      toast.error(error.message || "Failed to fetch manuscript details");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    getManuscriptDetails();
+  }, [token, id]);
 
   const handleSubmitReview = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API submission
-    setTimeout(() => {
-      console.log("Review submitted:", {
-        decision,
-        reviewText,
-        confidentialComments,
-        reviewFile: reviewFile ? reviewFile.name : null,
-        checklist: checklist.filter(item => item.checked),
-        manuscriptId: data.journal_id || 1
+    try {
+
+      const formData = {
+        manuscript_id: id,
+        message_to_author: reviewText,
+        message_to_editor: confidentialComments,
+        recommendation: decision,
+        image: reviewFile ? reviewFile : null, // If file is selected, include it
+        checklist: checklist.filter(item => item.answer === 1) // Only include checked items
+      }
+      console.log("Submitting review data:", formData);
+
+
+      // Submit the review data to the API
+      axios.post(`${API_URL}api/review/msg-editor-othor`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`
+        }
+      }).then((response) => {
+        if (response.data.flag === 1) {
+          toast.success("Review submitted successfully");
+          navigate(-1);
+        } else {
+          toast.error(response.data.message || "Failed to submit review");
+        }
+      }).catch((error) => {
+        console.error("Error submitting review:", error);
+        toast.error(error.response?.data?.message || "Failed to submit review");
       });
+
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      toast.error(error.message || "Failed to submit review");
+
+    } finally {
       setIsSubmitting(false);
-      navigate('/reviewer-dashboard', { state: { reviewSubmitted: true } });
-    }, 1500);
+    }
+
+    // // Simulate API submission
+    // setTimeout(() => {
+    //   console.log("Review submitted:", {
+    //     recommendation: decision,
+    //     message_to_author: reviewText,
+    //     message_to_editor: confidentialComments,
+    //     image: reviewFile ? reviewFile.name : null,
+    //     checklist: checklist.filter(item => item.answer === 1),
+    //     manuscript_id: id
+    //   });
+    //   setIsSubmitting(false);
+    //   navigate(-1);
+    //   toast.success("Review submitted successfully");
+    // }, 1500);
   };
 
   const handleCheckboxChange = (id) => {
     setChecklist(checklist.map(item =>
-      item.id === id ? { ...item, checked: !item.checked } : item
+      item.id === id ? { ...item, answer: item.answer === 1 ? 0 : 1 } : item
     ));
   };
 
@@ -86,9 +142,32 @@ const ReviewerManuscriptView = ({ manuscript = {} }) => {
     setReviewFile(e.target.files[0]);
   };
 
-  const downloadFile = (filename) => {
+  const downloadFile = (filePath) => {
+    if (!filePath) return;
+
+    // Extract filename from path
+    const filename = filePath.split('/').pop();
+
+    // In a real app, this would trigger a file download from the server
     console.log(`Downloading ${filename}`);
-    // In a real app, this would trigger a file download
+
+    // Example of how you might implement the actual download:
+    // window.open(`${API_URL}${filePath}`, '_blank');
+  };
+
+  if (loading) {
+    return <Loader />
+  }
+
+  if (!manuscriptDetails) {
+    return <div className="min-h-screen bg-gray-50 p-6">No manuscript details found</div>;
+  }
+
+  const { manuscript } = manuscriptDetails;
+
+  // Helper function to render HTML content safely
+  const renderHTML = (htmlString) => {
+    return <div dangerouslySetInnerHTML={{ __html: htmlString }} />;
   };
 
   return (
@@ -103,7 +182,7 @@ const ReviewerManuscriptView = ({ manuscript = {} }) => {
           Back to Dashboard
         </button>
         <h1 className="text-2xl font-bold text-gray-800">
-          Review Manuscript: {data.title}
+          Review Manuscript: {manuscript?.title}
         </h1>
       </div>
 
@@ -111,7 +190,7 @@ const ReviewerManuscriptView = ({ manuscript = {} }) => {
         {/* Files Card */}
         <div className="lg:col-span-1">
           <div className="sticky top-18">
-            <div className=" bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 ">
+            <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
               <div className="p-5 pb-3 bg-blue-50">
                 <h2 className="text-lg font-bold text-gray-800">
                   <FontAwesomeIcon icon={faFilePdf} className="mr-2 text-blue-500" />
@@ -122,18 +201,30 @@ const ReviewerManuscriptView = ({ manuscript = {} }) => {
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">Manuscript</span>
                   <button
-                    onClick={() => downloadFile(data.manuscript_file)}
+                    onClick={() => downloadFile(manuscript?.manuscript_file)}
                     className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
                   >
                     <FontAwesomeIcon icon={faDownload} className="mr-1" />
                     Download
                   </button>
                 </div>
-                {data.supplementary_files && data.supplementary_files.length > 0 && (
+                {manuscript?.copyright_form && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">Copyright Form</span>
+                    <button
+                      onClick={() => downloadFile(manuscript?.copyright_form)}
+                      className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                    >
+                      <FontAwesomeIcon icon={faDownload} className="mr-1" />
+                      Download
+                    </button>
+                  </div>
+                )}
+                {manuscript?.supplementary_files && manuscript?.supplementary_files.length > 0 ? (
                   <div>
                     <p className="text-sm font-medium mb-1">Supplementary Files</p>
                     <ul className="space-y-1">
-                      {data.supplementary_files.map((file, index) => (
+                      {manuscript?.supplementary_files.map((file, index) => (
                         <li key={index} className="flex justify-between items-center">
                           <span className="text-sm">{file}</span>
                           <button
@@ -147,11 +238,12 @@ const ReviewerManuscriptView = ({ manuscript = {} }) => {
                       ))}
                     </ul>
                   </div>
+                ) : (
+                  <div className="text-sm text-gray-500">No supplementary files</div>
                 )}
               </div>
             </div>
           </div>
-
         </div>
 
         {/* Manuscript Content */}
@@ -165,19 +257,19 @@ const ReviewerManuscriptView = ({ manuscript = {} }) => {
               </h2>
             </div>
             <div className="px-5 py-3">
-              <p className="text-sm text-gray-700 whitespace-pre-line">{data.abstract}</p>
+              <p className="text-sm text-gray-700 whitespace-pre-line">{manuscript?.abstract}</p>
             </div>
           </div>
 
           {/* Keywords */}
-          {data.keywords && data.keywords.length > 0 && (
+          {manuscript?.keywords && manuscript?.keywords.length > 0 && (
             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
               <div className="p-5 pb-3 bg-blue-50">
                 <h2 className="text-lg font-bold text-gray-800">Keywords</h2>
               </div>
               <div className="px-5 py-3">
                 <div className="flex flex-wrap gap-2">
-                  {data.keywords.map((keyword, index) => (
+                  {manuscript?.keywords.map((keyword, index) => (
                     <span key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
                       {keyword}
                     </span>
@@ -198,7 +290,7 @@ const ReviewerManuscriptView = ({ manuscript = {} }) => {
                 </h2>
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line">{data.introduction}</p>
+                <p className="text-sm text-gray-700 whitespace-pre-line">{manuscript?.introduction}</p>
               </div>
             </div>
 
@@ -211,7 +303,7 @@ const ReviewerManuscriptView = ({ manuscript = {} }) => {
                 </h2>
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line">{data.materials_and_methods}</p>
+                <p className="text-sm text-gray-700 whitespace-pre-line">{manuscript?.materials_and_methods}</p>
               </div>
             </div>
 
@@ -224,7 +316,7 @@ const ReviewerManuscriptView = ({ manuscript = {} }) => {
                 </h2>
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line">{data.results}</p>
+                <p className="text-sm text-gray-700 whitespace-pre-line">{manuscript?.results}</p>
               </div>
             </div>
 
@@ -237,7 +329,7 @@ const ReviewerManuscriptView = ({ manuscript = {} }) => {
                 </h2>
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line">{data.discussion}</p>
+                <p className="text-sm text-gray-700 whitespace-pre-line">{manuscript?.discussion}</p>
               </div>
             </div>
 
@@ -250,14 +342,55 @@ const ReviewerManuscriptView = ({ manuscript = {} }) => {
                 </h2>
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line">{data.conclusion}</p>
+                <p className="text-sm text-gray-700 whitespace-pre-line">{manuscript?.conclusion}</p>
               </div>
             </div>
+
+            {/* Author Contributions */}
+            {manuscript?.author_contributions && (
+              <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div className="p-5 pb-3 bg-blue-50">
+                  <h2 className="text-lg font-bold text-gray-800">
+                    Author Contributions
+                  </h2>
+                </div>
+                <div className="px-5 py-3 text-sm text-gray-700">
+                  {renderHTML(manuscript?.author_contributions)}
+                </div>
+              </div>
+            )}
+
+            {/* Conflict of Interest */}
+            {manuscript?.conflict_of_interest_statement && (
+              <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div className="p-5 pb-3 bg-blue-50">
+                  <h2 className="text-lg font-bold text-gray-800">
+                    Conflict of Interest Statement
+                  </h2>
+                </div>
+                <div className="px-5 py-3 text-sm text-gray-700">
+                  {renderHTML(manuscript?.conflict_of_interest_statement)}
+                </div>
+              </div>
+            )}
+
+            {/* References */}
+            {manuscript?.references && (
+              <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div className="p-5 pb-3 bg-blue-50">
+                  <h2 className="text-lg font-bold text-gray-800">
+                    References
+                  </h2>
+                </div>
+                <div className="px-5 py-3 text-sm text-gray-700">
+                  {renderHTML(manuscript?.references)}
+                </div>
+              </div>
+            )}
           </div>
-
-
         </div>
       </div>
+
       {/* Review Form */}
       <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
         <div className="p-5 pb-3 bg-blue-50">
@@ -280,36 +413,38 @@ const ReviewerManuscriptView = ({ manuscript = {} }) => {
             >
               <option value="">Select your recommendation</option>
               <option value="accept">Accept</option>
-              <option value="minor">Minor Revisions</option>
-              <option value="major">Major Revisions</option>
+              <option value="minor_revisions">Minor Revisions</option>
+              <option value="major_revisions">Major Revisions</option>
               <option value="reject">Reject</option>
             </select>
           </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <FontAwesomeIcon icon={faCheckSquare} className="mr-1 text-blue-500" />
-              Manuscript Evaluation Checklist
-            </label>
-            <div className="space-y-2">
-              {checklist.map((item) => (
-                <div key={item.id} className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      type="checkbox"
-                      id={`check-${item.id}`}
-                      checked={item.checked}
-                      onChange={() => handleCheckboxChange(item.id)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
+          {checklist.length > 0 && (
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <FontAwesomeIcon icon={faCheckSquare} className="mr-1 text-blue-500" />
+                Manuscript Evaluation Checklist
+              </label>
+              <div className="space-y-2">
+                {checklist.map((item) => (
+                  <div key={item.id} className="flex items-start">
+                    <div className="flex items-center h-5">
+                      <input
+                        type="checkbox"
+                        id={`check-${item.id}`}
+                        checked={item.answer === 1}
+                        onChange={() => handleCheckboxChange(item.id)}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                    </div>
+                    <label htmlFor={`check-${item.id}`} className="ml-2 text-sm text-gray-700">
+                      {item.question}
+                    </label>
                   </div>
-                  <label htmlFor={`check-${item.id}`} className="ml-2 text-sm text-gray-700">
-                    {item.label}
-                  </label>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="mb-6">
             <label htmlFor="reviewText" className="block text-sm font-medium text-gray-700 mb-1">
@@ -355,7 +490,7 @@ const ReviewerManuscriptView = ({ manuscript = {} }) => {
               id="reviewFile"
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               onChange={handleFileChange}
-              accept=".pdf,.doc,.docx"
+              accept="jpeg,  jpg,  pdf, doc, docx, excel, ppt, pptx"
             />
             {reviewFile && (
               <p className="text-sm text-gray-600 mt-1">
@@ -367,6 +502,7 @@ const ReviewerManuscriptView = ({ manuscript = {} }) => {
           <div className="flex justify-end space-x-3 mt-6 pb-4">
             <button
               type="button"
+              disabled={isSubmitting}
               onClick={() => navigate(-1)}
               className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >

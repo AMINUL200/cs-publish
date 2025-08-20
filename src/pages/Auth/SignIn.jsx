@@ -13,8 +13,8 @@ export default function SignIn() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
-    email: 'aminul2025@yopmail.com',
-    password: '123456',
+    email: 'admin@gamil.com',
+    password: 'password123',
     userRole: 'author',
   });
   const [showPassword, setShowPassword] = useState(false);

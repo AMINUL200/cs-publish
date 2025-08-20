@@ -196,6 +196,9 @@ const ViewUser = () => {
                                 Role
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
+                                Assigned Journal
+                            </th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
                                 Resume
                             </th>
                             <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
@@ -236,6 +239,9 @@ const ViewUser = () => {
                                         {getUserTypeLabel(user?.user_type)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2 text-center">
+                                        {user?.journal_id ? user?.journal_id : 'N/A'}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2 text-center">
                                         {user?.registration?.resume ? (
                                             <a
                                                 href={`${STORAGE_URL}${user.registration.resume}`}
@@ -250,13 +256,13 @@ const ViewUser = () => {
                                     </td>
 
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                                        <button
+                                        {/* <button
                                             onClick={() => handleNavigate(user.id)}
                                             disabled={deleteLoading}
                                             className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded mr-2 transition-colors duration-300 cursor-pointer">
                                             <FontAwesomeIcon icon={faEdit} className='mr-1' />
                                             Edit
-                                        </button>
+                                        </button> */}
                                         <button
                                             onClick={() => handleDelete(user.id)}
                                             disabled={deleteLoading}

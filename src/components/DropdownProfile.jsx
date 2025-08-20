@@ -51,11 +51,11 @@ function DropdownProfile({
         }
       });
       dispatch(logout());
-      toast.info(response.data.message);
+      // toast.info(response.data.message);
       navigate('/');
     } catch (error) {
       console.log(error);
-      toast.error(error.message)
+      // toast.error(error.message)
       dispatch(logout());
 
     }

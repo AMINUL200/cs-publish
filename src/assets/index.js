@@ -30,6 +30,20 @@ import services2 from './images/services/authorservice.jpg'
 
 import submitManuscript from './images/icon/sumit-manuscript.png'
 
+
+import partnear1 from './images/partnear-1-white.png'
+import partnear2 from './images/partnear-2-white.png'
+import partnear3 from './images/partnear-3-white.png'
+import partnear4 from './images/partnear-4-white.png'
+
+
+
+
+
+
+
+
+
 export {
     signupBg,
     logo,
@@ -55,7 +69,11 @@ export {
     research6,
     services1,
     services2,
-    submitManuscript
+    submitManuscript,
+    partnear1,
+    partnear2,
+    partnear3,
+    partnear4
 
 
 }

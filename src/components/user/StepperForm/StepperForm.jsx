@@ -11,6 +11,7 @@ const StepperForm = () => {
     const API_URL = import.meta.env.VITE_API_URL;
     const { token, userData } = useSelector((state) => state.auth);
     const [step, setStep] = useState(1);
+    const [journalData, setJournalData] = useState([]);
     const [formData, setFormData] = useState({
         journal_id: 1,
         // type_of_article: "research", // Added required field
@@ -54,7 +55,6 @@ const StepperForm = () => {
 
     const handleSubmit = async () => {
         setSubmitLoading(true);
-        console.log("Submitting supplementary_files as:", formData.supplementary_files);
         try {
             const submissionData = new FormData();
 
@@ -101,10 +101,13 @@ const StepperForm = () => {
                 submissionData.append("supplementary_files", formData.supplementary_files);
             }
 
-            // // Debug log
+            // console.log("🔍 Submitting data:");
             // for (let [key, value] of submissionData.entries()) {
-            //     console.log(`${key}:`, value);
+            //     console.log(key, value);
             // }
+
+            // console.log("Submitting data:", submissionData);
+
 
             const response = await axios.post(`${API_URL}api/manuscript`, submissionData, {
                 headers: {
@@ -124,17 +127,24 @@ const StepperForm = () => {
     };
 
 
-    const fetchData = async () => {
+    const fetchJournalData = async () => {
         try {
-            const response = await axios.get(`${API_URL}api/manuscript/show-form`, 
-                 {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                }
-            });
+            const response = await axios.get(`${API_URL}api/admin/journals`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    }
+                });
 
-            console.log(response.data);
-            
+            if (response.data.success) {
+                // console.log(response.data);
+                setJournalData(response.data.data.map(journal => ({
+                    id: journal.id,
+                    name: journal.j_title,
+                })))
+            } else {
+                toast.error(response.data.message || "Failed to fetch journals");
+            }
 
 
         } catch (error) {
@@ -145,13 +155,15 @@ const StepperForm = () => {
         }
     }
 
-    useEffect(()=>{
-        fetchData();
+    useEffect(() => {
+        fetchJournalData();
     }, [])
 
 
-    if(loading){
-        return <Loader/>
+
+
+    if (loading) {
+        return <Loader />
     }
 
     return (
@@ -171,7 +183,7 @@ const StepperForm = () => {
                 ))}
             </div>
 
-            {step === 1 && <StepOne formData={formData} setFormData={setFormData} handleChange={handleChange} />}
+            {step === 1 && <StepOne formData={formData} setFormData={setFormData} handleChange={handleChange} journalData={journalData} />}
             {step === 2 && <StepTwo formData={formData} handleChange={handleChange} />}
             {step === 3 && <StepThree formData={formData} setFormData={setFormData} handleChange={handleChange} />}
 

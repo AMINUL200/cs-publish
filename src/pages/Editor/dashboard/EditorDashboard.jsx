@@ -67,8 +67,10 @@ const EditorDashboard = () => {
         }
       );
 
-      if (response.status === 200) {
-        toast.success("Reviewer assigned successfully");
+      if (response.data.flag) {
+        toast.success(response.data.message || "Reviewer assigned successfully");
+        console.log(response.data);
+        
         fetchData(); // Refresh data
         setSelectedManuscript('');
         setSelectedReviewer('');

@@ -334,13 +334,15 @@ p {
     padding: 0 50px;
 }
 
-.recent-post .swiper-pagination {
+.recent-post .swiper-pagination,
+.our-partner .swiper-pagination {
     position: static;
     margin: 55px auto 0px;
     text-align: center;
 }
 
-.recent-post .swiper-pagination-bullet {
+.recent-post .swiper-pagination-bullet,
+.our-partner .swiper-pagination-bullet {
     width: 12px;
     height: 12px;
     background: #d1d5db;
@@ -348,7 +350,8 @@ p {
     transition: all 0.3s;
 }
 
-.recent-post .swiper-pagination-bullet-active {
+.recent-post .swiper-pagination-bullet-active,
+.our-partner .swiper-pagination-bullet-active {
     background: #ffba00;
     width: 30px;
     border-radius: 6px;
@@ -717,33 +720,51 @@ td ol {
     color: #FFF !important;
 }
 
+.our-partner .partnear-area {
+    height: auto;
+    background: none;
+    display: block;
+    text-align: center;
+}
+
+.our-partner .partnear-area .prtn_img {
+    width: auto;
+    height: 120px;
+    margin: 0 auto 15px auto;
+    display: inline-block;
+}
+
+.our-partner .partnear-area .prtn_name {
+    color: var(--white-color);
+    margin: 0;
+    border-top: 1px solid var(--white-color);
+    padding: 15px 0 0 0;
+}
+
+
+
 
 /* custom -scrollbar */
 /* Custom Scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
+/* .custom-scrollbar::-webkit-scrollbar {
     height: 8px;
-    /* for horizontal scroll */
     width: 8px;
-    /* for vertical scroll if used */
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    /* Light gray track */
+    background: #ffba00 !important;
     border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
     background-color: #888;
-    /* Darker thumb */
     border-radius: 4px;
     transition: background-color 0.3s;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background-color: #555;
-    /* Even darker on hover */
-}
+} */
 
 @keyframes fadeIn {
     from {

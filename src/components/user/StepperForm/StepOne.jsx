@@ -1,25 +1,28 @@
 import ArrayInput from "../../form/ArrayInput";
 import AuthorForm from "../../form/AuthorForm";
 
-const StepOne = ({ formData, setFormData, handleChange }) => (
+const StepOne = ({ formData, setFormData, handleChange, journalData }) => (
   <>
     <h2 className="text-xl mb-4 font-bold">Step 1: Article Submission Info</h2>
 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label className="block mb-1 font-medium">Type of Article *</label>
+        <label className="block mb-1 font-medium">Select Journal *</label>
         <select
-          name=" type_of_article"
-          value={formData.type_of_article}
+          name="journal_id"
+          value={formData.journal_id}
           onChange={handleChange}
           className="w-full p-2 border rounded"
           required
         >
-          <option value="">Select</option>
-          <option value="Research">Research</option>
-          <option value="Review">Review</option>
-          <option value="Case Study">Case Study</option>
+          <option value="">Select Journal</option>
+          {journalData.map((journal) => (
+            <option key={journal.id} value={journal.id}>
+              {journal.name}
+            </option>
+          ))}
         </select>
+
       </div>
 
       <div>

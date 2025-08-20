@@ -34,10 +34,15 @@ const ReviewerPermission = () => {
 
       if (response.status === 200 ) {
         const { reviewer, manuscripts } = response.data.data;
-        console.log(response.data.data);
+        // console.log(response.data.data);
         
         setReviewers(reviewer || []);
         setManuscripts(manuscripts || []);
+
+
+
+
+        
       } else {
         toast.error(response.data.message || "Failed to fetch data");
       }
@@ -141,8 +146,9 @@ const ReviewerPermission = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          <div></div>
 
-          <div className="relative">
+          {/* <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <FontAwesomeIcon icon={faFilter} className="text-gray-400" />
             </div>
@@ -158,7 +164,7 @@ const ReviewerPermission = () => {
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
 
           <div className="flex items-center justify-end">
             <button
@@ -242,10 +248,14 @@ const ReviewerPermission = () => {
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-semibold text-gray-800 mb-1">{manuscript.title}</h3>
+                        <h3 className="font-semibold text-gray-800 mb-1"
+                        dangerouslySetInnerHTML={{ __html: manuscript.title }}
+                        >
+                          {/* {manuscript.title} */}
+                        </h3>
                         <div className="flex flex-wrap gap-2 text-xs mb-3">
                           <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                            ID: {manuscript.id}
+                            ID: {manuscript.journal_id}
                           </span>
                           <span className="bg-purple-100 text-purple-600 px-2 py-1 rounded">
                             {manuscript.journal_title}

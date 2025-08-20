@@ -52,7 +52,7 @@ const ReviewerDashboard = () => {
       setLoading(false)
     }
   }
-  
+
   useEffect(() => {
     fetchManuscripts();
   }, [token])
@@ -69,7 +69,7 @@ const ReviewerDashboard = () => {
           }
         }
       );
-      
+
       if (response.data.flag === 1) {
         toast.success(`Manuscript ${status} successfully`);
         fetchManuscripts(); // Refresh the list
@@ -258,9 +258,11 @@ const ReviewerDashboard = () => {
             <div key={manuscript.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
               <div className="p-5">
                 <div className="flex justify-between items-start">
-                  <h2 className="text-lg font-bold text-gray-800 line-clamp-2">
-                    {manuscript.manuscript_data.title}
-                  </h2>
+                  <h2
+                    className="text-lg font-bold text-gray-800 line-clamp-2"
+                    dangerouslySetInnerHTML={{ __html: manuscript.manuscript_data.title }}
+                  ></h2>
+
                   <StatusBadge status={manuscript.status} />
                 </div>
 
@@ -277,7 +279,7 @@ const ReviewerDashboard = () => {
                   Submitted: {new Date(manuscript.created_at).toLocaleDateString()}
                 </div>
               </div>
-              
+
               <div className="px-5 py-3 bg-gray-50 border-t border-gray-100">
                 {manuscript.status === "pending" ? (
                   <div className="flex justify-between space-x-2">
@@ -304,8 +306,8 @@ const ReviewerDashboard = () => {
                   </div>
                 ) : (
                   <div className="flex justify-end">
-                    <Link 
-                      to={`/view-manuscript/${manuscript.manuscript_id}`}
+                    <Link
+                      to={`/view-manuscript/${manuscript.id}`}
                       className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                       <FontAwesomeIcon icon={faEye} className="mr-2" />

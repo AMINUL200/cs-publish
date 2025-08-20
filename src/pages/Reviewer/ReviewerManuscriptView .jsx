@@ -26,6 +26,7 @@ import Loader from '../../components/common/Loader';
 const ReviewerManuscriptView = () => {
   const { token } = useSelector((state) => state.auth);
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -46,6 +47,8 @@ const ReviewerManuscriptView = () => {
           Authorization: `Bearer ${token}`
         }
       });
+      console.log("Manuscript details response:", res.data);
+      
       if (res.data.flag === 1) {
         setManuscriptDetails(res.data.data);
         // Transform questions into checklist format
@@ -80,7 +83,7 @@ const ReviewerManuscriptView = () => {
     try {
 
       const formData = {
-        manuscript_id: id,
+        manuscript_id: manuscript.id,
         message_to_author: reviewText,
         message_to_editor: confidentialComments,
         recommendation: decision,
@@ -116,20 +119,7 @@ const ReviewerManuscriptView = () => {
       setIsSubmitting(false);
     }
 
-    // // Simulate API submission
-    // setTimeout(() => {
-    //   console.log("Review submitted:", {
-    //     recommendation: decision,
-    //     message_to_author: reviewText,
-    //     message_to_editor: confidentialComments,
-    //     image: reviewFile ? reviewFile.name : null,
-    //     checklist: checklist.filter(item => item.answer === 1),
-    //     manuscript_id: id
-    //   });
-    //   setIsSubmitting(false);
-    //   navigate(-1);
-    //   toast.success("Review submitted successfully");
-    // }, 1500);
+
   };
 
   const handleCheckboxChange = (id) => {
@@ -200,43 +190,45 @@ const ReviewerManuscriptView = () => {
               <div className="px-5 py-3 space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">Manuscript</span>
-                  <button
-                    onClick={() => downloadFile(manuscript?.manuscript_file)}
-                    className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                  <a
+                    href={`${STORAGE_URL}${manuscript?.manuscript_file}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                    className="text-blue-600 hover:text-blue-800 text-sm flex items-center cursor-pointer"
                   >
                     <FontAwesomeIcon icon={faDownload} className="mr-1" />
                     Download
-                  </button>
+                  </a>
                 </div>
                 {manuscript?.copyright_form && (
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Copyright Form</span>
-                    <button
-                      onClick={() => downloadFile(manuscript?.copyright_form)}
-                      className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                    <a
+                      href={`${STORAGE_URL}${manuscript?.copyright_form}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 text-sm flex items-center cursor-pointer"
+
                     >
                       <FontAwesomeIcon icon={faDownload} className="mr-1" />
                       Download
-                    </button>
+                    </a>
                   </div>
                 )}
-                {manuscript?.supplementary_files && manuscript?.supplementary_files.length > 0 ? (
-                  <div>
-                    <p className="text-sm font-medium mb-1">Supplementary Files</p>
-                    <ul className="space-y-1">
-                      {manuscript?.supplementary_files.map((file, index) => (
-                        <li key={index} className="flex justify-between items-center">
-                          <span className="text-sm">{file}</span>
-                          <button
-                            onClick={() => downloadFile(file)}
-                            className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                {manuscript?.supplementary_files  ? (
+                   <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">Supplementary Files</span>
+                    <a 
+                            href={`${STORAGE_URL}${manuscript?.supplementary_files}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 text-sm flex items-center cursor-pointer"
                           >
                             <FontAwesomeIcon icon={faDownload} className="mr-1" />
                             Download
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
+                          </a>
+                   
                   </div>
                 ) : (
                   <div className="text-sm text-gray-500">No supplementary files</div>

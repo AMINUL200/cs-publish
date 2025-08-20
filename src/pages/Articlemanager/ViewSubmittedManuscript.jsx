@@ -132,6 +132,8 @@ const ViewSubmittedManuscript = () => {
     });
 
     const visibleManuscripts = filteredManuscripts.slice(0, perPage);
+    console.log('Visible Manuscripts:', visibleManuscripts);
+
 
     if (loading) {
         return <Loader />
@@ -231,6 +233,13 @@ const ViewSubmittedManuscript = () => {
                                                         </tr>
                                                     </thead>
                                                     <tbody className="bg-white divide-y divide-gray-200">
+                                                        {selectedManuscript.reviewers.length === 0 && (
+                                                            <tr>
+                                                                <td colSpan="4" className="px-4 py-2 text-center text-sm text-gray-500">
+                                                                    No reviewers assigned yet.
+                                                                </td>
+                                                            </tr>
+                                                        )}
                                                         {selectedManuscript.reviewers.map((reviewer, index) => (
                                                             <tr key={index}>
                                                                 <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{reviewer.name}</td>
@@ -432,8 +441,8 @@ const ViewSubmittedManuscript = () => {
                                                     </div>
                                                 </td>
                                                 <td className="px-3 py-4 text-sm text-gray-500">
-                                                    <p className="font-medium">{m.reviewers[0].name}</p>
-                                                    <p className="text-xs text-gray-400">{m.reviewers[0].id}</p>
+                                                    <p className="font-medium">{m.reviewers[0]?.name || "Not Assigned"}</p>
+                                                    <p className="text-xs text-gray-400">{m.reviewers[0]?.id} </p>
                                                 </td>
                                                 <td className="whitespace-nowrap px-3 py-4 text-sm">
                                                     <div className="flex items-center">

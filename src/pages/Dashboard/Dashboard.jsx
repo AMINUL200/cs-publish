@@ -7,18 +7,21 @@ import EditorDashboard from '../Editor/dashboard/EditorDashboard';
 
 const Dashboard = () => {
   const { userData } = useSelector((state) => state.auth);
+
+  console.log("User Data in Dashboard:", userData);
+  
   return (
     <>
-      {userData.user_type === "0" &&
+      {userData.user_type == 0 &&
         <AdminDashboard /> 
       }
-      {userData.user_type === "1" &&
+      {userData.user_type == 1 &&
         <EditorDashboard /> 
       }
-      {userData.user_type === "2" &&
+      {userData.user_type == 2 &&
         <AuthorDashboard />
       }
-      {userData.user_type === "3" &&
+      {userData.user_type == 3 &&
         <ReviewerDashboard />
       }
 

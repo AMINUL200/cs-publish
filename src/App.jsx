@@ -55,6 +55,8 @@ import EmailTemplate from './pages/admin/email/EmailTemplate';
 import EditorDashboard from './pages/Editor/dashboard/EditorDashboard';
 import EditorCheckList from './pages/Editor/checklist/EditorCheckList';
 import AssignedManuscript from './pages/Editor/assigned manuscript/AssignedManuscript';
+import BlogDetails from './pages/blog details/BlogDetails';
+import AppLayout2 from './layout/AppLayout2';
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -74,16 +76,21 @@ function App() {
     }
     return <Outlet />;
   };
-  
+
 
   return (
     <>
       <ToastContainer />
       <Router>
         <Routes>
+          <Route element={<AppLayout2 />}>
+            <Route index path="/" element={<HomePage />} />
+            <Route index path="/blog/:id" element={<BlogDetails />} />
+          </Route>
+
+
           {/* Public routes - only accessible when not authenticated */}
           <Route element={<PublicRoute isAuthenticated={isAuthenticated} />}>
-            <Route index path="/" element={<HomePage />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
           </Route>
@@ -99,7 +106,7 @@ function App() {
 
 
               {/* Admin */}
-              <Route path="/permission/editor" element={<EditorPermission/>} />
+              <Route path="/permission/editor" element={<EditorPermission />} />
               <Route path="/articlemanager/checklist" element={<ChecklistPage />} />
               <Route path="/articlemanager/view-manuscript" element={<ViewSubmittedManuscript />} />
               <Route path="/payment" element={<Payment />} />

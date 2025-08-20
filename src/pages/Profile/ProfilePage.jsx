@@ -124,8 +124,10 @@ const ProfilePage = () => {
                 }
             });
 
+            console.log("data ",response.data.data);
             if (response.data.flag === 1) {
                 const data = response.data.data;
+
 
                 setFormData({
                     ...initialFormData, // Reset to initial state first
@@ -285,6 +287,7 @@ const ProfilePage = () => {
                                             onChange={handleChange}
                                             className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         >
+                                            <option value="">Select Title</option>
                                             <option value="Mr">Mr</option>
                                             <option value="Mrs">Mrs</option>
                                             <option value="Ms">Ms</option>
@@ -303,6 +306,7 @@ const ProfilePage = () => {
                                             onChange={handleChange}
                                             className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         >
+                                            <option value="">Select Gender </option>
                                             <option value="Male">Male</option>
                                             <option value="Female">Female</option>
                                             <option value="Other">Other</option>

@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Link as ScrollLink } from 'react-scroll';
 import { landingLog } from '../../assets';
+import { useSelector } from 'react-redux';
 
 const LandingHeader = ({ toggleMenu }) => {
     const [scrolled, setScrolled] = useState(false);
-
-
+    const { isAuthenticated } = useSelector((state) => state.auth);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -31,12 +31,13 @@ const LandingHeader = ({ toggleMenu }) => {
         { id: 'research', label: 'Research' },
         { id: 'services', label: 'Services' },
     ];
+    
     return (
         <header
             className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-2' : 'bg-white/90 backdrop-blur-sm py-4'
                 }`}
         >
-            <div className="  px-8 flex justify-between items-center"
+            <div className="px-8 flex justify-between items-center"
                 style={{ margin: '0 auto' }}
             >
 
@@ -73,37 +74,54 @@ const LandingHeader = ({ toggleMenu }) => {
                             {link.label}
                         </ScrollLink>
                     ))}
-                    <RouterLink
-                        to='/signin'
-                        className="ml-4 bg-[#ffba00] text-white px-4 py-2 rounded-md hover:bg-black transition-all duration-300"
-                    >
-                        Login
-                    </RouterLink>
+                    
+                    {/* Conditional rendering based on authentication status */}
+                    {isAuthenticated ? (
+                        <RouterLink
+                            to='/dashboard'
+                            className="ml-4 bg-[#ffba00] text-white px-4 py-2 rounded-md hover:bg-black transition-all duration-300"
+                        >
+                            Dashboard
+                        </RouterLink>
+                    ) : (
+                        <RouterLink
+                            to='/signin'
+                            className="ml-4 bg-[#ffba00] text-white px-4 py-2 rounded-md hover:bg-black transition-all duration-300"
+                        >
+                            Login
+                        </RouterLink>
+                    )}
                 </nav>
 
                 {/* Mobile Menu Button */}
                 <div className="md:hidden flex items-center space-x-4">
-                    <RouterLink
-                        to='/signin'
-                        className="bg-[#ffba00] text-white px-3 py-1 rounded-md text-sm"
-                    >
-                        Login
-                    </RouterLink>
+                    {/* Conditional rendering for mobile view */}
+                    {isAuthenticated ? (
+                        <RouterLink
+                            to='/dashboard'
+                            className="bg-[#ffba00] text-white px-3 py-1 rounded-md text-sm"
+                        >
+                            Dashboard
+                        </RouterLink>
+                    ) : (
+                        <RouterLink
+                            to='/signin'
+                            className="bg-[#ffba00] text-white px-3 py-1 rounded-md text-sm"
+                        >
+                            Login
+                        </RouterLink>
+                    )}
                     <button
                         onClick={toggleMenu}
                         className="text-gray-700 focus:outline-none"
                         aria-label="Toggle menu"
                     >
-
                         <FontAwesomeIcon className="w-6 h-6" icon={faBars} />
-
                     </button>
                 </div>
             </div>
-
-
         </header>
     )
 }
 
-export default LandingHeader
+export default LandingHeader;

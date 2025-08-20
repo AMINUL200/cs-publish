@@ -6,6 +6,7 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { Link } from "react-router-dom";
 
 const recentPosts = [
   {
@@ -43,7 +44,7 @@ const LandingRecentPost = () => {
     <section className="section recent-post">
       <div className="container-fluid ">
         <div className="titlebox text-center pb-8">
-          <h4 className="heading">Recent <span className="color_yellow">Post</span></h4>
+          <h4 className="heading">Recent <span className="color_yellow">Blogs</span></h4>
           <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus.</p>
         </div>
 
@@ -89,7 +90,9 @@ const LandingRecentPost = () => {
                         <p className="card-text text-gray-700 text-xl ">{post.authors}</p>
                       </div>
                       <div className='flex justify-center items-center'>
-                        <a href="#" className="bg-[#ffba00] hover:bg-black hover:text-white px-20 py-2 rounded-2xl transition-all duration-300 ">Read More</a>
+                        <Link to={`/blog/${post.id}`} className="bg-[#ffba00] hover:bg-black hover:text-white px-20 py-2 rounded-2xl transition-all duration-300 ">
+                        Read More
+                        </Link>
                       </div>
                     </div>
                   </div>

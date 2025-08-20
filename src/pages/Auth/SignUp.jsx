@@ -2,14 +2,16 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { login } from "../../features/auth/AuthSlice";
+import Loader from "../../components/common/Loader";
 
 const SignUp = () => {
-   const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL;
+  const { token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -28,6 +30,8 @@ const SignUp = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [journals, setJournals] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const userTypeOptions = [
     { value: 2, label: "Author" },
@@ -37,6 +41,34 @@ const SignUp = () => {
 
   const titleOptions = ["Mr", "Mrs", "Miss", "Dr", "Prof"];
   const genderOptions = ["Male", "Female", "Other"];
+
+
+  // Fetch journals
+  const fetchJournals = async () => {
+    try {
+      const response = await axios.get(`${API_URL}api/admin/journals`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200 && response.data.success) {
+        setJournals(response.data.data);
+        log
+      } else {
+        toast.error(response.data.message || "Failed to fetch journals");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong while fetching journals");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // useEffect(() => {
+  //   fetchJournals();
+  // }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -99,6 +131,10 @@ const SignUp = () => {
       }
     }
   };
+
+  if (loading) {
+    return <Loader/>
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-4">
@@ -202,11 +238,10 @@ const SignUp = () => {
                   key={type.value}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`flex items-center justify-center p-2 rounded-lg border cursor-pointer transition-all ${
-                    formData.user_type === type.value
-                      ? "bg-indigo-100 border-indigo-500"
-                      : "border-gray-300 hover:border-indigo-300"
-                  }`}
+                  className={`flex items-center justify-center p-2 rounded-lg border cursor-pointer transition-all ${formData.user_type === type.value
+                    ? "bg-indigo-100 border-indigo-500"
+                    : "border-gray-300 hover:border-indigo-300"
+                    }`}
                 >
                   <input
                     type="radio"
@@ -349,9 +384,8 @@ const SignUp = () => {
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-6 rounded-xl font-semibold text-white bg-blue-500 shadow-lg transition-all ${
-              isLoading ? "opacity-70 cursor-not-allowed" : "hover:shadow-xl"
-            }`}
+            className={`w-full py-3 px-6 rounded-xl font-semibold text-white bg-blue-500 shadow-lg transition-all ${isLoading ? "opacity-70 cursor-not-allowed" : "hover:shadow-xl"
+              }`}
           >
             {isLoading ? (
               <div className="flex items-center justify-center space-x-2">

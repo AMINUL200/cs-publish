@@ -15,16 +15,16 @@ const AddUser = () => {
     name: "",
     email: "",
     password: "",
-    user_type: 1,
+    user_type: "1",
     journal_id: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const userTypeOptions = [
-    { value: 1, label: "Editor" },
-    { value: 5, label: "Publisher" },
-    { value: 3, label: "Reviewer" }
+    { value: "1", label: "Editor" },
+    { value: "5", label: "Publisher" },
+    { value: "3", label: "Reviewer" }
   ];
 
   // Fetch journals
@@ -63,11 +63,11 @@ const AddUser = () => {
       // Prepare data to submit - only include journal_id if user_type is 1
       const submitData = { ...formData };
       
-      if (formData.user_type === 5) {
+      if (formData.user_type === "5") {
         delete submitData.journal_id;
       }
 
-      // console.log("Submitting data:", submitData);
+      console.log("Submitting data:", submitData);
 
       // Here you would typically make your API call
       const response = await axios.post(`${API_URL}api/admin/add-users`, submitData, {
@@ -102,8 +102,8 @@ const AddUser = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleRadioChange = (value) => {
-    setFormData(prev => ({ ...prev, user_type: value }));
+   const handleRadioChange = (value) => {
+    setFormData(prev => ({ ...prev, user_type: String(value) }));
   };
 
   const [showPassword, setShowPassword] = useState(false);
@@ -244,7 +244,7 @@ const AddUser = () => {
             </motion.div>
 
             {/* Conditionally render journal select only for Editors (type 1) */}
-            {formData.user_type !== 5 && (
+            {formData.user_type !== "5" && (
               <motion.div variants={itemVariants}>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Journal *

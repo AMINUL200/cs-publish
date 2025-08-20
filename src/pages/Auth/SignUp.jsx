@@ -18,7 +18,7 @@ const SignUp = () => {
     name: "",
     email: "",
     password: "",
-    user_type: 2, // Default: Author
+    user_type: "2",
     first_name: "",
     last_name: "",
     title: "Mr",
@@ -34,9 +34,9 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
 
   const userTypeOptions = [
-    { value: 2, label: "Author" },
-    { value: 3, label: "Reviewer" },
-    { value: 4, label: "Subscriber" }
+    { value: "2", label: "Author" },
+    { value: "3", label: "Reviewer" },
+    { value: "4", label: "Subscriber" }
   ];
 
   const titleOptions = ["Mr", "Mrs", "Miss", "Dr", "Prof"];
@@ -74,6 +74,8 @@ const SignUp = () => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    console.log("Form Data:", formData);
+
 
     try {
       const response = await axios.post(`${API_URL}api/register`, formData);
@@ -102,8 +104,10 @@ const SignUp = () => {
   };
 
   const handleRadioChange = (value) => {
-    setFormData(prev => ({ ...prev, user_type: value }));
+    setFormData(prev => ({ ...prev, user_type: String(value) }));
   };
+
+
 
   const [showPassword, setShowPassword] = useState(false);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
@@ -133,7 +137,7 @@ const SignUp = () => {
   };
 
   if (loading) {
-    return <Loader/>
+    return <Loader />
   }
 
   return (

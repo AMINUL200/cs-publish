@@ -2,13 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faFacebookF, 
-  faTwitter, 
-  faLinkedinIn, 
-  faGithub 
+import {
+    faFacebookF,
+    faTwitter,
+    faLinkedinIn,
+    faGithub
 } from '@fortawesome/free-brands-svg-icons';
-import Loader from '../../components/common/Loader';
+// import Loader from '../../components/common/Loader';
+// import { formatDate } from '../../lib/utils';
+import Loader from '../../../components/common/Loader';
+import { formatDate } from '../../../lib/utils';
+import Breadcrumb from '../../../components/common/Breadcrumb';
 
 // Dummy data for blog details
 const dummyBlogData = {
@@ -91,13 +95,10 @@ const BlogDetails = () => {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState({ name: "", email: "", message: "" });
 
-    // Format date function
-    const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'short', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('en-US', options);
-    };
+
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         // Simulate API call with setTimeout
         const timer = setTimeout(() => {
             setBlogDetailsData(dummyBlogData);
@@ -112,7 +113,7 @@ const BlogDetails = () => {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <Loader/>
+                <Loader />
             </div>
         );
     }
@@ -133,9 +134,18 @@ const BlogDetails = () => {
         setNewComment({ name: "", email: "", message: "" });
     };
 
+
     return (
         <>
-            <div className="blog-details-section pt-32 pb-8 relative">
+            <Breadcrumb items={[
+                { label: 'Home', path: '/', icon: 'home' },
+                { label: 'Blog', path: '/blog', icon: 'folder' },
+                { label: 'BlogDetails' },
+            ]}
+                pageTitle="Blog Details"
+                // pageDescription="Discover your next great read from our curated collection"
+            />
+            <div className="blog-details-section pb-8 relative">
                 <div className="container mx-auto px-4 max-w-6xl">
                     <div className="blog-details-section-wrap">
                         <div className="blog-post-content-box">
@@ -277,7 +287,7 @@ const BlogDetails = () => {
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div className="mt-10 lg:mt-14">
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 <div className="lg:col-span-2 flex flex-col gap-8">
@@ -285,10 +295,10 @@ const BlogDetails = () => {
                                     <div className="author-box bg-gray-50 p-6 rounded-lg border border-gray-100">
                                         <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                                             <div className="flex items-start gap-4">
-                                                <img 
-                                                    src={blogDetailsData?.author?.avatar} 
-                                                    alt={blogDetailsData?.author?.name} 
-                                                    className="w-16 h-16 rounded-full object-cover flex-shrink-0" 
+                                                <img
+                                                    src={blogDetailsData?.author?.avatar}
+                                                    alt={blogDetailsData?.author?.name}
+                                                    className="w-16 h-16 rounded-full object-cover flex-shrink-0"
                                                 />
                                                 <div>
                                                     <h3 className="text-lg font-semibold">{blogDetailsData?.author?.name}</h3>
@@ -297,40 +307,40 @@ const BlogDetails = () => {
                                             </div>
                                             <div className="flex items-center gap-3 text-gray-500 mt-4 sm:mt-0">
                                                 {blogDetailsData?.author?.social?.facebook && (
-                                                    <a 
-                                                        href={blogDetailsData.author.social.facebook} 
-                                                        target="_blank" 
-                                                        rel="noreferrer" 
+                                                    <a
+                                                        href={blogDetailsData.author.social.facebook}
+                                                        target="_blank"
+                                                        rel="noreferrer"
                                                         className="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-gray-200 hover:bg-[#ffba00] hover:text-white transition-colors"
                                                     >
                                                         <FontAwesomeIcon icon={faFacebookF} size="sm" />
                                                     </a>
                                                 )}
                                                 {blogDetailsData?.author?.social?.twitter && (
-                                                    <a 
-                                                        href={blogDetailsData.author.social.twitter} 
-                                                        target="_blank" 
-                                                        rel="noreferrer" 
+                                                    <a
+                                                        href={blogDetailsData.author.social.twitter}
+                                                        target="_blank"
+                                                        rel="noreferrer"
                                                         className="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-gray-200 hover:bg-[#ffba00] hover:text-white transition-colors"
                                                     >
                                                         <FontAwesomeIcon icon={faTwitter} size="sm" />
                                                     </a>
                                                 )}
                                                 {blogDetailsData?.author?.social?.linkedin && (
-                                                    <a 
-                                                        href={blogDetailsData.author.social.linkedin} 
-                                                        target="_blank" 
-                                                        rel="noreferrer" 
+                                                    <a
+                                                        href={blogDetailsData.author.social.linkedin}
+                                                        target="_blank"
+                                                        rel="noreferrer"
                                                         className="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-gray-200 hover:bg-[#ffba00] hover:text-white transition-colors"
                                                     >
                                                         <FontAwesomeIcon icon={faLinkedinIn} size="sm" />
                                                     </a>
                                                 )}
                                                 {blogDetailsData?.author?.social?.github && (
-                                                    <a 
-                                                        href={blogDetailsData.author.social.github} 
-                                                        target="_blank" 
-                                                        rel="noreferrer" 
+                                                    <a
+                                                        href={blogDetailsData.author.social.github}
+                                                        target="_blank"
+                                                        rel="noreferrer"
                                                         className="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-gray-200 hover:bg-[#ffba00] hover:text-white transition-colors"
                                                     >
                                                         <FontAwesomeIcon icon={faGithub} size="sm" />
@@ -400,8 +410,8 @@ const BlogDetails = () => {
                                                 />
                                             </div>
                                             <div className="md:col-span-2 flex justify-end">
-                                                <button 
-                                                    type="submit" 
+                                                <button
+                                                    type="submit"
                                                     className="px-5 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
                                                 >
                                                     Post Comment

@@ -47,9 +47,9 @@ const ReviewerManuscriptView = () => {
           Authorization: `Bearer ${token}`
         }
       });
-      console.log("Manuscript details response:", res.data);
-      
+
       if (res.data.flag === 1) {
+        console.log("Manuscript details response:", res.data.data);
         setManuscriptDetails(res.data.data);
         // Transform questions into checklist format
         if (res.data.data.questions && res.data.data.questions.length > 0) {
@@ -151,6 +151,8 @@ const ReviewerManuscriptView = () => {
 
   if (!manuscriptDetails) {
     return <div className="min-h-screen bg-gray-50 p-6">No manuscript details found</div>;
+  } else {
+    console.log("Manuscript Details::::", manuscriptDetails.manuscript.author);
   }
 
   const { manuscript } = manuscriptDetails;
@@ -172,15 +174,19 @@ const ReviewerManuscriptView = () => {
           Back to Dashboard
         </button>
         <h1 className="text-2xl font-bold text-gray-800">
-          Review Manuscript: {manuscript?.title}
+          Review Manuscript:&nbsp;
+          <span className='inline-block '
+            dangerouslySetInnerHTML={{ __html: manuscript?.title }}
+          />
         </h1>
+
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 pb-10">
         {/* Files Card */}
         <div className="lg:col-span-1">
           <div className="sticky top-18">
-            <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+            <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 mb-5">
               <div className="p-5 pb-3 bg-blue-50">
                 <h2 className="text-lg font-bold text-gray-800">
                   <FontAwesomeIcon icon={faFilePdf} className="mr-2 text-blue-500" />
@@ -216,25 +222,102 @@ const ReviewerManuscriptView = () => {
                     </a>
                   </div>
                 )}
-                {manuscript?.supplementary_files  ? (
-                   <div className="flex justify-between items-center">
+                {manuscript?.supplementary_files ? (
+                  <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Supplementary Files</span>
-                    <a 
-                            href={`${STORAGE_URL}${manuscript?.supplementary_files}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 text-sm flex items-center cursor-pointer"
-                          >
-                            <FontAwesomeIcon icon={faDownload} className="mr-1" />
-                            Download
-                          </a>
-                   
+                    <a
+                      href={`${STORAGE_URL}${manuscript?.supplementary_files}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 text-sm flex items-center cursor-pointer"
+                    >
+                      <FontAwesomeIcon icon={faDownload} className="mr-1" />
+                      Download
+                    </a>
+
                   </div>
                 ) : (
                   <div className="text-sm text-gray-500">No supplementary files</div>
                 )}
               </div>
             </div>
+
+            {/* Authors Card */}
+            {/* Authors Card */}
+            {/* <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+              <div className="p-5 pb-3 bg-gradient-to-r from-blue-50 to-indigo-50">
+                <h2 className="text-lg font-bold text-gray-800 flex items-center">
+                  <FontAwesomeIcon icon={faUserShield} className="mr-2 text-indigo-500" />
+                  Authors
+                  <span className="ml-2 bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full">
+                    {manuscriptDetails.manuscript.author?.length || 0}
+                  </span>
+                </h2>
+              </div>
+
+              {manuscriptDetails.manuscript.author && manuscriptDetails.manuscript.author.length > 0 ? (
+                <div className="p-4 space-y-4">
+                  {manuscriptDetails.manuscript.author.map((author, index) => (
+                    <div key={index} className="flex items-start p-4 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors duration-200">
+                      <div className="flex-shrink-0 mr-4">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-white font-bold text-lg">
+                          {author.name ? author.name.charAt(0).toUpperCase() : 'A'}
+                        </div>
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-md font-semibold text-gray-800 truncate">
+                          {author.name || "Unnamed Author"}
+                          {index === 0 && <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Corresponding</span>}
+                        </h3>
+
+                        <div className="mt-2 space-y-1">
+                          {author.email && (
+                            <div className="flex items-center text-sm text-gray-600">
+                              <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                              </svg>
+                              <span className='font-semibold mr-2'>Email: </span>
+                              <a href={`mailto:${author.email}`} className="truncate hover:text-blue-600">{author.email}</a>
+                            </div>
+                          )}
+
+                          {author.university && (
+                            <div className="flex items-center text-sm text-gray-600">
+                              <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                              </svg>
+                              <span className='font-semibold mr-2'>University: </span>
+                              <span className="truncate">{author.university}</span>
+                            </div>
+                          )}
+
+                          {author.affiliation && (
+                            <div className="flex items-center text-sm text-gray-600">
+                              <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                              </svg>
+                              <span className='font-semibold mr-2'>Affiliation: </span>
+                              <span className="truncate">{author.affiliation}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-6 text-center">
+                  <svg className="w-12 h-12 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <p className="mt-2 text-sm text-gray-500">No authors listed</p>
+                </div>
+              )}
+            </div> */}
+
+
           </div>
         </div>
 
@@ -249,7 +332,9 @@ const ReviewerManuscriptView = () => {
               </h2>
             </div>
             <div className="px-5 py-3">
-              <p className="text-sm text-gray-700 whitespace-pre-line">{manuscript?.abstract}</p>
+              <p className="text-sm text-gray-700 whitespace-pre-line"
+                dangerouslySetInnerHTML={{ __html: manuscript?.abstract }}
+              />
             </div>
           </div>
 
@@ -282,7 +367,9 @@ const ReviewerManuscriptView = () => {
                 </h2>
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line">{manuscript?.introduction}</p>
+                <p className="text-sm text-gray-700 whitespace-pre-line"
+                  dangerouslySetInnerHTML={{ __html: manuscript?.introduction }}
+                />
               </div>
             </div>
 
@@ -295,7 +382,9 @@ const ReviewerManuscriptView = () => {
                 </h2>
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line">{manuscript?.materials_and_methods}</p>
+                <p className="text-sm text-gray-700 whitespace-pre-line"
+                  dangerouslySetInnerHTML={{ __html: manuscript?.materials_and_methods }}
+                />
               </div>
             </div>
 
@@ -308,7 +397,9 @@ const ReviewerManuscriptView = () => {
                 </h2>
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line">{manuscript?.results}</p>
+                <p className="text-sm text-gray-700 whitespace-pre-line"
+                  dangerouslySetInnerHTML={{ __html: manuscript?.results }}
+                />
               </div>
             </div>
 
@@ -321,7 +412,9 @@ const ReviewerManuscriptView = () => {
                 </h2>
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line">{manuscript?.discussion}</p>
+                <p className="text-sm text-gray-700 whitespace-pre-line"
+                  dangerouslySetInnerHTML={{ __html: manuscript?.discussion }}
+                />
               </div>
             </div>
 
@@ -334,7 +427,9 @@ const ReviewerManuscriptView = () => {
                 </h2>
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line">{manuscript?.conclusion}</p>
+                <p className="text-sm text-gray-700 whitespace-pre-line"
+                  dangerouslySetInnerHTML={{ __html: manuscript?.conclusion }}
+                />
               </div>
             </div>
 
@@ -407,7 +502,7 @@ const ReviewerManuscriptView = () => {
               <option value="accept">Accept</option>
               <option value="minor_revisions">Minor Revisions</option>
               <option value="major_revisions">Major Revisions</option>
-              <option value="reject">Reject</option>
+              <option value="rejected">Reject</option>
             </select>
           </div>
 

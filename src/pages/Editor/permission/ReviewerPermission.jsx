@@ -10,6 +10,7 @@ import {
   faFilter
 } from "@fortawesome/free-solid-svg-icons";
 import Loader from "../../../components/common/Loader";
+import { formatDate } from "../../../lib/utils";
 
 const ReviewerPermission = () => {
   const { token } = useSelector((state) => state.auth);
@@ -23,6 +24,48 @@ const ReviewerPermission = () => {
   const [assigningReviewer, setAssigningReviewer] = useState(null);
   const [selectedManuscript, setSelectedManuscript] = useState(null);
 
+  // Function to get status color and icon
+  const getStatusInfo = (status) => {
+    let statusColor = "gray";
+    let statusIcon = null;
+    
+    switch(status?.toLowerCase()) {
+      case "completed":
+        statusColor = "green";
+        statusIcon = (
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        );
+        break;
+      case "accepted":
+        statusColor = "blue";
+        statusIcon = (
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        );
+        break;
+      case "rejected":
+        statusColor = "red";
+        statusIcon = (
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        );
+        break;
+      default: // pending
+        statusColor = "yellow";
+        statusIcon = (
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        );
+    }
+    
+    return { statusColor, statusIcon };
+  };
+
   // journals for filter
   const journals = [...new Set(manuscripts.map((m) => m.journal_title))];
 
@@ -32,17 +75,12 @@ const ReviewerPermission = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (response.status === 200 ) {
+      if (response.status === 200) {
         const { reviewer, manuscripts } = response.data.data;
-        // console.log(response.data.data);
-        
+        console.log(response.data.data);
+
         setReviewers(reviewer || []);
         setManuscripts(manuscripts || []);
-
-
-
-
-        
       } else {
         toast.error(response.data.message || "Failed to fetch data");
       }
@@ -63,6 +101,7 @@ const ReviewerPermission = () => {
       );
 
       if (response.status === 200 && response.data.flag) {
+        console.log(response.data);
         toast.success(response.data.message);
         fetchReviewerPermissions();
       } else {
@@ -148,24 +187,6 @@ const ReviewerPermission = () => {
           </div>
           <div></div>
 
-          {/* <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FontAwesomeIcon icon={faFilter} className="text-gray-400" />
-            </div>
-            <select
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
-              value={selectedJournal}
-              onChange={(e) => setSelectedJournal(e.target.value)}
-            >
-              <option value="all">All Journals</option>
-              {journals.map((journal) => (
-                <option key={journal} value={journal}>
-                  {journal}
-                </option>
-              ))}
-            </select>
-          </div> */}
-
           <div className="flex items-center justify-end">
             <button
               onClick={fetchReviewerPermissions}
@@ -192,11 +213,10 @@ const ReviewerPermission = () => {
                 {reviewers.map((rev) => (
                   <div
                     key={rev.id}
-                    className={`p-3 rounded-lg border transition cursor-pointer hover:shadow-md ${
-                      assigningReviewer?.user_id === rev.user_id
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-blue-300"
-                    }`}
+                    className={`p-3 rounded-lg border transition cursor-pointer hover:shadow-md ${assigningReviewer?.user_id === rev.user_id
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-200 hover:border-blue-300"
+                      }`}
                     onClick={() => setAssigningReviewer(rev)}
                   >
                     <div className="flex items-center gap-3">
@@ -239,20 +259,17 @@ const ReviewerPermission = () => {
                 {filteredManuscripts.map((manuscript) => (
                   <div
                     key={manuscript.id}
-                    className={`p-4 rounded-xl border transition ${
-                      selectedManuscript?.id === manuscript.id
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-blue-300 bg-white"
-                    }`}
+                    className={`p-4 rounded-xl border transition ${selectedManuscript?.id === manuscript.id
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-200 hover:border-blue-300 bg-white"
+                      }`}
                     onClick={() => setSelectedManuscript(manuscript)}
                   >
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-semibold text-gray-800 mb-1"
-                        dangerouslySetInnerHTML={{ __html: manuscript.title }}
-                        >
-                          {/* {manuscript.title} */}
-                        </h3>
+                          dangerouslySetInnerHTML={{ __html: manuscript.title }}
+                        />
                         <div className="flex flex-wrap gap-2 text-xs mb-3">
                           <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded">
                             ID: {manuscript.journal_id}
@@ -268,11 +285,10 @@ const ReviewerPermission = () => {
                         </div>
                       </div>
                       <button
-                        className={`px-3 py-1 rounded-lg text-sm font-medium transition cursor-pointer ${
-                          selectedManuscript?.id === manuscript.id && assigningReviewer
-                            ? "bg-blue-600 hover:bg-blue-700 text-white"
-                            : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                        }`}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium transition cursor-pointer ${selectedManuscript?.id === manuscript.id && assigningReviewer
+                          ? "bg-blue-600 hover:bg-blue-700 text-white"
+                          : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                          }`}
                         disabled={!assigningReviewer}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -290,17 +306,67 @@ const ReviewerPermission = () => {
                     {selectedManuscript?.id === manuscript.id && (
                       <div className="mt-3 pt-3 border-t border-gray-200">
                         <div className="text-sm text-gray-600">
+
+                          {/* Assigned Reviewers */}
+                          {manuscript.assignments && manuscript.assignments.length > 0 ? (
+                            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                              <h4 className="font-medium text-gray-700 mb-2 flex items-center">
+                                <svg className="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                                Assigned Reviewers ({manuscript.assignments.length})
+                              </h4>
+
+                              <div className="space-y-2">
+                                {manuscript.assignments.map((assignment) => {
+                                  const { statusColor, statusIcon } = getStatusInfo(assignment.status);
+
+                                  return (
+                                    <div key={assignment.id} className="flex items-center justify-between p-2 bg-white rounded-md border border-gray-200">
+                                      <div className="flex items-center">
+                                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium text-sm mr-3">
+                                          {assignment.assigned_to_name?.charAt(0).toUpperCase() || "R"}
+                                        </div>
+                                        <div>
+                                          <p className="text-sm font-medium text-gray-800">{assignment.assigned_to_name}</p>
+                                          <p className="text-xs text-gray-500">Stage: {assignment.stage || "Review"}</p>
+                                        </div>
+                                      </div>
+
+                                      <div className={`flex items-center px-2 py-1 rounded-full text-xs font-medium bg-${statusColor}-100 text-${statusColor}-800`}>
+                                        {statusIcon && <span className="mr-1">{statusIcon}</span>}
+                                        {assignment.status || "Pending"}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ) :(
+                            <p className="mb-4 text-gray-500">No reviewers assigned yet.</p>
+                          )}
+
+                          {/* Submission Date */}
                           <p className="mb-1">
                             <span className="font-medium">Submission Date:</span>{" "}
-                            {new Date(manuscript.created_at).toLocaleDateString()}
+                            {formatDate(manuscript.manuscript_created_at)}
                           </p>
-                          <p>
+
+                          {/* Abstract */}
+                          <div>
                             <span className="font-medium">Abstract:</span>{" "}
-                            {manuscript.abstract || "No abstract provided"}
-                          </p>
+                            {manuscript.abstract ? (
+                              <span
+                                dangerouslySetInnerHTML={{ __html: manuscript.abstract }}
+                              />
+                            ) : (
+                              "No abstract provided"
+                            )}
+                          </div>
                         </div>
                       </div>
                     )}
+
                   </div>
                 ))}
               </div>
@@ -314,7 +380,10 @@ const ReviewerPermission = () => {
         <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-xl flex items-center gap-4">
           <div>
             Assigning <span className="font-bold">{assigningReviewer.name}</span> to{" "}
-            <span className="font-bold">{selectedManuscript.title}</span>
+            <span
+              className="font-bold inline-block"
+              dangerouslySetInnerHTML={{ __html: selectedManuscript.title }}
+            ></span>
           </div>
           <button
             onClick={() =>

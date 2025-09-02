@@ -34,7 +34,7 @@ const LandingServices = () => {
 
     return (
         <section className="bg-gray-100 py-12">
-            <div className="container mx-auto px-4">
+            <div className=" mx-auto md:mx-20">
                 <div className="titlebox text-center mb-12">
                     <h4 className="heading text-3xl font-bold mb-4">Services</h4>
                     <p className="text-lg max-w-2xl font-light" style={{margin:'0 auto'}}>

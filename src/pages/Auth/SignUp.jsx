@@ -8,10 +8,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { login } from "../../features/auth/AuthSlice";
 import Loader from "../../components/common/Loader";
+import { faUpload } from "@fortawesome/free-solid-svg-icons";
+import { logo } from "../../assets";
 
 const SignUp = () => {
   const API_URL = import.meta.env.VITE_API_URL;
-  const { token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -25,13 +26,23 @@ const SignUp = () => {
     gender: "Male",
     phone: "",
     city: "",
-    country: ""
+    country: "",
+
+    // Reviewer specific fields
+    qualification: "",
+    university: "",
+    affiliation: "",
+    speciality: "",
+    designation: "",
+    journal_id: "",
+    resume: null
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [journals, setJournals] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [resumeFileName, setResumeFileName] = useState("");
 
   const userTypeOptions = [
     { value: "2", label: "Author" },
@@ -42,19 +53,23 @@ const SignUp = () => {
   const titleOptions = ["Mr", "Mrs", "Miss", "Dr", "Prof"];
   const genderOptions = ["Male", "Female", "Other"];
 
+  // Check if current user type is reviewer
+  const isReviewer = formData.user_type === "3";
 
   // Fetch journals
   const fetchJournals = async () => {
     try {
-      const response = await axios.get(`${API_URL}api/admin/journals`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await axios.get(`${API_URL}api/journal`, {
+
       });
 
       if (response.status === 200 && response.data.success) {
-        setJournals(response.data.data);
-        log
+        setJournals(response.data.data.map(journal => ({
+          id: journal.id,
+          name: journal.j_title
+        })));
+
+
       } else {
         toast.error(response.data.message || "Failed to fetch journals");
       }
@@ -66,9 +81,9 @@ const SignUp = () => {
     }
   };
 
-  // useEffect(() => {
-  //   fetchJournals();
-  // }, [token]);
+  useEffect(() => {
+    fetchJournals();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,13 +91,68 @@ const SignUp = () => {
     setError(null);
     console.log("Form Data:", formData);
 
+    // Define reviewer-specific fields
+    const reviewerFields = ['qualification', 'university', 'affiliation', 'speciality', 'designation', 'journal_id', 'resume'];
+
+    // Create FormData for file upload
+    const submitData = new FormData();
+
+    // Add form fields to FormData based on user type
+    Object.keys(formData).forEach(key => {
+      // Skip reviewer-specific fields if user is not a reviewer
+      if (reviewerFields.includes(key) && formData.user_type !== "3") {
+        return; // Skip this field
+      }
+
+      if (key === 'resume' && formData[key]) {
+        submitData.append('resume', formData[key]);
+      } else if (key !== 'resume') {
+        submitData.append(key, formData[key]);
+      }
+    });
+
+    // debugging: log FormData entries
+    for (let pair of submitData.entries()) {
+      console.log(`${pair[0]}: ${pair[1]}`);
+    }
 
     try {
-      const response = await axios.post(`${API_URL}api/register`, formData);
+      const response = await axios.post(`${API_URL}api/register`, submitData);
+
       if (response.data.flag === 1) {
-        dispatch(login({ userData: response.data.user, token: response.data.token }));
-        toast.success(response.data.message);
-        navigate('/dashboard');
+        // Check if user is reviewer
+        if (formData.user_type === "3") {
+          // For reviewers, show success message but don't login
+          toast.success("Registration successful! Please wait for admin activation.");
+          // Reset form or redirect to login
+          setFormData({
+            name: "",
+            email: "",
+            password: "",
+            user_type: "2",
+            first_name: "",
+            last_name: "",
+            title: "Mr",
+            gender: "Male",
+            phone: "",
+            city: "",
+            country: "",
+            qualification: "",
+            university: "",
+            affiliation: "",
+            speciality: "",
+            designation: "",
+            journal_id: "",
+            resume: null
+          });
+          setResumeFileName("");
+          navigate('/reviewer-activation');
+        } else {
+          // For non-reviewers, login immediately
+          dispatch(login({ userData: response.data.user, token: response.data.token }));
+          toast.success(response.data.message);
+          navigate('/dashboard');
+        }
       } else {
         toast.error(response.data.message);
       }
@@ -103,8 +173,41 @@ const SignUp = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type (optional)
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (allowedTypes.includes(file.type)) {
+        setFormData(prev => ({ ...prev, resume: file }));
+        setResumeFileName(file.name);
+      } else {
+        toast.error("Please upload a PDF or Word document");
+        e.target.value = "";
+      }
+    }
+  };
+
   const handleRadioChange = (value) => {
-    setFormData(prev => ({ ...prev, user_type: String(value) }));
+    setFormData(prev => ({
+      ...prev,
+      user_type: String(value),
+      // Clear reviewer-specific fields when changing from reviewer to other types
+      ...(value !== "3" && {
+        qualification: "",
+        university: "",
+        affiliation: "",
+        speciality: "",
+        designation: "",
+        journal_id: "",
+        resume: null
+      })
+    }));
+
+    // Clear file name when switching away from reviewer
+    if (value !== "3") {
+      setResumeFileName("");
+    }
   };
 
 
@@ -135,6 +238,7 @@ const SignUp = () => {
       }
     }
   };
+
 
   if (loading) {
     return <Loader />
@@ -340,6 +444,142 @@ const SignUp = () => {
               />
             </motion.div>
           </div>
+
+          {/* Reviewer Specific Fields */}
+          {isReviewer && (
+            <>
+
+              <motion.div variants={itemVariants}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Select Journal *
+                </label>
+                <select
+                  name="journal_id"
+                  value={formData.journal_id}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                >
+                  <option value="">-- Select Journal --</option>
+                  {journals.map((journal) => (
+                    <option key={journal.id} value={journal.id}>
+                      {journal.name}
+                    </option>
+                  ))}
+                </select>
+              </motion.div>
+              <motion.div variants={itemVariants}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Highest Qualification *
+                </label>
+                <input
+                  type="text"
+                  name="qualification"
+                  value={formData.qualification}
+                  onChange={handleChange}
+                  required={isReviewer}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                  placeholder="e.g., PhD in Computer Science"
+                />
+              </motion.div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <motion.div variants={itemVariants}>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    University *
+                  </label>
+                  <input
+                    type="text"
+                    name="university"
+                    value={formData.university}
+                    onChange={handleChange}
+                    required={isReviewer}
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                    placeholder="Enter your university name"
+                  />
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Designation *
+                  </label>
+                  <input
+                    type="text"
+                    name="designation"
+                    value={formData.designation}
+                    onChange={handleChange}
+                    required={isReviewer}
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                    placeholder="e.g., Professor, Associate Professor"
+                  />
+                </motion.div>
+              </div>
+
+              <motion.div variants={itemVariants}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Affiliation *
+                </label>
+                <input
+                  type="text"
+                  name="affiliation"
+                  value={formData.affiliation}
+                  onChange={handleChange}
+                  required={isReviewer}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                  placeholder="Enter your institutional affiliation"
+                />
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Speciality *
+                </label>
+                <input
+                  type="text"
+                  name="speciality"
+                  value={formData.speciality}
+                  onChange={handleChange}
+                  required={isReviewer}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                  placeholder="Enter your area of expertise"
+                />
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Resume/CV *
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    name="resume"
+                    onChange={handleFileChange}
+                    required={isReviewer}
+                    accept=".pdf,.doc,.docx"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <div className="flex items-center justify-center w-full px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-indigo-400 transition-all bg-gray-50">
+                    <div className="text-center">
+                      <FontAwesomeIcon icon={faUpload} className="text-gray-400 mb-2" size="lg" />
+                      <p className="text-sm text-gray-600">
+                        {resumeFileName || "Click to upload your resume/CV"}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        PDF, DOC, DOCX (Max 10MB)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                {resumeFileName && (
+                  <p className="text-xs text-green-600 mt-1">
+                    ✓ {resumeFileName} selected
+                  </p>
+                )}
+              </motion.div>
+            </>
+
+          )}
+
 
           <div className="grid grid-cols-1 gap-4">
             <motion.div variants={itemVariants} className="relative">

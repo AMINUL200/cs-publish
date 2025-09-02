@@ -70,8 +70,8 @@ export const sidebarRoutes = [
         allowedRoles: ["0"],
       },
       {
-        path: "/permission/reviewer",
-        title: "Reviewer",
+        path: "/permission/assigned-manuscript-reviewer",
+        title: "Manuscript Assigned to Reviewer",
         allowedRoles: ["1"],
       },
       {
@@ -79,6 +79,16 @@ export const sidebarRoutes = [
         title: "Check List",
         allowedRoles: ["1"],
       },
+      {
+        path: "/permission/add-reviewer",
+        title: "Add Reviewer",
+        allowedRoles: ["1"],
+      },
+      {
+        path: "/permission/manage-reviewer",
+        title: "Manage Reviewer",
+        allowedRoles: ["1"],
+      }
     ],
   },
   {
@@ -236,9 +246,10 @@ export const sidebarRoutes = [
 
   // Editor route
   {
-    path:"/assigned-manuscript",
-    title: "Assigned Manuscript",
+    path: "/assigned-manuscript",
+    title: "View Assigned Manuscript",
     icon: <FontAwesomeIcon icon={faCheckCircle} />,
     allowedRoles: ["1"],
-  }
+  },
+  
 ];

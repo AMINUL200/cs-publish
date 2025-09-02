@@ -16,7 +16,8 @@ import {
   faHourglassStart,
   faThumbsUp,
   faThumbsDown,
-  faEye
+  faEye,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -32,6 +33,8 @@ const ReviewerDashboard = () => {
   const [loading, setLoading] = useState(true)
   const [assignedManuscripts, setAssignedManuscripts] = useState([])
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [showAbstractModal, setShowAbstractModal] = useState(false);
+  const [selectedAbstract, setSelectedAbstract] = useState({ title: '', abstract: '' });
 
   const fetchManuscripts = async () => {
     try {
@@ -41,6 +44,8 @@ const ReviewerDashboard = () => {
         }
       });
       if (response.data.flag === 1) {
+        console.log("Fetched Manuscripts:", response.data.data);
+
         setAssignedManuscripts(response.data.data)
       } else {
         toast.error(response.data.message || "Failed to fetch manuscripts");
@@ -82,6 +87,11 @@ const ReviewerDashboard = () => {
     } finally {
       setUpdatingStatus(false);
     }
+  };
+
+  const handleShowAbstract = (title, abstract) => {
+    setSelectedAbstract({ title, abstract });
+    setShowAbstractModal(true);
   };
 
   // Filter manuscripts
@@ -132,6 +142,56 @@ const ReviewerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      {/* Abstract Modal */}
+      {showAbstractModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar">
+            {/* Header */}
+            <div className="flex justify-between items-center p-4 border-b">
+              <h3 className="text-lg font-semibold text-gray-800">Details</h3>
+              <button
+                onClick={() => setShowAbstractModal(false)}
+                className="text-gray-400 hover:text-gray-600 cursor-pointer"
+              >
+                <FontAwesomeIcon icon={faTimes} size="lg" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-4 space-y-4">
+              {/* Title */}
+              <div>
+                <h4 className="text-md font-medium text-gray-700 mb-1">Title:</h4>
+                <div
+                  className="text-gray-800 font-semibold"
+                  dangerouslySetInnerHTML={{ __html: selectedAbstract.title }}
+                />
+              </div>
+
+              {/* Abstract */}
+              <div>
+                <h4 className="text-md font-medium text-gray-700 mb-1">Abstract:</h4>
+                <div
+                  className="text-gray-600"
+                  dangerouslySetInnerHTML={{ __html: selectedAbstract.abstract }}
+                />
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end p-4 border-t">
+              <button
+                onClick={() => setShowAbstractModal(false)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">
@@ -254,70 +314,96 @@ const ReviewerDashboard = () => {
       {/* Manuscript Cards */}
       {filteredManuscripts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredManuscripts.map((manuscript) => (
-            <div key={manuscript.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="p-5">
-                <div className="flex justify-between items-start">
-                  <h2
-                    className="text-lg font-bold text-gray-800 line-clamp-2"
-                    dangerouslySetInnerHTML={{ __html: manuscript.manuscript_data.title }}
-                  ></h2>
+          {filteredManuscripts.map((manuscript) => {
+            // Clean and truncate abstract
+            const cleanAbstract = manuscript.manuscript_data.abstract.replace(/<[^>]*>/g, '');
+            const truncatedAbstract = cleanAbstract.length > 50
+              ? cleanAbstract.substring(0, 100) + '...'
+              : cleanAbstract;
 
-                  <StatusBadge status={manuscript.status} />
+            return (
+              <div key={manuscript.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
+                <div className="p-5 flex-grow">
+                  <div className="flex justify-between items-start mb-3">
+                    <h2
+                      className="text-lg font-bold text-gray-800 line-clamp-2 flex-grow mr-2"
+                      dangerouslySetInnerHTML={{ __html: manuscript.manuscript_data.title }}
+                    ></h2>
+
+                    <StatusBadge status={manuscript.status} />
+                  </div>
+
+                  <div className="mb-4">
+                    <p className="text-sm text-gray-600">
+                      {truncatedAbstract}
+                    </p>
+                    {cleanAbstract.length > 50 && (
+                      <button
+                        onClick={() => handleShowAbstract(
+                          manuscript.manuscript_data.title,
+                          manuscript.manuscript_data.abstract
+                        )}
+                        className="text-blue-600 text-xs mt-1 hover:underline cursor-pointer"
+                      >
+                        Show more
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="mt-3 text-sm text-gray-600">
+                    <span className="font-medium">Author:</span> {manuscript.manuscript_data.username}
+                  </div>
+
+                  <div className="mt-1 text-xs text-gray-500">
+                    <FontAwesomeIcon icon={faCalendarAlt} className="mr-1" />
+                    Submitted: {new Date(manuscript.created_at).toLocaleDateString()}
+                  </div>
                 </div>
 
-                <p className="text-sm text-gray-600 mt-2 line-clamp-3">
-                  {manuscript.manuscript_data.abstract}
-                </p>
-
-                <div className="mt-3 text-sm text-gray-600">
-                  <span className="font-medium">Author:</span> {manuscript.manuscript_data.username}
-                </div>
-
-                <div className="mt-1 text-xs text-gray-500">
-                  <FontAwesomeIcon icon={faCalendarAlt} className="mr-1" />
-                  Submitted: {new Date(manuscript.created_at).toLocaleDateString()}
+                <div className="px-5 py-3 bg-gray-50 border-t border-gray-100">
+                  {manuscript.status === "pending" ? (
+                    <div className="flex justify-between space-x-2">
+                      <button
+                        onClick={() => handleStatusUpdate(manuscript.id, "rejected")}
+                        disabled={updatingStatus}
+                        className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 cursor-pointer"
+                      >
+                        <FontAwesomeIcon icon={faThumbsDown} className="mr-2" />
+                        Reject
+                      </button>
+                      <button
+                        onClick={() => handleStatusUpdate(manuscript.id, "accepted")}
+                        disabled={updatingStatus}
+                        className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 cursor-pointer"
+                      >
+                        <FontAwesomeIcon icon={faThumbsUp} className="mr-2" />
+                        Accept
+                      </button>
+                    </div>
+                  ) : manuscript.status === "rejected" ? (
+                    <div className="text-center text-sm text-gray-500 py-2">
+                      You have declined to review this manuscript
+                    </div>
+                  ) : manuscript.status === "completed" ? (
+                    <div className="text-center text-sm text-gray-500 py-2">
+                      You have completed the review for this manuscript
+                    </div>
+                  ) :
+                    (
+                      <div className="flex justify-end">
+                        <Link
+                          to={`/view-manuscript/${manuscript.id}`}
+                          className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                          <FontAwesomeIcon icon={faEye} className="mr-2" />
+                          View Manuscript
+                        </Link>
+                      </div>
+                    )}
                 </div>
               </div>
-
-              <div className="px-5 py-3 bg-gray-50 border-t border-gray-100">
-                {manuscript.status === "pending" ? (
-                  <div className="flex justify-between space-x-2">
-                    <button
-                      onClick={() => handleStatusUpdate(manuscript.id, "rejected")}
-                      disabled={updatingStatus}
-                      className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 cursor-pointer"
-                    >
-                      <FontAwesomeIcon icon={faThumbsDown} className="mr-2" />
-                      Reject
-                    </button>
-                    <button
-                      onClick={() => handleStatusUpdate(manuscript.id, "accepted")}
-                      disabled={updatingStatus}
-                      className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 cursor-pointer"
-                    >
-                      <FontAwesomeIcon icon={faThumbsUp} className="mr-2" />
-                      Accept
-                    </button>
-                  </div>
-                ) : manuscript.status === "rejected" ? (
-                  <div className="text-center text-sm text-gray-500 py-2">
-                    You have declined to review this manuscript
-                  </div>
-                ) : (
-                  <div className="flex justify-end">
-                    <Link
-                      to={`/view-manuscript/${manuscript.id}`}
-                      className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      <FontAwesomeIcon icon={faEye} className="mr-2" />
-                      View Manuscript
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="bg-white rounded-xl shadow-sm p-8 text-center">

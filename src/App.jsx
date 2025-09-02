@@ -55,8 +55,18 @@ import EmailTemplate from './pages/admin/email/EmailTemplate';
 import EditorDashboard from './pages/Editor/dashboard/EditorDashboard';
 import EditorCheckList from './pages/Editor/checklist/EditorCheckList';
 import AssignedManuscript from './pages/Editor/assigned manuscript/AssignedManuscript';
-import BlogDetails from './pages/blog details/BlogDetails';
 import AppLayout2 from './layout/AppLayout2';
+import AuthorViewSubmittedManuscript from './pages/user/view submitted manuscript/AuthorViewSubmittedManuscript';
+import AddReviewer from './pages/Editor/add reviewer/AddReviewer';
+import EditorMangeReviewer from './pages/Editor/mange reviewer/EditorMangeReviewer';
+import ReviewerActivationPage from './pages/Editor/reviewer activation/ReviewerActivationPage';
+import BlogDetails from './pages/user/blog details/BlogDetails';
+import UserBlogPage from './pages/user/blog page/UserBlogPage';
+import InnovationPage from './pages/user/innovation/InnovationPage';
+import InnoVationDetailsPage from './pages/user/innovation/InnoVationDetailsPage';
+import BookStorePage from './pages/user/books page/BookStorePage';
+import BookDetailsPage from './pages/user/books page/BookDetailsPage';
+import BookCartPage from './pages/user/books page/BookCartPage';
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -78,14 +88,23 @@ function App() {
   };
 
 
+
+
   return (
     <>
       <ToastContainer />
       <Router>
         <Routes>
+
           <Route element={<AppLayout2 />}>
             <Route index path="/" element={<HomePage />} />
-            <Route index path="/blog/:id" element={<BlogDetails />} />
+            <Route  path="/blog" element={<UserBlogPage />} />
+            <Route  path="/blog/:id" element={<BlogDetails />} />
+            <Route path='/innovation' element={<InnovationPage/>}/>
+            <Route path='/innovation/:id' element={<InnoVationDetailsPage/>}/>
+            <Route path='/products' element={<BookStorePage/>}/>
+            <Route path='/products/:id' element={<BookDetailsPage/>}/>
+            <Route path='/cart' element={<BookCartPage/>}/>
           </Route>
 
 
@@ -94,6 +113,14 @@ function App() {
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
           </Route>
+
+          {/* ReviewerActivation page */}
+          <Route element={<PublicRoute isAuthenticated={isAuthenticated} />}>
+            <Route path="/reviewer-activation" element={<ReviewerActivationPage />} />
+          </Route>
+innovation
+
+
 
           {/* Protected routes - only accessible when authenticated */}
           <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
@@ -143,9 +170,12 @@ function App() {
 
 
               {/* Editor */}
-              <Route path='/permission/reviewer' element={<ReviewerPermission />} />
+              <Route path='/permission/assigned-manuscript-reviewer' element={<ReviewerPermission />} />
               <Route path='/permission/check-list' element={<EditorCheckList />} />
+              <Route path='/permission/add-reviewer' element={<AddReviewer />} />
+              <Route path='/permission/manage-reviewer' element={<EditorMangeReviewer />} />
               <Route path='/assigned-manuscript' element={<AssignedManuscript />} />
+
 
 
               {/* Reviewer */}
@@ -157,6 +187,7 @@ function App() {
               {/* author */}
               <Route path='/confirmation/new-paper' element={<UserCheckListPage />} />
               <Route path='/confirmation/add-new-paper' element={<SubmitManuscript />} />
+              <Route path='/confirmation/view-manuscript' element={<AuthorViewSubmittedManuscript />} />
 
             </Route>
           </Route>

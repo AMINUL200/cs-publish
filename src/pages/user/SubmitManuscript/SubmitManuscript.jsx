@@ -9,4 +9,4 @@ const SubmitManuscript = () => {
   )
 }
 
-export default SubmitManuscript
+export default SubmitManuscript;

@@ -58,6 +58,7 @@ const AuthorDashboard = () => {
                         {/* View Manuscripts Section */}
                         <div className="bg-white p-6 rounded-lg shadow-md ">
                             <Link
+                            to='/confirmation/view-manuscript'
                                 className='flex justify-around items-center gap-4 cursor-pointer'
                             >
                                 <div className=''>
@@ -163,7 +164,7 @@ const AuthorDashboard = () => {
 
                                 </div>
                                 <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                                    Check Manuscripts ({stats.underReview + stats.accepted + stats.published})
+                                    Check Manuscripts 
                                 </h2>
                             </Link>
                         </div>

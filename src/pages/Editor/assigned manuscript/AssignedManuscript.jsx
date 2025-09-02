@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import axios from 'axios'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -12,10 +12,14 @@ import {
     faEye,
     faTimes,
     faComments,
-    faQuestionCircle
+    faQuestionCircle,
+    faSearch,
+    faChevronLeft,
+    faChevronRight
 } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 import Loader from '../../../components/common/Loader'
+import { formatDate } from '../../../lib/utils'
 
 const statusStyles = {
     completed: 'bg-green-100 text-green-800',
@@ -38,23 +42,146 @@ const recommendationMap = {
     reject: 'Reject'
 }
 
-const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+
+
+const PaginationControls = ({ currentPage, totalPages, onPageChange }) => {
+    const pages = [];
+    const maxVisiblePages = 5;
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+    }
+
+    return (
+        <div className="flex items-center space-x-2">
+            <button
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                <FontAwesomeIcon icon={faChevronLeft} className="h-3 w-3" />
+            </button>
+
+            {startPage > 1 && (
+                <>
+                    <button
+                        onClick={() => onPageChange(1)}
+                        className="px-3 py-1.5 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                        1
+                    </button>
+                    {startPage > 2 && <span className="px-2 text-gray-500">...</span>}
+                </>
+            )}
+
+            {pages.map(page => (
+                <button
+                    key={page}
+                    onClick={() => onPageChange(page)}
+                    className={`px-3 py-1.5 rounded-md border text-sm font-medium ${currentPage === page
+                        ? 'border-blue-500 bg-blue-500 text-white'
+                        : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                        }`}
+                >
+                    {page}
+                </button>
+            ))}
+
+            {endPage < totalPages && (
+                <>
+                    {endPage < totalPages - 1 && <span className="px-2 text-gray-500">...</span>}
+                    <button
+                        onClick={() => onPageChange(totalPages)}
+                        className="px-3 py-1.5 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                        {totalPages}
+                    </button>
+                </>
+            )}
+
+            <button
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1.5 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                <FontAwesomeIcon icon={faChevronRight} className="h-3 w-3" />
+            </button>
+        </div>
+    );
 };
 
+const RecordsPerPageSelector = ({ value, onChange, options }) => {
+    return (
+        <div className="flex items-center">
+            <label htmlFor="recordsPerPage" className="text-sm text-gray-700 mr-2">
+                Show
+            </label>
+            <div className="relative">
+                <select
+                    id="recordsPerPage"
+                    value={value}
+                    onChange={(e) => onChange(Number(e.target.value))}
+                    className="appearance-none border border-gray-300 rounded-lg py-2 pl-3 pr-8 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm cursor-pointer transition-all duration-200 hover:border-gray-400"
+                >
+                    {options.map(option => (
+                        <option key={option} value={option}>
+                            {option}
+                        </option>
+                    ))}
+                </select>
+                {/* <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                </div> */}
+            </div>
+            <span className="text-sm text-gray-700 ml-2">entries</span>
+        </div>
+    );
+};
+
+const SearchInput = ({ value, onChange, placeholder }) => {
+    return (
+        <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FontAwesomeIcon icon={faSearch} className="text-gray-400 h-4 w-4" />
+            </div>
+            <input
+                type="text"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder={placeholder}
+                className="pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 w-64"
+            />
+        </div>
+    );
+};
 
 const AssignedManuscript = () => {
     const { token } = useSelector((state) => state.auth);
     const API_URL = import.meta.env.VITE_API_URL;
+    const VITE_STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
     const [manuscripts, setManuscripts] = useState([])
     const [loading, setLoading] = useState(true);
     const [selectedManuscript, setSelectedManuscript] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Pagination and search state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [recordsPerPage, setRecordsPerPage] = useState(10);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // Aggregate reviewer assignments for stats
+    const allAssignments = useMemo(() => {
+        return manuscripts.flatMap(m => m.reviewers || []);
+    }, [manuscripts]);
 
     const fetchAssignedManuscripts = async () => {
         try {
@@ -65,6 +192,7 @@ const AssignedManuscript = () => {
             });
             if (response.data.flag === 1) {
                 setManuscripts(response.data.data);
+                console.log("Assigned manuscripts data:", response.data.data);
             } else {
                 toast.error(response.data.message || "Failed to fetch assigned manuscripts");
             }
@@ -80,8 +208,22 @@ const AssignedManuscript = () => {
         fetchAssignedManuscripts();
     }, [token]);
 
-    const openModal = (assignment) => {
-        setSelectedManuscript(assignment);
+    // Filter manuscripts based on search term (by title only)
+    const filteredManuscripts = useMemo(() => {
+        if (!searchTerm) return manuscripts;
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        return manuscripts.filter(m => (m.title || '').toLowerCase().includes(lowerSearchTerm));
+    }, [manuscripts, searchTerm]);
+
+    // Calculate pagination values
+    const totalRecords = filteredManuscripts.length;
+    const totalPages = Math.ceil(totalRecords / recordsPerPage);
+    const startIndex = (currentPage - 1) * recordsPerPage;
+    const endIndex = Math.min(startIndex + recordsPerPage, totalRecords);
+    const currentRecords = filteredManuscripts.slice(startIndex, endIndex);
+
+    const openModal = (manuscript) => {
+        setSelectedManuscript(manuscript);
         setIsModalOpen(true);
     };
 
@@ -89,6 +231,47 @@ const AssignedManuscript = () => {
         setIsModalOpen(false);
         setSelectedManuscript(null);
     };
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
+
+
+    const handlePublish = async (manuscriptId) => {
+        if (!manuscriptId) return;
+
+        console.log("Publishing manuscript ID:", manuscriptId);
+
+    }
+    const handleNeedRevision = async (manuscriptId) => {
+        if (!manuscriptId) return;
+        console.log("Marking manuscript ID as needing revision:", manuscriptId);
+
+        try {
+            const response = await axios.post(`${API_URL}api/editor/resubmission-manuscript`, {
+                manuscript_id: manuscriptId
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (response.data.flag === 1) {
+                toast.success(response.data.message || "Manuscript marked as needing revision");
+                // Refresh the manuscripts list to reflect changes
+                fetchAssignedManuscripts();
+                closeModal();
+            } else {
+                toast.error(response.data.message || "Failed to mark manuscript as needing revision");
+            }
+
+        } catch (error) {
+            console.error("Error marking manuscript as needing revision:", error);
+            toast.error(error.response?.data?.message || "Failed to mark manuscript as needing revision");
+
+        }
+
+    }
 
     if (loading) {
         return <Loader />
@@ -100,9 +283,9 @@ const AssignedManuscript = () => {
             {isModalOpen && selectedManuscript && (
                 <div className="fixed inset-0 z-50 overflow-y-auto">
                     <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                        {/* <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                             <div className="absolute inset-0 bg-gray-500/75 " onClick={closeModal}></div>
-                        </div>
+                        </div> */}
 
                         <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
@@ -122,7 +305,7 @@ const AssignedManuscript = () => {
                                             </button>
                                         </div>
 
-                                        <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                        <div className="mt-6 grid grid-cols-1 gap-6 ">
                                             {/* Manuscript Details */}
                                             <div className="bg-gray-50 p-4 rounded-lg">
                                                 <h4 className="text-md font-medium text-gray-900 mb-3 flex items-center">
@@ -131,100 +314,149 @@ const AssignedManuscript = () => {
                                                 </h4>
                                                 <div className="space-y-2">
                                                     <div>
-                                                        <p className="text-sm font-medium text-gray-500">Title</p>
-                                                        <p className="text-sm text-gray-900">{selectedManuscript.manuscript.title}</p>
+                                                        <p className="text-sm font-bold text-gray-500">Title: </p>
+                                                        <p className="text-sm text-gray-900"
+                                                            dangerouslySetInnerHTML={{ __html: selectedManuscript.title }}
+                                                        />
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-medium text-gray-500">Abstract</p>
-                                                        <p className="text-sm text-gray-900">{selectedManuscript.manuscript.abstract}</p>
+                                                        <p className="text-sm font-bold text-gray-500">Abstract: </p>
+                                                        <p className="text-sm text-gray-900"
+                                                            dangerouslySetInnerHTML={{ __html: selectedManuscript.abstract }}
+                                                        />
                                                     </div>
+                                                    {/* <div>
+                                                        <p className="text-sm font-medium text-gray-500">Total Reviewers Assigned</p>
+                                                        <p className="text-sm text-gray-900">{selectedManuscript.reviewers?.length || 0}</p>
+                                                    </div> */}
                                                 </div>
                                             </div>
 
-                                            {/* Reviewer Details */}
+                                            {/* Reviewer Details (List) */}
                                             <div className="bg-gray-50 p-4 rounded-lg">
                                                 <h4 className="text-md font-medium text-gray-900 mb-3 flex items-center">
                                                     <FontAwesomeIcon icon={faUser} className="mr-2" />
-                                                    Reviewer Information
+                                                    Assigned Reviewers {`(${(selectedManuscript.reviewers || []).length})`}
                                                 </h4>
-                                                <div className="space-y-2">
-                                                    <div>
-                                                        <p className="text-sm font-medium text-gray-500">Name</p>
-                                                        <p className="text-sm text-gray-900">{selectedManuscript.reviewer.name}</p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-gray-500">Email</p>
-                                                        <p className="text-sm text-gray-900">{selectedManuscript.reviewer.email}</p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-gray-500">Assigned Date</p>
-                                                        <p className="text-sm text-gray-900">
-                                                            {formatDate(selectedManuscript.assigned_at)}
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-gray-500">Status</p>
-                                                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyles[selectedManuscript.status]}`}>
-                                                            {statusIcons[selectedManuscript.status]}
-                                                            <span className="ml-1 capitalize">{selectedManuscript.status}</span>
-                                                        </span>
-                                                    </div>
+                                                <div className="space-y-4 ">
+                                                    {(selectedManuscript.reviewers || []).map((assignment, idx) => (
+                                                        <div key={assignment.assignment_id} className="border rounded-md p-3">
+                                                            <div className="flex flex-wrap items-center justify-between gap-2">
+                                                                <div>
+                                                                    <p className="text-sm font-medium text-gray-900">{idx + 1}. {assignment.reviewer?.name}</p>
+                                                                    <p className="text-xs text-gray-500">{assignment.reviewer?.email}</p>
+                                                                </div>
+                                                                <div className="flex items-center gap-4">
+                                                                    <div className="text-xs text-gray-600 flex items-center">
+                                                                        <FontAwesomeIcon icon={faCalendarAlt} className="mr-1" />
+                                                                        {formatDate(assignment.assigned_at)}
+                                                                    </div>
+                                                                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyles[assignment.status]}`}>
+                                                                        {statusIcons[assignment.status]}
+                                                                        <span className="ml-1 capitalize">{assignment.status}</span>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Messages for this reviewer */}
+                                                            {(assignment.messages || []).length > 0 && (
+                                                                <div className="mt-3 bg-white rounded">
+                                                                    <h5 className="text-sm font-medium text-gray-800 mb-2 flex items-center">
+                                                                        <FontAwesomeIcon icon={faComments} className="mr-2" />
+                                                                        Messages
+                                                                    </h5>
+                                                                    <div className="space-y-3">
+                                                                        {assignment.messages.map((message, mIdx) => (
+                                                                            <div key={message.id || mIdx} className="border-l-4 border-indigo-500 pl-3">
+                                                                                {console.log("message: ", message)}
+                                                                                <div className="mb-1">
+                                                                                    <p className="text-xs font-medium text-gray-500">Message to Editor</p>
+                                                                                    <p className="text-sm text-gray-900">{message.message_to_editor}</p>
+                                                                                </div>
+                                                                                <div className="mb-1">
+                                                                                    <p className="text-xs font-medium text-gray-500">Message to Author</p>
+                                                                                    <p className="text-sm text-gray-900">{message.message_to_author}</p>
+                                                                                </div>
+                                                                                <div className="mb-1">
+                                                                                    <p className="text-xs font-medium text-gray-500">Recommendation</p>
+                                                                                    <p className="text-sm text-gray-900">{recommendationMap[message.recommendation] || 'N/A'}</p>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <p className="text-xs font-medium text-gray-500">Attached File</p>
+                                                                                    {message.image
+                                                                                        ? <a href={`${VITE_STORAGE_URL}${message.image}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Download File</a>
+                                                                                        : <span className="text-sm text-gray-600">No file attached</span>}
+                                                                                </div>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            {/* Problems for this reviewer */}
+                                                            {(assignment.problems || []).length > 0 && (
+                                                                <div className="mt-3 bg-white rounded">
+                                                                    <h5 className="text-sm font-medium text-gray-800 mb-2 flex items-center">
+                                                                        <FontAwesomeIcon icon={faQuestionCircle} className="mr-2" />
+                                                                        Questions
+                                                                    </h5>
+                                                                    <div className="space-y-2">
+                                                                        {assignment.problems.map((problem, pIdx) => (
+                                                                            <div key={problem.id || pIdx} className="border-l-4 border-blue-500 pl-3">
+                                                                                <p className="text-xs font-medium text-gray-500">Question {pIdx + 1}</p>
+                                                                                <p className="text-sm text-gray-900">{problem.question}</p>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             </div>
                                         </div>
 
-                                        {/* Messages */}
-                                        {selectedManuscript.manuscript.messages.length > 0 && (
-                                            <div className="mt-6 bg-gray-50 p-4 rounded-lg">
-                                                <h4 className="text-md font-medium text-gray-900 mb-3 flex items-center">
-                                                    <FontAwesomeIcon icon={faComments} className="mr-2" />
-                                                    Review Messages
-                                                </h4>
-                                                <div className="space-y-4">
-                                                    {selectedManuscript.manuscript.messages.map((message, index) => (
-                                                        <div key={index} className="border-l-4 border-indigo-500 pl-4 py-2">
-                                                            <div className="mb-2">
-                                                                <p className="text-sm font-medium text-gray-500">Message to Editor</p>
-                                                                <p className="text-sm text-gray-900">{message.message_to_editor}</p>
-                                                            </div>
-                                                            <div className="mb-2">
-                                                                <p className="text-sm font-medium text-gray-500">Message to Author</p>
-                                                                <p className="text-sm text-gray-900">{message.message_to_author}</p>
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-sm font-medium text-gray-500">Recommendation</p>
-                                                                <p className="text-sm text-gray-900">
-                                                                    {recommendationMap[message.recommendation] || 'N/A'}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Problems */}
-                                        {selectedManuscript.manuscript.problems.length > 0 && (
-                                            <div className="mt-6 bg-gray-50 p-4 rounded-lg">
-                                                <h4 className="text-md font-medium text-gray-900 mb-3 flex items-center">
-                                                    <FontAwesomeIcon icon={faQuestionCircle} className="mr-2" />
-                                                    Review Questions
-                                                </h4>
-                                                <div className="space-y-4">
-                                                    {selectedManuscript.manuscript.problems.map((problem, index) => (
-                                                        <div key={problem.id} className="border-l-4 border-blue-500 pl-4 py-2">
-                                                            <p className="text-sm font-medium text-gray-500">Question {index + 1}</p>
-                                                            <p className="text-sm text-gray-900">{problem.question}</p>
-                                                            {/* <p className="text-sm font-medium text-gray-500 mt-1">Answer : &nbsp; {problem.answer}</p> */}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
+                                        {/* Messages/Problems moved into reviewer list above */}
                                     </div>
                                 </div>
                             </div>
-                            <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                            <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row justify-between">
+
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        type="button"
+                                        className="inline-flex items-center gap-2 rounded-md bg-green-600 px-4 py-2 text-white text-sm font-semibold shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition cursor-pointer "
+                                        onClick={() => handlePublish(selectedManuscript.manuscript_id)}
+                                    >
+                                        <FontAwesomeIcon icon={faCheckCircle} className="h-4 w-4" />
+                                        Publish Manuscript
+                                    </button>
+
+                                    {selectedManuscript.is_update === "0" ? (
+                                        <button
+                                            type="button"
+                                            className="inline-flex items-center gap-2 rounded-md bg-yellow-500 px-4 py-2 text-white text-sm font-semibold shadow hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition cursor-pointer "
+                                            onClick={() => handleNeedRevision(selectedManuscript.manuscript_id)}
+                                        >
+                                            <FontAwesomeIcon icon={faQuestionCircle} className="h-4 w-4" />
+                                            Need Revision
+                                        </button>
+                                    ) :(
+                                        <button
+                                            type="button"
+                                            className="inline-flex items-center gap-2 rounded-md bg-gray-400 px-4 py-2 text-white text-sm font-semibold shadow cursor-not-allowed "
+                                            disabled
+                                        >
+                                            <FontAwesomeIcon icon={faQuestionCircle} className="h-4 w-4" />
+                                            Already Assigned To Update
+                                        </button>
+                                    )}
+
+
+                                </div>
+
+
+
                                 <button
                                     type="button"
                                     className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
@@ -239,7 +471,7 @@ const AssignedManuscript = () => {
             )}
 
             {/* Main Content */}
-            <div className="sm:flex sm:items-center">
+            <div className="sm:flex sm:items-center mb-4">
                 <div className="sm:flex-auto">
                     <h1 className="text-xl font-semibold text-gray-900">Assigned Manuscripts</h1>
                     <p className="mt-2 text-sm text-gray-700">
@@ -249,7 +481,7 @@ const AssignedManuscript = () => {
             </div>
 
             {/* Stats cards */}
-            <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
+            <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-3 mb-6">
                 <div className="overflow-hidden rounded-lg bg-white shadow">
                     <div className="px-4 py-5 sm:p-6">
                         <div className="flex items-center">
@@ -261,7 +493,7 @@ const AssignedManuscript = () => {
                                     <dt className="truncate text-sm font-medium text-gray-500">Completed</dt>
                                     <dd className="flex items-baseline">
                                         <div className="text-2xl font-semibold text-gray-900">
-                                            {manuscripts.filter(a => a.status === 'completed').length}
+                                            {allAssignments.filter(a => a.status === 'completed').length}
                                         </div>
                                     </dd>
                                 </dl>
@@ -281,7 +513,7 @@ const AssignedManuscript = () => {
                                     <dt className="truncate text-sm font-medium text-gray-500">Pending</dt>
                                     <dd className="flex items-baseline">
                                         <div className="text-2xl font-semibold text-gray-900">
-                                            {manuscripts.filter(a => a.status === 'pending').length}
+                                            {allAssignments.filter(a => a.status === 'pending').length}
                                         </div>
                                     </dd>
                                 </dl>
@@ -301,7 +533,7 @@ const AssignedManuscript = () => {
                                     <dt className="truncate text-sm font-medium text-gray-500">Rejected</dt>
                                     <dd className="flex items-baseline">
                                         <div className="text-2xl font-semibold text-gray-900">
-                                            {manuscripts.filter(a => a.status === 'rejected').length}
+                                            {allAssignments.filter(a => a.status === 'rejected').length}
                                         </div>
                                     </dd>
                                 </dl>
@@ -311,7 +543,25 @@ const AssignedManuscript = () => {
                 </div>
             </div>
 
-            <div className="mt-8 flow-root">
+            {/* Table Controls - Top */}
+            <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
+                <RecordsPerPageSelector
+                    value={recordsPerPage}
+                    onChange={(value) => {
+                        setRecordsPerPage(value);
+                        setCurrentPage(1);
+                    }}
+                    options={[5, 10, 25, 50]}
+                />
+
+                <SearchInput
+                    value={searchTerm}
+                    onChange={setSearchTerm}
+                    placeholder="Search by title..."
+                />
+            </div>
+
+            <div className="mt-4 flow-root">
                 <div className="-my-2 -mx-4 overflow-x-auto custom-scrollbar sm:-mx-6 lg:-mx-8">
                     <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
@@ -321,67 +571,72 @@ const AssignedManuscript = () => {
                                         <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                                             #
                                         </th>
-
                                         <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                            <FontAwesomeIcon icon={faUser} className="mr-2" />
-                                            Reviewer
+                                            Title
                                         </th>
                                         <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                            <FontAwesomeIcon icon={faCalendarAlt} className="mr-2" />
-                                            Assigned Date
-                                        </th>
-                                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                            Status
-                                        </th>
-                                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                            Recommendation
+                                            Reviewers
                                         </th>
                                         <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                                            <span className="sr-only">Details</span>
-                                            <span >Details</span>
+                                            <span className="sr-only">Action</span>
+                                            <span>Action</span>
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 bg-white">
-                                    {manuscripts.map((assignment, index) => (
-                                        <tr key={assignment.assignment_id}>
-                                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                                                {index + 1}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                <div className="text-gray-900">{assignment.reviewer.name}</div>
-                                                <div className="text-gray-500">{assignment.reviewer.email}</div>
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {formatDate(assignment.assigned_at)}
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyles[assignment.status]}`}>
-                                                    {statusIcons[assignment.status]}
-                                                    <span className="ml-1 capitalize">{assignment.status}</span>
-                                                </span>
-                                            </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {assignment.manuscript.messages.length > 0
-                                                    ? recommendationMap[assignment.manuscript.messages[0].recommendation] || 'N/A'
-                                                    : 'N/A'}
-                                            </td>
-                                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                                <button
-                                                    onClick={() => openModal(assignment)}
-                                                    className="text-indigo-600 hover:text-indigo-900"
-                                                >
-                                                    <FontAwesomeIcon icon={faEye} className="mr-1" />
-                                                    View<span className="sr-only">, {assignment.manuscript.title}</span>
-                                                </button>
+                                    {currentRecords.length > 0 ? (
+                                        currentRecords.map((manuscript, index) => (
+                                            <tr key={manuscript.manuscript_id}>
+                                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                                    {startIndex + index + 1}
+                                                </td>
+                                                <td className="whitespace-normal px-3 py-4 text-sm text-gray-500 line-clamp-2 w-80">
+                                                    <div className="text-gray-900 font-medium"
+                                                        dangerouslySetInnerHTML={{ __html: manuscript.title }}
+                                                    />
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                                                    {manuscript.reviewers?.length || 0}
+                                                </td>
+                                                <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                                    <button
+                                                        onClick={() => openModal(manuscript)}
+                                                        className="text-indigo-600 hover:text-indigo-900"
+                                                    >
+                                                        <FontAwesomeIcon icon={faEye} className="mr-1" />
+                                                        View<span className="sr-only">, {manuscript.title}</span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4" className="px-6 py-8 text-center text-sm text-gray-500">
+                                                {searchTerm ? 'No matching manuscripts found' : 'No manuscripts assigned yet'}
                                             </td>
                                         </tr>
-                                    ))}
+                                    )}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Table Controls - Bottom */}
+            <div className="mt-4 flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0 gap-4">
+                <div className="text-sm text-gray-700">
+                    Showing {startIndex + 1} to {endIndex} of {totalRecords} entries
+                    {searchTerm && ` (filtered from ${manuscripts.length} total entries)`}
+                </div>
+
+                {totalPages > 1 && (
+                    <PaginationControls
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                    />
+                )}
             </div>
         </div>
     )

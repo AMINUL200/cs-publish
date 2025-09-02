@@ -335,14 +335,18 @@ p {
 }
 
 .recent-post .swiper-pagination,
-.our-partner .swiper-pagination {
+.our-partner .swiper-pagination,
+.innovation-section .swiper-pagination,
+.voices-section .swiper-pagination {
     position: static;
     margin: 55px auto 0px;
     text-align: center;
 }
 
 .recent-post .swiper-pagination-bullet,
-.our-partner .swiper-pagination-bullet {
+.our-partner .swiper-pagination-bullet,
+.innovation-section .swiper-pagination-bullet,
+.voices-section .swiper-pagination-bullet {
     width: 12px;
     height: 12px;
     background: #d1d5db;
@@ -351,7 +355,9 @@ p {
 }
 
 .recent-post .swiper-pagination-bullet-active,
-.our-partner .swiper-pagination-bullet-active {
+.our-partner .swiper-pagination-bullet-active,
+.innovation-section .swiper-pagination-bullet-active,
+.voices-section .swiper-pagination-bullet-active {
     background: #ffba00;
     width: 30px;
     border-radius: 6px;

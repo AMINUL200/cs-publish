@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faEye, faFilter, faList,  faSearch,  faTh, faX,  } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faEye, faFilter, faList, faSearch, faTh, faX, } from '@fortawesome/free-solid-svg-icons';
 import Breadcrumb from '../../../components/common/Breadcrumb';
 import BookCard from '../../../components/user/book card/BookCard';
+import Loader from '../../../components/common/Loader';
 
 // Dummy book data
 const dummyBooks = [
@@ -174,6 +175,7 @@ const BookStorePage = () => {
     const [showFilters, setShowFilters] = useState(true);
     const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });
     const [showMobileFilters, setShowMobileFilters] = useState(false);
+    const [loading, setLoading] = useState(true)
 
     // Filter and sort books
     const filteredAndSortedBooks = useMemo(() => {
@@ -209,16 +211,30 @@ const BookStorePage = () => {
         }
     }, [searchTerm, searchBy, selectedCategory, sortBy, priceRange]);
 
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        // Simulate API call with setTimeout
+        const timer = setTimeout(() => {
+
+            setLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <Loader />
+    }
 
 
     return (
         <>
-        
+
             <Breadcrumb items={[
                 { label: 'Home', path: '/', icon: 'home' },
-                { label: 'Book Store' }
+                { label: 'Article Store' }
             ]}
-                pageTitle="Book Store"
+                pageTitle="Article Store"
                 pageDescription="Discover your next great read from our curated collection"
             />
             <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -67,6 +67,11 @@ import InnoVationDetailsPage from './pages/user/innovation/InnoVationDetailsPage
 import BookStorePage from './pages/user/books page/BookStorePage';
 import BookDetailsPage from './pages/user/books page/BookDetailsPage';
 import BookCartPage from './pages/user/books page/BookCartPage';
+import BookCheckoutPage from './pages/user/books page/BookCheckoutPage';
+import MentorsHubPage from './pages/user/mentor hub/MentorsHubPage';
+import MentorHubDetails from './pages/user/mentor hub/MentorHubDetails';
+import ResearchAndServicePage from './pages/user/research service/ResearchAndServicePage';
+import ResearchAndServicePageDetail from './pages/user/research service/ResearchAndServicePageDetail';
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -102,9 +107,21 @@ function App() {
             <Route  path="/blog/:id" element={<BlogDetails />} />
             <Route path='/innovation' element={<InnovationPage/>}/>
             <Route path='/innovation/:id' element={<InnoVationDetailsPage/>}/>
+
+            {/* Book Related route */}
             <Route path='/products' element={<BookStorePage/>}/>
             <Route path='/products/:id' element={<BookDetailsPage/>}/>
             <Route path='/cart' element={<BookCartPage/>}/>
+            <Route path='/checkout' element={<BookCheckoutPage/>}/>
+
+            {/* Mentors route */}
+             <Route path='/mentors' element={<MentorsHubPage/>}/>
+             <Route path='/mentors/:id' element={<MentorHubDetails/>}/>
+
+             {/* Research Services */}
+               <Route path='/research-services' element={<ResearchAndServicePage/>}/>
+               <Route path='/research-services/:serviceId' element={<ResearchAndServicePageDetail/>}/>
+
           </Route>
 
 

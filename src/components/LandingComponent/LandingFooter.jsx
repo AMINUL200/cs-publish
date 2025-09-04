@@ -7,63 +7,64 @@ const LandingFooter = () => {
     {
       title: "Product and services",
       items: [
-        { name: "Discover journals", path: "/journals" },
+        { name: "Discover journals", path: "#" },
         { name: "Books Hub", path: "/products" },
         { name: "Mentors", path: "/mentors" },
-        { name: "Author Services", path: "/author-services" },
+        { name: "Author Services", path: "#" },
         { name: "Blog", path: "/blog" },
-        { name: "Events", path: "/events" },
-        { name: "Conference", path: "/conference" }
+        { name: "Events", path: "#" },
+        { name: "Conference", path: "#" }
       ]
     },
     {
       title: "Resources",
       items: [
-        { name: "Data Depository", path: "/data-depository" },
-        { name: "Find protocols", path: "/protocols" },
+        { name: "Data Depository", path: "#" },
+        { name: "Find protocols", path: "#" },
         { name: "Innovation", path: "/innovation" },
-        { name: "Liberians Portal", path: "/librarians" },
-        { name: "Promote and Advertise", path: "/advertise" }
+        { name: "Research Service", path: "/research-services" },
+        { name: "Liberians Portal", path: "#" },
+        { name: "Promote and Advertise", path: "#" }
       ]
     },
     {
       title: "Policies and access",
       items: [
-        { name: "Open access", path: "/open-access" },
-        { name: "Subscription", path: "/subscription" },
-        { name: "Membership", path: "/membership" },
-        { name: "Editor Hub", path: "/editors" },
-        { name: "Reviewer hub", path: "/reviewers" },
-        { name: "Author hub", path: "/authors" },
-        { name: "Reprint", path: "/reprints" },
-        { name: "Partnership", path: "/partnership" },
-        { name: "Legal info", path: "/legal" }
+        { name: "Open access", path: "#" },
+        { name: "Subscription", path: "#" },
+        { name: "Membership", path: "#" },
+        { name: "Editor Hub", path: "#" },
+        { name: "Reviewer hub", path: "#" },
+        { name: "Author hub", path: "#" },
+        { name: "Reprint", path: "#" },
+        { name: "Partnership", path: "#" },
+        { name: "Legal info", path: "#" }
       ]
     },
     {
       title: "Support and contact",
       items: [
-        { name: "Press office", path: "/press" },
-        { name: "Our team", path: "/team" },
-        { name: "FAQ", path: "/faq" },
-        { name: "Live chat", path: "/chat" },
-        { name: "Career opportunities", path: "/careers" },
-        { name: "Fellowship", path: "/fellowship" },
-        { name: "Feedback", path: "/feedback" }
+        { name: "Press office", path: "#" },
+        { name: "Our team", path: "#" },
+        { name: "FAQ", path: "#" },
+        { name: "Live chat", path: "#" },
+        { name: "Career opportunities", path: "#" },
+        { name: "Fellowship", path: "#" },
+        { name: "Feedback", path: "#" }
       ]
     }
   ];
 
   const legalLinks = [
-    { name: "Privacy & Cookies", path: "/privacy" },
-    { name: "Terms & Conditions", path: "/terms" },
-    { name: "Legal Disclaimer", path: "/disclaimer" },
-    { name: "Refunds Policy", path: "/refunds" },
-    { name: "AML policy", path: "/aml-policy" }
+    { name: "Privacy & Cookies", path: "#" },
+    { name: "Terms & Conditions", path: "#" },
+    { name: "Legal Disclaimer", path: "#" },
+    { name: "Refunds Policy", path: "#" },
+    { name: "AML policy", path: "#" }
   ];
 
   return (
-    <footer className="text-gray-800">
+    <footer className="text-gray-800 relative bottom-0">
       <div className="mx-auto px-6 pt-12">
         {/* Main Links Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-6">

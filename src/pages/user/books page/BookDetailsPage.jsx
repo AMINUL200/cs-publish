@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAward, faBookmark, faClock, faEye, faHeart, faShare, faShoppingCart, faStar, faUsers } from '@fortawesome/free-solid-svg-icons';
 import Breadcrumb from '../../../components/common/Breadcrumb';
 import RelatedBooksCarousel from '../../../components/user/book carousel/RelatedBooksCarousel';
+import { Link } from 'react-router-dom';
+import Loader from '../../../components/common/Loader';
 
 // Dummy book data
 const bookData = {
@@ -87,15 +89,31 @@ const BookDetailsPage = () => {
     const [quantity, setQuantity] = useState(1);
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [activeTab, setActiveTab] = useState("description");
+    const [loading, setLoading] = useState(true)
+
+     useEffect(() => {
+        window.scrollTo(0, 0);
+        // Simulate API call with setTimeout
+        const timer = setTimeout(() => {
+
+            setLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <Loader />
+    }
 
     return (
         <>
             <Breadcrumb items={[
                 { label: 'Home', path: '/', icon: 'home' },
-                { label: 'Book Store', path: '/products', icon: 'file' },
-                { label: 'Book Details' }
+                { label: 'Article Store', path: '/products', icon: 'file' },
+                { label: 'Article Details' }
             ]}
-                pageTitle="Book Details"
+                pageTitle="Article Details"
                 pageDescription="Discover your next great read from our curated collection"
             />
             <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 mt-8">
@@ -244,10 +262,12 @@ const BookDetailsPage = () => {
                                 </div>
 
                                 <div className="flex space-x-4">
-                                    <button className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg cursor-pointer">
+                                    <Link
+                                        to='/cart'
+                                        className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg cursor-pointer">
                                         <FontAwesomeIcon icon={faShoppingCart} className="w-5 h-5" />
                                         <span>Add to Cart</span>
-                                    </button>
+                                    </Link>
                                     <button className="px-6 py-4 border-2 border-blue-600 text-blue-600 rounded-xl font-semibold hover:bg-blue-50 transition-colors cursor-pointer">
                                         Buy Now
                                     </button>

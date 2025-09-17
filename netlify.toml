@@ -1,0 +1,8 @@
+[build.environment]
+  NODE_VERSION = "18"
+
+[build]
+  command = "pnpm install && pnpm run build"
+
+[build.lifecycle]
+  onInstall = "npm install -g pnpm"

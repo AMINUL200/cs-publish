@@ -72,6 +72,13 @@ import MentorsHubPage from './pages/user/mentor hub/MentorsHubPage';
 import MentorHubDetails from './pages/user/mentor hub/MentorHubDetails';
 import ResearchAndServicePage from './pages/user/research service/ResearchAndServicePage';
 import ResearchAndServicePageDetail from './pages/user/research service/ResearchAndServicePageDetail';
+import AuthorViewSubmitManuscriptDetail from './pages/user/view submitted manuscript/AuthorViewSubmitManuscriptDetail';
+import Demo from './pages/user/view submitted manuscript/Demo';
+import PublisherViewPendingManuscripts from './pages/publisher/PublisherViewPendingManuscripts';
+import PublisherViewPayments from './pages/publisher/PublisherViewPayments';
+import PublisherViewPublishedManuscript from './pages/publisher/PublisherViewPublishedManuscript';
+import PublisherViewReports from './pages/publisher/PublisherViewReports';
+import PublisherDesignManuscript from './pages/publisher/PublisherDesignManuscript';
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -205,6 +212,17 @@ innovation
               <Route path='/confirmation/new-paper' element={<UserCheckListPage />} />
               <Route path='/confirmation/add-new-paper' element={<SubmitManuscript />} />
               <Route path='/confirmation/view-manuscript' element={<AuthorViewSubmittedManuscript />} />
+              <Route path='/confirmation/view-details-manuscript' element={<AuthorViewSubmitManuscriptDetail />} />
+              <Route path='/confirmation/view-details-manuscript2' element={<Demo />} />
+
+
+
+              {/* Publisher */}
+              <Route path='/publisher/manuscripts/pending' element={<PublisherViewPendingManuscripts />} />
+              <Route path='/publisher/payments' element={<PublisherViewPayments />} />
+              <Route path='/publisher/reports' element={<PublisherViewReports/>} />
+              <Route path='/publisher/manuscripts/published' element={<PublisherViewPublishedManuscript/>} />
+              <Route path='/publisher/manuscripts/design/:id' element={<PublisherDesignManuscript/>} />
 
             </Route>
           </Route>

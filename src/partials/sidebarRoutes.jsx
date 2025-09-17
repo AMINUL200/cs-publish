@@ -1,5 +1,5 @@
 // src/components/sidebarRoutes.js
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUser,
   faTachometerAlt,
@@ -13,28 +13,28 @@ import {
   faList,
   faLock,
   faCheckCircle,
-  faComments
-} from '@fortawesome/free-solid-svg-icons';
-import { DashboardIcon, ProfileIcon } from '../utils/icons';
-import { icon } from '@fortawesome/fontawesome-svg-core';
+  faComments,
+} from "@fortawesome/free-solid-svg-icons";
+import { DashboardIcon, ProfileIcon } from "../utils/icons";
+import { icon } from "@fortawesome/fontawesome-svg-core";
 
 export const sidebarRoutes = [
   {
     title: "Navigation",
     type: "header",
-    allowedRoles: ["0", "1", "2", "3", "4"]
+    allowedRoles: ["0", "1", "2", "3", "4", "5"],
   },
   {
     path: "/dashboard",
     title: "Dashboard",
     icon: <FontAwesomeIcon icon={faTachometerAlt} />,
-    allowedRoles: ["0", "1", "2", "3", "4"],
+    allowedRoles: ["0", "1", "2", "3", "4", "5"],
   },
   {
     path: "/profile",
     title: "Profile",
     icon: <FontAwesomeIcon icon={faUser} />,
-    allowedRoles: ["0", "1", "2", "3", "4"],
+    allowedRoles: ["0", "1", "2", "3", "4", "5"],
   },
   // Admin only routes
   {
@@ -88,7 +88,7 @@ export const sidebarRoutes = [
         path: "/permission/manage-reviewer",
         title: "Manage Reviewer",
         allowedRoles: ["1"],
-      }
+      },
     ],
   },
   {
@@ -219,16 +219,16 @@ export const sidebarRoutes = [
           {
             path: "/payment",
             title: "Phone Pe",
-            allowedRoles: ["0"]
+            allowedRoles: ["0"],
           },
           {
             path: "/payment",
             title: "Google Pe",
-            allowedRoles: ["0"]
-          }
-        ]
+            allowedRoles: ["0"],
+          },
+        ],
       },
-    ]
+    ],
   },
   {
     path: "/email-setting",
@@ -251,5 +251,51 @@ export const sidebarRoutes = [
     icon: <FontAwesomeIcon icon={faCheckCircle} />,
     allowedRoles: ["1"],
   },
-  
+
+  // Author route
+
+  {
+    path: "/confirmation/view-details-manuscript",
+    title: "View Details Manuscript",
+    icon: <FontAwesomeIcon icon={faCheckCircle} />,
+    allowedRoles: ["2"],
+  },
+  {
+    path: "/confirmation/view-details-manuscript2",
+    title: "View Details Manuscript",
+    icon: <FontAwesomeIcon icon={faCheckCircle} />,
+    allowedRoles: ["2"],
+  },
+
+  // Publisher route
+  {
+    path: "/publisher/manuscripts/pending",
+    title: "Pending Manuscripts",
+    icon: <FontAwesomeIcon icon={faList} />,
+    allowedRoles: ["5"],
+  },
+  {
+    path: "/publisher/payments",
+    title: "Payments",
+    icon: <FontAwesomeIcon icon={faCreditCard} />,
+    allowedRoles: ["5"],
+  },
+  {
+    path: "/publisher/manuscripts/published",
+    title: "Published Manuscripts",
+    icon: <FontAwesomeIcon icon={faList} />,
+    allowedRoles: ["5"],
+  },
+  {
+    path: "/publisher/reports",
+    title: "Reports",
+    icon: <FontAwesomeIcon icon={faList} />,
+    allowedRoles: ["5"],
+  },
+  {
+    path: "/publisher/manuscripts/design/:id",
+    title: "Design Manuscript",
+    icon: <FontAwesomeIcon icon={faList} />,
+    allowedRoles: ["5"],
+  },
 ];

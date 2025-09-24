@@ -79,6 +79,7 @@ import PublisherViewPayments from './pages/publisher/PublisherViewPayments';
 import PublisherViewPublishedManuscript from './pages/publisher/PublisherViewPublishedManuscript';
 import PublisherViewReports from './pages/publisher/PublisherViewReports';
 import PublisherDesignManuscript from './pages/publisher/PublisherDesignManuscript';
+import PublisherViewManuscript from './pages/publisher/PublisherViewManuscript';
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -218,6 +219,7 @@ innovation
 
 
               {/* Publisher */}
+              <Route path='/publisher/view-manuscript/:id' element={<PublisherViewManuscript />} />
               <Route path='/publisher/manuscripts/pending' element={<PublisherViewPendingManuscripts />} />
               <Route path='/publisher/payments' element={<PublisherViewPayments />} />
               <Route path='/publisher/reports' element={<PublisherViewReports/>} />

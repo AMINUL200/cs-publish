@@ -362,28 +362,28 @@ const StepperForm = () => {
                     }
                 }
 
-                // const response = await axios.post(`${API_URL}api/manuscript`, formDataToSend, {
-                //     headers: {
-                //         'Authorization': `Bearer ${token}`,
-                //         'Content-Type': 'multipart/form-data'
-                //     }
-                // });
+                const response = await axios.post(`${API_URL}api/manuscript`, formDataToSend, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
 
-                // console.log("Submission successful:", response.data);
-                // if (response.data.flag === 1) {
-                //     toast.success(response.data.message || "Manuscript submitted successfully");
+                console.log("Submission successful:", response.data);
+                if (response.data.flag === 1) {
+                    toast.success(response.data.message || "Manuscript submitted successfully");
 
-                //     // Generate PDF after successful submission
-                //     try {
-                //         const filename = generateManuscriptPDF(formData, authors, journalData);
-                //         toast.success(`PDF generated successfully: ${filename}`);
-                //     } catch (error) {
-                //         console.error("PDF generation error:", error);
-                //         toast.error("PDF generation failed, but manuscript was submitted successfully");
-                //     }
-                // } else {
-                //     toast.error(response.data.message || "Submission failed");
-                // }
+                    // Generate PDF after successful submission
+                    try {
+                        const filename = generateManuscriptPDF(formData, authors, journalData);
+                        toast.success(`PDF generated successfully: ${filename}`);
+                    } catch (error) {
+                        console.error("PDF generation error:", error);
+                        toast.error("PDF generation failed, but manuscript was submitted successfully");
+                    }
+                } else {
+                    toast.error(response.data.message || "Submission failed");
+                }
             }
 
         } catch (error) {

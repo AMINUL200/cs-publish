@@ -1,257 +1,232 @@
-import React, { useState } from 'react';
-import { 
-  FileText, 
-  DollarSign, 
-  CheckCircle, 
-  Download,
-  PieChart,
-  Calendar,
-  Search,
-  Filter,
-  ArrowUp,
-  TrendingUp
-} from 'lucide-react';
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import RecordsPerPageSelector from "../../components/common/RecordsPerPageSelector";
+import SearchInput from "../../components/common/SearchInput";
+import PaginationControls from "../../components/common/PaginationControls";
+import { Link } from "react-router-dom";
 
 const PublisherDashboard = () => {
-  // Mock data for demonstration
-  const [stats, setStats] = useState({
-    awaitingPayment: 12,
-    readyToPublish: 8,
-    publishedThisMonth: 23,
-    revenue: 2840
-  });
+  const { token } = useSelector((state) => state.auth);
+  const API_URL = import.meta.env.VITE_API_URL;
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [recordsPerPage, setRecordsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const [manuscripts, setManuscripts] = useState([
-    { id: 1, title: 'AI in Healthcare', author: 'Dr. Smith', status: 'awaiting-payment', submitted: '2023-05-15', amount: 250 },
-    { id: 2, title: 'Renewable Energy Solutions', author: 'Prof. Johnson', status: 'payment-received', submitted: '2023-05-18', amount: 300 },
-    { id: 3, title: 'Blockchain Applications', author: 'Dr. Williams', status: 'ready-to-publish', submitted: '2023-05-20', amount: 275 },
-    { id: 4, title: 'Climate Change Impacts', author: 'Dr. Brown', status: 'published', submitted: '2023-05-05', amount: 350 },
-    { id: 5, title: 'Neural Network Advances', author: 'Prof. Davis', status: 'awaiting-payment', submitted: '2023-05-22', amount: 225 },
-  ]);
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`${API_URL}api/publisher/list-manuscript`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Fetched data:", response.data);
 
-  const [activeTab, setActiveTab] = useState('all');
-
-  const filteredManuscripts = manuscripts.filter(manuscript => {
-    if (activeTab === 'all') return true;
-    return manuscript.status === activeTab;
-  });
-
-  const statusStyles = {
-    'awaiting-payment': 'bg-yellow-100 text-yellow-800',
-    'payment-received': 'bg-blue-100 text-blue-800',
-    'ready-to-publish': 'bg-purple-100 text-purple-800',
-    'published': 'bg-green-100 text-green-800'
+      if (response.data.flag === 1) {
+        setData(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error(error.message || "An error occurred while fetching data.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const statusText = {
-    'awaiting-payment': 'Awaiting Payment',
-    'payment-received': 'Payment Received',
-    'ready-to-publish': 'Ready to Publish',
-    'published': 'Published'
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // Function to strip HTML tags
+  const stripHtml = (html) => {
+    if (!html) return "";
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || "";
   };
 
-  const handleSendReminder = (id) => {
-    alert(`Payment reminder sent for manuscript #${id}`);
+  // Function to format date
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
-  const handlePublish = (id) => {
-    alert(`Publishing manuscript #${id}`);
-    setManuscripts(manuscripts.map(ms => 
-      ms.id === id ? {...ms, status: 'published'} : ms
-    ));
+  // Filter data based on search term
+  const filteredData = data ? data.filter(item => 
+    stripHtml(item.manuscript_data.title).toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.manuscript_data.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.editor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.manuscript_id.toString().includes(searchTerm)
+  ) : [];
+
+  // Pagination calculations
+  const totalRecords = filteredData.length;
+  const totalPages = Math.ceil(totalRecords / recordsPerPage);
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = filteredData.slice(indexOfFirstRecord, indexOfLastRecord);
+
+  // Change page
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
+
+  // Handle records per page change
+  const handleRecordsPerPageChange = (value) => {
+    setRecordsPerPage(value);
+    setCurrentPage(1); // Reset to first page when changing records per page
+  };
+
+  // Handle search term change
+  const handleSearchChange = (value) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-gray-600">Loading manuscripts...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Publisher Dashboard</h1>
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input 
-                type="text" 
-                placeholder="Search manuscripts..." 
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <button className="flex items-center text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 border border-gray-300 rounded-lg px-4 py-2">
-              <Filter className="mr-2 w-4 h-4" />
-              Filters
-            </button>
-          </div>
+    <div className="min-h-screen bg-white p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Publisher Dashboard</h1>
+          <p className="text-gray-600 mt-2">
+            Manage manuscripts assigned by editors for publication
+          </p>
         </div>
-      </header>
 
-      <main className="max-w-7xl mx-auto pt-4">
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-yellow-100">
-                <FileText className="text-yellow-600 w-6 h-6" />
-              </div>
-              <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Awaiting Payment</h3>
-                <p className="text-2xl font-semibold text-gray-900">{stats.awaitingPayment}</p>
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-sm text-green-600">
-              <TrendingUp className="mr-1 w-4 h-4" />
-              <span>2 from yesterday</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-blue-100">
-                <DollarSign className="text-blue-600 w-6 h-6" />
-              </div>
-              <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Ready to Publish</h3>
-                <p className="text-2xl font-semibold text-gray-900">{stats.readyToPublish}</p>
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-sm text-green-600">
-              <TrendingUp className="mr-1 w-4 h-4" />
-              <span>3 from yesterday</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-green-100">
-                <CheckCircle className="text-green-600 w-6 h-6" />
-              </div>
-              <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Published This Month</h3>
-                <p className="text-2xl font-semibold text-gray-900">{stats.publishedThisMonth}</p>
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-sm text-green-600">
-              <ArrowUp className="mr-1 w-4 h-4" />
-              <span>12% from last month</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-purple-100">
-                <PieChart className="text-purple-600 w-6 h-6" />
-              </div>
-              <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Revenue</h3>
-                <p className="text-2xl font-semibold text-gray-900">${stats.revenue}</p>
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-sm text-green-600">
-              <DollarSign className="mr-1 w-4 h-4" />
-              <span>$540 this week</span>
-            </div>
-          </div>
+        {/* Search and Controls */}
+        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <SearchInput
+            value={searchTerm}
+            onChange={handleSearchChange}
+            placeholder="Search manuscripts by title, author, editor, or ID..."
+          />
+          
+          <RecordsPerPageSelector
+            value={recordsPerPage}
+            onChange={handleRecordsPerPageChange}
+            options={[5, 10, 25, 50]}
+          />
         </div>
 
         {/* Manuscripts Table */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="border-b border-gray-200">
-            <nav className="flex -mb-px">
-              {['all', 'awaiting-payment', 'payment-received', 'ready-to-publish', 'published'].map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`ml-4 py-4 px-3 text-sm font-medium ${
-                    activeTab === tab 
-                      ? 'text-blue-600 border-b-2 border-blue-600' 
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  {tab === 'all' ? 'All Manuscripts' : statusText[tab]}
-                </button>
-              ))}
-            </nav>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase border-2">Manuscript</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase border-2">Author</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase border-2">Submitted</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase border-2">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase border-2">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase border-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredManuscripts.map((manuscript) => (
-                  <tr key={manuscript.id} className="hover:bg-gray-50">
-                    <td className="px-2 py-4 whitespace-nowrap border-2">
-                      <div className="text-sm font-medium text-gray-900">{manuscript.title}</div>
-                      <div className="text-sm text-gray-500">ID: #{manuscript.id}</div>
-                    </td>
-                    <td className="px-2 py-4 whitespace-nowrap border-2">
-                      <div className="text-sm text-gray-900">{manuscript.author}</div>
-                    </td>
-                    <td className="px-2 py-4 whitespace-nowrap flex items-center text-sm text-gray-900">
-                      {/* <Calendar className="mr-1 text-gray-400 w-4 h-4" /> */}
-                      {manuscript.submitted}
-                    </td>
-                    <td className="px-2 py-4 whitespace-nowrap border-2">
-                      <div className="text-sm font-medium text-gray-900">${manuscript.amount}</div>
-                    </td>
-                    <td className="px-2 py-4 whitespace-nowrap border-2">
-                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusStyles[manuscript.status]}`}>
-                        {statusText[manuscript.status]}
-                      </span>
-                    </td>
-                    <td className="px-2 py-4 whitespace-nowrap text-start text-sm font-medium flex flex-col justify-center items-center ">
-                      {manuscript.status === 'awaiting-payment' && (
-                        <button
-                          onClick={() => handleSendReminder(manuscript.id)}
-                          className="text-blue-600 hover:text-blue-900 mr-4"
-                        >
-                          Send Reminder
-                        </button>
-                      )}
-                      {manuscript.status === 'ready-to-publish' && (
-                        <button
-                          onClick={() => handlePublish(manuscript.id)}
-                          className="text-green-600 hover:text-green-900 mr-4"
-                        >
-                          Publish
-                        </button>
-                      )}
-                      <button className="text-gray-600 hover:text-gray-900 flex items-center">
-                        <Download className="inline-block mr-1 w-4 h-4" />
-                        Download
-                      </button>
-                    </td>
+        {data && data.length > 0 ? (
+          <>
+            <div className="bg-white   shadow-sm overflow-hidden mb-6">
+              <table className="min-w-full divide-y divide-gray-200">
+                {/* Table Header */}
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-400">
+                       ID
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider  border border-gray-400">
+                      Title
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider  border border-gray-400">
+                      Author
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider  border border-gray-400">
+                      Assigned By
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider  border border-gray-400">
+                      Date Assigned
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider  border border-gray-400">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          <div className="bg-white px-6 py-3 flex items-center justify-between border-t border-gray-200">
-            <div className="flex-1 flex justify-between items-center">
-              <p className="text-sm text-gray-700">
-                Showing <span className="font-medium">1</span> to <span className="font-medium">5</span> of{' '}
-                <span className="font-medium">23</span> results
-              </p>
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                <a href="#" className="px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm text-gray-500 hover:bg-gray-50">Previous</a>
-                <a href="#" className="px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600 hover:bg-blue-100">1</a>
-                <a href="#" className="px-4 py-2 border border-gray-300 bg-white text-sm text-gray-500 hover:bg-gray-50">2</a>
-                <a href="#" className="px-4 py-2 border border-gray-300 bg-white text-sm text-gray-500 hover:bg-gray-50">3</a>
-                <a href="#" className="px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm text-gray-500 hover:bg-gray-50">Next</a>
-              </nav>
+                </thead>
+                
+                {/* Table Body */}
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {currentRecords.map((item) => (
+                    <tr key={item.id} className="hover:bg-gray-50 transition-colors duration-150">
+                      <td className="px-6 py-4 whitespace-nowrap  border border-gray-400">
+                        <span className="text-sm text-gray-900 font-mono text-right">
+                          #{item.manuscript_id}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4  border border-gray-400">
+                        <div className="max-w-xs">
+                          <div className="text-sm font-medium text-gray-900 truncate" title={stripHtml(item.manuscript_data.title)}>
+                            {stripHtml(item.manuscript_data.title)}
+                          </div>
+                          <div className="text-xs text-gray-500 truncate mt-1" title={stripHtml(item.manuscript_data.abstract)}>
+                            {stripHtml(item.manuscript_data.abstract).substring(0, 60)}...
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap  border border-gray-400">
+                        <div className="text-sm text-gray-900">{item.manuscript_data.username}</div>
+                        <div className="text-xs text-gray-500">ID: {item.manuscript_data.user_id}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap  border border-gray-400">
+                        <div className="text-sm text-gray-900">{item.editor.name}</div>
+                        <div className="text-xs text-gray-500">ID: {item.editor.user_id}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500  border border-gray-400">
+                        {formatDate(item.created_at)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium  border border-gray-400">
+                        <div className="flex space-x-2">
+                          <Link to={`/publisher/view-manuscript/${item.manuscript_id}`} className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200">
+                            View
+                          </Link>
+                          {/* <button className="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200">
+                            Accept
+                          </button> */}
+                          {/* <button className="text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200">
+                            Details
+                          </button> */}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+
+            {/* Pagination Controls */}
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="text-sm text-gray-700">
+                Showing {indexOfFirstRecord + 1} to {Math.min(indexOfLastRecord, totalRecords)} of {totalRecords} entries
+              </div>
+              
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-12">
+            <div className="text-gray-500 text-lg">
+              {searchTerm ? 'No manuscripts found matching your search' : 'No manuscripts assigned yet'}
+            </div>
+            <p className="text-gray-400 mt-2">
+              {searchTerm ? 'Try adjusting your search terms' : 'Manuscripts assigned by editors will appear here'}
+            </p>
           </div>
-        </div>
-      </main>
+        )}
+      </div>
     </div>
   );
 };

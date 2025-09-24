@@ -15,9 +15,11 @@ import {
   Globe,
   FileCheck,
   AlertCircle,
+  ChevronRight,
+  Home,
 } from "lucide-react";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import Loader from "../../components/common/Loader";
@@ -28,6 +30,7 @@ const PublisherViewManuscript = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [manuscriptData, setManuscriptData] = useState(null);
@@ -93,6 +96,62 @@ const PublisherViewManuscript = () => {
     return tmp.textContent || tmp.innerText || "";
   };
 
+  // Function to handle image download
+  const downloadImage = async (imagePath, fileName) => {
+    try {
+      const imageUrl = `${STORAGE_URL}${imagePath}`;
+      
+      // Create a temporary anchor element to trigger download
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = fileName || imagePath.split('/').pop();
+      link.target = '_blank';
+      
+      // Append to body, click, and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success(`Downloading ${fileName || 'image'}...`);
+    } catch (error) {
+      console.error('Error downloading image:', error);
+      toast.error('Failed to download image. Please try again.');
+    }
+  };
+
+  // Breadcrumb component
+  const Breadcrumb = () => {
+    const breadcrumbItems = [
+      { label: 'Dashboard', path: '/publisher/dashboard' },
+      { label: 'Manuscripts', path: '/publisher/manuscripts' },
+      { label: 'View Manuscript', path: null }
+    ];
+
+    return (
+      <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
+        <Home 
+          className="h-4 w-4 cursor-pointer hover:text-gray-800" 
+          onClick={() => navigate('/publisher/dashboard')}
+        />
+        {breadcrumbItems.map((item, index) => (
+          <React.Fragment key={index}>
+            <ChevronRight className="h-4 w-4 text-gray-400" />
+            {item.path ? (
+              <button
+                onClick={() => navigate(item.path)}
+                className="hover:text-gray-800 cursor-pointer"
+              >
+                {item.label}
+              </button>
+            ) : (
+              <span className="text-gray-800 font-medium">{item.label}</span>
+            )}
+          </React.Fragment>
+        ))}
+      </nav>
+    );
+  };
+
   if (loading) {
     return <Loader />;
   }
@@ -118,6 +177,9 @@ const PublisherViewManuscript = () => {
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
+        {/* Breadcrumb */}
+        <Breadcrumb />
+
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -136,14 +198,6 @@ const PublisherViewManuscript = () => {
                 </div>
               </div>
             </div>
-            {/* <div
-              className={`px-4 py-2 rounded-full border text-sm font-medium ${getStatusColor(
-                manuscriptData.status
-              )}`}
-            >
-              <Clock className="inline-block h-4 w-4 mr-1" />
-              {manuscriptData.status || "Unknown"}
-            </div> */}
           </div>
         </div>
 
@@ -209,7 +263,6 @@ const PublisherViewManuscript = () => {
                     className="text-gray-700 leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: section.content }}
                   >
-                    {/* {section.content} */}
                   </p>
                 </div>
               ))}
@@ -224,6 +277,73 @@ const PublisherViewManuscript = () => {
                 {stripHtmlTags(manuscript.conflict_of_interest_statement)}
               </p>
             </div>
+
+            {/* Figures */}
+            {manuscriptData?.manuscript_data?.figures &&
+              manuscriptData?.manuscript_data?.figures.length > 0 && (
+                <div className="border border-gray-200 rounded-lg p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                    Figures ({manuscriptData?.manuscript_data?.figures.length})
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {manuscriptData?.manuscript_data?.figures.map(
+                      (figurePath, index) => (
+                        <div
+                          key={index}
+                          className="border border-gray-200 rounded-lg overflow-hidden"
+                        >
+                          <div className="aspect-video bg-gray-100 flex items-center justify-center">
+                            <img
+                              src={`${STORAGE_URL}${figurePath}`}
+                              alt={`Figure ${index + 1}`}
+                              className="w-full h-full object-contain max-h-64"
+                              onError={(e) => {
+                                e.target.style.display = "none";
+                                e.target.nextSibling.style.display = "flex";
+                              }}
+                            />
+                            <div className="hidden flex-col items-center justify-center text-gray-500 p-4">
+                              <FileText className="h-8 w-8 mb-2" />
+                              <span className="text-sm text-center">
+                                Image not available
+                              </span>
+                            </div>
+                          </div>
+                          <div className="p-3 bg-gray-50 border-t border-gray-200">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-gray-700">
+                                Figure {index + 1}
+                              </span>
+                              <div className="flex items-center space-x-2">
+                                <a
+                                  href={`${STORAGE_URL}${figurePath}`}
+                                  target="_blank"
+                                  download
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:text-blue-800 text-sm flex items-center px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+                                >
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  View
+                                </a>
+                                <button
+                                  onClick={() => downloadImage(figurePath, `Figure_${index + 1}.${figurePath.split('.').pop()}`)}
+                                  className="text-green-600 hover:text-green-800 text-sm flex items-center px-2 py-1 rounded hover:bg-green-50 transition-colors"
+                                >
+                                  <Download className="h-3 w-3 mr-1" />
+                                  Download
+                                </button>
+                              </div>
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1 truncate">
+                              {figurePath.split("/").pop()}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
           </div>
 
           {/* Sidebar */}
@@ -405,7 +525,6 @@ const PublisherViewManuscript = () => {
                         <div className="text-sm font-medium">
                           Supplementary Files
                         </div>
-                       
                       </div>
                     </div>
                     <a

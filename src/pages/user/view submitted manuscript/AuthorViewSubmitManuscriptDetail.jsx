@@ -1,9 +1,49 @@
-import React from 'react';
+import axios from "axios";
+import React from "react";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import Loader from "../../../components/common/Loader";
 
 const AuthorViewSubmitManuscriptDetail = () => {
+  const { id } = useParams();
+  const { token } = useSelector((state) => state.auth);
+  const API_URL = import.meta.env.VITE_API_URL;
+  const [manuscript, setManuscript] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+
+  const fetchManuscriptDetails = async () => {
+    try {
+      const response = await axios.get(`${API_URL}api/manuscript/journal-history/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if(response.data.flag === 1){
+        setManuscript(response.data.data);
+        console.log(response.data.data);
+        
+      }else{
+        toast.error(response.data.message || "Failed to fetch manuscript details");
+      }
+      
+    } catch (error) {
+      console.error("Error fetching manuscript details:", error);
+      toast.error(error?.message || "Failed to fetch manuscript details");
+    }finally{
+      setLoading(false);
+    }
+  }
+
+  React.useEffect(() => {
+    fetchManuscriptDetails();
+  }, [id]);
+
   // Dummy data for the manuscript
   const manuscriptData = {
-    title: "Machine Learning Applications in Healthcare: A Comprehensive Review",
+    title:
+      "Machine Learning Applications in Healthcare: A Comprehensive Review",
     journal: "Journal of Medical Technology & Innovation",
     status: "Under Review",
     currentStep: 5,
@@ -18,38 +58,38 @@ const AuthorViewSubmitManuscriptDetail = () => {
         step: 1,
         event: "Manuscript Submitted",
         description: "Your manuscript was submitted for review",
-        date: "Aug 15, 2024 at 10:30 AM"
+        date: "Aug 15, 2024 at 10:30 AM",
       },
       {
         step: 2,
         event: "Step 2 - Assigned to Editor",
         description: "Manuscript assigned to Editor 1",
-        date: "Aug 16, 2024 at 9:00 AM"
+        date: "Aug 16, 2024 at 9:00 AM",
       },
       {
         step: 3,
         event: "Step 3 - Editor Response",
         description: "Assignment accepted",
-        date: "Aug 16, 2024 at 2:30 PM"
+        date: "Aug 16, 2024 at 2:30 PM",
       },
       {
         step: 4,
         event: "Step 4 - Assigned to Reviewer",
         description: "Manuscript assigned to Reviewer 1",
-        date: "Aug 17, 2024 at 10:00 AM"
+        date: "Aug 17, 2024 at 10:00 AM",
       },
       {
         step: 5,
         event: "Step 5 - Reviewer Response",
         description: "Review completed - Decision: Major revisions",
-        date: "Aug 20, 2024 at 3:00 PM"
+        date: "Aug 20, 2024 at 3:00 PM",
       },
       {
         step: 6,
         event: "Step 6 - Assigned to Reviewer",
         description: "Manuscript assigned to Reviewer 2",
-        date: "Aug 21, 2024 at 11:00 AM"
-      }
+        date: "Aug 21, 2024 at 11:00 AM",
+      },
     ],
     assignments: {
       editor: [
@@ -57,40 +97,41 @@ const AuthorViewSubmitManuscriptDetail = () => {
           name: "Editor 1",
           status: "Accepted",
           assignedBy: "System",
-          date: "Aug 16, 2024"
-        }
+          date: "Aug 16, 2024",
+        },
       ],
       reviewers: [
         {
           name: "Reviewer 1",
           status: "Accepted",
           assignedBy: "Editor 1",
-          date: "Aug 17, 2024"
+          date: "Aug 17, 2024",
         },
         {
           name: "Reviewer 2",
           status: "Pending",
           assignedBy: "Editor 1",
-          date: "Aug 21, 2024"
+          date: "Aug 21, 2024",
         },
         {
           name: "Reviewer 3",
           status: "Pending",
           assignedBy: "Editor 1",
-          date: "Aug 21, 2024"
-        }
-      ]
+          date: "Aug 21, 2024",
+        },
+      ],
     },
     nextSteps: {
       action: "Review in Progress",
-      description: "Reviewer is evaluating your manuscript and will provide feedback",
-      estimatedTime: "7-14 business days"
-    }
+      description:
+        "Reviewer is evaluating your manuscript and will provide feedback",
+      estimatedTime: "7-14 business days",
+    },
   };
 
   // Helper function to get status badge class
   const getStatusClass = (status) => {
-    switch(status) {
+    switch (status) {
       case "Accepted":
         return "status-accepted";
       case "Pending":
@@ -102,21 +143,28 @@ const AuthorViewSubmitManuscriptDetail = () => {
     }
   };
 
+  if (loading) {
+    return <Loader/>
+  }
+
   return (
     <div className="container">
       {/* Manuscript Header */}
       <div className="manuscript-header">
         <div className="manuscript-title">"{manuscriptData.title}"</div>
         <div className="journal-name">{manuscriptData.journal}</div>
-        <div className="status-badge">{manuscriptData.status} - Step {manuscriptData.currentStep} of {manuscriptData.totalSteps}</div>
+        <div className="status-badge">
+          {manuscriptData.status} - Step {manuscriptData.currentStep} of{" "}
+          {manuscriptData.totalSteps}
+        </div>
         <div className="progress-container">
           <div className="progress-info">
             <span>Workflow Progress</span>
             <span>{manuscriptData.progressPercentage}% Complete</span>
           </div>
           <div className="progress-bar">
-            <div 
-              className="progress" 
+            <div
+              className="progress"
               style={{ width: `${manuscriptData.progressPercentage}%` }}
             ></div>
           </div>
@@ -137,7 +185,9 @@ const AuthorViewSubmitManuscriptDetail = () => {
           </div>
           <div className="status-item">
             <div className="status-label">Workflow Step</div>
-            <div className="status-value">Step {manuscriptData.currentStep} of {manuscriptData.totalSteps}</div>
+            <div className="status-value">
+              Step {manuscriptData.currentStep} of {manuscriptData.totalSteps}
+            </div>
           </div>
           <div className="status-item">
             <div className="status-label">Status</div>
@@ -145,7 +195,9 @@ const AuthorViewSubmitManuscriptDetail = () => {
           </div>
           <div className="status-item">
             <div className="status-label">Days Since Submission</div>
-            <div className="status-value">{manuscriptData.daysSinceSubmission} days</div>
+            <div className="status-value">
+              {manuscriptData.daysSinceSubmission} days
+            </div>
           </div>
           <div className="status-item">
             <div className="status-label">Last Activity</div>
@@ -182,7 +234,11 @@ const AuthorViewSubmitManuscriptDetail = () => {
               <div key={index} className="assignment-item">
                 <div className="assignee-info">
                   <span className="assignee-name">{editor.name}</span>
-                  <span className={`status-badge-small ${getStatusClass(editor.status)}`}>
+                  <span
+                    className={`status-badge-small ${getStatusClass(
+                      editor.status
+                    )}`}
+                  >
                     {editor.status}
                   </span>
                 </div>
@@ -201,7 +257,11 @@ const AuthorViewSubmitManuscriptDetail = () => {
               <div key={index} className="assignment-item">
                 <div className="assignee-info">
                   <span className="assignee-name">{reviewer.name}</span>
-                  <span className={`status-badge-small ${getStatusClass(reviewer.status)}`}>
+                  <span
+                    className={`status-badge-small ${getStatusClass(
+                      reviewer.status
+                    )}`}
+                  >
                     {reviewer.status}
                   </span>
                 </div>
@@ -219,20 +279,24 @@ const AuthorViewSubmitManuscriptDetail = () => {
       <div className="next-steps">
         <h3>What Happens Next?</h3>
         <div className="next-steps-content">
-          <div className="next-steps-action">{manuscriptData.nextSteps.action}</div>
-          <div className="next-steps-description">{manuscriptData.nextSteps.description}</div>
-          <div className="next-steps-time">Estimated time: {manuscriptData.nextSteps.estimatedTime}</div>
+          <div className="next-steps-action">
+            {manuscriptData.nextSteps.action}
+          </div>
+          <div className="next-steps-description">
+            {manuscriptData.nextSteps.description}
+          </div>
+          <div className="next-steps-time">
+            Estimated time: {manuscriptData.nextSteps.estimatedTime}
+          </div>
         </div>
       </div>
 
       <style jsx>{`
-        
-
         .container {
           max-width: 1200px;
           margin: 0 auto;
           padding: 20px;
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
           background-color: #f8f9fa;
           color: #333;
           line-height: 1.6;
@@ -244,7 +308,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
           padding: 30px;
           border-radius: 12px;
           margin-bottom: 30px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .manuscript-title {
@@ -261,7 +325,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
 
         .status-badge {
           display: inline-block;
-          background: rgba(255,255,255,0.2);
+          background: rgba(255, 255, 255, 0.2);
           padding: 8px 20px;
           border-radius: 25px;
           font-size: 14px;
@@ -270,7 +334,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
         }
 
         .progress-container {
-          background: rgba(255,255,255,0.1);
+          background: rgba(255, 255, 255, 0.1);
           border-radius: 10px;
           padding: 15px;
         }
@@ -285,14 +349,14 @@ const AuthorViewSubmitManuscriptDetail = () => {
         .progress-bar {
           width: 100%;
           height: 12px;
-          background: rgba(255,255,255,0.2);
+          background: rgba(255, 255, 255, 0.2);
           border-radius: 6px;
           overflow: hidden;
         }
 
         .progress {
           height: 100%;
-          background: linear-gradient(90deg, #4CAF50, #8BC34A);
+          background: linear-gradient(90deg, #4caf50, #8bc34a);
           transition: width 0.3s ease;
           border-radius: 6px;
         }
@@ -302,7 +366,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
           border-radius: 12px;
           padding: 25px;
           margin-bottom: 30px;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
           border-left: 5px solid #007bff;
         }
 
@@ -351,7 +415,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
           border-radius: 12px;
           padding: 25px;
           margin-bottom: 30px;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .timeline-title {
@@ -374,7 +438,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
         }
 
         .timeline::before {
-          content: '';
+          content: "";
           position: absolute;
           left: 20px;
           top: 0;
@@ -404,7 +468,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
           justify-content: center;
           font-weight: bold;
           font-size: 14px;
-          box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+          box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
         }
 
         .timeline-content {
@@ -412,7 +476,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
           padding: 20px;
           border-radius: 10px;
           border-left: 4px solid #007bff;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
 
         .timeline-event {
@@ -438,7 +502,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
           background: white;
           border-radius: 12px;
           padding: 25px;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .assignment-title {
@@ -487,7 +551,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
           border-radius: 8px;
           margin-bottom: 15px;
           border-left: 4px solid #28a745;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .assignee-info {
@@ -553,7 +617,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
         }
 
         .next-steps-content {
-          background: rgba(255,255,255,0.1);
+          background: rgba(255, 255, 255, 0.1);
           padding: 15px;
           border-radius: 8px;
         }
@@ -577,19 +641,19 @@ const AuthorViewSubmitManuscriptDetail = () => {
           .container {
             padding: 10px;
           }
-          
+
           .status-grid {
             grid-template-columns: 1fr;
           }
-          
+
           .assignment-cards {
             grid-template-columns: 1fr;
           }
-          
+
           .timeline {
             padding-left: 30px;
           }
-          
+
           .timeline-marker {
             width: 30px;
             height: 30px;

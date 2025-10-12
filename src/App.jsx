@@ -80,6 +80,11 @@ import PublisherViewPublishedManuscript from './pages/publisher/PublisherViewPub
 import PublisherViewReports from './pages/publisher/PublisherViewReports';
 import PublisherDesignManuscript from './pages/publisher/PublisherDesignManuscript';
 import PublisherViewManuscript from './pages/publisher/PublisherViewManuscript';
+import PublisherViewDesignManuscript from './pages/publisher/PublisherViewDesignManuscript';
+import TermsAndCondition from './pages/user/company policy/TermsAndCondition';
+import CompanyPolicy from './pages/user/company policy/CompanyPolicy';
+import HandleTermsAndCondition from './pages/admin/policy/HandleTermsAndCondition';
+import HandleCompanyPolicy from './pages/admin/policy/HandleCompanyPolicy';
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -130,6 +135,10 @@ function App() {
                <Route path='/research-services' element={<ResearchAndServicePage/>}/>
                <Route path='/research-services/:serviceId' element={<ResearchAndServicePageDetail/>}/>
 
+            {/* company policy */}
+             <Route path='/terms' element={<TermsAndCondition/>}/>
+             <Route path='/policy' element={<CompanyPolicy/>}/>
+
           </Route>
 
 
@@ -173,6 +182,8 @@ innovation
               <Route path="/setting/news" element={<LatestNews />} />
               <Route path="/setting/add-news" element={<AddNews />} />
               <Route path="/setting/news/:id" element={<UpdateNews />} />
+              <Route path="/setting/terms" element={<HandleTermsAndCondition />} />
+              <Route path="/setting/policy" element={<HandleCompanyPolicy />} />
 
               {/* user manger route */}
               <Route path='/users/add-user' element={<AddUser />} />
@@ -194,6 +205,8 @@ innovation
               <Route path='/article-manger/journal/edit-journal/:id' element={<EditJournal />} />
 
 
+              {/* ------------------------------------------ Admin Route End--------------------- */}
+
               {/* Editor */}
               <Route path='/permission/assigned-manuscript-reviewer' element={<ReviewerPermission />} />
               <Route path='/permission/check-list' element={<EditorCheckList />} />
@@ -213,6 +226,8 @@ innovation
               <Route path='/confirmation/new-paper' element={<UserCheckListPage />} />
               <Route path='/confirmation/add-new-paper' element={<SubmitManuscript />} />
               <Route path='/confirmation/view-manuscript' element={<AuthorViewSubmittedManuscript />} />
+              <Route path='/confirmation/view-manuscript/:id' element={<AuthorViewSubmitManuscriptDetail />} />
+              {/* demo */}
               <Route path='/confirmation/view-details-manuscript' element={<AuthorViewSubmitManuscriptDetail />} />
               <Route path='/confirmation/view-details-manuscript2' element={<Demo />} />
 
@@ -224,7 +239,10 @@ innovation
               <Route path='/publisher/payments' element={<PublisherViewPayments />} />
               <Route path='/publisher/reports' element={<PublisherViewReports/>} />
               <Route path='/publisher/manuscripts/published' element={<PublisherViewPublishedManuscript/>} />
+
+              
               <Route path='/publisher/manuscripts/design/:id' element={<PublisherDesignManuscript/>} />
+              <Route path='/publisher/manuscripts/view/:id' element={<PublisherViewDesignManuscript/>} />
 
             </Route>
           </Route>

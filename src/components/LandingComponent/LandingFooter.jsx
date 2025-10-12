@@ -57,9 +57,9 @@ const LandingFooter = () => {
 
   const legalLinks = [
     { name: "Privacy & Cookies", path: "#" },
-    { name: "Terms & Conditions", path: "#" },
+    { name: "Terms & Conditions", path: "/terms" },
     { name: "Legal Disclaimer", path: "#" },
-    { name: "Refunds Policy", path: "#" },
+    { name: "Policy", path: "/policy" },
     { name: "AML policy", path: "#" }
   ];
 

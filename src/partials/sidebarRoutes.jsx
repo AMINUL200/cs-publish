@@ -196,6 +196,16 @@ export const sidebarRoutes = [
         title: "Add News",
         allowedRoles: ["0"],
       },
+      {
+        path: "/setting/terms",
+        title: "Terms & Condition",
+        allowedRoles: ["0"],
+      },
+      {
+        path: "/setting/policy",
+        title: "Policy",
+        allowedRoles: ["0"],
+      },
     ],
   },
   {
@@ -295,6 +305,12 @@ export const sidebarRoutes = [
   {
     path: "/publisher/manuscripts/design/:id",
     title: "Design Manuscript",
+    icon: <FontAwesomeIcon icon={faList} />,
+    allowedRoles: ["5"],
+  },
+  {
+    path: "/publisher/manuscripts/view/:id",
+    title: "View Design Manuscript",
     icon: <FontAwesomeIcon icon={faList} />,
     allowedRoles: ["5"],
   },

@@ -100,38 +100,46 @@ const PublisherViewManuscript = () => {
   const downloadImage = async (imagePath, fileName) => {
     try {
       const imageUrl = `${STORAGE_URL}${imagePath}`;
-      
-      // Create a temporary anchor element to trigger download
-      const link = document.createElement('a');
-      link.href = imageUrl;
-      link.download = fileName || imagePath.split('/').pop();
-      link.target = '_blank';
-      
-      // Append to body, click, and remove
+
+      // Fetch file as blob
+      const response = await fetch(imageUrl, { mode: "cors" });
+      const blob = await response.blob();
+
+      // Create temporary URL for the blob
+      const blobUrl = URL.createObjectURL(blob);
+
+      // Create a hidden link element
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = fileName || imagePath.split("/").pop();
+
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
-      toast.success(`Downloading ${fileName || 'image'}...`);
+
+      // Cleanup
+      URL.revokeObjectURL(blobUrl);
+
+      toast.success(`Downloading ${fileName || "image"}...`);
     } catch (error) {
-      console.error('Error downloading image:', error);
-      toast.error('Failed to download image. Please try again.');
+      console.error("Error downloading image:", error);
+      toast.error("Failed to download image. Please try again.");
     }
   };
 
   // Breadcrumb component
   const Breadcrumb = () => {
     const breadcrumbItems = [
-      { label: 'Dashboard', path: '/publisher/dashboard' },
-      { label: 'Manuscripts', path: '/publisher/manuscripts' },
-      { label: 'View Manuscript', path: null }
+      { label: "Dashboard", path: "/publisher/dashboard" },
+      { label: "Manuscripts", path: "/publisher/manuscripts" },
+      { label: "View Manuscript", path: null },
     ];
 
     return (
       <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
-        <Home 
-          className="h-4 w-4 cursor-pointer hover:text-gray-800" 
-          onClick={() => navigate('/publisher/dashboard')}
+        <Home
+          className="h-4 w-4 cursor-pointer hover:text-gray-800"
+          onClick={() => navigate("/publisher/dashboard")}
         />
         {breadcrumbItems.map((item, index) => (
           <React.Fragment key={index}>
@@ -209,8 +217,11 @@ const PublisherViewManuscript = () => {
               <h2 className="text-xl font-semibold text-gray-900 mb-4">
                 Abstract
               </h2>
-              <p className="text-gray-700 leading-relaxed">
-                {manuscript.abstract}
+              <p
+                className="text-gray-700 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: manuscript.abstract }}
+              >
+                {/* {manuscript.abstract} */}
               </p>
             </div>
 
@@ -262,8 +273,7 @@ const PublisherViewManuscript = () => {
                   <p
                     className="text-gray-700 leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: section.content }}
-                  >
-                  </p>
+                  ></p>
                 </div>
               ))}
             </div>
@@ -317,16 +327,26 @@ const PublisherViewManuscript = () => {
                               <div className="flex items-center space-x-2">
                                 <a
                                   href={`${STORAGE_URL}${figurePath}`}
+                                  download={`Figure_${index + 1}.${figurePath
+                                    .split(".")
+                                    .pop()}`}
                                   target="_blank"
-                                  download
                                   rel="noopener noreferrer"
                                   className="text-blue-600 hover:text-blue-800 text-sm flex items-center px-2 py-1 rounded hover:bg-blue-50 transition-colors"
                                 >
-                                  <Eye className="h-3 w-3 mr-1" />
-                                  View
+                                  <Download className="h-3 w-3 mr-1" />
+                                  Download
                                 </a>
+
                                 <button
-                                  onClick={() => downloadImage(figurePath, `Figure_${index + 1}.${figurePath.split('.').pop()}`)}
+                                  onClick={() =>
+                                    downloadImage(
+                                      figurePath,
+                                      `Figure_${index + 1}.${figurePath
+                                        .split(".")
+                                        .pop()}`
+                                    )
+                                  }
                                   className="text-green-600 hover:text-green-800 text-sm flex items-center px-2 py-1 rounded hover:bg-green-50 transition-colors"
                                 >
                                   <Download className="h-3 w-3 mr-1" />

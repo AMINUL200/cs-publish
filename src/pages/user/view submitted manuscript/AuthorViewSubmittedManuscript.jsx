@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import Loader from '../../../components/common/Loader';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { formatDate } from '../../../lib/utils';
 
 const AuthorViewSubmittedManuscript = () => {
@@ -98,15 +98,15 @@ const AuthorViewSubmittedManuscript = () => {
                         return (
                             <div key={item.id} className="rounded border border-gray-200 p-4 bg-white">
                                 <div className="flex items-start justify-between gap-3">
-                                    <div>
-                                        <h3 className="text-lg font-medium" dangerouslySetInnerHTML={renderHtml(item?.title || 'Untitled')} />
-                                        <p className="mt-1 text-sm text-gray-600 line-clamp-3"
+                                    <Link to={`/confirmation/view-manuscript/${item.id}`} className="flex-1 group">
+                                        <h3 className="text-lg font-medium group-hover:text-blue-500 " dangerouslySetInnerHTML={renderHtml(item?.title || 'Untitled')} />
+                                        <p className="mt-1 text-sm text-gray-600 line-clamp-3 group-hover:underline "
                                         dangerouslySetInnerHTML={{__html:item?.abstract}}
                                         >
                                             {/* {item?.abstract} */}
 
                                         </p>
-                                    </div>
+                                    </Link>
                                     <div className="flex flex-col items-end gap-2">
                                         <span className={`text-xs px-2 py-1 rounded-full ${item?.manuscript_status === 'Published' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                                             {item?.manuscript_status || 'Unknown'}

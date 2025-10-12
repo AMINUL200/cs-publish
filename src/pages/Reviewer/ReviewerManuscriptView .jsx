@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
   faFileAlt,
@@ -11,17 +11,20 @@ import {
   faLock,
   faUserShield,
   faCheckSquare,
-  faPaperclip
-} from '@fortawesome/free-solid-svg-icons';
-import { useNavigate, useParams } from 'react-router-dom';
-import { faLightbulb } from '@fortawesome/free-solid-svg-icons';
-import { faFlask } from '@fortawesome/free-solid-svg-icons';
-import { faChartBar } from '@fortawesome/free-solid-svg-icons';
-import { faComments } from '@fortawesome/free-solid-svg-icons';
+  faPaperclip,
+} from "@fortawesome/free-solid-svg-icons";
+import { useNavigate, useParams } from "react-router-dom";
+import { faLightbulb } from "@fortawesome/free-solid-svg-icons";
+import { faFlask } from "@fortawesome/free-solid-svg-icons";
+import { faChartBar } from "@fortawesome/free-solid-svg-icons";
+import { faComments } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { useSelector } from 'react-redux';
-import Loader from '../../components/common/Loader';
+import { useSelector } from "react-redux";
+import Loader from "../../components/common/Loader";
+import { Download } from "lucide-react";
+import { View } from "lucide-react";
+import { FileText } from "lucide-react";
 
 const ReviewerManuscriptView = () => {
   const { token } = useSelector((state) => state.auth);
@@ -30,9 +33,9 @@ const ReviewerManuscriptView = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const [decision, setDecision] = useState('');
-  const [reviewText, setReviewText] = useState('');
-  const [confidentialComments, setConfidentialComments] = useState('');
+  const [decision, setDecision] = useState("");
+  const [reviewText, setReviewText] = useState("");
+  const [confidentialComments, setConfidentialComments] = useState("");
   const [reviewFile, setReviewFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [manuscriptDetails, setManuscriptDetails] = useState(null);
@@ -44,8 +47,8 @@ const ReviewerManuscriptView = () => {
     try {
       const res = await axios.get(`${API_URL}api/review/manuscript-dtl/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (res.data.flag === 1) {
@@ -53,12 +56,13 @@ const ReviewerManuscriptView = () => {
         setManuscriptDetails(res.data.data);
         // Transform questions into checklist format
         if (res.data.data.questions && res.data.data.questions.length > 0) {
-          setChecklist(res.data.data.questions.map((question, index) => ({
-            id: question.id,
-            question: question.name,
-            answer: 0
-          })));
-
+          setChecklist(
+            res.data.data.questions.map((question, index) => ({
+              id: question.id,
+              question: question.name,
+              answer: 0,
+            }))
+          );
         }
       } else {
         toast.error(res.data.message || "Failed to fetch manuscript details");
@@ -70,7 +74,7 @@ const ReviewerManuscriptView = () => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     getManuscriptDetails();
@@ -81,62 +85,91 @@ const ReviewerManuscriptView = () => {
     setIsSubmitting(true);
 
     try {
-
       const formData = {
         manuscript_id: manuscript.id,
         message_to_author: reviewText,
         message_to_editor: confidentialComments,
         recommendation: decision,
         image: reviewFile ? reviewFile : null, // If file is selected, include it
-        checklist: checklist.filter(item => item.answer === 1) // Only include checked items
-      }
+        checklist: checklist.filter((item) => item.answer === 1), // Only include checked items
+      };
       console.log("Submitting review data:", formData);
 
-
       // Submit the review data to the API
-      axios.post(`${API_URL}api/review/msg-editor-othor`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`
-        }
-      }).then((response) => {
-        if (response.data.flag === 1) {
-          toast.success("Review submitted successfully");
-          navigate(-1);
-        } else {
-          toast.error(response.data.message || "Failed to submit review");
-        }
-      }).catch((error) => {
-        console.error("Error submitting review:", error);
-        toast.error(error.response?.data?.message || "Failed to submit review");
-      });
-
+      axios
+        .post(`${API_URL}api/review/msg-editor-othor`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          if (response.data.flag === 1) {
+            toast.success("Review submitted successfully");
+            navigate(-1);
+          } else {
+            toast.error(response.data.message || "Failed to submit review");
+          }
+        })
+        .catch((error) => {
+          console.error("Error submitting review:", error);
+          toast.error(
+            error.response?.data?.message || "Failed to submit review"
+          );
+        });
     } catch (error) {
       console.error("Error submitting review:", error);
       toast.error(error.message || "Failed to submit review");
-
     } finally {
       setIsSubmitting(false);
     }
-
-
   };
 
   const handleCheckboxChange = (id) => {
-    setChecklist(checklist.map(item =>
-      item.id === id ? { ...item, answer: item.answer === 1 ? 0 : 1 } : item
-    ));
+    setChecklist(
+      checklist.map((item) =>
+        item.id === id ? { ...item, answer: item.answer === 1 ? 0 : 1 } : item
+      )
+    );
   };
 
   const handleFileChange = (e) => {
     setReviewFile(e.target.files[0]);
   };
+  const downloadImage = async (imagePath, fileName) => {
+    try {
+      const imageUrl = `${STORAGE_URL}${imagePath}`;
 
+      // Fetch file as blob
+      const response = await fetch(imageUrl, { mode: "cors" });
+      const blob = await response.blob();
+
+      // Create temporary URL for the blob
+      const blobUrl = URL.createObjectURL(blob);
+
+      // Create a hidden link element
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = fileName || imagePath.split("/").pop();
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Cleanup
+      URL.revokeObjectURL(blobUrl);
+
+      toast.success(`Downloading ${fileName || "image"}...`);
+    } catch (error) {
+      console.error("Error downloading image:", error);
+      toast.error("Failed to download image. Please try again.");
+    }
+  };
   const downloadFile = (filePath) => {
     if (!filePath) return;
 
     // Extract filename from path
-    const filename = filePath.split('/').pop();
+    const filename = filePath.split("/").pop();
 
     // In a real app, this would trigger a file download from the server
     console.log(`Downloading ${filename}`);
@@ -146,11 +179,15 @@ const ReviewerManuscriptView = () => {
   };
 
   if (loading) {
-    return <Loader />
+    return <Loader />;
   }
 
   if (!manuscriptDetails) {
-    return <div className="min-h-screen bg-gray-50 p-6">No manuscript details found</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        No manuscript details found
+      </div>
+    );
   } else {
     console.log("Manuscript Details::::", manuscriptDetails.manuscript.author);
   }
@@ -175,11 +212,11 @@ const ReviewerManuscriptView = () => {
         </button>
         <h1 className="text-2xl font-bold text-gray-800">
           Review Manuscript:&nbsp;
-          <span className='inline-block '
+          <span
+            className="inline-block "
             dangerouslySetInnerHTML={{ __html: manuscript?.title }}
           />
         </h1>
-
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 pb-10">
@@ -189,7 +226,10 @@ const ReviewerManuscriptView = () => {
             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 mb-5">
               <div className="p-5 pb-3 bg-blue-50">
                 <h2 className="text-lg font-bold text-gray-800">
-                  <FontAwesomeIcon icon={faFilePdf} className="mr-2 text-blue-500" />
+                  <FontAwesomeIcon
+                    icon={faFilePdf}
+                    className="mr-2 text-blue-500"
+                  />
                   Manuscript Files
                 </h2>
               </div>
@@ -215,7 +255,6 @@ const ReviewerManuscriptView = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 text-sm flex items-center cursor-pointer"
-
                     >
                       <FontAwesomeIcon icon={faDownload} className="mr-1" />
                       Download
@@ -224,7 +263,9 @@ const ReviewerManuscriptView = () => {
                 )}
                 {manuscript?.supplementary_files ? (
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Supplementary Files</span>
+                    <span className="text-sm font-medium">
+                      Supplementary Files
+                    </span>
                     <a
                       href={`${STORAGE_URL}${manuscript?.supplementary_files}`}
                       target="_blank"
@@ -234,15 +275,15 @@ const ReviewerManuscriptView = () => {
                       <FontAwesomeIcon icon={faDownload} className="mr-1" />
                       Download
                     </a>
-
                   </div>
                 ) : (
-                  <div className="text-sm text-gray-500">No supplementary files</div>
+                  <div className="text-sm text-gray-500">
+                    No supplementary files
+                  </div>
                 )}
               </div>
             </div>
 
-            {/* Authors Card */}
             {/* Authors Card */}
             {/* <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
               <div className="p-5 pb-3 bg-gradient-to-r from-blue-50 to-indigo-50">
@@ -316,8 +357,6 @@ const ReviewerManuscriptView = () => {
                 </div>
               )}
             </div> */}
-
-
           </div>
         </div>
 
@@ -327,12 +366,16 @@ const ReviewerManuscriptView = () => {
           <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
             <div className="p-5 pb-3 bg-blue-50">
               <h2 className="text-lg font-bold text-gray-800">
-                <FontAwesomeIcon icon={faFileAlt} className="mr-2 text-blue-500" />
+                <FontAwesomeIcon
+                  icon={faFileAlt}
+                  className="mr-2 text-blue-500"
+                />
                 Abstract
               </h2>
             </div>
             <div className="px-5 py-3">
-              <p className="text-sm text-gray-700 whitespace-pre-line"
+              <p
+                className="text-sm text-gray-700 whitespace-pre-line"
                 dangerouslySetInnerHTML={{ __html: manuscript?.abstract }}
               />
             </div>
@@ -347,7 +390,10 @@ const ReviewerManuscriptView = () => {
               <div className="px-5 py-3">
                 <div className="flex flex-wrap gap-2">
                   {manuscript?.keywords.map((keyword, index) => (
-                    <span key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
+                    <span
+                      key={index}
+                      className="bg-gray-100 px-3 py-1 rounded-full text-sm"
+                    >
                       {keyword}
                     </span>
                   ))}
@@ -362,12 +408,16 @@ const ReviewerManuscriptView = () => {
             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
               <div className="p-5 pb-3 bg-blue-50">
                 <h2 className="text-lg font-bold text-gray-800">
-                  <FontAwesomeIcon icon={faLightbulb} className="mr-2 text-blue-500" />
+                  <FontAwesomeIcon
+                    icon={faLightbulb}
+                    className="mr-2 text-blue-500"
+                  />
                   Introduction
                 </h2>
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line"
+                <p
+                  className="text-sm text-gray-700 whitespace-pre-line"
                   dangerouslySetInnerHTML={{ __html: manuscript?.introduction }}
                 />
               </div>
@@ -377,13 +427,19 @@ const ReviewerManuscriptView = () => {
             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
               <div className="p-5 pb-3 bg-blue-50">
                 <h2 className="text-lg font-bold text-gray-800">
-                  <FontAwesomeIcon icon={faFlask} className="mr-2 text-blue-500" />
+                  <FontAwesomeIcon
+                    icon={faFlask}
+                    className="mr-2 text-blue-500"
+                  />
                   Materials and Methods
                 </h2>
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line"
-                  dangerouslySetInnerHTML={{ __html: manuscript?.materials_and_methods }}
+                <p
+                  className="text-sm text-gray-700 whitespace-pre-line"
+                  dangerouslySetInnerHTML={{
+                    __html: manuscript?.materials_and_methods,
+                  }}
                 />
               </div>
             </div>
@@ -392,12 +448,16 @@ const ReviewerManuscriptView = () => {
             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
               <div className="p-5 pb-3 bg-blue-50">
                 <h2 className="text-lg font-bold text-gray-800">
-                  <FontAwesomeIcon icon={faChartBar} className="mr-2 text-blue-500" />
+                  <FontAwesomeIcon
+                    icon={faChartBar}
+                    className="mr-2 text-blue-500"
+                  />
                   Results
                 </h2>
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line"
+                <p
+                  className="text-sm text-gray-700 whitespace-pre-line"
                   dangerouslySetInnerHTML={{ __html: manuscript?.results }}
                 />
               </div>
@@ -407,12 +467,16 @@ const ReviewerManuscriptView = () => {
             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
               <div className="p-5 pb-3 bg-blue-50">
                 <h2 className="text-lg font-bold text-gray-800">
-                  <FontAwesomeIcon icon={faComments} className="mr-2 text-blue-500" />
+                  <FontAwesomeIcon
+                    icon={faComments}
+                    className="mr-2 text-blue-500"
+                  />
                   Discussion
                 </h2>
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line"
+                <p
+                  className="text-sm text-gray-700 whitespace-pre-line"
                   dangerouslySetInnerHTML={{ __html: manuscript?.discussion }}
                 />
               </div>
@@ -422,12 +486,16 @@ const ReviewerManuscriptView = () => {
             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
               <div className="p-5 pb-3 bg-blue-50">
                 <h2 className="text-lg font-bold text-gray-800">
-                  <FontAwesomeIcon icon={faCheckCircle} className="mr-2 text-blue-500" />
+                  <FontAwesomeIcon
+                    icon={faCheckCircle}
+                    className="mr-2 text-blue-500"
+                  />
                   Conclusion
                 </h2>
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line"
+                <p
+                  className="text-sm text-gray-700 whitespace-pre-line"
                   dangerouslySetInnerHTML={{ __html: manuscript?.conclusion }}
                 />
               </div>
@@ -477,6 +545,74 @@ const ReviewerManuscriptView = () => {
           </div>
         </div>
       </div>
+      {/* Figures */}
+      {manuscript?.figures && manuscript?.figures.length > 0 && (
+        <div className="border border-gray-200 rounded-lg p-6 pb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Figures ({manuscript?.figures.length})
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {manuscript?.figures.map((figurePath, index) => (
+              <div
+                key={index}
+                className="border border-gray-200 rounded-lg overflow-hidden"
+              >
+                <div className="aspect-video bg-gray-100 flex items-center justify-center">
+                  <img
+                    src={`${STORAGE_URL}${figurePath}`}
+                    alt={`Figure ${index + 1}`}
+                    className="w-full h-full object-contain max-h-64"
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                      e.target.nextSibling.style.display = "flex";
+                    }}
+                  />
+                  <div className="hidden flex-col items-center justify-center text-gray-500 p-4">
+                    <FileText className="h-8 w-8 mb-2" />
+                    <span className="text-sm text-center">
+                      Image not available
+                    </span>
+                  </div>
+                </div>
+                <div className="p-3 bg-gray-50 border-t border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">
+                      Figure {index + 1}
+                    </span>
+                    <div className="flex items-center space-x-2">
+                      <a
+                        href={`${STORAGE_URL}${figurePath}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 text-sm flex items-center px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+                      >
+                        <View className="h-3 w-3 mr-1" />
+                        View
+                      </a>
+
+                      <button
+                        onClick={() =>
+                          downloadImage(
+                            figurePath,
+                            `Figure_${index + 1}.${figurePath.split(".").pop()}`
+                          )
+                        }
+                        className="text-green-600 hover:text-green-800 text-sm flex items-center px-2 py-1 rounded hover:bg-green-50 transition-colors"
+                      >
+                        <Download className="h-3 w-3 mr-1" />
+                        Download
+                      </button>
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1 truncate">
+                    {figurePath.split("/").pop()}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Review Form */}
       <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
@@ -488,7 +624,10 @@ const ReviewerManuscriptView = () => {
         </div>
         <form onSubmit={handleSubmitReview} className="px-5 py-3">
           <div className="mb-6">
-            <label htmlFor="decision" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="decision"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Recommendation
             </label>
             <select
@@ -509,7 +648,10 @@ const ReviewerManuscriptView = () => {
           {checklist.length > 0 && (
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                <FontAwesomeIcon icon={faCheckSquare} className="mr-1 text-blue-500" />
+                <FontAwesomeIcon
+                  icon={faCheckSquare}
+                  className="mr-1 text-blue-500"
+                />
                 Manuscript Evaluation Checklist
               </label>
               <div className="space-y-2">
@@ -524,7 +666,10 @@ const ReviewerManuscriptView = () => {
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
                     </div>
-                    <label htmlFor={`check-${item.id}`} className="ml-2 text-sm text-gray-700">
+                    <label
+                      htmlFor={`check-${item.id}`}
+                      className="ml-2 text-sm text-gray-700"
+                    >
                       {item.question}
                     </label>
                   </div>
@@ -534,7 +679,10 @@ const ReviewerManuscriptView = () => {
           )}
 
           <div className="mb-6">
-            <label htmlFor="reviewText" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="reviewText"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Comments for Author
             </label>
             <textarea
@@ -549,7 +697,10 @@ const ReviewerManuscriptView = () => {
           </div>
 
           <div className="mb-6">
-            <label htmlFor="confidentialComments" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="confidentialComments"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               <FontAwesomeIcon icon={faLock} className="mr-1 text-blue-500" />
               Confidential Comments to Editor
             </label>
@@ -568,8 +719,14 @@ const ReviewerManuscriptView = () => {
           </div>
 
           <div className="mb-6">
-            <label htmlFor="reviewFile" className="block text-sm font-medium text-gray-700 mb-1">
-              <FontAwesomeIcon icon={faPaperclip} className="mr-1 text-blue-500" />
+            <label
+              htmlFor="reviewFile"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              <FontAwesomeIcon
+                icon={faPaperclip}
+                className="mr-1 text-blue-500"
+              />
               Upload Review Document (Optional)
             </label>
             <input
@@ -598,7 +755,9 @@ const ReviewerManuscriptView = () => {
             <button
               type="submit"
               disabled={isSubmitting || !decision}
-              className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${isSubmitting || !decision ? "opacity-70 cursor-not-allowed" : ""}`}
+              className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                isSubmitting || !decision ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             >
               {isSubmitting ? "Submitting..." : "Submit Review"}
             </button>

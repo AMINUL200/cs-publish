@@ -97,7 +97,7 @@ import HandlePartners from "./pages/admin/handle_landing_page/HandlePartners";
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
 
-  console.log("app:: ", userData);
+  // console.log("app:: ", userData);
 
   // Protected Route Component
   const ProtectedRoute = ({ isAuthenticated, redirectPath = "/" }) => {

@@ -17,7 +17,6 @@ const HomePage = () => {
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
-  console.log(isOpen);
 
   const [bannerData, setBannerData] = useState([]);
 

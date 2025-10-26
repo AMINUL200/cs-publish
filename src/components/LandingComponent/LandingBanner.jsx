@@ -7,6 +7,9 @@ import 'swiper/css/effect-fade';
 
 const LandingBanner = ({ bannerData = [], loading = false, error = null }) => {
     console.log("banner data:: ", bannerData);
+    console.log("banner error:: ", error);
+    console.log("banner loading:: ", loading);
+    
     
   // Loading Skeleton
   if (loading) {

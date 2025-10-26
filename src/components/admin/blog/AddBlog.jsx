@@ -263,7 +263,7 @@ const AddBlog = () => {
         </div>
 
         {/* Most Views */}
-        <div>
+        {/* <div>
           <label
             htmlFor="most_view"
             className="block text-sm font-medium text-gray-700 mb-2"
@@ -284,7 +284,7 @@ const AddBlog = () => {
           <p className="text-sm text-gray-500 mt-1">
             Number of times this blog has been viewed
           </p>
-        </div>
+        </div> */}
 
         {/* Image Upload */}
         <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">

@@ -9,27 +9,44 @@ import OurPartner from "../../components/LandingComponent/OurPartner";
 import LandingPricing from "../../components/LandingComponent/LandingPricing";
 import { toast } from "react-toastify";
 import axios from "axios";
+import LandingPublishedJournal from "../../components/LandingComponent/LandingPublishedJournal";
 
 const HomePage = () => {
   const [isOpen, setIsOpen] = useState(false);
-   const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
   const [bannerData, setBannerData] = useState([]);
+  const [partnerData, setPartnerData] = useState([]);
+  const [blogData, setBlogData] = useState([]);
+  const [aboutData, setAboutData] = useState({});
+  const [pricingData, setPricingData] = useState([]);
 
   const [loading, setLoading] = useState({
     banner: true,
+    partner: true,
+    blog: true,
+    about: true,
+    pricing: true,
   });
   const [error, setError] = useState({
     banner: null,
+    partner: null,
+    blog: null,
+    about: null,
+    pricing: null,
   });
 
   const fetchAll = async () => {
     const requests = {
       banner: axios.get(`${API_URL}api/banners`),
+      partner: axios.get(`${API_URL}api/partners`),
+      blog: axios.get(`${API_URL}api/blog-user`),
+      about: axios.get(`${API_URL}api/about`),
+      pricing: axios.get(`${API_URL}api/plan`),
     };
 
     Object.entries(requests).forEach(async ([key, request]) => {
@@ -37,6 +54,10 @@ const HomePage = () => {
         const response = await request;
         if (response.status === 200) {
           if (key === "banner") setBannerData(response.data.data);
+          if (key === "partner") setPartnerData(response.data.data);
+          if (key === "blog") setBlogData(response.data.data);
+          if (key === "about") setAboutData(response.data.data[0]);
+          if (key === "pricing") setPricingData(response.data);
         }
       } catch (error) {
         console.log(`Error fetching ${key}: `, error);
@@ -48,9 +69,9 @@ const HomePage = () => {
     });
   };
 
-    React.useEffect(() => {
+  React.useEffect(() => {
     fetchAll();
-    }, []);
+  }, []);
 
   return (
     <>
@@ -59,13 +80,30 @@ const HomePage = () => {
         loading={loading.banner}
         error={error.banner}
       />
-      <LandingAbout />
+      <LandingAbout
+        aboutData={aboutData}
+        loading={loading.about}
+        error={error.about}
+      />
       <BrowseJournals />
-      <LandingRecentPost />
+      <LandingPublishedJournal />
+      <LandingRecentPost
+        postData={blogData}
+        loading={loading.blog}
+        error={error.blog}
+      />
       <LandingResearch />
-      <LandingPricing />
+      <LandingPricing
+        pricingData={pricingData}
+        loading={loading.pricing}
+        error={error.pricing}
+      />
       <LandingServices />
-      <OurPartner />
+      <OurPartner
+        partnerData={partnerData}
+        loading={loading.partner}
+        error={error.partner}
+      />
     </>
   );
 };

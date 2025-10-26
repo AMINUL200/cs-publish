@@ -93,6 +93,7 @@ import HandleBannerPage from "./pages/admin/handle_landing_page/HandleBannerPage
 import HandleAbout from "./pages/admin/handle_landing_page/HandleAbout";
 import AddAbout from "./pages/admin/handle_landing_page/AddAbout";
 import HandlePartners from "./pages/admin/handle_landing_page/HandlePartners";
+import UserProfilePage from "./pages/user/profile_page/UserProfilePage";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -152,6 +153,7 @@ function App() {
           >
             <Route element={<AppLayout2 />}>
               <Route index path="/" element={<HomePage />} />
+              <Route path="/about" element={<UserProfilePage />} />
               <Route path="/blog" element={<UserBlogPage />} />
               <Route path="/blog/:id" element={<BlogDetails />} />
               <Route path="/innovation" element={<InnovationPage />} />
@@ -200,6 +202,7 @@ function App() {
           </Route>
 
           {/* Protected routes - only accessible when authenticated */}
+          {/* <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}> */}
           <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />

@@ -172,7 +172,7 @@ const UpdateBlog = () => {
       submitData.append("long_description", formData.long_description);
       submitData.append("image_alt", formData.image_alt);
       submitData.append("date", formData.date);
-      submitData.append("most_view", formData.most_view);
+      // submitData.append("most_view", formData.most_view);
       // submitData.append('_method', 'PUT'); // For Laravel to recognize as PUT request
 
       if (formData.image) {
@@ -306,7 +306,7 @@ const UpdateBlog = () => {
         </div>
 
         {/* Most Views */}
-        <div>
+        {/* <div>
           <label
             htmlFor="most_view"
             className="block text-sm font-medium text-gray-700 mb-2"
@@ -327,7 +327,7 @@ const UpdateBlog = () => {
           <p className="text-sm text-gray-500 mt-1">
             Number of times this blog has been viewed
           </p>
-        </div>
+        </div> */}
 
         {/* Image Upload */}
         <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">

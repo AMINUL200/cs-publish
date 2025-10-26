@@ -1,422 +1,269 @@
-import {
-    faArrowRight,
-    faEye,
-    faCalendar,
-    faUser,
-    faHeart,
-    faCoffee,
-    faLightbulb,
-    faPenNib,
-    faMicrophone,
-    faBrain
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import Loader from '../../../components/common/Loader';
-import InnovationTestimonial from '../../../components/common/InnovationTestimonial';
-import Breadcrumb from '../../../components/common/Breadcrumb';
-// import { ArrowRight, Eye, Calendar, User, Heart, Coffee, Lightbulb, PenTool, Mic, Brain } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Breadcrumb from "../../../components/common/Breadcrumb";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { formatDate } from "../../../lib/utils";
 
 const UserBlogPage = () => {
-    // Blog Categories Data
-    const blogCategories = [
-        {
-            id: 1,
-            title: "Author Stories",
-            description: "Personal journeys and experiences from writers around the world",
-            icon: <FontAwesomeIcon icon={faUser} className="w-8 h-8" />,
-            color: "from-purple-500 to-pink-500",
-            posts: 45
-        },
-        {
-            id: 2,
-            title: "How to Write Better",
-            description: "Tips, techniques and strategies to improve your writing skills",
-            icon: <FontAwesomeIcon icon={faPenNib} className="w-8 h-8" />,
-            color: "from-blue-500 to-cyan-500",
-            posts: 32
-        },
-        {
-            id: 3,
-            title: "Publishing Made Simple",
-            description: "Navigate the publishing world with confidence and ease",
-            icon: <FontAwesomeIcon icon={faCoffee} className="w-8 h-8" />,
-            color: "from-green-500 to-teal-500",
-            posts: 28
-        },
-        {
-            id: 4,
-            title: "Hidden Voices",
-            description: "Amplifying underrepresented stories and perspectives",
-            icon: <FontAwesomeIcon icon={faMicrophone} className="w-8 h-8" />,
-            color: "from-orange-500 to-red-500",
-            posts: 19
-        },
-        {
-            id: 5,
-            title: "Creative Sparks",
-            description: "Inspiration and ideas to fuel your creative writing journey",
-            icon: <FontAwesomeIcon icon={faLightbulb} className="w-8 h-8" />,
-            color: "from-yellow-500 to-orange-500",
-            posts: 36
-        },
-        {
-            id: 6,
-            title: "Mind & Motivation",
-            description: "Mental wellness and motivation for writers and creators",
-            icon: <FontAwesomeIcon icon={faBrain} className="w-8 h-8" />,
-            color: "from-indigo-500 to-purple-500",
-            posts: 24
-        }
-    ];
+  const API_URL = import.meta.env.VITE_API_URL;
+  const { token } = useSelector((state) => state.auth);
+  const [blogData, setBlogData] = useState([]);
+  const [filteredBlogs, setFilteredBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [categories, setCategories] = useState([]);
 
-    // Recent Blogs Data
-    const recentBlogs = [
-        {
-            id: 1,
-            title: "The Art of Storytelling in the Digital Age",
-            image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&h=250&fit=crop",
-            excerpt: "Discover how modern writers are adapting traditional storytelling techniques for digital platforms...",
-            author: "Sarah Johnson",
-            date: "2025-08-25",
-            category: "Author Stories",
-            readTime: "5 min read"
+  const fetchBlogData = async () => {
+    try {
+      const response = await axios.get(`${API_URL}api/blogs`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-        {
-            id: 2,
-            title: "10 Writing Habits That Changed My Life",
-            image: "https://images.unsplash.com/photo-1471107340929-a87cd0f5b5f3?w=400&h=250&fit=crop",
-            excerpt: "Transform your writing routine with these powerful habits that successful authors swear by...",
-            author: "Michael Chen",
-            date: "2025-08-23",
-            category: "How to Write Better",
-            readTime: "7 min read"
-        },
-        {
-            id: 3,
-            title: "Self-Publishing Success: A Complete Guide",
-            image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=250&fit=crop",
-            excerpt: "Everything you need to know about self-publishing your first book and building your author brand...",
-            author: "Emma Davis",
-            date: "2025-08-20",
-            category: "Publishing Made Simple",
-            readTime: "12 min read"
-        },
-        // {
-        //     id: 4,
-        //     title: "Finding Your Unique Voice as a Writer",
-        //     image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&h=250&fit=crop",
-        //     excerpt: "Learn how to develop and refine your authentic writing voice that resonates with readers...",
-        //     author: "Alex Rodriguez",
-        //     date: "2025-08-18",
-        //     category: "Creative Sparks",
-        //     readTime: "6 min read"
-        // }
-    ];
+      });
 
-    // Most Viewed Blogs Data
-    const mostViewedBlogs = [
-        {
-            id: 1,
-            title: "Why Every Writer Needs a Morning Routine",
-            image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop",
-            views: 15420,
-            author: "Jennifer Lopez",
-            date: "2025-07-15",
-            category: "Mind & Motivation",
-            readTime: "8 min read"
-        },
-        {
-            id: 2,
-            title: "The Psychology Behind Compelling Characters",
-            image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop",
-            views: 12830,
-            author: "David Kim",
-            date: "2025-07-10",
-            category: "How to Write Better",
-            readTime: "10 min read"
-        },
-        {
-            id: 3,
-            title: "From Manuscript to Bestseller: A Journey",
-            image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=250&fit=crop",
-            views: 11250,
-            author: "Rachel Green",
-            date: "2025-06-28",
-            category: "Author Stories",
-            readTime: "15 min read"
-        },
-        // {
-        //     id: 4,
-        //     title: "Breaking Writer's Block: 7 Proven Methods",
-        //     image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=250&fit=crop",
-        //     views: 9640,
-        //     author: "Tom Wilson",
-        //     date: "2025-06-20",
-        //     category: "Creative Sparks",
-        //     readTime: "9 min read"
-        // }
-    ];
-
-    // Team Members Data
-    const teamMembers = [
-        {
-            id: 1,
-            name: "Sarah Mitchell",
-            role: "Editor-in-Chief",
-            image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop",
-            bio: "Award-winning journalist with 15+ years in digital publishing",
-            social: "@sarahmitchell"
-        },
-        {
-            id: 2,
-            name: "Marcus Johnson",
-            role: "Senior Writer",
-            image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop",
-            bio: "Bestselling author and writing coach specializing in fiction",
-            social: "@marcusjwrites"
-        },
-        {
-            id: 3,
-            name: "Lisa Chen",
-            role: "Content Strategist",
-            image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop",
-            bio: "Digital marketing expert helping authors build their online presence",
-            social: "@lisachen_media"
-        },
-        {
-            id: 4,
-            name: "James Rivera",
-            role: "Community Manager",
-            image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop",
-            bio: "Passionate about connecting writers and fostering creative communities",
-            social: "@jamesrivera"
-        }
-    ];
-
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        window.scrollTo(0, 0);
-        // Simulate API call with setTimeout
-        const timer = setTimeout(() => {
-
-            setLoading(false);
-        }, 1000);
-
-        return () => clearTimeout(timer);
-    }, []);
-
-    if (loading) {
-        return <Loader />
+      if (response.status === 200) {
+        const blogs = response.data.data;
+        setBlogData(blogs);
+        setFilteredBlogs(blogs);
+        
+        // Extract unique categories
+        const uniqueCategories = [...new Map(blogs.map(blog => 
+          [blog.category.id, blog.category])
+        ).values()];
+        setCategories(uniqueCategories);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
+    fetchBlogData();
+  }, []);
+
+  // Filter blogs based on selected category
+  useEffect(() => {
+    if (selectedCategory === "all") {
+      setFilteredBlogs(blogData);
+    } else {
+      const filtered = blogData.filter(blog => 
+        blog.category.id.toString() === selectedCategory
+      );
+      setFilteredBlogs(filtered);
+    }
+  }, [selectedCategory, blogData]);
+
+  if (loading) {
     return (
-        <>
-            <Breadcrumb items={[
-                { label: 'Home', path: '/', icon: 'home' },
-                { label: 'Blog' }
-            ]}
-             pageTitle="Blog "
-              />
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 ">
-
-
-                {/* Blog Categories Section */}
-                <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                            Explore Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Categories</span>
-                        </h2>
-                        <h5 className="text-lg text-gray-600 max-w-2xl mx-auto">
-                            Dive into topics that inspire, educate, and elevate your writing journey
-                        </h5>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {blogCategories.map((category) => (
-                            <Link
-                                key={category.id}
-                                to='#'
-                                className="group relative overflow-hidden rounded-2xl bg-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 cursor-pointer"
-                            >
-                                <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
-                                <div className="relative p-8">
-                                    <div className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${category.color} text-white mb-6 shadow-lg`}>
-                                        {category.icon}
-                                    </div>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300">
-                                        {category.title}
-                                    </h3>
-                                    <p className="text-gray-600 mb-4 leading-relaxed">
-                                        {category.description}
-                                    </p>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-sm font-medium text-gray-500">
-                                            {category.posts} posts
-                                        </span>
-                                        <FontAwesomeIcon icon={faArrowRight} className="w-5 h-5 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all duration-300" />
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                </section>
-
-                {/* Recent Blogs Section */}
-                <section className="py-20 bg-white">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center mb-16">
-                            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                                Latest <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-600">Stories</span>
-                            </h2>
-                            <h5 className="text-lg text-gray-600 max-w-2xl mx-auto">
-                                Fresh insights and inspiring content from our community of writers
-                            </h5>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {recentBlogs.map((blog) => (
-                                <article
-                                    key={blog.id}
-                                    className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100"
-                                >
-                                    <div className="relative overflow-hidden">
-                                        <img
-                                            src={blog.image}
-                                            alt={blog.title}
-                                            className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
-                                        />
-                                        <div className="absolute top-4 left-4">
-                                            <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-gray-700">
-                                                {blog.category}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="p-6">
-                                        <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors duration-300 line-clamp-2">
-                                            {blog.title}
-                                        </h3>
-                                        <p className="text-gray-600 mb-4 leading-relaxed line-clamp-3">
-                                            {blog.excerpt}
-                                        </p>
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className="flex items-center space-x-2">
-                                                <FontAwesomeIcon icon={faUser} className="w-4 h-4 text-gray-400" />
-                                                <span className="text-sm text-gray-600">{blog.author}</span>
-                                            </div>
-                                            <div className="flex items-center space-x-4 text-sm text-gray-500">
-                                                <div className="flex items-center space-x-1">
-                                                    <FontAwesomeIcon icon={faCalendar} className="w-4 h-4" />
-                                                    <span>{new Date(blog.date).toLocaleDateString()}</span>
-                                                </div>
-                                                <span>{blog.readTime}</span>
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={() => navigate(`${blog.id}`)}
-                                            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl cursor-pointer">
-                                            Read More
-                                        </button>
-                                    </div>
-                                </article>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* Most Viewed Blogs Section */}
-                <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center mb-16">
-                            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                                Most <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-pink-600">Popular</span>
-                            </h2>
-                            <h5 className="text-lg text-gray-600 max-w-2xl mx-auto">
-                                The articles our community loves most - don't miss these trending reads
-                            </h5>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {mostViewedBlogs.map((blog) => (
-                                <article
-                                    key={blog.id}
-                                    className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100"
-                                >
-                                    <div className="relative overflow-hidden">
-                                        <img
-                                            src={blog.image}
-                                            alt={blog.title}
-                                            className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
-                                        />
-                                        <div className="absolute top-4 left-4">
-                                            <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center space-x-1">
-                                                <FontAwesomeIcon icon={faHeart} className="w-3 h-3" />
-                                                <span>Popular</span>
-                                            </span>
-                                        </div>
-                                        <div className="absolute top-4 right-4">
-                                            <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-gray-700 flex items-center space-x-1">
-                                                <FontAwesomeIcon icon={faEye} className="w-3 h-3" />
-                                                <span>{blog.views.toLocaleString()}</span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="p-6">
-                                        <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-red-600 transition-colors duration-300 line-clamp-2">
-                                            {blog.title}
-                                        </h3>
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className="flex items-center space-x-2">
-                                                <FontAwesomeIcon icon={faUser} className="w-4 h-4 text-gray-400" />
-                                                <span className="text-sm text-gray-600">{blog.author}</span>
-                                            </div>
-                                            <div className="flex items-center space-x-4 text-sm text-gray-500">
-                                                <div className="flex items-center space-x-1">
-                                                    <FontAwesomeIcon icon={faCalendar} className="w-4 h-4" />
-                                                    <span>{new Date(blog.date).toLocaleDateString()}</span>
-                                                </div>
-                                                <span>{blog.readTime}</span>
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={() => navigate(`${blog.id}`)}
-                                            className="w-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl cursor-pointer">
-                                            Read More
-                                        </button>
-                                    </div>
-                                </article>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* Team Section */}
-                <section className="py-20 bg-white innovation-section">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center mb-16">
-                            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                                Meet Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">Team</span>
-                            </h2>
-                            <h5 className="text-lg text-gray-600 max-w-2xl mx-auto text-center">
-                                The passionate writers and editors behind our content
-                            </h5>
-                        </div>
-                        <InnovationTestimonial innovatorVoices={teamMembers} />
-
-
-                    </div>
-                </section>
-
-
-
-
-            </div>
-        </>
-
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading blogs...</p>
+        </div>
+      </div>
     );
+  }
+
+  return (
+    <>
+      <Breadcrumb
+        items={[{ label: "Home", path: "/", icon: "home" }, { label: "Blogs" }]}
+        pageTitle="Blogs"
+      />
+      
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8">
+        <div className="container mx-auto px-4 max-w-8xl">
+          {/* Header Section */}
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Our <span className="text-blue-600">Blog</span>
+            </h1>
+            <h5 className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Discover insightful articles, latest trends, and expert opinions from our team
+            </h5>
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Sidebar - Filters */}
+            <div className="lg:w-1/4">
+              <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-20">
+                <h3 className="text-xl font-bold text-gray-900 mb-6">Filter by Category</h3>
+                
+                {/* All Categories Button */}
+                <button
+                  onClick={() => setSelectedCategory("all")}
+                  className={`w-full text-left px-4 py-3 rounded-xl mb-3 transition-all duration-200 ${
+                    selectedCategory === "all" 
+                      ? "bg-blue-600 text-white shadow-lg" 
+                      : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <span className="font-medium">All Categories</span>
+                  <span className="ml-2 text-sm opacity-75">({blogData.length})</span>
+                </button>
+
+                {/* Category Filters */}
+                <div className="space-y-2">
+                  {categories.map((category) => (
+                    <button
+                      key={category.id}
+                      onClick={() => setSelectedCategory(category.id.toString())}
+                      className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 ${
+                        selectedCategory === category.id.toString()
+                          ? "bg-blue-600 text-white shadow-lg"
+                          : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      <span className="font-medium">{category.category_name}</span>
+                      <span className="ml-2 text-sm opacity-75">
+                        ({blogData.filter(blog => blog.category.id === category.id).length})
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Active Filter Info */}
+                {selectedCategory !== "all" && (
+                  <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                    <p className="text-sm text-blue-800">
+                      Showing blogs from{" "}
+                      <strong>
+                        {categories.find(cat => cat.id.toString() === selectedCategory)?.category_name}
+                      </strong>
+                    </p>
+                    <button
+                      onClick={() => setSelectedCategory("all")}
+                      className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2"
+                    >
+                      Clear filter
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Main Content - Blog Cards */}
+            <div className="lg:w-3/4">
+              {/* Results Count */}
+              <div className="flex justify-between items-center mb-6">
+                <p className="text-gray-600">
+                  Showing <span className="font-semibold">{filteredBlogs.length}</span> 
+                  {filteredBlogs.length === 1 ? " blog" : " blogs"}
+                  {selectedCategory !== "all" && (
+                    <> in <span className="font-semibold text-blue-600">
+                      {categories.find(cat => cat.id.toString() === selectedCategory)?.category_name}
+                    </span></>
+                  )}
+                </p>
+              </div>
+
+              {/* Blog Grid */}
+              {filteredBlogs.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {filteredBlogs.map((blog) => (
+                    <div
+                      key={blog.id}
+                      className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group"
+                    >
+                      {/* Image */}
+                      <div className="relative overflow-hidden h-48">
+                        <img
+                          src={blog.image}
+                          alt={blog.image_alt || blog.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        {/* Category Badge */}
+                        <div className="absolute top-4 left-4">
+                          <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">
+                            {blog.category.category_name}
+                          </span>
+                        </div>
+                        {/* View Count */}
+                        <div className="absolute top-4 right-4">
+                          <span className="bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs font-medium">
+                            {blog.most_view} views
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-6">
+                        {/* Date */}
+                        <div className="flex items-center text-gray-500 text-sm mb-3">
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          {formatDate(blog.date)}
+                        </div>
+
+                        {/* Title */}
+                        <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                          {blog.title}
+                        </h3>
+
+                        {/* Description */}
+                        {/* <p className="text-gray-600 mb-4 line-clamp-3 leading-relaxed">
+                          {blog.description}
+                        </p> */}
+
+                        {/* Author */}
+                        <div className="flex items-center text-gray-500 text-sm mb-4">
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                          By {blog.author}
+                        </div>
+
+                        {/* Read More Button */}
+                        <Link
+                          to={`/blog/${blog.id}`}
+                          className="inline-flex items-center justify-center w-full bg-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-blue-700 transition-all duration-200 hover:shadow-lg group/btn"
+                        >
+                          Read More
+                          <svg className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          </svg>
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                // No Results State
+                <div className="text-center py-16">
+                  <div className="max-w-md mx-auto">
+                    <svg className="w-24 h-24 text-gray-300 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">No blogs found</h3>
+                    <p className="text-gray-600 mb-6">
+                      {selectedCategory !== "all" 
+                        ? `No blogs found in the selected category. Try selecting a different category.`
+                        : `No blogs available at the moment. Please check back later.`
+                      }
+                    </p>
+                    {selectedCategory !== "all" && (
+                      <button
+                        onClick={() => setSelectedCategory("all")}
+                        className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors"
+                      >
+                        View All Blogs
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 };
 
 export default UserBlogPage;

@@ -15,7 +15,9 @@ const partners = [
   { img: partnear2, name: "Partner name" },
 ];
 
-const OurPartner = () => {
+const OurPartner = ({partnerData =[], loading = false, error=null}) => {
+  // console.log(partnerData);
+  
   return (
     <section className="our-partner">
       <div className="mx-auto md:mx-20">
@@ -44,11 +46,11 @@ const OurPartner = () => {
           }}
           className="partnears"
         >
-          {partners.map((partner, index) => (
+          {partnerData.map((partner, index) => (
             <SwiperSlide key={index}>
               <div className="partnear-area">
                 <div className="prtn_img">
-                  <img src={partner.img} alt="partner" className="img-fluid" />
+                  <img src={partner.images} alt={partner.image_alt} className="img-fluid" />
                 </div>
                 <p className="prtn_name">{partner.name}</p>
               </div>

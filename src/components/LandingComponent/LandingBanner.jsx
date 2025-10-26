@@ -6,6 +6,8 @@ import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 
 const LandingBanner = ({ bannerData = [], loading = false, error = null }) => {
+    console.log("banner data:: ", bannerData);
+    
   // Loading Skeleton
   if (loading) {
     return (

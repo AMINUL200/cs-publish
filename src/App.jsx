@@ -79,8 +79,8 @@ import PublisherViewReports from "./pages/publisher/PublisherViewReports";
 import PublisherDesignManuscript from "./pages/publisher/PublisherDesignManuscript";
 import PublisherViewManuscript from "./pages/publisher/PublisherViewManuscript";
 import PublisherViewDesignManuscript from "./pages/publisher/PublisherViewDesignManuscript";
-import TermsAndCondition from "./pages/user/company policy/TermsAndCondition";
-import CompanyPolicy from "./pages/user/company policy/CompanyPolicy";
+import TermsAndCondition from "./pages/user/company_policy/TermsAndCondition";``
+import CompanyPolicy from "./pages/user/company_policy/CompanyPolicy";
 import HandleTermsAndCondition from "./pages/admin/policy/HandleTermsAndCondition";
 import HandleCompanyPolicy from "./pages/admin/policy/HandleCompanyPolicy";
 import { el } from "date-fns/locale/el";
@@ -88,11 +88,11 @@ import FeaturePayment from "./pages/admin/payment/FeaturePayment";
 import ForgotPassword from "./pages/Auth/ForgetPassword";
 import ArticleFrontView from "./pages/ArtiicleFrontView";
 import HandlePaymentPolicy from "./pages/admin/policy/HandlePaymentPolicy";
-import PaymentPolicy from "./pages/user/company policy/PaymentPolicy";
-import HandleBannerPage from "./pages/admin/handle landing page/HandleBannerPage";
-import HandleAbout from "./pages/admin/handle landing page/HandleAbout";
-import AddAbout from "./pages/admin/handle landing page/AddAbout";
-import HandlePartners from "./pages/admin/handle landing page/Handlepartners";
+import PaymentPolicy from "./pages/user/company_policy/PaymentPolicy";
+import HandleBannerPage from "./pages/admin/handle_landing_page/HandleBannerPage";
+import HandleAbout from "./pages/admin/handle_landing_page/HandleAbout";
+import AddAbout from "./pages/admin/handle_landing_page/AddAbout";
+import HandlePartners from "./pages/admin/handle_landing_page/HandlePartners";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);

@@ -206,6 +206,11 @@ export const sidebarRoutes = [
         title: "Policy",
         allowedRoles: ["0"],
       },
+      {
+        path: "/setting/payment-policy",
+        title: "Payment Policy",
+        allowedRoles: ["0"],
+      }
     ],
   },
   {
@@ -218,26 +223,16 @@ export const sidebarRoutes = [
     // path: "/payment",
     title: "Payment",
     icon: <FontAwesomeIcon icon={faCreditCard} />,
-    allowedRoles: ["0", "1"],
+    allowedRoles: ["0"],
     subRoutes: [
       {
         // path: "/payment",
-        title: "On Line",
+        title: "Featured Payment",
         icon: <FontAwesomeIcon icon={faCreditCard} />,
-        allowedRoles: ["0", "1"],
-        subRoutes: [
-          {
-            path: "/payment",
-            title: "Phone Pe",
-            allowedRoles: ["0"],
-          },
-          {
-            path: "/payment",
-            title: "Google Pe",
-            allowedRoles: ["0"],
-          },
-        ],
+        allowedRoles: ["0"],
+        path: "/payment/featured-payment",
       },
+      
     ],
   },
   {
@@ -245,6 +240,29 @@ export const sidebarRoutes = [
     title: "Email Setting",
     icon: <FontAwesomeIcon icon={faCog} />,
     allowedRoles: ["0"],
+  },
+  {
+    title: "Handle Landing Page",
+    icon: <FontAwesomeIcon icon={faCog} />,
+    allowedRoles: ["0"],
+    subRoutes: [
+      {
+        path: "/landing-page/banner",
+        title: "Manage Banners",
+        allowedRoles: ["0"],
+      },
+      {
+        path: "/landing-page/about-us",
+        title: "Manage About Us",
+        allowedRoles: ["0"],
+      },
+      {
+        path: "/landing-page/partners",
+        title: "Manage Partners",
+        allowedRoles: ["0"],
+      }
+      
+    ]
   },
   // Reviewer route
   {

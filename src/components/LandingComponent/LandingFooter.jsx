@@ -60,7 +60,7 @@ const LandingFooter = () => {
     { name: "Terms & Conditions", path: "/terms" },
     { name: "Legal Disclaimer", path: "#" },
     { name: "Policy", path: "/policy" },
-    { name: "AML policy", path: "#" }
+    { name: "Payment Policy", path: "/payment-policy" }
   ];
 
   return (

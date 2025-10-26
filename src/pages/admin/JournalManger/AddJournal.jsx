@@ -30,6 +30,7 @@ const AddJournal = () => {
         issn_online_no: "",
         ugc_approved: "1",
         ugc_no: "",
+        amount: "", // Added amount field
         image: null,
         status: "1",
     });
@@ -104,7 +105,6 @@ const AddJournal = () => {
         try {
             const submitData = new FormData();
 
-
             // Append all form data to FormData object
             Object.entries(formData).forEach(([key, value]) => {
                 // Skip null or undefined values
@@ -112,8 +112,6 @@ const AddJournal = () => {
                     submitData.append(key, value);
                 }
             });
-
-
 
             const res = await axios.post(`${API_URL}api/admin/journals`, submitData, {
                 headers: {
@@ -138,6 +136,7 @@ const AddJournal = () => {
                     issn_online_no: "",
                     ugc_approved: "1",
                     ugc_no: "",
+                    amount: "", // Reset amount field
                     image: null,
                     status: "1",
                 });
@@ -260,6 +259,19 @@ const AddJournal = () => {
                         value={formData.editor}
                         onChange={handleChange}
                         className="w-full border px-3 py-2 rounded"
+                    />
+                </div>
+
+                {/* Amount */}
+                <div>
+                    <label className="block mb-1 font-medium">Amount</label>
+                    <input
+                        type="number"
+                        name="amount"
+                        value={formData.amount}
+                        onChange={handleChange}
+                        className="w-full border px-3 py-2 rounded"
+                        placeholder="Enter amount"
                     />
                 </div>
 

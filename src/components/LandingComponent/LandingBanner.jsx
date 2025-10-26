@@ -6,7 +6,11 @@ import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 import { sliderImage } from '../../assets';
 
-const LandingBanner = () => {
+const LandingBanner = ({bannerData, loading = false, error=null}) => {
+
+    console.log(bannerData);
+    
+
     const slides = [
         {
             title: "After all is said ",
@@ -38,8 +42,8 @@ const LandingBanner = () => {
                 loop={true}
                 className="h-full"
             >
-                {slides.map((slide, index) => (
-                    <SwiperSlide key={index}>
+                {bannerData.map((slide, index) => (
+                    <SwiperSlide key={slide.id}>
                         {/* Background Image */}
                         <div
                             className="absolute inset-0 bg-cover bg-center z-0"
@@ -55,11 +59,11 @@ const LandingBanner = () => {
                                     {slide.title}
                                 </h1>
                                 <p className="text-lg md:text-xl text-white/90 mb-8 max-w-lg">
-                                    {slide.text}
+                                    {slide.description}
                                 </p>
                                 <div className="pt-6 border-t border-white/20">
                                     <button className="px-8 py-3 bg-[#ffba00] text-white font-medium rounded-3xl hover:bg-black transition-all duration-300 ease-in-out transform hover:scale-105">
-                                        {slide.cta}
+                                        {slide.button_name}
                                     </button>
                                 </div>
                             </div>

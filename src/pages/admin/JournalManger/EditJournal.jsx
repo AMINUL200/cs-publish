@@ -29,6 +29,7 @@ const EditJournal = () => {
         j_description: "",
         editorial_board: "",
         editor: "",
+        amount: "", // Added amount field
         issn_print: "1",
         issn_print_no: "",
         issn_online: "1",
@@ -90,6 +91,7 @@ const EditJournal = () => {
                     j_description: j.j_description || "",
                     editorial_board: j.editorial_board || "",
                     editor: j.editor || "",
+                    amount: j.amount || "", // Added amount field
                     issn_print: j.issn_print ? "1" : "0",
                     issn_print_no: j.issn_print_no || "",
                     issn_online: j.issn_online ? "1" : "0",
@@ -122,8 +124,6 @@ const EditJournal = () => {
         } else {
             setFormData((prev) => ({ ...prev, [name]: value }));
         }
-
-
     };
 
     const handleSubmit = async (e) => {
@@ -147,9 +147,6 @@ const EditJournal = () => {
                     },
                 }
             );
-
-            
-
 
             if (res.status === 200) {
                 console.log(res.data);
@@ -252,6 +249,19 @@ const EditJournal = () => {
                         value={formData.editor}
                         onChange={handleChange}
                         className="w-full border px-3 py-2 rounded"
+                    />
+                </div>
+
+                {/* Amount */}
+                <div>
+                    <label className="block mb-1 font-medium">Amount</label>
+                    <input
+                        type="number"
+                        name="amount"
+                        value={formData.amount}
+                        onChange={handleChange}
+                        className="w-full border px-3 py-2 rounded"
+                        placeholder="Enter amount"
                     />
                 </div>
 

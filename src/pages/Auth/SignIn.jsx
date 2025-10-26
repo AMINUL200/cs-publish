@@ -49,7 +49,16 @@ export default function SignIn() {
       if (response.data.flag === 1 || response.data) {
         dispatch(login({ userData: response.data.user, token: response.data.token }));
         toast.success(response.data.message);
-        navigate('/dashboard');
+
+        if(response.data.user.user_type == 4){
+          navigate('/');
+          return;
+        }else{
+          navigate('/dashboard');
+          return;
+        }
+
+
       } else {
         toast.error(response.data.message);
       }
@@ -296,13 +305,15 @@ export default function SignIn() {
                 transition={{ delay: 0.8 }}
                 className="mt-6 text-center"
               >
-                <motion.a
-                  href="#"
+                {/* Changed from anchor tag to Link component */}
+                <Link
+                  to="/forgot-password"
                   className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
-                  whileHover={{ x: 2 }}
                 >
-                  Forgot password?
-                </motion.a>
+                  <motion.span whileHover={{ x: 2 }}>
+                    Forgot password?
+                  </motion.span>
+                </Link>
                 <p className="text-gray-600 text-sm mt-2">
                   Don't have an account?{' '}
                   <Link

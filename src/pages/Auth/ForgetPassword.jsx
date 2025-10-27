@@ -124,7 +124,7 @@ const ForgotPassword = () => {
         {/* Card Container */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Header */}
-          <div className="relative h-24 bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center">
+          <div className="relative h-24 bg-gradient-to-r from-[#8B0000] to-[#ffba00] flex items-center justify-center">
             <div className="absolute inset-0 opacity-10">
               <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 20% 50%, currentColor 0%, transparent 50%)'}} />
             </div>
@@ -156,7 +156,7 @@ const ForgotPassword = () => {
                       className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition ${
                         errors.email
                           ? 'border-red-500 focus:ring-red-500'
-                          : 'border-gray-300 focus:ring-blue-500'
+                          : 'border-yellow-300 focus:ring-yellow-500'
                       }`}
                     />
                   </div>
@@ -166,14 +166,14 @@ const ForgotPassword = () => {
                 <button
                   onClick={handleEmailSubmit}
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-gradient-to-r from-[#8B0000] to-[#ffba00] hover:from-yellow-700 hover:to-[#8B0000] text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Sending...' : 'Continue'}
                   <ArrowRight className="w-5 h-5" />
                 </button>
 
                 <div className="text-center">
-                  <p className="text-gray-600 text-sm">Remember your password? <Link to="/signin" className="text-blue-600 hover:text-blue-700 font-semibold">Sign in</Link></p>
+                  <p className="text-gray-600 text-sm">Remember your password? <Link to="/signin" className="text-yellow-600 hover:text-yellow-700 font-semibold">Sign in</Link></p>
                 </div>
               </div>
             )}
@@ -223,7 +223,7 @@ const ForgotPassword = () => {
                       className={`w-full pl-12 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 transition ${
                         errors.password
                           ? 'border-red-500 focus:ring-red-500'
-                          : 'border-gray-300 focus:ring-blue-500'
+                          : 'border-yellow-300 focus:ring-yellow-500'
                       }`}
                     />
                     <button
@@ -252,7 +252,7 @@ const ForgotPassword = () => {
                       className={`w-full pl-12 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 transition ${
                         errors.confirmPassword
                           ? 'border-red-500 focus:ring-red-500'
-                          : 'border-gray-300 focus:ring-blue-500'
+                          : 'border-yellow-300 focus:ring-yellow-500'
                       }`}
                     />
                     <button
@@ -269,7 +269,7 @@ const ForgotPassword = () => {
                 <button
                   onClick={handlePasswordUpdate}
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-gradient-to-r from-[#8B0000] to-[#ffba00] hover:from-[#ffba00] hover:to-[#8B0000] text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Updating...' : 'Update Password'}
                 </button>
@@ -299,7 +299,7 @@ const ForgotPassword = () => {
 
                 <button
                   onClick={handleBackToLogin}
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition"
+                  className="w-full bg-gradient-to-r from-[#8B0000] to-[#ffba00] hover:from-[#ffba00] hover:to-[#8B0000] text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition"
                 >
                   Back to Login
                   <ArrowRight className="w-5 h-5" />
@@ -310,9 +310,9 @@ const ForgotPassword = () => {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-gray-600 text-sm mt-6">
+        {/* <p className="text-center text-gray-600 text-sm mt-6">
           Having trouble? <a href="/support" className="text-blue-600 hover:text-blue-700 font-semibold">Contact support</a>
-        </p>
+        </p> */}
       </div>
 
       <style>{`

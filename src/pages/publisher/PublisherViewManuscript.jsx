@@ -325,18 +325,7 @@ const PublisherViewManuscript = () => {
                                 Figure {index + 1}
                               </span>
                               <div className="flex items-center space-x-2">
-                                <a
-                                  href={`${STORAGE_URL}${figurePath}`}
-                                  download={`Figure_${index + 1}.${figurePath
-                                    .split(".")
-                                    .pop()}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-600 hover:text-blue-800 text-sm flex items-center px-2 py-1 rounded hover:bg-blue-50 transition-colors"
-                                >
-                                  <Download className="h-3 w-3 mr-1" />
-                                  Download
-                                </a>
+                               
 
                                 <button
                                   onClick={() =>

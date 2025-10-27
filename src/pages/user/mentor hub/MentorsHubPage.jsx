@@ -189,7 +189,7 @@ const MentorsHubPage = () => {
                             <input
                                 type="text"
                                 placeholder="Search articles..."
-                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -198,7 +198,7 @@ const MentorsHubPage = () => {
                         {/* Mobile filter toggle */}
                         <button
                             onClick={() => setShowFilters(!showFilters)}
-                            className="lg:hidden mt-4 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            className="lg:hidden mt-4 flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
                         >
                             <FontAwesomeIcon icon={faFilter} className="w-4 h-4" />
                             Filters
@@ -217,7 +217,7 @@ const MentorsHubPage = () => {
                                         <label key={category} className="flex items-start gap-3 cursor-pointer group">
                                             <input
                                                 type="checkbox"
-                                                className="mt-1 w-4 h-4 text-blue-600  border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                                                className="mt-1 w-4 h-4 text-yellow-600  border-gray-300 rounded focus:ring-yellow-500 focus:ring-2"
                                                 checked={selectedCategories.includes(category)}
                                                 onChange={() => handleCategoryChange(category)}
                                             />
@@ -231,7 +231,7 @@ const MentorsHubPage = () => {
                                 {selectedCategories.length > 0 && (
                                     <button
                                         onClick={() => setSelectedCategories([])}
-                                        className="mt-4 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                                        className="mt-4 text-sm text-yellow-600 hover:text-yellow-800 font-medium"
                                     >
                                         Clear all filters
                                     </button>
@@ -250,12 +250,12 @@ const MentorsHubPage = () => {
                                         {selectedCategories.map((category) => (
                                             <span
                                                 key={category}
-                                                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
                                             >
                                                 {category}
                                                 <button
                                                     onClick={() => handleCategoryChange(category)}
-                                                    className="ml-2 hover:text-blue-600"
+                                                    className="ml-2 hover:text-yellow-600"
                                                 >
                                                     ×
                                                 </button>
@@ -286,7 +286,7 @@ const MentorsHubPage = () => {
 
                                             {/* Article Content */}
                                             <div className="p-6">
-                                                <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                                                <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-yellow-600 transition-colors">
                                                     {article.title}
                                                 </h3>
 
@@ -309,7 +309,7 @@ const MentorsHubPage = () => {
 
                                                     <Link
                                                         to={`/mentors/${article.id}`}
-                                                        className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                                                        className="px-4 py-2 custom-btn text-sm font-medium rounded-lg hover:bg-yellow-700 transition-colors">
                                                         Read More
                                                     </Link>
                                                 </div>

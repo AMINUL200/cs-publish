@@ -1,11 +1,17 @@
 import React, { useState } from "react";
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 // import PageMeta from "../../components/common/PageMeta";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash, faUserEdit, faUserCheck, faUserAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faEye,
+  faEyeSlash,
+  faUserEdit,
+  faUserCheck,
+  faUserAlt,
+} from "@fortawesome/free-solid-svg-icons";
 import { login } from "../../features/auth/AuthSlice";
 import { useDispatch } from "react-redux";
-import axios from 'axios';
+import axios from "axios";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -13,28 +19,28 @@ export default function SignIn() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
-    email: 'admin@gamil.com',
-    password: 'password123',
-    userRole: 'author',
+    email: "admin@gamil.com",
+    password: "password123",
+    userRole: "author",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState({
     email: false,
-    password: false
+    password: false,
   });
   const API_URL = import.meta.env.VITE_API_URL;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleRoleChange = (role) => {
-    setFormData(prev => ({ ...prev, userRole: role }));
+    setFormData((prev) => ({ ...prev, userRole: role }));
   };
 
   const handleSubmit = async (e) => {
@@ -47,18 +53,18 @@ export default function SignIn() {
       });
 
       if (response.data.flag === 1 || response.data) {
-        dispatch(login({ userData: response.data.user, token: response.data.token }));
+        dispatch(
+          login({ userData: response.data.user, token: response.data.token })
+        );
         toast.success(response.data.message);
 
-        if(response.data.user.user_type == 4){
-          navigate('/');
+        if (response.data.user.user_type == 4) {
+          navigate("/");
           return;
-        }else{
-          navigate('/dashboard');
+        } else {
+          navigate("/dashboard");
           return;
         }
-
-
       } else {
         toast.error(response.data.message);
       }
@@ -92,7 +98,7 @@ export default function SignIn() {
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-gradient-to-r from-blue-600 to-indigo-700 h-3 w-full"
+              className="bg-gradient-to-r from-[#8B0000] to-[#ffba00] h-3 w-full"
             />
 
             <div className="p-8 pt-4">
@@ -138,12 +144,9 @@ export default function SignIn() {
                       className="absolute -bottom-1 -right-1 bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ delay: 0.6, type: 'spring' }}
+                      transition={{ delay: 0.6, type: "spring" }}
                     >
-                      <FontAwesomeIcon
-                        icon={faUserCheck}
-                        className="h-3 w-3"
-                      />
+                      <FontAwesomeIcon icon={faUserCheck} className="h-3 w-3" />
                     </motion.div>
                   </motion.div>
 
@@ -151,14 +154,16 @@ export default function SignIn() {
                   <motion.div
                     className="absolute inset-0 rounded-2xl border-2 border-indigo-200 opacity-0"
                     animate={{ opacity: [0, 0.3, 0], scale: [1, 1.2, 1.4] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "easeOut" }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeOut",
+                    }}
                   />
                 </div>
               </motion.div>
 
               <form onSubmit={handleSubmit} className="mt-8">
-
-
                 <div className="mb-6">
                   <motion.div
                     initial={{ opacity: 0 }}
@@ -172,18 +177,23 @@ export default function SignIn() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      onFocus={() => setIsFocused({ ...isFocused, email: true })}
-                      onBlur={() => setIsFocused({ ...isFocused, email: false })}
-                      className="peer w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none transition-all"
+                      onFocus={() =>
+                        setIsFocused({ ...isFocused, email: true })
+                      }
+                      onBlur={() =>
+                        setIsFocused({ ...isFocused, email: false })
+                      }
+                      className="peer w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-500 focus:outline-none transition-all"
                       placeholder=" "
                       required
                     />
                     <label
                       htmlFor="email"
-                      className={`absolute left-4 transition-all duration-200 pointer-events-none ${isFocused.email || formData.email
-                        ? '-top-[10px] -translate-y-1/2 bg-white px-2 text-sm text-indigo-600'
-                        : 'top-3 text-gray-400'
-                        }`}
+                      className={`absolute left-4 transition-all duration-200 pointer-events-none ${
+                        isFocused.email || formData.email
+                          ? "-top-[10px] -translate-y-1/2 bg-white px-2 text-sm text-yellow-600"
+                          : "top-3 text-gray-400"
+                      }`}
                     >
                       Email Address
                     </label>
@@ -203,15 +213,19 @@ export default function SignIn() {
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
-                      onFocus={() => setIsFocused({ ...isFocused, password: true })}
-                      onBlur={() => setIsFocused({ ...isFocused, password: false })}
-                      className="peer w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none transition-all pr-12"
+                      onFocus={() =>
+                        setIsFocused({ ...isFocused, password: true })
+                      }
+                      onBlur={() =>
+                        setIsFocused({ ...isFocused, password: false })
+                      }
+                      className="peer w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-yellow-500 focus:outline-none transition-all pr-12"
                       placeholder=" "
                       required
                     />
                     <motion.span
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-[50%] text-gray-500 hover:text-indigo-600 transition-colors"
+                      className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-[50%] text-gray-500 hover:text-yellow-600 transition-colors"
                     >
                       <motion.div
                         key={showPassword ? "visible" : "hidden"}
@@ -227,10 +241,11 @@ export default function SignIn() {
                     </motion.span>
                     <label
                       htmlFor="password"
-                      className={`absolute left-4 transition-all duration-200 pointer-events-none ${isFocused.password || formData.password
-                        ? '-top-[10px] -translate-y-1/2 bg-white px-2 text-sm text-indigo-600'
-                        : 'top-3 text-gray-400'
-                        }`}
+                      className={`absolute left-4 transition-all duration-200 pointer-events-none ${
+                        isFocused.password || formData.password
+                          ? "-top-[10px] -translate-y-1/2 bg-white px-2 text-sm text-yellow-600"
+                          : "top-3 text-gray-400"
+                      }`}
                     >
                       Password
                     </label>
@@ -240,19 +255,20 @@ export default function SignIn() {
                 <motion.button
                   whileHover={{
                     scale: 1.03,
-                    boxShadow: "0 10px 25px -5px rgba(79, 70, 229, 0.5)",
-                    backgroundPosition: "100% 0"
+                    boxShadow: "0 10px 25px -5px rgba(255, 186, 0, 0.4)", // soft yellow glow
+                    backgroundPosition: "100% 0",
                   }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
-                  className={`w-full relative overflow-hidden text-white py-3 px-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 ${isLoading ? "cursor-not-allowed" : ""
-                    }`}
+                  className={`w-full relative overflow-hidden text-white py-3 px-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 ${
+                    isLoading ? "cursor-not-allowed" : ""
+                  }`}
                   disabled={isLoading}
                   style={{
-                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%)",
+                    background: "linear-gradient(to right, #8B0000, #ffba00)",
                     backgroundSize: "200% 100%",
                     border: "2px solid rgba(255, 255, 255, 0.2)",
-                    backdropFilter: "blur(2px)"
+                    backdropFilter: "blur(2px)",
                   }}
                 >
                   {isLoading ? (
@@ -264,17 +280,24 @@ export default function SignIn() {
                     >
                       <motion.span
                         animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
                         className="block h-5 w-5 border-2 border-white border-t-transparent rounded-full"
                       />
                       <span>Processing...</span>
                     </motion.div>
                   ) : (
                     <motion.span
-                      initial={{ opacity: 0.9, textShadow: "0 0 0 rgba(255,255,255,0)" }}
+                      initial={{
+                        opacity: 0.9,
+                        textShadow: "0 0 0 rgba(255,255,255,0)",
+                      }}
                       whileHover={{
                         opacity: 1,
-                        textShadow: "0 0 8px rgba(255,255,255,0.5)"
+                        textShadow: "0 0 8px rgba(255,255,255,0.5)",
                       }}
                       className="block"
                     >
@@ -287,12 +310,12 @@ export default function SignIn() {
                       className="absolute inset-0 border-2 border-transparent rounded-xl"
                       initial={{
                         borderColor: "rgba(255,255,255,0)",
-                        boxShadow: "inset 0 0 0 rgba(255,255,255,0)"
+                        boxShadow: "inset 0 0 0 rgba(255,255,255,0)",
                       }}
                       whileHover={{
                         borderColor: "rgba(255,255,255,0.3)",
                         boxShadow: "inset 0 0 20px rgba(255,255,255,0.2)",
-                        transition: { delay: 0.2 }
+                        transition: { delay: 0.2 },
                       }}
                     />
                   )}
@@ -308,17 +331,17 @@ export default function SignIn() {
                 {/* Changed from anchor tag to Link component */}
                 <Link
                   to="/forgot-password"
-                  className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                  className="text-yellow-600 hover:text-yellow-800 text-sm font-medium"
                 >
                   <motion.span whileHover={{ x: 2 }}>
                     Forgot password?
                   </motion.span>
                 </Link>
                 <p className="text-gray-600 text-sm mt-2">
-                  Don't have an account?{' '}
+                  Don't have an account?{" "}
                   <Link
                     to="/signup"
-                    className="text-indigo-600 hover:text-indigo-800 font-medium"
+                    className="text-yellow-600 hover:text-yellow-800 font-medium"
                   >
                     Sign up
                   </Link>

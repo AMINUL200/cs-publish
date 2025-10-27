@@ -81,7 +81,7 @@ const UserBlogPage = () => {
           {/* Header Section */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Our <span className="text-blue-600">Blog</span>
+              Our <span className="text-yellow-600">Blog</span>
             </h1>
             <h5 className="text-xl text-gray-600 max-w-3xl mx-auto">
               Discover insightful articles, latest trends, and expert opinions from our team
@@ -99,7 +99,7 @@ const UserBlogPage = () => {
                   onClick={() => setSelectedCategory("all")}
                   className={`w-full text-left px-4 py-3 rounded-xl mb-3 transition-all duration-200 ${
                     selectedCategory === "all" 
-                      ? "bg-blue-600 text-white shadow-lg" 
+                      ? "bg-yellow-600 text-white shadow-lg" 
                       : "bg-gray-50 text-gray-700 hover:bg-gray-100"
                   }`}
                 >
@@ -115,7 +115,7 @@ const UserBlogPage = () => {
                       onClick={() => setSelectedCategory(category.id.toString())}
                       className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 ${
                         selectedCategory === category.id.toString()
-                          ? "bg-blue-600 text-white shadow-lg"
+                          ? "bg-yellow-600 text-white shadow-lg"
                           : "bg-gray-50 text-gray-700 hover:bg-gray-100"
                       }`}
                     >
@@ -129,8 +129,8 @@ const UserBlogPage = () => {
 
                 {/* Active Filter Info */}
                 {selectedCategory !== "all" && (
-                  <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                    <p className="text-sm text-blue-800">
+                  <div className="mt-6 p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+                    <p className="text-sm text-yellow-800">
                       Showing blogs from{" "}
                       <strong>
                         {categories.find(cat => cat.id.toString() === selectedCategory)?.category_name}
@@ -138,7 +138,7 @@ const UserBlogPage = () => {
                     </p>
                     <button
                       onClick={() => setSelectedCategory("all")}
-                      className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2"
+                      className="text-yellow-600 hover:text-yellow-800 text-sm font-medium mt-2"
                     >
                       Clear filter
                     </button>
@@ -155,7 +155,7 @@ const UserBlogPage = () => {
                   Showing <span className="font-semibold">{filteredBlogs.length}</span> 
                   {filteredBlogs.length === 1 ? " blog" : " blogs"}
                   {selectedCategory !== "all" && (
-                    <> in <span className="font-semibold text-blue-600">
+                    <> in <span className="font-semibold text-yellow-600">
                       {categories.find(cat => cat.id.toString() === selectedCategory)?.category_name}
                     </span></>
                   )}
@@ -179,7 +179,7 @@ const UserBlogPage = () => {
                         />
                         {/* Category Badge */}
                         <div className="absolute top-4 left-4">
-                          <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">
+                          <span className="custom-btn text-white px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">
                             {blog.category.category_name}
                           </span>
                         </div>
@@ -202,7 +202,7 @@ const UserBlogPage = () => {
                         </div>
 
                         {/* Title */}
-                        <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                        <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-yellow-600 transition-colors">
                           {blog.title}
                         </h3>
 
@@ -222,7 +222,7 @@ const UserBlogPage = () => {
                         {/* Read More Button */}
                         <Link
                           to={`/blog/${blog.id}`}
-                          className="inline-flex items-center justify-center w-full bg-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-blue-700 transition-all duration-200 hover:shadow-lg group/btn"
+                          className="inline-flex items-center justify-center w-full custom-btn text-white py-3 px-6 rounded-xl font-semibold hover:bg-blue-700 transition-all duration-200 hover:shadow-lg group/btn"
                         >
                           Read More
                           <svg className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -250,7 +250,7 @@ const UserBlogPage = () => {
                     {selectedCategory !== "all" && (
                       <button
                         onClick={() => setSelectedCategory("all")}
-                        className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors"
+                        className="custom-btn text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors"
                       >
                         View All Blogs
                       </button>

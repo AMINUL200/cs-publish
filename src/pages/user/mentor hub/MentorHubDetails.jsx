@@ -309,7 +309,7 @@ const MentorHubDetails = () => {
                                 <div className="flex justify-end">
                                     <button
                                         type="submit"
-                                        className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                        className="px-6 py-2 custom-btn  font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                                     >
                                         Post Comment
                                     </button>
@@ -329,7 +329,7 @@ const MentorHubDetails = () => {
                                             <MediaRenderer media={item.media} className="h-20" />
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold text-gray-800 hover:text-blue-600 transition-colors">
+                                            <h3 className="font-semibold text-gray-800 hover:text-yellow-600 transition-colors">
                                                 <Link to={`/mentors/${item.id}`}>{item.title}</Link>
                                             </h3>
                                         </div>

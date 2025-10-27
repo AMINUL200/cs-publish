@@ -85,11 +85,11 @@ const LandingPricing = ({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-0 sm:pt-10 pb-8 sm:pb-10">
       {/* Header */}
       <div className="text-center mb-12">
-        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-          Choose Your Plan
+        <h2 className="text-3xl sm:text-4xl font-bold  mb-4">
+          Choose <span className="text-yellow-400">Your Plan</span> 
         </h2>
         <h5 className="text-lg text-gray-600 max-w-2xl mx-auto">
           Select the perfect plan for your manuscript
@@ -103,11 +103,11 @@ const LandingPricing = ({
             key={plan.id}
             className={`relative rounded-2xl p-8 transition-all duration-300 cursor-pointer ${
               plan.popular
-                ? "border-2 border-blue-500 bg-white shadow-xl"
-                : "border-2 border-gray-200 bg-white hover:border-blue-300 hover:shadow-lg"
+                ? "border-2 border-yellow-500 bg-white shadow-xl"
+                : "border-2 border-gray-200 bg-white hover:border-yellow-300 hover:shadow-lg"
             } ${
               selectedPlan === plan.id
-                ? "ring-2 ring-blue-500 ring-opacity-50"
+                ? "ring-2 ring-yellow-500 ring-opacity-50"
                 : ""
             }`}
             onClick={() => setSelectedPlan(plan.id)}
@@ -123,7 +123,7 @@ const LandingPricing = ({
                 {plan.name}
               </h3>
               <div className="mb-2">
-                <span className="text-4xl font-bold text-blue-600">
+                <span className="text-4xl font-bold text-yellow-600">
                   ₹{plan.price}
                 </span>
                 <span className="text-gray-600 ml-2">{plan.duration}</span>
@@ -140,7 +140,7 @@ const LandingPricing = ({
                 loadingPayment && selectedPlan === plan.id
                   ? "bg-gray-400 text-white"
                   : selectedPlan === plan.id
-                  ? "bg-green-500 text-white hover:bg-green-600"
+                  ? "custom-btn"
                   : plan.popular
                   ? "bg-blue-500 text-white hover:bg-blue-600"
                   : "bg-gray-100 text-gray-900 hover:bg-gray-200"

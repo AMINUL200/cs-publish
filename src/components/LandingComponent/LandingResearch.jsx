@@ -42,10 +42,10 @@ const LandingResearch = () => {
   ];
 
   return (
-    <section className="research-innovation py-20">
+    <section className="research-innovation py-10 sm:py-20">
       <div className="container mx-auto">
         <div className="text-center">
-          <h4 className="heading mb-8">Research and <span className="color_yellow">Innovation</span></h4>
+          <h2 className="heading mb-8">Research and <span className="color_yellow">Innovation</span></h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

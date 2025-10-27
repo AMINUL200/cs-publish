@@ -232,6 +232,12 @@ export const sidebarRoutes = [
         allowedRoles: ["0"],
         path: "/payment/featured-payment",
       },
+      {
+        title: "Subscription History",
+        icon: <FontAwesomeIcon icon={faCreditCard} />,
+        allowedRoles: ["0"],
+        path: "/payment/subscription-history",
+      }
       
     ],
   },
@@ -296,40 +302,40 @@ export const sidebarRoutes = [
   },
 
   // Publisher route
+  // {
+  //   path: "/publisher/manuscripts/pending",
+  //   title: "Pending Manuscripts",
+  //   icon: <FontAwesomeIcon icon={faList} />,
+  //   allowedRoles: ["5"],
+  // },
+  // {
+  //   path: "/publisher/payments",
+  //   title: "Payments",
+  //   icon: <FontAwesomeIcon icon={faCreditCard} />,
+  //   allowedRoles: ["5"],
+  // },
   {
-    path: "/publisher/manuscripts/pending",
-    title: "Pending Manuscripts",
-    icon: <FontAwesomeIcon icon={faList} />,
-    allowedRoles: ["5"],
-  },
-  {
-    path: "/publisher/payments",
-    title: "Payments",
-    icon: <FontAwesomeIcon icon={faCreditCard} />,
-    allowedRoles: ["5"],
-  },
-  {
-    path: "/publisher/manuscripts/published",
+    path: "/publisher/published-manuscripts-list",
     title: "Published Manuscripts",
     icon: <FontAwesomeIcon icon={faList} />,
     allowedRoles: ["5"],
   },
-  {
-    path: "/publisher/reports",
-    title: "Reports",
-    icon: <FontAwesomeIcon icon={faList} />,
-    allowedRoles: ["5"],
-  },
-  {
-    path: "/publisher/manuscripts/design/:id",
-    title: "Design Manuscript",
-    icon: <FontAwesomeIcon icon={faList} />,
-    allowedRoles: ["5"],
-  },
-  {
-    path: "/publisher/manuscripts/view/:id",
-    title: "View Design Manuscript",
-    icon: <FontAwesomeIcon icon={faList} />,
-    allowedRoles: ["5"],
-  },
+  // {
+  //   path: "/publisher/reports",
+  //   title: "Reports",
+  //   icon: <FontAwesomeIcon icon={faList} />,
+  //   allowedRoles: ["5"],
+  // },
+  // {
+  //   path: "/publisher/manuscripts/design/:id",
+  //   title: "Design Manuscript",
+  //   icon: <FontAwesomeIcon icon={faList} />,
+  //   allowedRoles: ["5"],
+  // },
+  // {
+  //   path: "/publisher/manuscripts/view/:id",
+  //   title: "View Design Manuscript",
+  //   icon: <FontAwesomeIcon icon={faList} />,
+  //   allowedRoles: ["5"],
+  // },
 ];

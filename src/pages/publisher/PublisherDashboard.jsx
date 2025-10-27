@@ -189,9 +189,11 @@ const PublisherDashboard = () => {
                           <Link to={`/publisher/view-manuscript/${item.manuscript_id}`} className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200">
                             View
                           </Link>
-                          {/* <button className="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200">
-                            Accept
-                          </button> */}
+                          <Link 
+                            to={`/publisher/manuscripts/design/${item.manuscript_id}`}
+                          className="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200">
+                            Design Web View
+                          </Link>
                           {/* <button className="text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200">
                             Details
                           </button> */}

@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { logout } from '../../features/auth/AuthSlice';
 import axios from "axios";
+import { User2Icon } from "lucide-react";
 
 const LandingHeader = ({ toggleMenu }) => {
   const [scrolled, setScrolled] = useState(false);
@@ -408,7 +409,7 @@ const LandingHeader = ({ toggleMenu }) => {
             className="text-2xl font-bold text-indigo-600 flex items-center cursor-pointer"
             onClick={() => handleNavClick("#home")}
           >
-            <img src={landingLog} alt="logo" height={20} />
+            <img src={landingLog} alt="logo" height={10} className="h-8 md:h-14" />
           </div>
         </div>
 
@@ -420,7 +421,7 @@ const LandingHeader = ({ toggleMenu }) => {
           {!isAuthenticated && (
             <RouterLink
               to="/signin"
-              className="ml-4 bg-[#ffba00] text-white px-4 py-2 rounded-md hover:bg-black transition-all duration-300"
+              className="ml-4 custom-btn px-4 py-2 rounded-md  transition-all duration-300"
             >
               Login
             </RouterLink>
@@ -462,9 +463,10 @@ const LandingHeader = ({ toggleMenu }) => {
           {!isAuthenticated && (
             <RouterLink
               to="/signin"
-              className="bg-[#ffba00] text-white px-3 py-1 rounded-md text-sm"
+              className=" text-black px-3 py-1  text-sm border border-black rounded-4xl flex justify-center items-center"
             >
-              Login
+              {/* Login  */}
+              <User2Icon className="inline-block w-6 h-6 ml-1 text-yellow-800" />
             </RouterLink>
           )}
 

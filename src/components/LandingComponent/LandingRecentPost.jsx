@@ -33,7 +33,7 @@ const LandingRecentPost = ({
           </p>
         </div>
 
-        <div className="recent-post-slider">
+        <div className="recent-post-slider !px-0 sm:px-6">
           <Swiper
             modules={[Navigation, Pagination, Autoplay]}
             spaceBetween={30}
@@ -84,7 +84,7 @@ const LandingRecentPost = ({
                       <div className="flex justify-center items-center">
                         <Link
                           to={`/blog/${post.id}`}
-                          className="bg-[#ffba00] hover:bg-black hover:text-white px-20 py-2 rounded-2xl transition-all duration-300 "
+                          className="custom-btn px-20 py-2 rounded-2xl transition-all duration-300 "
                         >
                           Read More
                         </Link>

@@ -245,7 +245,8 @@ p {
 }
 
 .recent-post {
-    background: url(../src/assets/images/post/recent-post-bg.jpg) center center no-repeat;
+    /* background: url(../src/assets/images/post/recent-post-bg.jpg) center center no-repeat; */
+    background: url(/public/images/recent-post-bg1.jpg) center center no-repeat;
     background-size: cover;
 }
 

@@ -94,19 +94,19 @@ const UserProfilePage = () => {
         pageTitle="About"
       />
       <div className="min-h-screen bg-gray-50 py-8 ">
-        <div className="container mx-auto px-4 max-w-6xl">
+        <div className="container mx-auto px-4 max-w-8xl">
           {/* Header Section */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               {profileData.title || "Profile"}
             </h1>
-            <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
+            <div className="w-24 h-1 bg-yellow-600 mx-auto"></div>
           </div>
 
           {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             {/* Image Gallery */}
-            <div className="space-y-6">
+            <div className="lg:col-span-5 space-y-6">
               {/* Main Image */}
               <div className="aspect-w-16 aspect-h-12 rounded-2xl overflow-hidden shadow-lg">
                 <img
@@ -136,7 +136,7 @@ const UserProfilePage = () => {
             </div>
 
             {/* Content Section */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
+            <div className="lg:col-span-7 bg-white rounded-2xl shadow-lg p-8">
               <div className="space-y-6">
                 {/* Description */}
                 <div>

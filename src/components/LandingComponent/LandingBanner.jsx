@@ -72,9 +72,9 @@ const LandingBanner = ({ bannerData = [], loading = false, error = null }) => {
               <h1 className="text-2xl md:text-4xl font-bold text-blue-800 mb-4">
                 No Content Available
               </h1>
-              <p className="text-lg text-blue-600">
+              <h5 className="text-lg text-blue-600">
                 Banner content is currently unavailable. Please check back later.
-              </p>
+              </h5>
             </div>
           </div>
         </div>
@@ -84,7 +84,7 @@ const LandingBanner = ({ bannerData = [], loading = false, error = null }) => {
 
   // Normal State with Data
   return (
-    <div className="relative w-full h-screen max-h-[540px] py-4 pt-20 overflow-hidden" id='home'>
+    <div className="relative w-full h-screen max-h-[540px] py-4 pt-10 sm:pt-20 overflow-hidden" id='home'>
       <Swiper
         modules={[Autoplay, Pagination, EffectFade]}
         autoplay={{ delay: 5000, disableOnInteraction: false }}
@@ -110,11 +110,11 @@ const LandingBanner = ({ bannerData = [], loading = false, error = null }) => {
                 <h1 className="text-2xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
                   {slide.title}
                 </h1>
-                <p className="text-lg md:text-xl text-white/90 mb-8 max-w-lg">
+                <h5 className="text-lg md:text-xl text-white/90 mb-8 max-w-lg text-center mx-auto">
                   {slide.description}
-                </p>
+                </h5>
                 <div className="pt-6 border-t border-white/20">
-                  <button className="px-8 py-3 bg-[#ffba00] text-white font-medium rounded-3xl hover:bg-black transition-all duration-300 ease-in-out transform hover:scale-105">
+                  <button className="px-8 py-3 custom-btn font-medium rounded-3xl  transition-all duration-300 ease-in-out transform hover:scale-105">
                     {slide.button_name}
                   </button>
                 </div>

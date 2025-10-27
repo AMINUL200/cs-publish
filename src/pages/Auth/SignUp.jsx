@@ -261,7 +261,7 @@ const SignUp = () => {
         >
           <motion.h2
             variants={itemVariants}
-            className="text-3xl font-bold text-center text-indigo-700"
+            className="text-3xl font-bold text-center text-yellow-700"
           >
             Create Account
           </motion.h2>
@@ -287,7 +287,7 @@ const SignUp = () => {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
               />
             </motion.div>
 
@@ -301,7 +301,7 @@ const SignUp = () => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
               />
             </motion.div>
           </div>
@@ -317,7 +317,7 @@ const SignUp = () => {
                 value={formData.first_name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
               />
             </motion.div>
 
@@ -331,7 +331,7 @@ const SignUp = () => {
                 value={formData.last_name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
               />
             </motion.div>
           </div>
@@ -347,8 +347,8 @@ const SignUp = () => {
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.98 }}
                   className={`flex items-center justify-center p-2 rounded-lg border cursor-pointer transition-all ${formData.user_type === type.value
-                    ? "bg-indigo-100 border-indigo-500"
-                    : "border-gray-300 hover:border-indigo-300"
+                    ? "bg-yellow-100 border-yellow-500"
+                    : "border-gray-300 hover:border-yellow-300"
                     }`}
                 >
                   <input
@@ -374,7 +374,7 @@ const SignUp = () => {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
               >
                 {titleOptions.map((title) => (
                   <option key={title} value={title}>
@@ -392,7 +392,7 @@ const SignUp = () => {
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
               >
                 {genderOptions.map((gender) => (
                   <option key={gender} value={gender}>
@@ -413,7 +413,7 @@ const SignUp = () => {
               value={formData.phone}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
             />
           </motion.div>
 
@@ -427,7 +427,7 @@ const SignUp = () => {
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
               />
             </motion.div>
 
@@ -440,7 +440,7 @@ const SignUp = () => {
                 name="country"
                 value={formData.country}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
               />
             </motion.div>
           </div>
@@ -458,7 +458,7 @@ const SignUp = () => {
                   value={formData.journal_id}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
                 >
                   <option value="">-- Select Journal --</option>
                   {journals.map((journal) => (
@@ -478,7 +478,7 @@ const SignUp = () => {
                   value={formData.qualification}
                   onChange={handleChange}
                   required={isReviewer}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
                   placeholder="e.g., PhD in Computer Science"
                 />
               </motion.div>
@@ -494,7 +494,7 @@ const SignUp = () => {
                     value={formData.university}
                     onChange={handleChange}
                     required={isReviewer}
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
                     placeholder="Enter your university name"
                   />
                 </motion.div>
@@ -509,7 +509,7 @@ const SignUp = () => {
                     value={formData.designation}
                     onChange={handleChange}
                     required={isReviewer}
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
                     placeholder="e.g., Professor, Associate Professor"
                   />
                 </motion.div>
@@ -525,7 +525,7 @@ const SignUp = () => {
                   value={formData.affiliation}
                   onChange={handleChange}
                   required={isReviewer}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
                   placeholder="Enter your institutional affiliation"
                 />
               </motion.div>
@@ -540,7 +540,7 @@ const SignUp = () => {
                   value={formData.speciality}
                   onChange={handleChange}
                   required={isReviewer}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all"
                   placeholder="Enter your area of expertise"
                 />
               </motion.div>
@@ -593,12 +593,12 @@ const SignUp = () => {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all pr-10"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all pr-10"
                 />
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="absolute inset-y-8 right-0 pr-3 flex items-center text-gray-500 hover:text-indigo-600"
+                  className="absolute inset-y-8 right-0 pr-3 flex items-center text-gray-500 hover:text-yellow-600"
                   style={{ top: '1.4rem' }}
                 >
                   <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
@@ -615,7 +615,7 @@ const SignUp = () => {
               Already have an account?{' '}
               <Link
                 to="/signin"
-                className="text-indigo-600 hover:text-indigo-800 font-medium"
+                className="text-yellow-600 hover:text-yellow-800 font-medium"
               >
                 Login
               </Link>
@@ -628,7 +628,7 @@ const SignUp = () => {
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-6 rounded-xl font-semibold text-white bg-blue-500 shadow-lg transition-all ${isLoading ? "opacity-70 cursor-not-allowed" : "hover:shadow-xl"
+            className={`w-full py-3 px-6 rounded-xl font-semibold custom-btn shadow-lg transition-all ${isLoading ? "opacity-70 cursor-not-allowed" : "hover:shadow-xl"
               }`}
           >
             {isLoading ? (

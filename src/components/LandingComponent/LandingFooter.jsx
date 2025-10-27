@@ -8,49 +8,49 @@ const LandingFooter = () => {
       title: "Product and services",
       items: [
         { name: "Discover journals", path: "#" },
-        { name: "Books Hub", path: "/products" },
-        { name: "Mentors", path: "/mentors" },
-        { name: "Author Services", path: "#" },
+        // { name: "Books Hub", path: "/products" },
+        // { name: "Mentors", path: "/mentors" },
+        // { name: "Author Services", path: "#" },
         { name: "Blog", path: "/blog" },
-        { name: "Events", path: "#" },
-        { name: "Conference", path: "#" }
+        // { name: "Events", path: "#" },
+        // { name: "Conference", path: "#" }
       ]
     },
-    {
-      title: "Resources",
-      items: [
-        { name: "Data Depository", path: "#" },
-        { name: "Find protocols", path: "#" },
-        { name: "Innovation", path: "/innovation" },
-        { name: "Research Service", path: "/research-services" },
-        { name: "Liberians Portal", path: "#" },
-        { name: "Promote and Advertise", path: "#" }
-      ]
-    },
-    {
-      title: "Policies and access",
-      items: [
-        { name: "Open access", path: "#" },
-        { name: "Subscription", path: "#" },
-        { name: "Membership", path: "#" },
-        { name: "Editor Hub", path: "#" },
-        { name: "Reviewer hub", path: "#" },
-        { name: "Author hub", path: "#" },
-        { name: "Reprint", path: "#" },
-        { name: "Partnership", path: "#" },
-        { name: "Legal info", path: "#" }
-      ]
-    },
+    // {
+    //   title: "Resources",
+    //   items: [
+    //     // { name: "Data Depository", path: "#" },
+    //     // { name: "Find protocols", path: "#" },
+    //     { name: "Innovation", path: "/innovation" },
+    //     { name: "Research Service", path: "/research-services" },
+    //     // { name: "Liberians Portal", path: "#" },
+    //     // { name: "Promote and Advertise", path: "#" }
+    //   ]
+    // },
+    // {
+    //   title: "Policies and access",
+    //   items: [
+    //     { name: "Open access", path: "#" }, 
+    //     { name: "Subscription", path: "#" },
+    //     { name: "Membership", path: "#" },
+    //     { name: "Editor Hub", path: "#" },
+    //     { name: "Reviewer hub", path: "#" },
+    //     { name: "Author hub", path: "#" },
+    //     { name: "Reprint", path: "#" },
+    //     { name: "Partnership", path: "#" },
+    //     { name: "Legal info", path: "#" }
+    //   ]
+    // },
     {
       title: "Support and contact",
       items: [
-        { name: "Press office", path: "#" },
+        // { name: "Press office", path: "#" },
         { name: "Our team", path: "#" },
-        { name: "FAQ", path: "#" },
-        { name: "Live chat", path: "#" },
-        { name: "Career opportunities", path: "#" },
-        { name: "Fellowship", path: "#" },
-        { name: "Feedback", path: "#" }
+        { name: "FAQ", path: "/faq" },
+        // { name: "Live chat", path: "#" },
+        // { name: "Career opportunities", path: "#" },
+        // { name: "Fellowship", path: "#" },
+        // { name: "Feedback", path: "#" }
       ]
     }
   ];

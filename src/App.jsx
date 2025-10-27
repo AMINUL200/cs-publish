@@ -79,7 +79,8 @@ import PublisherViewReports from "./pages/publisher/PublisherViewReports";
 import PublisherDesignManuscript from "./pages/publisher/PublisherDesignManuscript";
 import PublisherViewManuscript from "./pages/publisher/PublisherViewManuscript";
 import PublisherViewDesignManuscript from "./pages/publisher/PublisherViewDesignManuscript";
-import TermsAndCondition from "./pages/user/company_policy/TermsAndCondition";``
+import TermsAndCondition from "./pages/user/company_policy/TermsAndCondition";
+``;
 import CompanyPolicy from "./pages/user/company_policy/CompanyPolicy";
 import HandleTermsAndCondition from "./pages/admin/policy/HandleTermsAndCondition";
 import HandleCompanyPolicy from "./pages/admin/policy/HandleCompanyPolicy";
@@ -94,6 +95,11 @@ import HandleAbout from "./pages/admin/handle_landing_page/HandleAbout";
 import AddAbout from "./pages/admin/handle_landing_page/AddAbout";
 import HandlePartners from "./pages/admin/handle_landing_page/HandlePartners";
 import UserProfilePage from "./pages/user/profile_page/UserProfilePage";
+import HandleSubScriptionHistory from "./pages/admin/payment/HandleSubScriptionHistory";
+import PublisherViewPublishedManuscriptList from "./pages/publisher/PublisherViewPublishedManuscript";
+import PublisherEditDesignManuscript from "./pages/publisher/PublisherEditDesignManuscript";
+import ViewManuscriptDetails from "./pages/user/manuscript/ViewManuscriptDetails";
+import FaqPage from "./pages/user/faqpage/FaqPage";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -109,15 +115,18 @@ function App() {
   };
 
   // Public Route Component (for already authenticated users)
-  const PublicRoute = ({ isAuthenticated, redirectPath = "/dashboard", userData }) => {
+  const PublicRoute = ({
+    isAuthenticated,
+    redirectPath = "/dashboard",
+    userData,
+  }) => {
     if (isAuthenticated) {
       // return <Navigate to={redirectPath} replace />;
-      if(userData?.user_type == 4){
-        return <Navigate to='/' replace/>;
-      }else{
-        return <Navigate to={redirectPath} replace/>;
+      if (userData?.user_type == 4) {
+        return <Navigate to="/" replace />;
+      } else {
+        return <Navigate to={redirectPath} replace />;
       }
-
     }
     return <Outlet />;
   };
@@ -153,6 +162,7 @@ function App() {
           >
             <Route element={<AppLayout2 />}>
               <Route index path="/" element={<HomePage />} />
+              <Route path="/view-published-manuscript/:id" element={<ViewManuscriptDetails />} />
               <Route path="/about" element={<UserProfilePage />} />
               <Route path="/blog" element={<UserBlogPage />} />
               <Route path="/blog/:id" element={<BlogDetails />} />
@@ -187,11 +197,20 @@ function App() {
               <Route path="/policy" element={<CompanyPolicy />} />
               <Route path="/payment-policy" element={<PaymentPolicy />} />
 
+              <Route path="/faq" element={<FaqPage />} />
+
               <Route path="/font-vew" element={<ArticleFrontView />} />
             </Route>
           </Route>
 
-          <Route element={<PublicRoute isAuthenticated={isAuthenticated} userData={userData} />}>
+          <Route
+            element={
+              <PublicRoute
+                isAuthenticated={isAuthenticated}
+                userData={userData}
+              />
+            }
+          >
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -241,7 +260,10 @@ function App() {
                 element={<HandleTermsAndCondition />}
               />
               <Route path="/setting/policy" element={<HandleCompanyPolicy />} />
-              <Route path="/setting/payment-policy" element={<HandlePaymentPolicy />} />
+              <Route
+                path="/setting/payment-policy"
+                element={<HandlePaymentPolicy />}
+              />
 
               {/* user manger route */}
               <Route path="/users/add-user" element={<AddUser />} />
@@ -275,15 +297,26 @@ function App() {
               />
 
               {/* Payment */}
-              <Route path="/payment/featured-payment" element={<FeaturePayment />} />
+              <Route
+                path="/payment/featured-payment"
+                element={<FeaturePayment />}
+              />
+              <Route
+                path="/payment/subscription-history"
+                element={<HandleSubScriptionHistory />}
+              />
 
               {/* handle landing page route */}
-              <Route path="/landing-page/banner" element={<HandleBannerPage />} />
+              <Route
+                path="/landing-page/banner"
+                element={<HandleBannerPage />}
+              />
               <Route path="/landing-page/about-us" element={<HandleAbout />} />
               <Route path="/landing-page/add-about" element={<AddAbout />} />
-              <Route path="/landing-page/partners" element={<HandlePartners />} />
-
-
+              <Route
+                path="/landing-page/partners"
+                element={<HandlePartners />}
+              />
 
               {/* ------------------------------------------ Admin Route End--------------------- */}
 
@@ -345,34 +378,28 @@ function App() {
               />
 
               {/* Publisher */}
+
+              {/* View manuscript details  */}
               <Route
                 path="/publisher/view-manuscript/:id"
                 element={<PublisherViewManuscript />}
               />
-              <Route
-                path="/publisher/manuscripts/pending"
-                element={<PublisherViewPendingManuscripts />}
-              />
-              <Route
-                path="/publisher/payments"
-                element={<PublisherViewPayments />}
-              />
-              <Route
-                path="/publisher/reports"
-                element={<PublisherViewReports />}
-              />
-              <Route
-                path="/publisher/manuscripts/published"
-                element={<PublisherViewPublishedManuscript />}
-              />
 
+              <Route
+                path="/publisher/published-manuscripts-list"
+                element={<PublisherViewPublishedManuscriptList />}
+              />
               <Route
                 path="/publisher/manuscripts/design/:id"
                 element={<PublisherDesignManuscript />}
               />
               <Route
-                path="/publisher/manuscripts/view/:id"
+                path="/publisher/published-manuscripts-view/:id"
                 element={<PublisherViewDesignManuscript />}
+              />
+               <Route
+                path="/publisher/published-manuscripts-edit/:id"
+                element={<PublisherEditDesignManuscript />}
               />
             </Route>
           </Route>

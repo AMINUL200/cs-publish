@@ -36,6 +36,26 @@
 }
 
 
+.custom-btn{
+  background: #ffba00;
+  color: #fff;
+}
+.custom-btn:hover{
+  background: #000;
+  color: #fff;
+}
+
+/* Smooth scrolling for the whole page */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Adjust scroll margin for all sections to account for fixed header */
+section[id] {
+  scroll-margin-top: 8rem; /* 32 * 0.25rem = 8rem = 128px */
+}
+
+
 /* Blog Content Styling */
 .blog-rich-text {
   color: #374151;
@@ -142,7 +162,7 @@
   max-width: 100%;
   height: auto;
   border-radius: 0.5rem;
-  margin: 1rem 0;
+  margin: 0.8rem ;
 }
 
 /* Tables */

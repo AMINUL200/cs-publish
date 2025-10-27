@@ -94,12 +94,12 @@ const BrowseJournals = () => {
     ];
 
     return (
-        <section className="browsjurnal py-16" id='jurnals'>
+        <section className="browsjurnal py-10 sm:py-16" id='jurnals'>
             <div className=" mx-auto ">
                 <div className="text-center mb-12">
-                    <h3 className="text-3xl md:text-4xl font-bold mb-5">
+                    <h2 className="text-3xl md:text-4xl font-bold mb-5">
                         Browse <span className="text-yellow-400">Journals</span>
-                    </h3>
+                    </h2>
                 </div>
 
                 <div className="quick_previewbase">
@@ -152,23 +152,7 @@ const BrowseJournals = () => {
                     </div>
                 </div>
 
-                <div className="py-5 pt-10 px-5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="Publishtxt_info">
-                            <a href="" className="block w-full">Publish with ACS</a>
-                        </div>
-                        <div className="Publishtxt_info">
-                            <a href="" className="block w-full">New products & Services</a>
-                        </div>
-                        <div className="Publishtxt_info">
-                            <a href="" className="block w-full">ACS Open Science</a>
-                        </div>
-                        <div className="Publishtxt_info">
-                            <a href="" className="block w-full">Explore ACS Solutions</a>
-                        </div>
-                    </div>
-                </div>
-
+                
             </div>
         </section>
     );

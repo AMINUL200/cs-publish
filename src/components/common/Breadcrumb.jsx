@@ -40,7 +40,7 @@ const Breadcrumb = ({ items = [], pageTitle = "", pageDescription = "" }) => {
           {/* Combined Container */}
           <div className="relative backdrop-blur-md bg-white/70 border border-white/20 rounded-2xl shadow-xl shadow-black/5 p-8">
             {/* Subtle gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-2xl" />
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-purple-500/5 rounded-2xl" />
 
             <div className="relative z-10">
               {/* Page Title Section - Centered */}
@@ -76,7 +76,7 @@ const Breadcrumb = ({ items = [], pageTitle = "", pageDescription = "" }) => {
                           <div className="flex items-center mx-3">
                             <FontAwesomeIcon
                               icon={faChevronRight}
-                              className="w-3 h-3 text-gray-400 transition-colors duration-200 group-hover:text-blue-500"
+                              className="w-3 h-3 text-gray-400 transition-colors duration-200 group-hover:text-yellow-500"
                             />
                           </div>
                         )}
@@ -85,14 +85,14 @@ const Breadcrumb = ({ items = [], pageTitle = "", pageDescription = "" }) => {
                         <div className="relative flex items-center">
                           {/* Hover background */}
                           <div
-                            className={`absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 transition-all duration-300 transform ${isHovered ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+                            className={`absolute inset-0 rounded-xl bg-gradient-to-r from-yellow-500/10 to-[#ffba00]/10 transition-all duration-300 transform ${isHovered ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
                               }`}
                           />
 
                           <div className="relative flex items-center px-3 py-1 space-x-2">
                             {/* Icon */}
                             {item.icon && (
-                              <div className={`transition-all duration-200 ${isHovered ? 'text-blue-600 scale-110' : 'text-gray-500'
+                              <div className={`transition-all duration-200 ${isHovered ? 'text-yellow-600 scale-110' : 'text-gray-500'
                                 }`}>
                                 {getIcon(item.icon)}
                               </div>
@@ -103,15 +103,15 @@ const Breadcrumb = ({ items = [], pageTitle = "", pageDescription = "" }) => {
                               <Link
                                 to={item.path}
                                 className={`relative transition-all duration-200 ${isHovered
-                                    ? 'text-blue-600 transform translate-x-1'
-                                    : 'text-gray-700 hover:text-blue-600'
+                                    ? 'text-yellow-600 transform translate-x-1'
+                                    : 'text-gray-700 hover:text-yellow-600'
                                   }`}
                               >
                                 {item.label}
 
                                 {/* Underline animation */}
                                 <span
-                                  className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 ${isHovered ? 'w-full' : 'w-0'
+                                  className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-yellow-500 to-[#8B0000] transition-all duration-300 ${isHovered ? 'w-full' : 'w-0'
                                     }`}
                                 />
                               </Link>

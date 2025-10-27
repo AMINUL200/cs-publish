@@ -24,6 +24,7 @@ const HomePage = () => {
   const [blogData, setBlogData] = useState([]);
   const [aboutData, setAboutData] = useState({});
   const [pricingData, setPricingData] = useState([]);
+  const [publishedJournalData, setPublishedJournalData] = useState([]);
 
   const [loading, setLoading] = useState({
     banner: true,
@@ -31,6 +32,7 @@ const HomePage = () => {
     blog: true,
     about: true,
     pricing: true,
+    publishedJournal: true,
   });
   const [error, setError] = useState({
     banner: null,
@@ -38,6 +40,7 @@ const HomePage = () => {
     blog: null,
     about: null,
     pricing: null,
+    publishedJournal: null,
   });
 
   const fetchAll = async () => {
@@ -47,17 +50,20 @@ const HomePage = () => {
       blog: axios.get(`${API_URL}api/blog-user`),
       about: axios.get(`${API_URL}api/about`),
       pricing: axios.get(`${API_URL}api/plan`),
+      publishedJournal: axios.get(`${API_URL}api/published-manuscripts-list`),
     };
 
     Object.entries(requests).forEach(async ([key, request]) => {
       try {
         const response = await request;
-        if (response.status === 200) {
+        if (response.status === 200|| response.status || response.data.status) {
           if (key === "banner") setBannerData(response.data.data);
           if (key === "partner") setPartnerData(response.data.data);
           if (key === "blog") setBlogData(response.data.data);
           if (key === "about") setAboutData(response.data.data[0]);
           if (key === "pricing") setPricingData(response.data);
+          if (key === "publishedJournal") setPublishedJournalData(response.data.data);
+          
         }
       } catch (error) {
         console.log(`Error fetching ${key}: `, error);
@@ -86,7 +92,11 @@ const HomePage = () => {
         error={error.about}
       />
       <BrowseJournals />
-      <LandingPublishedJournal />
+      <LandingPublishedJournal
+        publishedJournalData={publishedJournalData}
+        loading={loading.publishedJournal}
+        error={error.publishedJournal}
+      />
       <LandingRecentPost
         postData={blogData}
         loading={loading.blog}

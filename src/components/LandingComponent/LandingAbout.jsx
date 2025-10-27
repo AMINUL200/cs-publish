@@ -5,7 +5,7 @@ const LandingAbout = ({ aboutData = {}, loading = false, error = null }) => {
     // console.log(aboutData);
     
   return (
-    <section className="py-16 bg-white" id="about">
+    <section className="py-10 sm:py-16 bg-white" id="about">
       <div className="mx-auto sm:mx-20 px-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Image Gallery Column */}
@@ -57,7 +57,7 @@ const LandingAbout = ({ aboutData = {}, loading = false, error = null }) => {
                 dangerouslySetInnerHTML={{__html: aboutData?.description}} 
               />
               
-              <Link to="/about" className="px-8 py-4 bg-[#ffba00] text-white font-medium rounded-full hover:bg-black transition-all duration-300 hover:shadow-lg">
+              <Link to="/about" className="px-8 py-4 custom-btn font-medium rounded-full  transition-all duration-300 hover:shadow-lg">
                 Read More
               </Link>
             </div>

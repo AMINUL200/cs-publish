@@ -27,9 +27,7 @@ const LandingRecentPost = ({
             Recent <span className="color_yellow">Blogs</span>
           </h4>
           <p>
-            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean
-            commodo ligula eget dolor. Aenean massa. Cum sociis natoque
-            penatibus.
+           The CS Data Repository ensures your research data is safely stored, properly cited, and easily discoverable by other scholars.
           </p>
         </div>
 

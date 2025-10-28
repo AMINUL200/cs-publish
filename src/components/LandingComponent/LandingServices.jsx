@@ -18,9 +18,7 @@ const LandingServices = ({
             className="text-lg max-w-2xl font-light"
             style={{ margin: "0 auto" }}
           >
-            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean
-            commodo ligula eget dolor. Aenean massa. Cum sociis natoque
-            penatibus.
+           CS Publishing House provides a seamless journal publishing experience for authors and researchers
           </p>
         </div>
 

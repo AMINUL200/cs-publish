@@ -30,6 +30,8 @@ const CmsTemplate = () => {
 
       if (res.data.status) {
         setContent(res.data.data);
+        console.log(res.data.data);
+        
       } else {
         setError("Content not found");
         toast.error("Content not found");
@@ -71,20 +73,20 @@ const CmsTemplate = () => {
       research: {
         icon: "🔬",
         color: "yellow",
-        gradient: "from-yellow-50 to-cyan-50",
+        gradient: "from-yellow-50 to-yellow-50",
         badgeColor: "bg-yellow-100 text-yellow-800",
       },
       service: {
         icon: "🛠️",
-        color: "green",
-        gradient: "from-green-50 to-emerald-50",
-        badgeColor: "bg-green-100 text-green-800",
+        color: "yellow",
+        gradient: "from-yellow-50 to-emerald-50",
+        badgeColor: "bg-yellow-100 text-yellow-800",
       },
       team: {
         icon: "👥",
-        color: "purple",
-        gradient: "from-purple-50 to-pink-50",
-        badgeColor: "bg-purple-100 text-purple-800",
+        color: "yellow",
+        gradient: "from-yellow-50 to-pink-50",
+        badgeColor: "bg-yellow-100 text-yellow-800",
       },
     };
     return configs[type] || configs.research;
@@ -105,7 +107,7 @@ const CmsTemplate = () => {
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => window.history.back()}
-            className="bg-yellow-500 text-white px-6 py-2 rounded-lg hover:bg-yellow-600 transition-colors"
+            className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
           >
             Go Back
           </button>
@@ -190,7 +192,7 @@ const CmsTemplate = () => {
                       <h1 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-3">
                         {teamInfo.name}
                       </h1>
-                      <p className="text-xl lg:text-2xl text-yellow-600 font-semibold mb-6">
+                      <p className="text-xl lg:text-2xl text-blue-600 font-semibold mb-6">
                         {teamInfo.position}
                       </p>
                     </>
@@ -215,7 +217,7 @@ const CmsTemplate = () => {
                           href={content.facebook_link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="bg-yellow-600 text-white p-3 rounded-full hover:bg-yellow-700 transition-colors shadow-lg"
+                          className="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition-colors shadow-lg"
                         >
                           <svg
                             className="w-5 h-5"
@@ -231,7 +233,7 @@ const CmsTemplate = () => {
                           href={content.twitter_link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="bg-yellow-400 text-white p-3 rounded-full hover:bg-yellow-500 transition-colors shadow-lg"
+                          className="bg-blue-400 text-white p-3 rounded-full hover:bg-blue-500 transition-colors shadow-lg"
                         >
                           <svg
                             className="w-5 h-5"
@@ -247,7 +249,7 @@ const CmsTemplate = () => {
                           href={content.linkedin_link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="bg-yellow-700 text-white p-3 rounded-full hover:bg-yellow-800 transition-colors shadow-lg"
+                          className="bg-blue-700 text-white p-3 rounded-full hover:bg-blue-800 transition-colors shadow-lg"
                         >
                           <svg
                             className="w-5 h-5"
@@ -294,7 +296,7 @@ const CmsTemplate = () => {
                       : "Detailed Description"}
                   </h2>
                   <div
-                    className="prose prose-lg max-w-none"
+                    className="prose prose-lg max-w-none blog-rich-text"
                     dangerouslySetInnerHTML={{
                       __html: content.long_description,
                     }}
@@ -306,32 +308,7 @@ const CmsTemplate = () => {
         )}
 
         {/* Metadata Section */}
-        {/* <div className="py-12 bg-white border-t border-gray-200">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                <div className="bg-gray-50 rounded-lg p-6">
-                  <div className="text-2xl font-bold text-gray-800 mb-2">
-                    {new Date(content.created_at).toLocaleDateString()}
-                  </div>
-                  <div className="text-gray-600">Created Date</div>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-6">
-                  <div className="text-2xl font-bold text-gray-800 mb-2">
-                    {new Date(content.updated_at).toLocaleDateString()}
-                  </div>
-                  <div className="text-gray-600">Last Updated</div>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-6">
-                  <div className="text-2xl font-bold text-gray-800 mb-2">
-                    {content.slug}
-                  </div>
-                  <div className="text-gray-600">URL Slug</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> */}
+        
       </div>
     </>
   );

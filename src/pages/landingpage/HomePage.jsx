@@ -10,6 +10,7 @@ import LandingPricing from "../../components/LandingComponent/LandingPricing";
 import { toast } from "react-toastify";
 import axios from "axios";
 import LandingPublishedJournal from "../../components/LandingComponent/LandingPublishedJournal";
+import LandingOurTeam from "../../components/LandingComponent/LandingOurTeam";
 
 const HomePage = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,6 +27,9 @@ const HomePage = () => {
   const [pricingData, setPricingData] = useState([]);
   const [publishedJournalData, setPublishedJournalData] = useState([]);
   const [browsJournalData, setBrowsJournalData] = useState([]);
+  const [researchData, setResearchData] = useState([]);
+  const [servicesData, setServicesData] = useState([]);
+  const [ourTeamData, setOurTeamData] = useState([]);
 
   const [loading, setLoading] = useState({
     banner: true,
@@ -35,6 +39,9 @@ const HomePage = () => {
     pricing: true,
     publishedJournal: true,
     browsJournal: true,
+    research: true,
+    service: true,
+    team: true,
   });
   const [error, setError] = useState({
     banner: null,
@@ -44,6 +51,9 @@ const HomePage = () => {
     pricing: null,
     publishedJournal: null,
     browsJournal: null,
+    research: null,
+    service: null,
+    team: null,
   });
 
   const fetchAll = async () => {
@@ -55,6 +65,9 @@ const HomePage = () => {
       pricing: axios.get(`${API_URL}api/plan`),
       publishedJournal: axios.get(`${API_URL}api/published-manuscripts-list`),
       browsJournal: axios.get(`${API_URL}api/show-journals`),
+      research: axios.get(`${API_URL}api/research`),
+      service: axios.get(`${API_URL}api/services`),
+      team: axios.get(`${API_URL}api/team`),
     };
 
     Object.entries(requests).forEach(async ([key, request]) => {
@@ -73,6 +86,9 @@ const HomePage = () => {
           if (key === "publishedJournal")
             setPublishedJournalData(response.data.data);
           if (key === "browsJournal") setBrowsJournalData(response.data.data);
+          if (key === "research") setResearchData(response.data.data);
+          if (key === "service") setServicesData(response.data.data);
+          if (key === "team") setOurTeamData(response.data.data);
         }
       } catch (error) {
         console.log(`Error fetching ${key}: `, error);
@@ -115,17 +131,30 @@ const HomePage = () => {
         loading={loading.blog}
         error={error.blog}
       />
-      <LandingResearch />
+      <LandingResearch
+        researchInfo={researchData}
+        loading={loading.research}
+        error={error.research}
+      />
       <LandingPricing
         pricingData={pricingData}
         loading={loading.pricing}
         error={error.pricing}
       />
-      <LandingServices />
+      <LandingServices
+        servicesData={servicesData}
+        loading={loading.service}
+        error={error.service}
+      />
       <OurPartner
         partnerData={partnerData}
         loading={loading.partner}
         error={error.partner}
+      />
+      <LandingOurTeam
+        ourTeamData={ourTeamData}
+        loading={loading.team}
+        error={error.team}
       />
     </>
   );

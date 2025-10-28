@@ -107,6 +107,8 @@ import HandleServices from "./pages/admin/research_service_team/HandleServices";
 import AddService from "./pages/admin/research_service_team/AddService";
 import HandleTeams from "./pages/admin/research_service_team/HandleTeams";
 import AddTeam from "./pages/admin/research_service_team/AddTeam";
+import HandleSubScriptionPlans from "./pages/admin/payment/HandleSubScriptionPlans";
+import CmsTemplate from "./pages/user/CmsTemplate";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -174,6 +176,7 @@ function App() {
               <Route path="/about" element={<UserProfilePage />} />
               <Route path="/blog" element={<UserBlogPage />} />
               <Route path="/blog/:id" element={<BlogDetails />} />
+              <Route path="/cms/:slug" element={<CmsTemplate />} />
               <Route path="/innovation" element={<InnovationPage />} />
               <Route
                 path="/innovation/:id"
@@ -317,6 +320,10 @@ function App() {
               <Route
                 path="/payment/featured-payment"
                 element={<FeaturePayment />}
+              />
+              <Route
+                path="/payment/subscription-plans"
+                element={<HandleSubScriptionPlans />}
               />
               <Route
                 path="/payment/subscription-history"

@@ -1,6 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLongArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 const BrowseJournals = ({
   browsJournalData = [],
@@ -45,14 +46,14 @@ const BrowseJournals = ({
                 <h3 className="text-2xl md:text-3xl font-extrabold mb-3 leading-snug">
                   {journal.j_title}
                 </h3>
-                <a
-                  href="#"
+                <Link
+                  to="/view-published-manuscript-list"
                   className={`font-bold text-lg flex items-center gap-2 ${
                     index % 2 === 0 ? "text-black" : "text-yellow-400"
                   } hover:underline`}
                 >
                   View Journal <FontAwesomeIcon icon={faLongArrowRight} />
-                </a>
+                </Link>
               </div>
             </div>
           ))}

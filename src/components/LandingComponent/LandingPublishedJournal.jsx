@@ -46,7 +46,7 @@ const LandingPublishedJournal = ({
       </div>
 
       {/* Carousel Container */}
-      <div className="max-w-7xl mx-auto mb-12">
+      <div className="max-w-7xl mx-auto mb-2 md:mb-12">
         <Swiper
           modules={[Navigation, Pagination, Autoplay]}
           spaceBetween={30}

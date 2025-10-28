@@ -253,6 +253,13 @@ export const sidebarRoutes = [
         path: "/payment/featured-payment",
       },
       {
+        title: "Subscription Plans",
+        icon: <FontAwesomeIcon icon={faCreditCard} />,
+        path: "/payment/subscription-plans",
+        allowedRoles: ["0"],
+
+      },
+      {
         title: "Subscription History",
         icon: <FontAwesomeIcon icon={faCreditCard} />,
         allowedRoles: ["0"],

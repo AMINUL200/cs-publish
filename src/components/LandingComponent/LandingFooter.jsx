@@ -156,7 +156,7 @@ const LandingFooter = ({ settingsData = {}, loading = false }) => {
 
       {/* Copyright */}
       <div className="text-center text-sm bg-gray-700 w-full p-4 text-white">
-        ©2023 cs publishing house.com All rights reserved.
+        ©2023 cspublishinghouse.com All rights reserved.
       </div>
     </footer>
   );

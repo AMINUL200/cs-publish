@@ -73,8 +73,8 @@ const LandingFooter = ({ settingsData = {}, loading = false }) => {
       <div className="mx-auto px-6 pt-12">
         {/* Main Links Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-6">
-          <div className="mb-12">
-            <img src={settingsData?.image} alt="Company Logo" />
+          <div className="mb-2 md:mb-16">
+            <img src={settingsData?.image} alt="Company Logo" className="text-center mx-auto sm:mx-0" />
             <div className="space-y-1 mt-4 ml-4">
               <p className="text-[0.7rem]">{settingsData?.address_line1}</p>
               <p className="text-[0.7rem]">{settingsData?.address_line2}</p>

@@ -84,7 +84,7 @@ const LandingAbout = ({ aboutData = {}, loading = false, error = null }) => {
 
           {/* Content Column */}
           <div className="lg:col-span-6">
-            <div className="lg:pl-8">
+            <div className="lg:pl-8 text-center md:text-start">
               <h2 className="text-3xl md:text-4xl font-bold text-[#ffba00] mb-6">
                 About <span className="text-black">Us</span>
               </h2>

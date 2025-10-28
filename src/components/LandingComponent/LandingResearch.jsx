@@ -19,7 +19,7 @@ const LandingResearch = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {researchInfo.map((research) => (
             <div key={research.id}>
-              <div className="research_box">
+              <div className="research_box !mb-0">
                 <div className="research_top">
                   <h4 className="titletxt text-[1.2rem]">{research.title}</h4>
                   <Link to={`/cms/${research.slug}`} className="btn btn-outline">

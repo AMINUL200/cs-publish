@@ -114,8 +114,7 @@ const LandingOurTeam = ({
               el: '.team-swiper-pagination',
             }}
             autoplay={{
-              delay: 5000,
-              disableOnInteraction: false,
+              delay: 5000
             }}
             breakpoints={{
               640: {

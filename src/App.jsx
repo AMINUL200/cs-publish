@@ -100,6 +100,13 @@ import PublisherViewPublishedManuscriptList from "./pages/publisher/PublisherVie
 import PublisherEditDesignManuscript from "./pages/publisher/PublisherEditDesignManuscript";
 import ViewManuscriptDetails from "./pages/user/manuscript/ViewManuscriptDetails";
 import FaqPage from "./pages/user/faqpage/FaqPage";
+import ViewManuscriptPage from "./pages/user/manuscript/ViewManuscriptPage";
+import HandleResearch from "./pages/admin/research_service_team/HandleResearch";
+import AddResearch from "./pages/admin/research_service_team/AddResearch";
+import HandleServices from "./pages/admin/research_service_team/HandleServices";
+import AddService from "./pages/admin/research_service_team/AddService";
+import HandleTeams from "./pages/admin/research_service_team/HandleTeams";
+import AddTeam from "./pages/admin/research_service_team/AddTeam";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -162,6 +169,7 @@ function App() {
           >
             <Route element={<AppLayout2 />}>
               <Route index path="/" element={<HomePage />} />
+              <Route path="/view-published-manuscript-list" element={<ViewManuscriptPage />} />
               <Route path="/view-published-manuscript/:id" element={<ViewManuscriptDetails />} />
               <Route path="/about" element={<UserProfilePage />} />
               <Route path="/blog" element={<UserBlogPage />} />
@@ -226,7 +234,7 @@ function App() {
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/contact" element={<Contact />} />
+              {/* <Route path="/contact" element={<Contact />} /> */}
 
               {/* Add more protected routes here */}
 
@@ -252,6 +260,7 @@ function App() {
                 element={<AddCategory />}
               />
               {/* setting */}
+              <Route path="/setting/setting" element={<Contact />} />
               <Route path="/setting/news" element={<LatestNews />} />
               <Route path="/setting/add-news" element={<AddNews />} />
               <Route path="/setting/news/:id" element={<UpdateNews />} />
@@ -264,6 +273,14 @@ function App() {
                 path="/setting/payment-policy"
                 element={<HandlePaymentPolicy />}
               />
+              <Route path="/setting/research" element={<HandleResearch />} />
+              <Route path="/setting/add-research" element={<AddResearch/>}/>
+
+              <Route path="/setting/service" element={<HandleServices />} />
+              <Route path="/setting/add-service" element={<AddService/>}/>
+
+              <Route path="/setting/teams" element={<HandleTeams />} />
+              <Route path="/setting/add-team" element={<AddTeam />} />
 
               {/* user manger route */}
               <Route path="/users/add-user" element={<AddUser />} />

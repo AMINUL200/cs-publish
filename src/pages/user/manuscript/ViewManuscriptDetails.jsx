@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useParams, Link } from "react-router-dom";
+import Loader from "../../../components/common/Loader";
 
 const ViewManuscriptDetails = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -36,7 +37,9 @@ const ViewManuscriptDetails = () => {
     } catch (error) {
       console.error("Error fetching manuscript:", error);
       setError(error.response?.data?.message || error.message);
-      toast.error(error.response?.data?.message || "Failed to fetch manuscript");
+      toast.error(
+        error.response?.data?.message || "Failed to fetch manuscript"
+      );
     } finally {
       setLoading(false);
     }
@@ -67,11 +70,12 @@ const ViewManuscriptDetails = () => {
     if (element) {
       const headerOffset = 120; // Increased offset for better positioning
       const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      const offsetPosition =
+        elementPosition + window.pageYOffset - headerOffset;
 
       window.scrollTo({
         top: offsetPosition,
-        behavior: "smooth"
+        behavior: "smooth",
       });
     }
   };
@@ -80,35 +84,42 @@ const ViewManuscriptDetails = () => {
   useEffect(() => {
     const handleScroll = () => {
       const sections = [
-        "abstract", "introduction", "materials-methods", "results", 
-        "discussion", "conclusion", "author-contributions", "conflict-interest", "references"
+        "abstract",
+        "introduction",
+        "materials-methods",
+        "results",
+        "discussion",
+        "conclusion",
+        "author-contributions",
+        "conflict-interest",
+        "references",
       ];
-      
+
       const scrollPosition = window.scrollY + 150; // Adjusted for better detection
-      
+
       // Find the current section
       let currentSection = sections[0];
-      
+
       for (const sectionId of sections) {
         const section = document.getElementById(sectionId);
         if (section) {
           const sectionTop = section.offsetTop;
           const sectionBottom = sectionTop + section.offsetHeight;
-          
+
           if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
             currentSection = sectionId;
             break;
           }
         }
       }
-      
+
       setActiveSection(currentSection);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     handleScroll(); // Call once on mount
-    
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [manuscriptData]); // Added manuscriptData dependency
 
   // Navigation sections
@@ -125,14 +136,7 @@ const ViewManuscriptDetails = () => {
   ];
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-24">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading manuscript details...</p>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (error) {
@@ -161,7 +165,9 @@ const ViewManuscriptDetails = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Manuscript Not Found
           </h2>
-          <p className="text-gray-600">The requested manuscript could not be found.</p>
+          <p className="text-gray-600">
+            The requested manuscript could not be found.
+          </p>
         </div>
       </div>
     );
@@ -177,15 +183,18 @@ const ViewManuscriptDetails = () => {
             <nav className="flex mb-4" aria-label="Breadcrumb">
               <ol className="flex items-center space-x-2 text-sm text-gray-600">
                 <li>
-                  <Link to="/" className="hover:text-blue-600 transition-colors">
+                  <Link
+                    to="/"
+                    className="hover:text-yellow-600 transition-colors"
+                  >
                     Home
                   </Link>
                 </li>
                 <li className="flex items-center">
                   <span className="mx-2">/</span>
                   <Link
-                    to="/published-manuscripts"
-                    className="hover:text-blue-600 transition-colors"
+                    to="/view-published-manuscript-list"
+                    className="hover:text-yellow-600 transition-colors"
                   >
                     Published Manuscripts
                   </Link>
@@ -233,7 +242,7 @@ const ViewManuscriptDetails = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Navigation */}
           <div className="lg:w-64 flex-shrink-0">
-            <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-32">
+            <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-22">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Jump to Section
               </h3>
@@ -255,7 +264,23 @@ const ViewManuscriptDetails = () => {
 
               {/* Additional Actions */}
               <div className="mt-6 pt-6 border-t border-gray-200">
-                <button className="w-full custom-btn px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors mb-3">
+                <button
+                  onClick={() => {
+                    const pdfUrl =
+                      manuscriptData?.pdf ||
+                      manuscriptData?.file_url ||
+                      manuscriptData?.manuscript_pdf;
+
+                    if (!pdfUrl) {
+                      toast.error("PDF not available for this manuscript.");
+                      return;
+                    }
+
+                    // Trigger download in a new tab
+                    window.open(pdfUrl, "_blank", "noopener,noreferrer");
+                  }}
+                  className="w-full custom-btn px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors mb-3"
+                >
                   Download PDF
                 </button>
               </div>
@@ -310,7 +335,10 @@ const ViewManuscriptDetails = () => {
 
                 {/* Materials and Methods */}
                 {manuscriptData.materials_and_methods && (
-                  <section id="materials-methods" className="mb-12 scroll-mt-32">
+                  <section
+                    id="materials-methods"
+                    className="mb-12 scroll-mt-32"
+                  >
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
                       <span className="w-2 h-6 bg-blue-600 rounded mr-3"></span>
                       Materials and Methods
@@ -374,7 +402,10 @@ const ViewManuscriptDetails = () => {
 
                 {/* Author Contributions */}
                 {manuscriptData.author_contributions && (
-                  <section id="author-contributions" className="mb-12 scroll-mt-32">
+                  <section
+                    id="author-contributions"
+                    className="mb-12 scroll-mt-32"
+                  >
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
                       <span className="w-2 h-6 bg-blue-600 rounded mr-3"></span>
                       Author Contributions
@@ -390,7 +421,10 @@ const ViewManuscriptDetails = () => {
 
                 {/* Conflict of Interest */}
                 {manuscriptData.conflict_of_interest_statement && (
-                  <section id="conflict-interest" className="mb-12 scroll-mt-32">
+                  <section
+                    id="conflict-interest"
+                    className="mb-12 scroll-mt-32"
+                  >
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
                       <span className="w-2 h-6 bg-blue-600 rounded mr-3"></span>
                       Conflict of Interest
@@ -429,24 +463,32 @@ const ViewManuscriptDetails = () => {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="font-medium text-gray-600">Manuscript ID:</span>
+                  <span className="font-medium text-gray-600">
+                    Manuscript ID:
+                  </span>
                   <span className="ml-2 text-gray-900">
                     {manuscriptData.m_unique_id}
                   </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-600">Email:</span>
-                  <span className="ml-2 text-gray-900">{manuscriptData.email}</span>
+                  <span className="ml-2 text-gray-900">
+                    {manuscriptData.email}
+                  </span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-600">Affiliation:</span>
+                  <span className="font-medium text-gray-600">
+                    Affiliation:
+                  </span>
                   <span className="ml-2 text-gray-900">
                     {manuscriptData.affiliation}
                   </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-600">Country:</span>
-                  <span className="ml-2 text-gray-900">{manuscriptData.country}</span>
+                  <span className="ml-2 text-gray-900">
+                    {manuscriptData.country}
+                  </span>
                 </div>
               </div>
             </div>

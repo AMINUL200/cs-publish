@@ -9,7 +9,7 @@ import { logout } from '../../features/auth/AuthSlice';
 import axios from "axios";
 import { User2Icon } from "lucide-react";
 
-const LandingHeader = ({ toggleMenu }) => {
+const LandingHeader = ({ toggleMenu , settingsData={}, loading=false }) => {
   const [scrolled, setScrolled] = useState(false);
   const [openDropdowns, setOpenDropdowns] = useState({});
   const dropdownRefs = useRef({});
@@ -52,6 +52,8 @@ const LandingHeader = ({ toggleMenu }) => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  
 
   // Updated navLinks with dropdown support
   const navLinks = [
@@ -391,6 +393,30 @@ const LandingHeader = ({ toggleMenu }) => {
     );
   };
 
+  if (loading) {
+    return (
+      <header className="fixed w-full z-50 bg-white/90 backdrop-blur-sm shadow-md py-3">
+        <div className="px-8 flex justify-between items-center animate-pulse">
+          {/* Skeleton for logo */}
+          <div className="flex items-center">
+            <div className="h-10 w-40 bg-gray-200 rounded-md"></div>
+          </div>
+
+          {/* Skeleton for nav links */}
+          <div className="hidden md:flex space-x-6">
+            <div className="h-5 w-16 bg-gray-200 rounded"></div>
+            <div className="h-5 w-20 bg-gray-200 rounded"></div>
+            <div className="h-5 w-24 bg-gray-200 rounded"></div>
+            <div className="h-5 w-16 bg-gray-200 rounded"></div>
+          </div>
+
+          {/* Skeleton for button */}
+          <div className="hidden md:block h-9 w-20 bg-gray-200 rounded"></div>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header
       className={`fixed w-full z-50 transition-all duration-300 ${
@@ -409,7 +435,7 @@ const LandingHeader = ({ toggleMenu }) => {
             className="text-2xl font-bold text-indigo-600 flex items-center cursor-pointer"
             onClick={() => handleNavClick("#home")}
           >
-            <img src={landingLog} alt="logo" height={10} className="h-8 md:h-14" />
+            <img src={settingsData?.image} alt="logo" height={10} className="h-8 md:h-14" />
           </div>
         </div>
 

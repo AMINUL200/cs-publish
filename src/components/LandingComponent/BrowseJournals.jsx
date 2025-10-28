@@ -1,161 +1,65 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-    faFile,
-    faFileText,
-    faPieChart,
-    faThermometerFull,
-    faAtom,
-    faLongArrowRight
-} from '@fortawesome/free-solid-svg-icons';
-import { analyticalJurnalImg, bengaliJurnalImg, biochemistryJurnalImg, biologicalJurnalImg, chemistryJurnalImg, englishJurnalImg, phycialJurnalImg } from '../../assets';
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLongArrowRight } from "@fortawesome/free-solid-svg-icons";
 
-const BrowseJournals = () => {
-    const journals = [
-        {
-            id: 1,
-            title: "English",
-            icon: faFileText,
-            color: "color1",
-            image: englishJurnalImg,
-            orderClasses: "order-0 order-sm-0 order-md-0 order-lg-0 order-xl-0",
-            whiteContent: false,
-            borderLeft: true
-        },
-        {
-            id: 2,
-            title: "Bengali",
-            icon: faFile,
-            color: "color4",
-            image: bengaliJurnalImg,
-            orderClasses: "order-first",
-            whiteContent: true,
-            borderLeft: false
-        },
-        {
-            id: 3,
-            title: "Biological",
-            icon: faFile,
-            color: "color4",
-            image: biologicalJurnalImg,
-            orderClasses: "order-1 order-sm-2 order-md-1 order-lg-1 order-xl-1",
-            whiteContent: true,
-            borderLeft: false
-        },
-        {
-            id: 4,
-            title: "Physical",
-            icon: faFile,
-            color: "color2",
-            image: phycialJurnalImg,
-            orderClasses: "order-2 order-sm-1 order-md-2 order-lg-2 order-xl-2",
-            whiteContent: false,
-            borderLeft: false
-        },
-        {
-            id: 5,
-            title: "Analytical",
-            icon: faPieChart,
-            color: "color3",
-            image: analyticalJurnalImg,
-            orderClasses: "order-4 order-sm-4 order-md-3 order-lg-3 order-xl-3",
-            whiteContent: false,
-            borderLeft: false
-        },
-        {
-            id: 6,
-            title: "Biochemistry",
-            icon: faThermometerFull,
-            color: "color4",
-            image: biochemistryJurnalImg,
-            orderClasses: "order-3 order-sm-3 order-md-4 order-lg-4 order-xl-4",
-            whiteContent: true,
-            borderLeft: false
-        },
-        {
-            id: 7,
-            title: "Chemistry",
-            icon: faAtom,
-            color: "color4",
-            image: chemistryJurnalImg,
-            orderClasses: "order-5 order-sm-5 order-md-5 order-lg-5 order-xl-5",
-            whiteContent: false,
-            borderLeft: false
-        },
-        {
-            id: 8,
-            title: "Chemistry",
-            icon: faAtom,
-            color: "color4",
-            image: chemistryJurnalImg,
-            orderClasses: "order-5 order-sm-6 order-md-6 order-lg-6 order-xl-6",
-            whiteContent: true,
-            borderLeft: false
-        }
-    ];
+const BrowseJournals = ({
+  browsJournalData = [],
+  loading = false,
+  error = null,
+}) => {
+  if (loading)
+    return <p className="text-center py-10 text-gray-500">Loading...</p>;
+  if (error) return <p className="text-center py-10 text-red-500">{error}</p>;
 
-    return (
-        <section className="browsjurnal py-10 sm:py-16" id='jurnals'>
-            <div className=" mx-auto ">
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-5">
-                        Browse <span className="text-yellow-400">Journals</span>
-                    </h2>
-                </div>
-
-                <div className="quick_previewbase">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-0">
-                        {journals.map((journal, index) => (
-                            <div
-                                key={journal.id}
-                                className={`${journal.orderClasses} flex`}
-                            >
-                                <div className={`quick_preview_basebox ${journal.whiteContent ? 'white_content' : ''} relative w-full`}>
-                                    <div className={`quick_preview ${journal.borderLeft ? 'border-l-0' : ''} p-10 relative z-10 text-center`}>
-                                        <div className={`w-20 h-20  mx-auto flex justify-center items-center rounded-3xl mb-4 
-                                            ${(index === 1 || index === 2 || index === 4 || index === 7) ? "bg-[#ffba00]" : "bg-white"}`}
-                                        >
-                                            <FontAwesomeIcon
-                                                icon={journal.icon}
-                                                className={` text-4xl
-                                            ${(index === 1 || index === 2 || index === 4 || index === 7) ? "text-white" : "text-black"}
-                                            `}
-                                            />
-
-                                        </div>
-                                        <h3 className={`text-4xl font-bold mb-3
-                                             ${(index === 1 || index === 2 || index === 4 || index === 7) ? "text-[#ffba00]" : "  text-black"}
-                                             `}>
-                                            {journal.title}
-                                        </h3>
-                                        <p>
-                                            <a className={`d-block text-xl font-bold hover:text-white transition-colors
-                                                ${(index === 1 || index === 2 || index === 4 || index === 7) ? "text-[#ffba00] " : "  text-black"}
-                                                `}
-                                                href="#">
-                                                View Journal <FontAwesomeIcon icon={faLongArrowRight} className="ml-2" />
-                                            </a>
-                                        </p>
-                                    </div>
-                                    <div className={`color_overly absolute inset-0 z-0
-                                          ${(index === 1 || index === 2 || index === 4 || index === 7) ? "bg_black" : ""}
-                                        `}></div>
-                                    <div className="h-full quick_preview_imgbox absolute inset-0 overflow-hidden">
-                                        <img
-                                            src={journal.image}
-                                            alt={journal.title}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                
+  return (
+    <section className="py-10 sm:py-16 bg-gray-50" id="journals">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-5">
+            Browse <span className="text-yellow-400">Journals</span>
+          </h2>
+          <h5 className="text-gray-600 max-w-2xl mx-auto">
+            Discover our collection of specialized scientific journals covering
+            various fields of research and innovation.
+          </h5>
+        </div>
+        <div className="grid md:grid-cols-3 gap-4 w-full ">
+          {browsJournalData.map((journal, index) => (
+            <div
+              key={journal.id}
+              className="relative group h-[250px] md:h-[300px] overflow-hidden rounded-xl shadow-lg cursor-pointer transition-all duration-500"
+              style={{
+                backgroundImage: `url(${journal.image})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            >
+              {/* Overlay */}
+              <div
+                className={`absolute inset-0 ${
+                  index % 2 === 0
+                    ? "bg-yellow-400/70 group-hover:bg-yellow-500/80 text-black"
+                    : "bg-black/70 group-hover:bg-black/80 text-yellow-400"
+                } backdrop-blur-[2px] flex flex-col justify-center items-center text-center px-6 transition-all duration-500`}
+              >
+                <h3 className="text-2xl md:text-3xl font-extrabold mb-3 leading-snug">
+                  {journal.j_title}
+                </h3>
+                <a
+                  href="#"
+                  className={`font-bold text-lg flex items-center gap-2 ${
+                    index % 2 === 0 ? "text-black" : "text-yellow-400"
+                  } hover:underline`}
+                >
+                  View Journal <FontAwesomeIcon icon={faLongArrowRight} />
+                </a>
+              </div>
             </div>
-        </section>
-    );
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 };
 
 export default BrowseJournals;

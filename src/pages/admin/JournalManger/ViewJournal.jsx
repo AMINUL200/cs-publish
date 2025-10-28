@@ -152,7 +152,7 @@ const ViewJournal = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-2 text-center">
                     {journal.image ? (
                       <img
-                        src={`https://api.cspublishinghouse.com/storage/app/public/${journal.image}`}
+                        src={`${journal.image}`}
                         alt={journal.j_title}
                         className="h-12 w-12 object-cover rounded mx-auto"
                       />

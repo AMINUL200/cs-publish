@@ -6,7 +6,8 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/autoplay";
 import { formatDate } from "../../lib/utils";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const LandingPublishedJournal = ({
   publishedJournalData = [],
@@ -17,6 +18,8 @@ const LandingPublishedJournal = ({
 
   // Remove the sample data since you're using real data now
   // const publishedManuscripts = [...];
+  const navigate = useNavigate();
+  const { token } = useSelector((state) => state.auth);
 
   if (loading) {
     return <div>Loading published journals...</div>;
@@ -99,7 +102,17 @@ const LandingPublishedJournal = ({
                       Published: {formatDate(manuscript?.created_at)}
                     </span>
                     <Link
-                      to={`/view-published-manuscript/${manuscript?.id}`}
+                      to={
+                        token
+                          ? `/view-published-manuscript/${manuscript?.id}`
+                          : "#"
+                      }
+                      onClick={(e) => {
+                        if (!token) {
+                          e.preventDefault(); // stop navigation
+                          alert("Please log in to view this manuscript.");
+                        }
+                      }}
                       className="bg-gradient-to-r custom-btn cursor-pointer px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
                     >
                       View
@@ -117,7 +130,10 @@ const LandingPublishedJournal = ({
 
       {/* View All Button */}
       <div className="text-center">
-        <button className="bg-gradient-to-r custom-btn px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 inline-flex items-center gap-2 cursor-pointer">
+        <button
+          onClick={() => navigate("/view-published-manuscript-list")}
+          className="bg-gradient-to-r custom-btn px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 inline-flex items-center gap-2 cursor-pointer"
+        >
           View All Manuscripts
           <svg
             className="w-5 h-5 transition-transform duration-300 hover:translate-x-1"

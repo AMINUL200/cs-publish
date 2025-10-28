@@ -25,6 +25,7 @@ const HomePage = () => {
   const [aboutData, setAboutData] = useState({});
   const [pricingData, setPricingData] = useState([]);
   const [publishedJournalData, setPublishedJournalData] = useState([]);
+  const [browsJournalData, setBrowsJournalData] = useState([]);
 
   const [loading, setLoading] = useState({
     banner: true,
@@ -33,6 +34,7 @@ const HomePage = () => {
     about: true,
     pricing: true,
     publishedJournal: true,
+    browsJournal: true,
   });
   const [error, setError] = useState({
     banner: null,
@@ -41,6 +43,7 @@ const HomePage = () => {
     about: null,
     pricing: null,
     publishedJournal: null,
+    browsJournal: null,
   });
 
   const fetchAll = async () => {
@@ -51,19 +54,25 @@ const HomePage = () => {
       about: axios.get(`${API_URL}api/about`),
       pricing: axios.get(`${API_URL}api/plan`),
       publishedJournal: axios.get(`${API_URL}api/published-manuscripts-list`),
+      browsJournal: axios.get(`${API_URL}api/show-journals`),
     };
 
     Object.entries(requests).forEach(async ([key, request]) => {
       try {
         const response = await request;
-        if (response.status === 200|| response.status || response.data.status) {
+        if (
+          response.status === 200 ||
+          response.status ||
+          response.data.status
+        ) {
           if (key === "banner") setBannerData(response.data.data);
           if (key === "partner") setPartnerData(response.data.data);
           if (key === "blog") setBlogData(response.data.data);
           if (key === "about") setAboutData(response.data.data[0]);
           if (key === "pricing") setPricingData(response.data);
-          if (key === "publishedJournal") setPublishedJournalData(response.data.data);
-          
+          if (key === "publishedJournal")
+            setPublishedJournalData(response.data.data);
+          if (key === "browsJournal") setBrowsJournalData(response.data.data);
         }
       } catch (error) {
         console.log(`Error fetching ${key}: `, error);
@@ -91,7 +100,11 @@ const HomePage = () => {
         loading={loading.about}
         error={error.about}
       />
-      <BrowseJournals />
+      <BrowseJournals
+        browsJournalData={browsJournalData}
+        loading={loading.browsJournal}
+        error={error.browsJournal}
+      />
       <LandingPublishedJournal
         publishedJournalData={publishedJournalData}
         loading={loading.publishedJournal}

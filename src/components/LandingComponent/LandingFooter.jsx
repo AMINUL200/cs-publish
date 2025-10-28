@@ -1,20 +1,25 @@
-import React from 'react'
+import React from "react";
 import { landingLog } from "../../assets";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTwitter } from "@fortawesome/free-brands-svg-icons";
+import { faInstagram } from "@fortawesome/free-brands-svg-icons";
+import { faLinkedin } from "@fortawesome/free-brands-svg-icons";
+import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 
-const LandingFooter = () => {
+const LandingFooter = ({ settingsData = {}, loading = false }) => {
   const sections = [
     {
       title: "Product and services",
       items: [
-        { name: "Discover journals", path: "#" },
+        { name: "Discover Manuscript", path: "/view-published-manuscript-list" },
         // { name: "Books Hub", path: "/products" },
         // { name: "Mentors", path: "/mentors" },
         // { name: "Author Services", path: "#" },
         { name: "Blog", path: "/blog" },
         // { name: "Events", path: "#" },
         // { name: "Conference", path: "#" }
-      ]
+      ],
     },
     // {
     //   title: "Resources",
@@ -30,7 +35,7 @@ const LandingFooter = () => {
     // {
     //   title: "Policies and access",
     //   items: [
-    //     { name: "Open access", path: "#" }, 
+    //     { name: "Open access", path: "#" },
     //     { name: "Subscription", path: "#" },
     //     { name: "Membership", path: "#" },
     //     { name: "Editor Hub", path: "#" },
@@ -51,8 +56,8 @@ const LandingFooter = () => {
         // { name: "Career opportunities", path: "#" },
         // { name: "Fellowship", path: "#" },
         // { name: "Feedback", path: "#" }
-      ]
-    }
+      ],
+    },
   ];
 
   const legalLinks = [
@@ -60,7 +65,7 @@ const LandingFooter = () => {
     { name: "Terms & Conditions", path: "/terms" },
     { name: "Legal Disclaimer", path: "#" },
     { name: "Policy", path: "/policy" },
-    { name: "Payment Policy", path: "/payment-policy" }
+    { name: "Payment Policy", path: "/payment-policy" },
   ];
 
   return (
@@ -69,22 +74,59 @@ const LandingFooter = () => {
         {/* Main Links Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-6">
           <div className="mb-12">
-            <img src={landingLog} alt="Company Logo" />
-            <div className="space-y-1 mt-4">
-              <p className="text-[0.7rem]">Address line 1: Address here</p>
-              <p className="text-[0.7rem]">Address line 2: Address here</p>
-              <p className="text-[0.7rem]">Address line 3: Address here</p>
+            <img src={settingsData?.image} alt="Company Logo" />
+            <div className="space-y-1 mt-4 ml-4">
+              <p className="text-[0.7rem]">{settingsData?.address_line1}</p>
+              <p className="text-[0.7rem]">{settingsData?.address_line2}</p>
+            </div>
+            <div className="space-y-1 mt-4 ml-4">
+              {/* Twitter Icon */}
+              <a
+                href={settingsData?.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-yellow-500 transition-colors duration-300 mr-2"
+              >
+                <FontAwesomeIcon icon={faTwitter} className="w-5 h-5" />
+              </a>
+              {/* instagram icon */}
+              <a
+                href={settingsData?.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-yellow-500 transition-colors duration-300 mr-2"
+              >
+                <FontAwesomeIcon icon={faInstagram} className="w-5 h-5" />
+              </a>
+              {/* linkedin icon */}
+              <a
+                href={settingsData?.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-yellow-500 transition-colors duration-300 mr-2"
+              >
+                <FontAwesomeIcon icon={faLinkedin} className="w-5 h-5" />
+              </a>
+              {/* whatsapp icon */}
+              <a
+                href={settingsData?.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-yellow-500 transition-colors duration-300 mr-2"
+              >
+                <FontAwesomeIcon icon={faWhatsapp} className="w-5 h-5" />
+              </a>
             </div>
           </div>
-          
+
           {sections.map((section, index) => (
             <div key={index}>
               <h2 className="text-lg font-semibold mb-4">{section.title}</h2>
               <ul className="space-y-2 pl-3">
                 {section.items.map((item, itemIndex) => (
                   <li key={itemIndex} className="mb-0">
-                    <Link 
-                      to={item.path} 
+                    <Link
+                      to={item.path}
                       className="text-[0.8rem] hover:text-[#ffba00] transition-colors"
                     >
                       {item.name}
@@ -101,8 +143,8 @@ const LandingFooter = () => {
       <div className="flex flex-wrap gap-2 justify-center bg-gray-500 p-4 text-white">
         {legalLinks.map((link, index) => (
           <React.Fragment key={index}>
-            <a 
-              href={link.path} 
+            <a
+              href={link.path}
               className="text-sm hover:text-[#ffba00] transition-colors text-white"
             >
               {link.name}
@@ -111,13 +153,13 @@ const LandingFooter = () => {
           </React.Fragment>
         ))}
       </div>
-      
+
       {/* Copyright */}
       <div className="text-center text-sm bg-gray-700 w-full p-4 text-white">
         ©2023 republication.com All rights reserved.
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default LandingFooter
+export default LandingFooter;

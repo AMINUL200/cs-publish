@@ -187,6 +187,11 @@ export const sidebarRoutes = [
     allowedRoles: ["0"],
     subRoutes: [
       {
+        path: "/setting/setting",
+        title: "Setting",
+        allowedRoles: ["0"],
+      },
+      {
         path: "/setting/news",
         title: "Latest News",
         allowedRoles: ["0"],
@@ -210,15 +215,30 @@ export const sidebarRoutes = [
         path: "/setting/payment-policy",
         title: "Payment Policy",
         allowedRoles: ["0"],
+      },
+      {
+        path:"/setting/research",
+        title:"Handle Research ",
+        allowedRoles:["0"],
+      },
+      {
+        path: "/setting/service",
+        title: "Handle Service ",
+        allowedRoles: ["0"],
+      },
+      {
+        path: "/setting/teams",
+        title: "Handle Teams",
+        allowedRoles: ["0"],
       }
     ],
   },
-  {
-    path: "/contact",
-    title: "Contact",
-    icon: <FontAwesomeIcon icon={faEnvelope} />,
-    allowedRoles: ["0"],
-  },
+  // {
+  //   path: "/contact",
+  //   title: "Contact",
+  //   icon: <FontAwesomeIcon icon={faEnvelope} />,
+  //   allowedRoles: ["0"],
+  // },
   {
     // path: "/payment",
     title: "Payment",

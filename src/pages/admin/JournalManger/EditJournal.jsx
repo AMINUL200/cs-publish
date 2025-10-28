@@ -29,7 +29,7 @@ const EditJournal = () => {
         j_description: "",
         editorial_board: "",
         editor: "",
-        amount: "", // Added amount field
+        amount: "",
         issn_print: "1",
         issn_print_no: "",
         issn_online: "1",
@@ -39,6 +39,9 @@ const EditJournal = () => {
         image: null,
         status: "1",
     });
+
+    const [imagePreview, setImagePreview] = useState(null);
+    const [currentImageUrl, setCurrentImageUrl] = useState("");
 
     // fetch groups
     const fetchGroups = async () => {
@@ -82,6 +85,13 @@ const EditJournal = () => {
                 // set read-only display values
                 setGroupName(j.group?.group_name || "");
                 setCategoryName(j.category?.category_name || "");
+                
+                // Set current image URL for preview
+                if (j.image) {
+                    setCurrentImageUrl(j.image);
+                    setImagePreview(j.image);
+                }
+                
                 // set editable fields
                 setFormData({
                     group_id: j.group_id || "",
@@ -91,14 +101,14 @@ const EditJournal = () => {
                     j_description: j.j_description || "",
                     editorial_board: j.editorial_board || "",
                     editor: j.editor || "",
-                    amount: j.amount || "", // Added amount field
+                    amount: j.amount || "",
                     issn_print: j.issn_print ? "1" : "0",
                     issn_print_no: j.issn_print_no || "",
                     issn_online: j.issn_online ? "1" : "0",
                     issn_online_no: j.issn_online_no || "",
                     ugc_approved: j.ugc_approved ? "1" : "0",
                     ugc_no: j.ugc_no || "",
-                    image: null,
+                    image: null, // Keep as null initially, we'll handle file separately
                     status: j.status ? "1" : "0",
                 });
             }
@@ -116,13 +126,32 @@ const EditJournal = () => {
     const handleChange = (e) => {
         const { name, value, type, files } = e.target;
         if (type === "file") {
-            setFormData((prev) => ({ ...prev, [name]: files[0] }));
+            const file = files[0];
+            if (file) {
+                setFormData((prev) => ({ ...prev, [name]: file }));
+                
+                // Create preview for new image
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setImagePreview(reader.result);
+                };
+                reader.readAsDataURL(file);
+            }
         } else if (
             ["issn_print", "issn_online", "ugc_approved", "status"].includes(name)
         ) {
             setFormData((prev) => ({ ...prev, [name]: value }));
         } else {
             setFormData((prev) => ({ ...prev, [name]: value }));
+        }
+    };
+
+    const handleRemoveImage = () => {
+        setFormData((prev) => ({ ...prev, image: null }));
+        setImagePreview(null);
+        setCurrentImageUrl("");
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
         }
     };
 
@@ -138,7 +167,7 @@ const EditJournal = () => {
             });
 
             const res = await axios.post(
-                `${API_URL}api/admin/journals/update/${id}`, // or use axios.put if API supports
+                `${API_URL}api/admin/journals/update/${id}`,
                 submitData,
                 {
                     headers: {
@@ -152,7 +181,7 @@ const EditJournal = () => {
                 console.log(res.data);
                 
                 toast.success(res.data.message || "Journal updated successfully");
-                navigate("/article-manger/journal"); // redirect if needed
+                navigate("/article-manger/journal");
             } else {
                 toast.error(res.data.message || "Failed to update journal");
             }
@@ -379,9 +408,32 @@ const EditJournal = () => {
                     />
                 </div>
 
-                {/* Image */}
+                {/* Image Upload and Preview */}
                 <div>
                     <label className="block mb-1 font-medium">Image</label>
+                    
+                    {/* Image Preview */}
+                    {imagePreview && (
+                        <div className="mb-4">
+                            <p className="text-sm text-gray-600 mb-2">Image Preview:</p>
+                            <div className="relative inline-block">
+                                <img 
+                                    src={imagePreview} 
+                                    alt="Journal preview" 
+                                    className="w-32 h-32 object-cover rounded-lg border shadow-sm"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleRemoveImage}
+                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* File Input */}
                     <input
                         type="file"
                         name="image"
@@ -390,11 +442,23 @@ const EditJournal = () => {
                         accept="image/*"
                         className="w-full border px-3 py-2 rounded"
                     />
-                    {formData.image === null && (
-                        <p className="text-sm text-gray-500">
-                            (Current image will remain unless you upload a new one)
-                        </p>
-                    )}
+                    
+                    {/* Help Text */}
+                    <div className="mt-2">
+                        {currentImageUrl && !formData.image ? (
+                            <p className="text-sm text-blue-600">
+                                Current image is being used. Upload a new image to replace it.
+                            </p>
+                        ) : formData.image ? (
+                            <p className="text-sm text-green-600">
+                                New image selected. Click "Update Journal" to save changes.
+                            </p>
+                        ) : (
+                            <p className="text-sm text-gray-500">
+                                No image selected. The journal will not have an image.
+                            </p>
+                        )}
+                    </div>
                 </div>
 
                 {/* Status */}
@@ -428,10 +492,11 @@ const EditJournal = () => {
                 <button
                     type="submit"
                     disabled={handleLoading}
-                    className={`px-4 py-2 rounded text-white flex items-center justify-center gap-2 ${handleLoading
-                        ? "bg-gray-500 cursor-not-allowed"
-                        : "bg-green-600 hover:bg-green-700"
-                        }`}
+                    className={`px-4 py-2 rounded text-white flex items-center justify-center gap-2 ${
+                        handleLoading
+                            ? "bg-gray-500 cursor-not-allowed"
+                            : "bg-green-600 hover:bg-green-700"
+                    }`}
                 >
                     {handleLoading ? "Updating..." : "Update Journal"}
                 </button>

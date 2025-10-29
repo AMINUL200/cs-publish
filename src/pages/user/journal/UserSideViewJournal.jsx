@@ -3,7 +3,13 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
-import { ChevronLeft, ChevronRight, Eye, Download, Calendar } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Download,
+  Calendar,
+} from "lucide-react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -15,26 +21,25 @@ const UserSideViewJournal = () => {
   const [journalData, setJournalData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const {id} = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
 
   // Fetch journal data
   const fetchJournalData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `${API_URL}api/journal-article/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get(`${API_URL}api/journal-article/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.data.status) {
         setJournalData(response.data);
       } else {
-        throw new Error(response.data.message || "Failed to fetch journal data");
+        throw new Error(
+          response.data.message || "Failed to fetch journal data"
+        );
       }
     } catch (error) {
       console.error("Error fetching journal data:", error);
@@ -56,10 +61,10 @@ const UserSideViewJournal = () => {
 
   // Function to format date
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -105,7 +110,14 @@ const UserSideViewJournal = () => {
     );
   }
 
-  const { journal, editor, latest_published, most_viewed, most_downloaded, all_manuscripts } = journalData;
+  const {
+    journal,
+    editor,
+    latest_published,
+    most_viewed,
+    most_downloaded,
+    all_manuscripts,
+  } = journalData;
 
   return (
     <div className="min-h-screen bg-gray-50 pt-10 sm:pt-24">
@@ -121,7 +133,7 @@ const UserSideViewJournal = () => {
                 className="w-48 h-64 object-cover rounded-lg shadow-2xl border-4 border-yellow-500"
               />
             </div>
-            
+
             {/* Journal Information */}
             <div className="flex-1 text-center lg:text-left">
               <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-yellow-400">
@@ -130,25 +142,37 @@ const UserSideViewJournal = () => {
               <p className="text-xl mb-6 text-yellow-300">
                 {journal.j_categories}
               </p>
-              
+
               {/* Journal Details Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                 {journal.issn_print && (
                   <div className="bg-inherit bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                    <span className="font-semibold text-yellow-300">ISSN Print:</span>
-                    <span className="ml-2 text-yellow-200">{journal.issn_print_no}</span>
+                    <span className="font-semibold text-yellow-300">
+                      ISSN Print:
+                    </span>
+                    <span className="ml-2 text-yellow-200">
+                      {journal.issn_print_no}
+                    </span>
                   </div>
                 )}
                 {journal.issn_online && (
                   <div className="bg-inherit bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                    <span className="font-semibold text-yellow-300">ISSN Online:</span>
-                    <span className="ml-2 text-yellow-200">{journal.issn_online_no}</span>
+                    <span className="font-semibold text-yellow-300">
+                      ISSN Online:
+                    </span>
+                    <span className="ml-2 text-yellow-200">
+                      {journal.issn_online_no}
+                    </span>
                   </div>
                 )}
                 {journal.ugc_approved && (
                   <div className="bg-inherit bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                    <span className="font-semibold text-yellow-300">UGC Approved:</span>
-                    <span className="ml-2 text-yellow-200">{journal.ugc_no}</span>
+                    <span className="font-semibold text-yellow-300">
+                      UGC Approved:
+                    </span>
+                    <span className="ml-2 text-yellow-200">
+                      {journal.ugc_no}
+                    </span>
                   </div>
                 )}
               </div>
@@ -156,9 +180,13 @@ const UserSideViewJournal = () => {
               {/* Editor Information */}
               {editor && editor.length > 0 && (
                 <div className="bg-inherit bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                  <h3 className="font-bold text-yellow-300 mb-2">Editor-in-Chief</h3>
+                  <h3 className="font-bold text-yellow-300 mb-2">
+                    Editor-in-Chief
+                  </h3>
                   <p className="text-yellow-200">
-                    <span className="font-semibold text-yellow-300">{editor[0].editor_name}</span>
+                    <span className="font-semibold text-yellow-300">
+                      {editor[0].editor_name}
+                    </span>
                     <span className="mx-2 text-yellow-400">•</span>
                     {editor[0].editor_email}
                   </p>
@@ -175,14 +203,22 @@ const UserSideViewJournal = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Journal Description */}
             <div className="bg-gray-50 rounded-lg p-6 border-l-4 border-yellow-500">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Journal Description</h2>
-              <p className="text-gray-700 leading-relaxed">{journal.j_description}</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Journal Description
+              </h2>
+              <p className="text-gray-700 leading-relaxed">
+                {journal.j_description}
+              </p>
             </div>
 
             {/* Editorial Board */}
             <div className="bg-gray-50 rounded-lg p-6 border-l-4 border-red-800">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Editorial Board</h2>
-              <p className="text-gray-700 leading-relaxed">{journal.editorial_board}</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Editorial Board
+              </h2>
+              <p className="text-gray-700 leading-relaxed">
+                {journal.editorial_board}
+              </p>
             </div>
           </div>
         </div>
@@ -191,9 +227,8 @@ const UserSideViewJournal = () => {
       {/* Slider Sections */}
       <div className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
           {/* Latest Published Slider */}
-          <SectionSlider 
+          <SectionSlider
             title="Latest Published Articles"
             articles={latest_published}
             stripHtmlTags={stripHtmlTags}
@@ -201,7 +236,7 @@ const UserSideViewJournal = () => {
           />
 
           {/* Most Viewed Slider */}
-          <SectionSlider 
+          <SectionSlider
             title="Most Viewed Articles"
             articles={most_viewed}
             stripHtmlTags={stripHtmlTags}
@@ -209,7 +244,7 @@ const UserSideViewJournal = () => {
           />
 
           {/* Most Downloaded Slider */}
-          <SectionSlider 
+          <SectionSlider
             title="Most Downloaded Articles"
             articles={most_downloaded}
             stripHtmlTags={stripHtmlTags}
@@ -217,13 +252,12 @@ const UserSideViewJournal = () => {
           />
 
           {/* All Manuscripts Slider */}
-          <SectionSlider 
+          <SectionSlider
             title="All Manuscripts"
             articles={all_manuscripts}
             stripHtmlTags={stripHtmlTags}
             formatDate={formatDate}
           />
-
         </div>
       </div>
     </div>
@@ -244,7 +278,7 @@ const SectionSlider = ({ title, articles, stripHtmlTags, formatDate }) => {
         <h2 className="text-3xl font-bold text-gray-900 border-l-4 border-yellow-500 pl-4">
           {title}
         </h2>
-        
+
         {/* Custom Navigation Buttons */}
         <div className="flex gap-2">
           <button
@@ -278,23 +312,24 @@ const SectionSlider = ({ title, articles, stripHtmlTags, formatDate }) => {
         }}
         pagination={{
           clickable: true,
-          el: '.swiper-pagination',
-          bulletClass: 'swiper-pagination-bullet bg-yellow-500 opacity-50',
-          bulletActiveClass: 'swiper-pagination-bullet-active !bg-yellow-600 !opacity-100',
+          el: ".swiper-pagination",
+          bulletClass: "swiper-pagination-bullet bg-yellow-500 opacity-50",
+          bulletActiveClass:
+            "swiper-pagination-bullet-active !bg-yellow-600 !opacity-100",
         }}
         onSwiper={setSwiperInstance}
         className="relative"
       >
         {articles.map((article) => (
           <SwiperSlide key={article.id}>
-            <ArticleCard 
-              article={article} 
+            <ArticleCard
+              article={article}
               stripHtmlTags={stripHtmlTags}
               formatDate={formatDate}
             />
           </SwiperSlide>
         ))}
-        
+
         {/* Custom Pagination */}
         <div className="swiper-pagination mt-6 !relative !bottom-0"></div>
       </Swiper>
@@ -305,6 +340,18 @@ const SectionSlider = ({ title, articles, stripHtmlTags, formatDate }) => {
 // Article Card Component
 const ArticleCard = ({ article, stripHtmlTags, formatDate }) => {
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
+  const { token } = useSelector((state) => state.auth); // ✅ get token from Redux
+
+  const handleReadMore =  () => {
+      navigate(`${API_URL}api/subscription/increase-view/${article.id}`);
+      axios.post(`${API_URL}api/articles/${article.id}/view` ,{},{
+        headers:{Authorization: `Bearer ${token}`},
+      })
+  }
+
+
+
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 group">
       {/* Article Image */}
@@ -324,7 +371,7 @@ const ArticleCard = ({ article, stripHtmlTags, formatDate }) => {
         <h3 className="font-bold text-gray-900 mb-3 line-clamp-2 h-14 overflow-hidden">
           {stripHtmlTags(article.title)}
         </h3>
-        
+
         <div className="flex items-center text-sm text-gray-600 mb-3">
           <span className="font-semibold text-black">By:</span>
           <span className="ml-1">{article.username}</span>
@@ -336,24 +383,10 @@ const ArticleCard = ({ article, stripHtmlTags, formatDate }) => {
         </div>
 
         <div className="flex items-center justify-center text-sm ">
-          {/* <div className="flex items-center space-x-4">
-            <div className="flex items-center text-gray-600">
-              <Eye className="w-4 h-4 mr-1 text-red-800" />
-              <span>1.2K</span>
-            </div>
-            <div className="flex items-center text-gray-600">
-              <Download className="w-4 h-4 mr-1 text-red-800" />
-              <span>856</span>
-            </div>
-          </div> */}
-          
-          <button 
-          onClick={()=> {
-            navigate(`/view-published-manuscript/${article.id}`)
-            // console.log("click ")
-            
-        }}
-          className="bg-yellow-500 text-black px-4 py-2 rounded-lg text-sm font-semibold hover:bg-yellow-600 transition-colors">
+          <button
+            onClick={handleReadMore}
+            className="bg-yellow-500 text-black px-4 py-2 rounded-lg text-sm font-semibold hover:bg-yellow-600 transition-colors"
+          >
             Read More
           </button>
         </div>

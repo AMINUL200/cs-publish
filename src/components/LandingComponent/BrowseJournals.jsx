@@ -47,7 +47,7 @@ const BrowseJournals = ({
                   {journal.j_title}
                 </h3>
                 <Link
-                  to="/view-published-manuscript-list"
+                  to={`/journal/${journal?.j_title}`}
                   className={`font-bold text-lg flex items-center gap-2 ${
                     index % 2 === 0 ? "text-black" : "text-yellow-400"
                   } hover:underline`}

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const LandingPricing = ({
   pricingData = [],
@@ -33,7 +34,12 @@ const LandingPricing = ({
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log(data);
+      console.log("order details::",data);
+
+      if(!data.status){
+        toast.info(data.message);
+        return ;
+      }
 
       // Step 3: Configure Razorpay options
       const options = {

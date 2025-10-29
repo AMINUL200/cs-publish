@@ -311,7 +311,7 @@ const PublisherViewDesignManuscript = () => {
             </button>
           </div>
           
-          <div className="flex gap-3">
+          {/* <div className="flex gap-3">
             <button
               onClick={handleApprove}
               className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -321,7 +321,7 @@ const PublisherViewDesignManuscript = () => {
               </svg>
               Approve Manuscript
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
 

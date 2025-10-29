@@ -29,7 +29,7 @@ const LandingResearch = ({
                 <div className="research_img_box">
                   <img
                     src={research.image}
-                    className="w-[500px] h-[300px] object-cover"
+                    className="w-[100%] h-[300px] object-cover"
                     alt={research.title}
                   />
                 </div>

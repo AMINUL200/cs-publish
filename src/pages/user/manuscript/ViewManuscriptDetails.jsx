@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useParams, Link } from "react-router-dom";
+import { ChevronDown, Download, Image, BookOpen, Menu, X, ExternalLink } from "lucide-react";
 import Loader from "../../../components/common/Loader";
 
 const ViewManuscriptDetails = () => {
@@ -14,6 +15,12 @@ const ViewManuscriptDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeSection, setActiveSection] = useState("abstract");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [rightPanelView, setRightPanelView] = useState("figures");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showRightSidebar, setShowRightSidebar] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [figures, setFigures] = useState([]);
 
   // Fetch manuscript data
   const fetchManuscriptData = async () => {
@@ -29,8 +36,36 @@ const ViewManuscriptDetails = () => {
       );
 
       if (response.data.status) {
-        setManuscriptData(response.data.data);
-        toast.success(response.data.message);
+        const data = response.data.data;
+        setManuscriptData(data);
+
+        // Parse figures data
+        if (data.figures) {
+          try {
+            let figuresArray = [];
+            
+            if (typeof data.figures === 'string') {
+              // Parse the JSON string and clean up escaped slashes
+              const cleanedString = data.figures.replace(/\\\//g, '/');
+              figuresArray = JSON.parse(cleanedString);
+            } else if (Array.isArray(data.figures)) {
+              figuresArray = data.figures;
+            }
+            
+            // Transform into the expected format for display
+            const formattedFigures = figuresArray.map((figureUrl, index) => ({
+              id: index + 1,
+              image: figureUrl,
+              title: `Figure ${index + 1}`,
+              description: `Figure ${index + 1} from the manuscript`
+            }));
+            
+            setFigures(formattedFigures);
+          } catch (parseError) {
+            console.error("Error parsing figures:", parseError);
+            setFigures([]);
+          }
+        }
       } else {
         throw new Error(response.data.message || "Failed to fetch manuscript");
       }
@@ -66,9 +101,11 @@ const ViewManuscriptDetails = () => {
   // Function to handle section navigation with proper offset
   const scrollToSection = (sectionId) => {
     setActiveSection(sectionId);
+    setDropdownOpen(false);
+    setIsMobileMenuOpen(false);
     const element = document.getElementById(sectionId);
     if (element) {
-      const headerOffset = 120; // Increased offset for better positioning
+      const headerOffset = 140;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition =
         elementPosition + window.pageYOffset - headerOffset;
@@ -95,9 +132,8 @@ const ViewManuscriptDetails = () => {
         "references",
       ];
 
-      const scrollPosition = window.scrollY + 150; // Adjusted for better detection
+      const scrollPosition = window.scrollY + 150;
 
-      // Find the current section
       let currentSection = sections[0];
 
       for (const sectionId of sections) {
@@ -117,10 +153,48 @@ const ViewManuscriptDetails = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Call once on mount
+    handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [manuscriptData]); // Added manuscriptData dependency
+  }, [manuscriptData]);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setShowRightSidebar(true);
+        setIsMobileMenuOpen(false);
+      } else {
+        setShowRightSidebar(false);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Handle right sidebar toggle with animation
+  const toggleRightSidebar = () => {
+    if (isAnimating) return;
+    
+    setIsAnimating(true);
+    if (!showRightSidebar) {
+      setShowRightSidebar(true);
+    } else {
+      setShowRightSidebar(false);
+    }
+    
+    // Reset animation state after transition
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 300);
+  };
+
+  // Handle figure preview
+  const handleFigurePreview = (figureUrl) => {
+    window.open(figureUrl, '_blank', 'noopener,noreferrer');
+  };
 
   // Navigation sections
   const sections = [
@@ -135,6 +209,19 @@ const ViewManuscriptDetails = () => {
     { id: "references", label: "References" },
   ];
 
+  const handleDownloadPDF = () => {
+    const pdfUrl =
+      manuscriptData?.pdf ||
+      manuscriptData?.file_url ||
+      manuscriptData?.manuscript_pdf;
+
+    if (!pdfUrl) {
+      toast.error("PDF not available for this manuscript.");
+      return;
+    }
+    window.open(pdfUrl, "_blank", "noopener,noreferrer");
+  };
+
   if (loading) {
     return <Loader />;
   }
@@ -148,7 +235,7 @@ const ViewManuscriptDetails = () => {
           <p className="text-gray-600 mb-4">{error}</p>
           <Link
             to="/"
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700 transition-colors"
           >
             Back to Home
           </Link>
@@ -174,13 +261,13 @@ const ViewManuscriptDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-gray-50 relative">
+      {/* Fixed Header with Navigation */}
+      <div className="bg-white shadow-md border-b fixed top-0 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            {/* Breadcrumb */}
-            <nav className="flex mb-4" aria-label="Breadcrumb">
+          <div className="py-4">
+            {/* Top Row: Breadcrumb */}
+            <nav className="flex mb-3" aria-label="Breadcrumb">
               <ol className="flex items-center space-x-2 text-sm text-gray-600">
                 <li>
                   <Link
@@ -201,20 +288,84 @@ const ViewManuscriptDetails = () => {
                 </li>
                 <li className="flex items-center">
                   <span className="mx-2">/</span>
-                  <span className="text-gray-900 font-medium">
-                    Manuscript Details
-                  </span>
+                  <span className="text-gray-900 font-medium">Details</span>
                 </li>
               </ol>
             </nav>
 
-            {/* Title */}
-            <h1 className="text-3xl font-bold text-gray-900 leading-tight">
-              {getCleanTitle()}
-            </h1>
+            {/* Bottom Row: Title and Actions */}
+            <div className="flex items-center justify-between gap-4">
+              {/* Title - Hidden on medium screens */}
+              <h1 className="text-2xl font-bold text-gray-900 flex-1 lg:block hidden">
+                {getCleanTitle()}
+              </h1>
+              
+              {/* Mobile Menu Button - Show on medium and small screens */}
+              <div className="lg:hidden flex items-center gap-3">
+                <button
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="flex items-center gap-2 px-3 py-2 bg-inherit text-yellow-500  border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-sm font-medium  cursor-pointer"
+                >
+                  {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+                  <span>Menu</span>
+                </button>
 
-            {/* Author and Metadata */}
-            <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                {/* Show More Button for Right Sidebar */}
+                <button
+                  onClick={toggleRightSidebar}
+                  className="flex items-center gap-2 px-3 py-2 bg-inherit text-yellow-700 border-yellow-300 rounded-lg hover:bg-yellow-300 transition-colors text-sm font-medium cursor-pointer"
+                >
+                  {showRightSidebar ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+                  <span>{showRightSidebar ? "Close" : "Show More"}</span>
+                </button>
+              </div>
+
+              {/* Right Side Actions - Hidden on medium screens */}
+              <div className="hidden lg:flex items-center gap-3">
+                {/* Jump to Section Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="flex items-center gap-2 px-4 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-sm font-medium text-gray-700"
+                  >
+                    <span>Jump to Section</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {dropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-64 bg-white border text-yellow-200 border-yellow-200 rounded-lg shadow-lg z-50 cursor-pointer">
+                      <div className="py-2">
+                        {sections.map((section) => (
+                          <button
+                            key={section.id}
+                            onClick={() => scrollToSection(section.id)}
+                            className={`w-full text-left px-4 py-2 text-sm hover:bg-yellow-500 hover:text-white transition-colors ${
+                              activeSection === section.id
+                                ? "bg-yellow-50 text-yellow-700 font-medium"
+                                : "text-gray-700"
+                            }`}
+                          >
+                            {section.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Download PDF Button */}
+                <button
+                  onClick={handleDownloadPDF}
+                  className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm font-medium cursor-pointer"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download PDF</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Metadata Row */}
+            <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-gray-600">
               <div className="flex items-center">
                 <span className="font-medium">Author:</span>
                 <span className="ml-2">{manuscriptData.username}</span>
@@ -238,75 +389,48 @@ const ViewManuscriptDetails = () => {
         </div>
       </div>
 
-      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Navigation */}
-          <div className="lg:w-64 flex-shrink-0">
-            <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-22">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Jump to Section
-              </h3>
-              <nav className="space-y-2">
-                {sections.map((section) => (
-                  <button
-                    key={section.id}
-                    onClick={() => scrollToSection(section.id)}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      activeSection === section.id
-                        ? "bg-yellow-100 text-yellow-700 border border-blue-200"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                    }`}
-                  >
-                    {section.label}
-                  </button>
-                ))}
-              </nav>
-
-              {/* Additional Actions */}
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <button
-                  onClick={() => {
-                    const pdfUrl =
-                      manuscriptData?.pdf ||
-                      manuscriptData?.file_url ||
-                      manuscriptData?.manuscript_pdf;
-
-                    if (!pdfUrl) {
-                      toast.error("PDF not available for this manuscript.");
-                      return;
-                    }
-
-                    // Trigger download in a new tab
-                    window.open(pdfUrl, "_blank", "noopener,noreferrer");
-                  }}
-                  className="w-full custom-btn px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors mb-3"
-                >
-                  Download PDF
-                </button>
-              </div>
-            </div>
+      {/* Mobile Menu Dropdown */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed top-24 left-4 right-4 bg-white border text-yellow-200 border-yellow-200 rounded-lg shadow-lg z-50">
+          <div className="py-2 max-h-80 overflow-y-auto custom-scrollbar">
+            {sections.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => scrollToSection(section.id)}
+                className={`w-full text-left px-4 py-3 text-sm hover:bg-yellow-500  transition-colors border-b border-gray-100 last:border-b-0 ${
+                  activeSection === section.id
+                    ? "bg-yellow-50 text-yellow-700 font-medium"
+                    : "text-gray-700"
+                }`}
+              >
+                {section.label}
+              </button>
+            ))}
+            {/* Download PDF in Mobile Menu */}
+            <button
+              onClick={handleDownloadPDF}
+              className="w-full text-center justify-center px-4 py-3 text-sm custom-btn  rounded-lg  transition-colors flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download PDF</span>
+            </button>
           </div>
+        </div>
+      )}
 
-          {/* Main Content */}
-          <div className="flex-1">
+      {/* Main Content Area with Top Padding for Fixed Header */}
+      <div className="pt-44 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex gap-8 relative">
+          {/* Main Content - Left Side */}
+          <div className={`flex-1 min-w-0 transition-all duration-300 ${
+            showRightSidebar ? 'lg:block' : ''
+          }`}>
             <div className="bg-white rounded-lg shadow-sm border">
-              {/* Manuscript Image */}
-              {/* {manuscriptData.image && (
-                <div className="w-full h-64 sm:h-80 lg:h-96 overflow-hidden rounded-t-lg">
-                  <img
-                    src={manuscriptData.image}
-                    alt={getCleanTitle()}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )} */}
-
-              {/* Content Sections */}
               <div className="p-6 lg:p-8">
                 {/* Abstract */}
-                <section id="abstract" className="mb-12 scroll-mt-32">
+                <section id="abstract" className="mb-12 scroll-mt-44">
                   <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                    <span className="w-2 h-6 bg-blue-600 rounded mr-3"></span>
+                    <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
                     Abstract
                   </h2>
                   <div
@@ -319,9 +443,9 @@ const ViewManuscriptDetails = () => {
 
                 {/* Introduction */}
                 {manuscriptData.introduction && (
-                  <section id="introduction" className="mb-12 scroll-mt-32">
+                  <section id="introduction" className="mb-12 scroll-mt-44">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                      <span className="w-2 h-6 bg-blue-600 rounded mr-3"></span>
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
                       Introduction
                     </h2>
                     <div
@@ -337,10 +461,10 @@ const ViewManuscriptDetails = () => {
                 {manuscriptData.materials_and_methods && (
                   <section
                     id="materials-methods"
-                    className="mb-12 scroll-mt-32"
+                    className="mb-12 scroll-mt-44"
                   >
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                      <span className="w-2 h-6 bg-blue-600 rounded mr-3"></span>
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
                       Materials and Methods
                     </h2>
                     <div
@@ -354,9 +478,9 @@ const ViewManuscriptDetails = () => {
 
                 {/* Results */}
                 {manuscriptData.results && (
-                  <section id="results" className="mb-12 scroll-mt-32">
+                  <section id="results" className="mb-12 scroll-mt-44">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                      <span className="w-2 h-6 bg-blue-600 rounded mr-3"></span>
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
                       Results
                     </h2>
                     <div
@@ -370,9 +494,9 @@ const ViewManuscriptDetails = () => {
 
                 {/* Discussion */}
                 {manuscriptData.discussion && (
-                  <section id="discussion" className="mb-12 scroll-mt-32">
+                  <section id="discussion" className="mb-12 scroll-mt-44">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                      <span className="w-2 h-6 bg-blue-600 rounded mr-3"></span>
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
                       Discussion
                     </h2>
                     <div
@@ -386,9 +510,9 @@ const ViewManuscriptDetails = () => {
 
                 {/* Conclusion */}
                 {manuscriptData.conclusion && (
-                  <section id="conclusion" className="mb-12 scroll-mt-32">
+                  <section id="conclusion" className="mb-12 scroll-mt-44">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                      <span className="w-2 h-6 bg-blue-600 rounded mr-3"></span>
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
                       Conclusion
                     </h2>
                     <div
@@ -404,10 +528,10 @@ const ViewManuscriptDetails = () => {
                 {manuscriptData.author_contributions && (
                   <section
                     id="author-contributions"
-                    className="mb-12 scroll-mt-32"
+                    className="mb-12 scroll-mt-44"
                   >
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                      <span className="w-2 h-6 bg-blue-600 rounded mr-3"></span>
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
                       Author Contributions
                     </h2>
                     <div
@@ -423,10 +547,10 @@ const ViewManuscriptDetails = () => {
                 {manuscriptData.conflict_of_interest_statement && (
                   <section
                     id="conflict-interest"
-                    className="mb-12 scroll-mt-32"
+                    className="mb-12 scroll-mt-44"
                   >
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                      <span className="w-2 h-6 bg-blue-600 rounded mr-3"></span>
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
                       Conflict of Interest
                     </h2>
                     <div
@@ -438,11 +562,11 @@ const ViewManuscriptDetails = () => {
                   </section>
                 )}
 
-                {/* References */}
+                {/* References - Left Section */}
                 {manuscriptData.references && (
-                  <section id="references" className="mb-12 scroll-mt-32">
+                  <section id="references" className="mb-12 scroll-mt-44">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                      <span className="w-2 h-6 bg-blue-600 rounded mr-3"></span>
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
                       References
                     </h2>
                     <div
@@ -493,8 +617,138 @@ const ViewManuscriptDetails = () => {
               </div>
             </div>
           </div>
+
+          {/* Right Sidebar - Figures & References with Slide Animation */}
+          <div className={`
+            lg:w-80 flex-shrink-0
+            fixed lg:relative
+            top-0 lg:top-auto
+            right-0 lg:right-auto
+            h-screen lg:h-auto
+            bg-white lg:bg-transparent
+            shadow-2xl lg:shadow-none
+            z-40 lg:z-auto
+            transform transition-transform duration-300 ease-in-out
+            ${showRightSidebar ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+            ${showRightSidebar ? 'block' : 'hidden lg:block'}
+          `}>
+            <div className="sticky top-44 h-[calc(100vh-176px)] lg:h-auto overflow-y-auto custom-scrollbar">
+              {/* Close Button for Mobile */}
+              <div className="lg:hidden flex justify-between items-center p-4 border-b bg-white sticky top-0 z-10">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {rightPanelView === "figures" ? "Figures" : "References"}
+                </h3>
+                <button
+                  onClick={toggleRightSidebar}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                  <span>Close</span>
+                </button>
+              </div>
+
+              <div className="p-4 lg:p-0">
+                {/* Toggle Buttons */}
+                <div className="bg-white rounded-lg shadow-sm border mb-4">
+                  <div className="flex border-b">
+                    <button
+                      onClick={() => setRightPanelView("figures")}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                        rightPanelView === "figures"
+                          ? "bg-yellow-50 text-yellow-700 border-b-2 border-yellow-700"
+                          : "text-gray-600 hover:bg-gray-50"
+                      }`}
+                    >
+                      <Image className="w-4 h-4" />
+                      Figures
+                    </button>
+                    <button
+                      onClick={() => setRightPanelView("references")}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                        rightPanelView === "references"
+                          ? "bg-yellow-50 text-yellow-700 border-b-2 border-yellow-700"
+                          : "text-gray-600 hover:bg-gray-50"
+                      }`}
+                    >
+                      <BookOpen className="w-4 h-4" />
+                      References
+                    </button>
+                  </div>
+                </div>
+
+                {/* Content Area */}
+                <div className="bg-white rounded-lg shadow-sm border overflow-hidden max-h-[calc(100vh-250px)] lg:max-h-[calc(100vh-250px)] overflow-y-auto custom-scrollbar">
+                  {rightPanelView === "figures" ? (
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 lg:block hidden">Figures</h3>
+                      <div className="space-y-6">
+                        {figures && figures.length > 0 ? (
+                          figures.map((figure) => (
+                            <div key={figure.id} className="border-b pb-4 last:border-b-0 group">
+                              <div className="relative overflow-hidden rounded-lg">
+                                <img
+                                  src={figure.image}
+                                  alt={figure.title}
+                                  className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                                />
+                                <button
+                                  onClick={() => handleFigurePreview(figure.image)}
+                                  className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-2 hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
+                                  title="Preview Figure"
+                                >
+                                  <ExternalLink className="w-4 h-4" />
+                                </button>
+                              </div>
+                              <h4 className="font-semibold text-sm text-gray-900 mb-1 mt-2">
+                                {figure.title}
+                              </h4>
+                              <p className="text-xs text-gray-600">{figure.description}</p>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-8">
+                            <Image className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                            <p className="text-sm text-gray-500">No figures available</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 lg:block hidden">References</h3>
+                      <div
+                        className="blog-rich-text max-w-none text-gray-700"
+                        dangerouslySetInnerHTML={{
+                          __html: manuscriptData.references,
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Overlay for mobile when sidebar is open */}
+          {showRightSidebar && (
+            <div 
+              className="fixed inset-0 bg-black/50 bg-opacity-50 z-30 lg:hidden"
+              onClick={toggleRightSidebar}
+            />
+          )}
         </div>
       </div>
+
+      {/* Click outside to close dropdowns */}
+      {(dropdownOpen || isMobileMenuOpen) && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => {
+            setDropdownOpen(false);
+            setIsMobileMenuOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 };

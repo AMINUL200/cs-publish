@@ -12,9 +12,10 @@ const LandingFooter = ({ settingsData = {}, loading = false }) => {
     {
       title: "Product and services",
       items: [
-        { name: "Discover Manuscript", path: "/view-published-manuscript-list" },
+        // { name: "Discover Manuscript", path: "/view-published-manuscript-list" },
+        { name: "Discover Journal", path: "/journal" },
         // { name: "Books Hub", path: "/products" },
-        // { name: "Mentors", path: "/mentors" },
+        { name: "Mentors Hub", path: "/mentors" },
         // { name: "Author Services", path: "#" },
         { name: "Blog", path: "/blog" },
         // { name: "Events", path: "#" },

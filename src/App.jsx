@@ -109,6 +109,10 @@ import HandleTeams from "./pages/admin/research_service_team/HandleTeams";
 import AddTeam from "./pages/admin/research_service_team/AddTeam";
 import HandleSubScriptionPlans from "./pages/admin/payment/HandleSubScriptionPlans";
 import CmsTemplate from "./pages/user/CmsTemplate";
+import ViewJournalList from "./pages/user/journal/ViewJournalList";
+import UserSideViewJournal from "./pages/user/journal/UserSideViewJournal";
+import SubscriberProfile from "./pages/user/dashboard/SubscriberProfile";
+import MySubscription from "./pages/user/my_subscription/MySubscription";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -171,6 +175,15 @@ function App() {
           >
             <Route element={<AppLayout2 />}>
               <Route index path="/" element={<HomePage />} />
+              <Route path="/user-profile" element={<SubscriberProfile/>}/>
+
+              <Route path="/journal" element={<ViewJournalList/>}/>
+              <Route path="/journal/:id" element={<UserSideViewJournal/>}/>
+
+              <Route path="/my-subscription" element={<MySubscription/>}/>
+
+
+
               <Route path="/view-published-manuscript-list" element={<ViewManuscriptPage />} />
               <Route path="/view-published-manuscript/:id" element={<ViewManuscriptDetails />} />
               <Route path="/about" element={<UserProfilePage />} />

@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useParams, Link } from "react-router-dom";
-import { ChevronDown, Download, Image, BookOpen, Menu, X, ExternalLink } from "lucide-react";
+import { ChevronDown, Download, Image, BookOpen, Menu, X, ExternalLink, FileText } from "lucide-react";
 import Loader from "../../../components/common/Loader";
 
 const ViewManuscriptDetails = () => {
@@ -127,6 +127,7 @@ const ViewManuscriptDetails = () => {
         "results",
         "discussion",
         "conclusion",
+        "supplementary-file",
         "author-contributions",
         "conflict-interest",
         "references",
@@ -196,6 +197,15 @@ const ViewManuscriptDetails = () => {
     window.open(figureUrl, '_blank', 'noopener,noreferrer');
   };
 
+  // Handle supplementary file download
+  const handleSupplementaryFileDownload = () => {
+    if (manuscriptData?.supplementary_file) {
+      window.open(manuscriptData.supplementary_file, '_blank', 'noopener,noreferrer');
+    } else {
+      toast.error("Supplementary file not available.");
+    }
+  };
+
   // Navigation sections
   const sections = [
     { id: "abstract", label: "Abstract" },
@@ -204,6 +214,7 @@ const ViewManuscriptDetails = () => {
     { id: "results", label: "Results" },
     { id: "discussion", label: "Discussion" },
     { id: "conclusion", label: "Conclusion" },
+    { id: "supplementary-file", label: "Supplementary File" },
     { id: "author-contributions", label: "Author Contributions" },
     { id: "conflict-interest", label: "Conflict of Interest" },
     { id: "references", label: "References" },
@@ -524,6 +535,43 @@ const ViewManuscriptDetails = () => {
                   </section>
                 )}
 
+                {/* Supplementary File Section */}
+                {manuscriptData.supplementary_file && (
+                  <section id="supplementary-file" className="mb-12 scroll-mt-44">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
+                      Supplementary File
+                    </h2>
+                    <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="p-3 bg-yellow-100 rounded-lg">
+                            <FileText className="w-6 h-6 text-yellow-600" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              Supplementary Materials
+                            </h3>
+                            <p className="text-sm text-gray-600 mt-1">
+                              Additional supporting documents and data
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={handleSupplementaryFileDownload}
+                          className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm font-medium"
+                        >
+                          <Download className="w-4 h-4" />
+                          <span>Download File</span>
+                        </button>
+                      </div>
+                      <div className="mt-4 text-sm text-gray-600">
+                        <p>This supplementary file contains additional data, methods, or supporting information related to the research.</p>
+                      </div>
+                    </div>
+                  </section>
+                )}
+
                 {/* Author Contributions */}
                 {manuscriptData.author_contributions && (
                   <section
@@ -614,6 +662,20 @@ const ViewManuscriptDetails = () => {
                     {manuscriptData.country}
                   </span>
                 </div>
+                {manuscriptData.supplementary_file && (
+                  <div className="md:col-span-2">
+                    <span className="font-medium text-gray-600">
+                      Supplementary File:
+                    </span>
+                    <button
+                      onClick={handleSupplementaryFileDownload}
+                      className="ml-2 text-yellow-600 hover:text-yellow-700 underline text-sm flex items-center gap-1"
+                    >
+                      <FileText className="w-4 h-4" />
+                      <span>Download Supplementary Materials</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

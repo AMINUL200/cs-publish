@@ -1,7 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLongArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const BrowseJournals = ({
   browsJournalData = [],
@@ -11,6 +11,8 @@ const BrowseJournals = ({
   if (loading)
     return <p className="text-center py-10 text-gray-500">Loading...</p>;
   if (error) return <p className="text-center py-10 text-red-500">{error}</p>;
+
+  const navigate = useNavigate()
 
   return (
     <section className="py-10 sm:py-16 bg-gray-50" id="journals">
@@ -57,6 +59,27 @@ const BrowseJournals = ({
               </div>
             </div>
           ))}
+        </div>
+        <div className="text-center pt-6">
+          <button
+            onClick={() => navigate("/journal")}
+            className="bg-gradient-to-r custom-btn px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 inline-flex items-center gap-2 cursor-pointer"
+          >
+            View All Journal
+            <svg
+              className="w-5 h-5 transition-transform duration-300 hover:translate-x-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </section>

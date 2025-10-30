@@ -13,7 +13,10 @@ const LandingResearch = ({
     <section className="research-innovation py-10 px-4 sm:py-14 sm:pb-2">
       <div className="container mx-auto">
         <div className="text-center">
-          <h2 className="heading !mb-8 !md:mb-10">Research</h2>
+          {/* <h2 className="heading !mb-8 !md:mb-10">Research And Innovation</h2> */}
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+          Research And<span className="text-yellow-400"> Innovation</span> 
+        </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

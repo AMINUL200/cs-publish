@@ -6,14 +6,17 @@ const LandingServices = ({
   loading = false,
   error = null,
 }) => {
-  console.log(servicesData);
+  // console.log(servicesData);
 
  
   return (
     <section className="bg-gray-100 py-12">
       <div className=" mx-auto md:mx-20">
         <div className="titlebox text-center mb-12">
-          <h4 className="heading text-3xl font-bold mb-4">Services</h4>
+          {/* <h4 className="heading text-3xl font-bold mb-4">Services</h4> */}
+           <h2 className="text-3xl md:text-4xl font-bold mb-5">
+            Author <span className="text-yellow-400">Services</span>
+          </h2>
           <p
             className="text-lg max-w-2xl font-light"
             style={{ margin: "0 auto" }}

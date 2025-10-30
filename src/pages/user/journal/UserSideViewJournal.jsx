@@ -14,6 +14,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const UserSideViewJournal = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -51,7 +52,7 @@ const UserSideViewJournal = () => {
 
   useEffect(() => {
     fetchJournalData();
-  }, []);
+  }, [id]);
 
   // Function to strip HTML tags from title
   const stripHtmlTags = (html) => {
@@ -344,10 +345,16 @@ const ArticleCard = ({ article, stripHtmlTags, formatDate }) => {
   const { token } = useSelector((state) => state.auth); // ✅ get token from Redux
 
   const handleReadMore =  () => {
-      navigate(`${API_URL}api/subscription/increase-view/${article.id}`);
-      axios.post(`${API_URL}api/articles/${article.id}/view` ,{},{
+      navigate(`/view-published-manuscript/${article.id}`);
+      try {
+        axios.post(`${API_URL}api/subscription/increase-view/${article.id}` ,{},{
         headers:{Authorization: `Bearer ${token}`},
       })
+      } catch (error) {
+        console.log(error);
+        toast.error(error.message)
+      }
+      
   }
 
 

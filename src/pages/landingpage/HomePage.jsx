@@ -63,7 +63,7 @@ const HomePage = () => {
       blog: axios.get(`${API_URL}api/blog-user`),
       about: axios.get(`${API_URL}api/about`),
       pricing: axios.get(`${API_URL}api/plan`),
-      publishedJournal: axios.get(`${API_URL}api/published-manuscripts-list`),
+      // publishedJournal: axios.get(`${API_URL}api/published-manuscripts-list`),
       browsJournal: axios.get(`${API_URL}api/show-journals`),
       research: axios.get(`${API_URL}api/research`),
       service: axios.get(`${API_URL}api/services`),
@@ -83,8 +83,8 @@ const HomePage = () => {
           if (key === "blog") setBlogData(response.data.data);
           if (key === "about") setAboutData(response.data.data[0]);
           if (key === "pricing") setPricingData(response.data);
-          if (key === "publishedJournal")
-            setPublishedJournalData(response.data.data);
+          // if (key === "publishedJournal")
+          //   setPublishedJournalData(response.data.data);
           if (key === "browsJournal") setBrowsJournalData(response.data.data);
           if (key === "research") setResearchData(response.data.data);
           if (key === "service") setServicesData(response.data.data);
@@ -121,11 +121,11 @@ const HomePage = () => {
         loading={loading.browsJournal}
         error={error.browsJournal}
       />
-      <LandingPublishedJournal
+      {/* <LandingPublishedJournal
         publishedJournalData={publishedJournalData}
         loading={loading.publishedJournal}
         error={error.publishedJournal}
-      />
+      /> */}
       <LandingRecentPost
         postData={blogData}
         loading={loading.blog}

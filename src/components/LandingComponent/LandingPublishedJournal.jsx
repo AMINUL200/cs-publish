@@ -21,6 +21,17 @@ const LandingPublishedJournal = ({
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.auth);
 
+  const handleView = ({id}) => {
+    navigate(`${API_URL}api/subscription/increase-view/${id}`);
+    axios.post(
+      `${API_URL}api/articles/${article.id}/view`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+  };
+
   if (loading) {
     return <div>Loading published journals...</div>;
   }

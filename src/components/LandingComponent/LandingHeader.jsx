@@ -5,22 +5,26 @@ import { Link as RouterLink } from "react-router-dom";
 import { landingLog } from "../../assets";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { logout } from '../../features/auth/AuthSlice';
+import { logout } from "../../features/auth/AuthSlice";
 import axios from "axios";
 import { User2Icon } from "lucide-react";
 
-const LandingHeader = ({ toggleMenu , settingsData={}, loading=false }) => {
+const LandingHeader = ({
+  toggleMenu,
+  settingsData = {},
+  journalList = [],
+  loading = false,
+}) => {
   const [scrolled, setScrolled] = useState(false);
   const [openDropdowns, setOpenDropdowns] = useState({});
   const dropdownRefs = useRef({});
-  const { isAuthenticated, userData, token } = useSelector((state) => state.auth);
+  const { isAuthenticated, userData, token } = useSelector(
+    (state) => state.auth
+  );
   const dispatch = useDispatch();
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // Logout handler
-  //   const handleLogout = () => {
-  //     dispatch(logout());
-  //   };
+  console.log(journalList);
 
   const handleLogout = async () => {
     try {
@@ -53,14 +57,12 @@ const LandingHeader = ({ toggleMenu , settingsData={}, loading=false }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  
-
   // Updated navLinks with dropdown support
   const navLinks = [
     { id: "home", label: "Home", path: "/" },
     {
-      id: "journals",
-      label: "Journals",
+      id: "whoweare",
+      label: "Who We Are",
       dropdown: [
         {
           id: "recent-journals",
@@ -102,91 +104,18 @@ const LandingHeader = ({ toggleMenu , settingsData={}, loading=false }) => {
       ],
     },
     {
-      id: "post",
-      label: "Post",
-      dropdown: [
-        { id: "latest-posts", label: "Latest Posts", path: "/posts/latest" },
-        {
-          id: "featured-posts",
-          label: "Featured Posts",
-          path: "/posts/featured",
-        },
-        { id: "author-posts", label: "Author Posts", path: "/posts/authors" },
-      ],
+      id: "journal",
+      label: "Discover Journal",
+      dropdown: journalList.length
+        ? journalList.map((journal) => ({
+            id: `${journal.id}`,
+            label: journal.j_title,
+            path: `/journal/${journal.j_title}`,
+          }))
+        : [{ id: "no-journal", label: "No Journals Available", path: "#" }],
     },
-    {
-      id: "research",
-      label: "Research",
-      dropdown: [
-        {
-          id: "ongoing-research",
-          label: "Ongoing Research",
-          path: "/research/ongoing",
-        },
-        {
-          id: "completed-research",
-          label: "Completed Research",
-          path: "/research/completed",
-        },
-        {
-          id: "research-areas",
-          label: "Research Areas",
-          dropdown: [
-            {
-              id: "artificial-intelligence",
-              label: "Artificial Intelligence",
-              path: "/research/ai",
-            },
-            {
-              id: "machine-learning",
-              label: "Machine Learning",
-              path: "/research/ml",
-            },
-            {
-              id: "data-science",
-              label: "Data Science",
-              path: "/research/data-science",
-            },
-            {
-              id: "biotechnology",
-              label: "Biotechnology",
-              path: "/research/biotech",
-            },
-          ],
-        },
-        {
-          id: "collaboration",
-          label: "Collaboration",
-          path: "/research/collaboration",
-        },
-      ],
-    },
-    {
-      id: "services",
-      label: "Services",
-      dropdown: [
-        {
-          id: "consultation",
-          label: "Consultation",
-          path: "/services/consultation",
-        },
-        {
-          id: "peer-review",
-          label: "Peer Review",
-          path: "/services/peer-review",
-        },
-        {
-          id: "publication-support",
-          label: "Publication Support",
-          path: "/services/publication-support",
-        },
-        {
-          id: "training",
-          label: "Training Programs",
-          path: "/services/training",
-        },
-      ],
-    },
+    { id: "mentor", label: "Mentor Hub", path: "/" },
+    { id: "service", label: "Author Service", path: "/" },
   ];
 
   // Helper function to get parent dropdown id from a sub-dropdown id
@@ -435,7 +364,12 @@ const LandingHeader = ({ toggleMenu , settingsData={}, loading=false }) => {
             className="text-2xl font-bold text-indigo-600 flex items-center cursor-pointer"
             onClick={() => handleNavClick("#home")}
           >
-            <img src={settingsData?.image} alt="logo" height={10} className="h-8 md:h-14" />
+            <img
+              src={settingsData?.image}
+              alt="logo"
+              height={10}
+              className="h-8 md:h-14"
+            />
           </div>
         </div>
 
@@ -473,7 +407,7 @@ const LandingHeader = ({ toggleMenu , settingsData={}, loading=false }) => {
 
           <button
             onClick={toggleMenu}
-            className="text-gray-700 focus:outline-none cursor-pointer"
+            className="md:hidden  text-gray-700 focus:outline-none cursor-pointer"
             aria-label="Toggle menu"
           >
             <FontAwesomeIcon
@@ -486,12 +420,11 @@ const LandingHeader = ({ toggleMenu , settingsData={}, loading=false }) => {
 
         {/* Mobile Menu Button */}
         <div className="md:hidden flex items-center space-x-4">
-          {!isAuthenticated && (
+          {/* {!isAuthenticated && (
             <RouterLink
               to="/signin"
               className=" text-black px-3 py-1  text-sm border border-black rounded-4xl flex justify-center items-center"
             >
-              {/* Login  */}
               <User2Icon className="inline-block w-6 h-6 ml-1 text-yellow-800" />
             </RouterLink>
           )}
@@ -512,7 +445,7 @@ const LandingHeader = ({ toggleMenu , settingsData={}, loading=false }) => {
             >
               Dashboard
             </RouterLink>
-          )}
+          )} */}
 
           <button
             onClick={toggleMenu}

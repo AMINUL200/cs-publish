@@ -681,7 +681,7 @@ td ol {
 .our-partner {
     background: url(../assets/images/partner.jpg) no-repeat center;
     background-size: cover;
-    padding: 85px 0;
+    padding: 15px 0;
 }
 
 @media (max-width: 479.98px) {

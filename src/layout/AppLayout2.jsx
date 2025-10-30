@@ -10,32 +10,46 @@ import { toast } from "react-toastify";
 const AppLayout2 = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [settingsData, setSettingsData] = useState(null);
+  const [aboutData, setAboutData] = useState(null);
+  const [serviceData, setServiceData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [journalList, setJournalList] = useState([]);
 
   const API_URL = import.meta.env.VITE_API_URL;
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-  const fetchSettings = async () => {
+  const fetchAllData = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API_URL}api/contact-us`);
-      if (res.data.flag === 1) {
-        setSettingsData(res.data.data);
-        console.log(res.data.data);
-      }
+
+      // ✅ Fire all requests in parallel
+      const [settingsRes, journal] = await Promise.all([
+        axios.get(`${API_URL}api/contact-us`),
+        axios.get(`${API_URL}api/show-journals`),
+        // axios.get(`${API_URL}api/services`)
+      ]);
+
+      // ✅ Handle each response
+      if (settingsRes.data.flag === 1) setSettingsData(settingsRes.data.data);
+      if (journal.data.status) setJournalList(journal.data.data);
+      // if (serviceRes.data.flag === 1) setServiceData(serviceRes.data.data);
+
+      // console.log({
+      //   settings: settingsRes.data.data,
+      //   journal: journal.data.data,
+      //   // services: serviceRes.data.data,
+      // });
     } catch (error) {
-      console.error("Settings fetch failed:", error);
-      toast.error("Failed to load site settings!");
+      console.error("Parallel fetch failed:", error);
+      toast.error("Failed to load site data!");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchSettings();
+    fetchAllData();
   }, []);
 
   return (
@@ -43,17 +57,21 @@ const AppLayout2 = () => {
       <LandingHeader
         toggleMenu={toggleSidebar}
         settingsData={settingsData}
+        journalList={journalList}
         loading={loading}
       />
-      <LandingSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+      <LandingSidebar
+        sidebarOpen={sidebarOpen}
+        toggleSidebar={toggleSidebar}
+        settingsData={settingsData}
+        journalList={journalList}
+      />
       <BackToTop />
 
-      {/* Main content area that grows to fill available space */}
       <main className="flex-grow">
-        <Outlet />
+        <Outlet context={{ aboutData, serviceData, settingsData, loading }} />
       </main>
 
-      {/* Footer will always be at the bottom */}
       <LandingFooter settingsData={settingsData} loading={loading} />
     </div>
   );

@@ -113,6 +113,9 @@ import ViewJournalList from "./pages/user/journal/ViewJournalList";
 import UserSideViewJournal from "./pages/user/journal/UserSideViewJournal";
 import SubscriberProfile from "./pages/user/dashboard/SubscriberProfile";
 import MySubscription from "./pages/user/my_subscription/MySubscription";
+import AddNewCmsPage from "./pages/admin/cms/AddNewCmsPage";
+import ViewCmsPageList from "./pages/admin/cms/ViewCmsPageList";
+import CmsPage from "./pages/user/cms page/CmsPage";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -190,6 +193,8 @@ function App() {
               <Route path="/blog" element={<UserBlogPage />} />
               <Route path="/blog/:id" element={<BlogDetails />} />
               <Route path="/cms/:slug" element={<CmsTemplate />} />
+              <Route path="/cms-page/:slug" element={<CmsPage/>}/>
+
               <Route path="/innovation" element={<InnovationPage />} />
               <Route
                 path="/innovation/:id"
@@ -354,6 +359,9 @@ function App() {
                 path="/landing-page/partners"
                 element={<HandlePartners />}
               />
+
+              <Route path="/add-cms-page" element={<AddNewCmsPage/>}/>
+              <Route path="/list-cms-page" element={<ViewCmsPageList/>}/>
 
               {/* ------------------------------------------ Admin Route End--------------------- */}
 

@@ -18,7 +18,7 @@ const TermsAndCondition = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${API_URL}api/terms`);
+      const response = await axios.get(`${API_URL}api/terms-shows/terms-condition`);
       
       if (response.data.status && response.data.data) {
         setTermsData({

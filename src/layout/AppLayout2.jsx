@@ -14,6 +14,7 @@ const AppLayout2 = () => {
   const [serviceData, setServiceData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [journalList, setJournalList] = useState([]);
+  const [cmsPageList, setCmsPageList] = useState([]);
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -24,15 +25,16 @@ const AppLayout2 = () => {
       setLoading(true);
 
       // ✅ Fire all requests in parallel
-      const [settingsRes, journal] = await Promise.all([
+      const [settingsRes, journal, cmsPage] = await Promise.all([
         axios.get(`${API_URL}api/contact-us`),
         axios.get(`${API_URL}api/show-journals`),
-        // axios.get(`${API_URL}api/services`)
+        axios.get(`${API_URL}api/cms-page-show`),
       ]);
 
       // ✅ Handle each response
       if (settingsRes.data.flag === 1) setSettingsData(settingsRes.data.data);
       if (journal.data.status) setJournalList(journal.data.data);
+      if (cmsPage.data.status) setCmsPageList(cmsPage.data.data);
       // if (serviceRes.data.flag === 1) setServiceData(serviceRes.data.data);
 
       // console.log({
@@ -72,7 +74,11 @@ const AppLayout2 = () => {
         <Outlet context={{ aboutData, serviceData, settingsData, loading }} />
       </main>
 
-      <LandingFooter settingsData={settingsData} loading={loading} />
+      <LandingFooter
+        settingsData={settingsData}
+        loading={loading}
+        cmsPageList={cmsPageList}
+      />
     </div>
   );
 };

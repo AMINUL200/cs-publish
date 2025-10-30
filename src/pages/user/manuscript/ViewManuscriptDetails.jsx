@@ -234,29 +234,36 @@ const ViewManuscriptDetails = () => {
     { id: "references", label: "References" },
   ];
 
-  const handleDownloadPDF = async () => {
+  const handleDownloadPDF = async (pdf) => {
+    if (!pdf) {
+      toast.info("PDF Not Found");
+    }
     try {
       setDownloadLoading(true); // optional loader
-      const response = await axios.get(
+      const response = await axios.post(
         `${API_URL}api/subscription/increase-download/${id}`,
+        {},
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          responseType: "blob", // very important for binary data
+          // responseType: "blob", // very important for binary data
         }
       );
 
-      // Create a blob link for download
-      const blob = new Blob([response.data], { type: "application/pdf" });
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-      link.download = `manuscript_${id}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      
 
-      toast.success("PDF downloaded successfully!");
+      if (response.data.status) {
+        // Create a blob link for download
+        // const link = document.createElement("a");
+        // link.href = pdf;
+        // link.download = `manuscript_${id}.pdf`;
+        // document.body.appendChild(link);
+        // link.click();
+        // link.remove();
+         window.open(pdf, "_blank", "noopener,noreferrer");
+        toast.success("PDF downloaded successfully!");
+      }
     } catch (error) {
       console.error("Error downloading PDF:", error);
       toast.error("Failed to download PDF");
@@ -410,7 +417,7 @@ const ViewManuscriptDetails = () => {
 
                 {/* Download PDF Button */}
                 <button
-                  onClick={handleDownloadPDF}
+                  onClick={() => handleDownloadPDF(manuscriptData.pdf)}
                   disabled={downloadLoading}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer 
     ${
@@ -497,7 +504,7 @@ const ViewManuscriptDetails = () => {
             ))}
             {/* Download PDF in Mobile Menu */}
             <button
-              onClick={handleDownloadPDF}
+              onClick={() => handleDownloadPDF(manuscriptData.pdf)}
               disabled={downloadLoading}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer 
     ${
@@ -537,6 +544,15 @@ const ViewManuscriptDetails = () => {
                 </>
               )}
             </button>
+
+            <a 
+  href="https://cspublishinghouse.com/cs-api/public/uploads/published_manuscripts/pdfs/1761588744_68ffb60805237.pdf" 
+  download
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  Download PDF
+</a>
           </div>
         </div>
       )}

@@ -24,7 +24,7 @@ const LandingHeader = ({
   const dispatch = useDispatch();
   const API_URL = import.meta.env.VITE_API_URL;
 
-  console.log(journalList);
+  // console.log(journalList);
 
   const handleLogout = async () => {
     try {

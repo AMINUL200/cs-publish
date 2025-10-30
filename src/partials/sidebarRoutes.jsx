@@ -217,9 +217,9 @@ export const sidebarRoutes = [
         allowedRoles: ["0"],
       },
       {
-        path:"/setting/research",
-        title:"Handle Research ",
-        allowedRoles:["0"],
+        path: "/setting/research",
+        title: "Handle Research ",
+        allowedRoles: ["0"],
       },
       {
         path: "/setting/service",
@@ -230,7 +230,7 @@ export const sidebarRoutes = [
         path: "/setting/teams",
         title: "Handle Teams",
         allowedRoles: ["0"],
-      }
+      },
     ],
   },
   // {
@@ -257,15 +257,13 @@ export const sidebarRoutes = [
         icon: <FontAwesomeIcon icon={faCreditCard} />,
         path: "/payment/subscription-plans",
         allowedRoles: ["0"],
-
       },
       {
         title: "Subscription History",
         icon: <FontAwesomeIcon icon={faCreditCard} />,
         allowedRoles: ["0"],
         path: "/payment/subscription-history",
-      }
-      
+      },
     ],
   },
   {
@@ -293,9 +291,25 @@ export const sidebarRoutes = [
         path: "/landing-page/partners",
         title: "Manage Partners",
         allowedRoles: ["0"],
-      }
-      
-    ]
+      },
+    ],
+  },
+  {
+    title: "Handle CMS Page",
+    icon: <FontAwesomeIcon icon={faCog} />,
+    allowedRoles: ["0"],
+    subRoutes: [
+      {
+        path: "/add-cms-page",
+        title: "Add CMS Page",
+        allowedRoles: ["0"],
+      },
+      {
+        path: "/list-cms-page",
+        title: "CMS Page",
+        allowedRoles: ["0"],
+      },
+    ],
   },
   // Reviewer route
   {

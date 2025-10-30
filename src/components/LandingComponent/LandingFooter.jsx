@@ -7,7 +7,13 @@ import { faInstagram } from "@fortawesome/free-brands-svg-icons";
 import { faLinkedin } from "@fortawesome/free-brands-svg-icons";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 
-const LandingFooter = ({ settingsData = {}, loading = false }) => {
+const LandingFooter = ({
+  settingsData = {},
+  cmsPageList = [],
+  loading = false,
+}) => {
+  console.log(cmsPageList.policies_and_access);
+
   const sections = [
     {
       title: "Product and services",
@@ -16,48 +22,40 @@ const LandingFooter = ({ settingsData = {}, loading = false }) => {
         { name: "Discover Journal", path: "/journal" },
         // { name: "Books Hub", path: "/products" },
         { name: "Mentors Hub", path: "/mentors" },
-        // { name: "Author Services", path: "#" },
+        { name: "Author Services", path: "#" },
         { name: "Blog", path: "/blog" },
-        // { name: "Events", path: "#" },
-        // { name: "Conference", path: "#" }
+        { name: "Events", path: "#" },
+        { name: "Conference", path: "#" },
       ],
     },
-    // {
-    //   title: "Resources",
-    //   items: [
-    //     // { name: "Data Depository", path: "#" },
-    //     // { name: "Find protocols", path: "#" },
-    //     { name: "Innovation", path: "/innovation" },
-    //     { name: "Research Service", path: "/research-services" },
-    //     // { name: "Liberians Portal", path: "#" },
-    //     // { name: "Promote and Advertise", path: "#" }
-    //   ]
-    // },
-    // {
-    //   title: "Policies and access",
-    //   items: [
-    //     { name: "Open access", path: "#" },
-    //     { name: "Subscription", path: "#" },
-    //     { name: "Membership", path: "#" },
-    //     { name: "Editor Hub", path: "#" },
-    //     { name: "Reviewer hub", path: "#" },
-    //     { name: "Author hub", path: "#" },
-    //     { name: "Reprint", path: "#" },
-    //     { name: "Partnership", path: "#" },
-    //     { name: "Legal info", path: "#" }
-    //   ]
-    // },
+    {
+      title: "Resources",
+      items: [
+        // { name: "Data Depository", path: "#" },
+        // { name: "Find protocols", path: "#" },
+        { name: "Innovation", path: "/innovation" },
+        { name: "Research Service", path: "/research-services" },
+        // { name: "Liberians Portal", path: "#" },
+        // { name: "Promote and Advertise", path: "#" }
+      ],
+    },
+    {
+      title: "Policies and access",
+      items: cmsPageList?.policies_and_access?.length
+        ? cmsPageList.policies_and_access.map((policies) => ({
+            name: policies.page_title,
+            path: `/cms-page/${policies.slug}`,
+          }))
+        : [{ name: "No Policies ", path: "#" }],
+    },
     {
       title: "Support and contact",
-      items: [
-        // { name: "Press office", path: "#" },
-        { name: "Our team", path: "#" },
-        { name: "FAQ", path: "/faq" },
-        // { name: "Live chat", path: "#" },
-        // { name: "Career opportunities", path: "#" },
-        // { name: "Fellowship", path: "#" },
-        // { name: "Feedback", path: "#" }
-      ],
+      items: cmsPageList?.support_and_contact?.length
+        ? cmsPageList.support_and_contact.map((support) => ({
+            name: support.page_title,
+            path: `/cms-page/${support.slug}`,
+          }))
+        : [{ name: "No support ", path: "#" }],
     },
   ];
 
@@ -75,7 +73,11 @@ const LandingFooter = ({ settingsData = {}, loading = false }) => {
         {/* Main Links Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-6">
           <div className="mb-2 md:mb-16">
-            <img src={settingsData?.image} alt="Company Logo" className="text-center mx-auto sm:mx-0" />
+            <img
+              src={settingsData?.image}
+              alt="Company Logo"
+              className="text-center mx-auto sm:mx-0"
+            />
             <div className="space-y-1 mt-4 ml-4">
               <p className="text-[0.7rem]">{settingsData?.address_line1}</p>
               <p className="text-[0.7rem]">{settingsData?.address_line2}</p>

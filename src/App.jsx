@@ -116,6 +116,16 @@ import MySubscription from "./pages/user/my_subscription/MySubscription";
 import AddNewCmsPage from "./pages/admin/cms/AddNewCmsPage";
 import ViewCmsPageList from "./pages/admin/cms/ViewCmsPageList";
 import CmsPage from "./pages/user/cms page/CmsPage";
+import UpdateTerms from "./pages/admin/policy/UpdateTerms";
+import CompanyPolicyCmsPage from "./pages/user/company_policy/CompanyPolicyCmsPage";
+import HandleInnovation from "./pages/admin/innovation/HandleInnovation";
+import AddInnovation from "./pages/admin/innovation/AddInnovation";
+import HandleVolume from "./pages/admin/volume/HandleVolume";
+import ListOfIssueJournal from "./pages/user/journal/ListOfIssueJournal";
+import DetailsOfArchiveList from "./pages/user/journal/DetailsOfArchiveList";
+import PaymentForAuthor from "./pages/admin/payment/PaymentForAuthor";
+import ListOfArchive from "./pages/user/journal/ListOfArchive";
+import DetailsOfCurrentIssue from "./pages/user/journal/DetailsOfCurrentIssue";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -178,26 +188,46 @@ function App() {
           >
             <Route element={<AppLayout2 />}>
               <Route index path="/" element={<HomePage />} />
-              <Route path="/user-profile" element={<SubscriberProfile/>}/>
+              <Route path="/user-profile" element={<SubscriberProfile />} />
 
-              <Route path="/journal" element={<ViewJournalList/>}/>
-              <Route path="/journal/:id" element={<UserSideViewJournal/>}/>
+              <Route path="/journal" element={<ViewJournalList />} />
+              <Route path="/journal/:id" element={<UserSideViewJournal />} />
+              <Route
+                path="/list-of-archive/:id"
+                element={<ListOfIssueJournal />}
+              />
+              {/* <Route
+                path="/list-of-archive/"
+                element={<ListOfArchive />}
+              /> */}
+              <Route
+                path="/view-archive/:j_id/:v_id"
+                element={<DetailsOfArchiveList />}
+              />
+              <Route
+                path="/view-current-issue/:id"
+                element={<DetailsOfCurrentIssue />}
+              />
 
-              <Route path="/my-subscription" element={<MySubscription/>}/>
+              <Route path="/my-subscription" element={<MySubscription />} />
 
-
-
-              <Route path="/view-published-manuscript-list" element={<ViewManuscriptPage />} />
-              <Route path="/view-published-manuscript/:id" element={<ViewManuscriptDetails />} />
+              <Route
+                path="/view-published-manuscript-list"
+                element={<ViewManuscriptPage />}
+              />
+              <Route
+                path="/view-published-manuscript/:id"
+                element={<ViewManuscriptDetails />}
+              />
               <Route path="/about" element={<UserProfilePage />} />
               <Route path="/blog" element={<UserBlogPage />} />
               <Route path="/blog/:id" element={<BlogDetails />} />
               <Route path="/cms/:slug" element={<CmsTemplate />} />
-              <Route path="/cms-page/:slug" element={<CmsPage/>}/>
+              <Route path="/cms-page/:slug" element={<CmsPage />} />
 
               <Route path="/innovation" element={<InnovationPage />} />
               <Route
-                path="/innovation/:id"
+                path="/innovation/:slug"
                 element={<InnoVationDetailsPage />}
               />
 
@@ -223,6 +253,11 @@ function App() {
 
               {/* company policy */}
               <Route path="/terms" element={<TermsAndCondition />} />
+              <Route
+                path="/policy-page/:slug"
+                element={<CompanyPolicyCmsPage />}
+              />
+
               <Route path="/policy" element={<CompanyPolicy />} />
               <Route path="/payment-policy" element={<PaymentPolicy />} />
 
@@ -289,16 +324,17 @@ function App() {
                 path="/setting/terms"
                 element={<HandleTermsAndCondition />}
               />
+              <Route path="/update-terms/:id" element={<UpdateTerms />} />
               <Route path="/setting/policy" element={<HandleCompanyPolicy />} />
               <Route
                 path="/setting/payment-policy"
                 element={<HandlePaymentPolicy />}
               />
               <Route path="/setting/research" element={<HandleResearch />} />
-              <Route path="/setting/add-research" element={<AddResearch/>}/>
+              <Route path="/setting/add-research" element={<AddResearch />} />
 
               <Route path="/setting/service" element={<HandleServices />} />
-              <Route path="/setting/add-service" element={<AddService/>}/>
+              <Route path="/setting/add-service" element={<AddService />} />
 
               <Route path="/setting/teams" element={<HandleTeams />} />
               <Route path="/setting/add-team" element={<AddTeam />} />
@@ -333,6 +369,7 @@ function App() {
                 path="/article-manger/journal/edit-journal/:id"
                 element={<EditJournal />}
               />
+              <Route path="/handle-volume" element={<HandleVolume />} />
 
               {/* Payment */}
               <Route
@@ -347,6 +384,10 @@ function App() {
                 path="/payment/subscription-history"
                 element={<HandleSubScriptionHistory />}
               />
+              <Route
+                path="/payment/author-paid"
+                element={<PaymentForAuthor />}
+              />
 
               {/* handle landing page route */}
               <Route
@@ -360,8 +401,10 @@ function App() {
                 element={<HandlePartners />}
               />
 
-              <Route path="/add-cms-page" element={<AddNewCmsPage/>}/>
-              <Route path="/list-cms-page" element={<ViewCmsPageList/>}/>
+              <Route path="/add-cms-page" element={<AddNewCmsPage />} />
+              <Route path="/list-cms-page" element={<ViewCmsPageList />} />
+              <Route path="/handle-innovation" element={<HandleInnovation />} />
+              <Route path="/add-innovation" element={<AddInnovation />} />
 
               {/* ------------------------------------------ Admin Route End--------------------- */}
 
@@ -413,14 +456,14 @@ function App() {
                 element={<AuthorViewSubmitManuscriptDetail />}
               />
               {/* demo */}
-              <Route
+              {/* <Route
                 path="/confirmation/view-details-manuscript"
                 element={<AuthorViewSubmitManuscriptDetail />}
               />
               <Route
                 path="/confirmation/view-details-manuscript2"
                 element={<Demo />}
-              />
+              /> */}
 
               {/* Publisher */}
 
@@ -442,7 +485,7 @@ function App() {
                 path="/publisher/published-manuscripts-view/:id"
                 element={<PublisherViewDesignManuscript />}
               />
-               <Route
+              <Route
                 path="/publisher/published-manuscripts-edit/:id"
                 element={<PublisherEditDesignManuscript />}
               />

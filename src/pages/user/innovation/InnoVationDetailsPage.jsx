@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import Breadcrumb from '../../../components/common/Breadcrumb';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar,
   faUser,
-  faQuoteLeft,
   faShareAlt,
   faEnvelope,
   faMessage,
   faEye,
-  faList
+  faTag,
+  faDownload
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFacebook,
   faTwitter,
-  faLinkedin,
-  faGithub
+  faLinkedin
 } from '@fortawesome/free-brands-svg-icons';
 import Loader from '../../../components/common/Loader';
 import InnovationTestimonial from '../../../components/common/InnovationTestimonial';
@@ -23,79 +24,70 @@ import MediaRenderer from '../../../components/common/MediaRenderer';
 import { Link } from 'react-router-dom';
 
 const InnoVationDetailsPage = () => {
-  const [loading, setLoading] = useState(true)
-  const dummyInnovationData = {
-    id: 1,
-    title: "The Future of Remote Work in 2023",
-    date: "2023-10-15",
-    views: "1.25K",
-    comments: "500",
-    paragraph1: "Remote work has transformed how companies operate and how employees approach their careers. As we move further into 2023, new trends and technologies are shaping this landscape.",
-    media: {
-      type: "youtube", // "image" | "youtube" | "video"
-      url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    },
-    content: `
-      <h2>The Evolution of Remote Work</h2>
-      <p>The pandemic accelerated remote work adoption by years, if not decades. Companies that once resisted remote work have now embraced it, discovering benefits they hadn't anticipated.</p>
-      
-      <h2>Key Trends in 2023</h2>
-      <p>Several trends are defining remote work in 2023:</p>
-      <ul>
-        <li>Hybrid models becoming the standard</li>
-        <li>Focus on results rather than hours worked</li>
-        <li>Increased investment in collaboration tools</li>
-        <li>Greater emphasis on work-life balance</li>
-      </ul>
-      
-      <blockquote>
-        "The future of work is not a place, but an experience that can happen anywhere."
-      </blockquote>
-      
-      <h2>Challenges and Solutions</h2>
-      <p>While remote work offers many benefits, it also presents challenges such as maintaining company culture, ensuring effective communication, and preventing employee burnout.</p>
-    `,
-    innovator_info: {
-      name: "Jane Doe",
-      avatar: "https://i.pravatar.cc/100?img=5",
-      bio: "Tech writer and remote work enthusiast.",
-      social: {
-        facebook: "https://facebook.com",
-        twitter: "https://twitter.com",
-        linkedin: "https://linkedin.com",
-        github: "https://github.com"
-      }
-    },
+  const { slug } = useParams(); // Extract slug from URL
+  const [loading, setLoading] = useState(true);
+  const [innovation, setInnovation] = useState(null);
+  const [popularInnovations, setPopularInnovations] = useState([]);
+  const API_URL = import.meta.env.VITE_API_URL;
 
-    popular_Innovation: [
-      {
-        id: 2,
-        title: "How AI is Transforming Business Operations",
-        media: {
-          type: "image",
-          url: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40"
-        }
-      },
-      {
-        id: 3,
-        title: "The Rise of Sustainable Business Practices",
-        media: {
-          type: "youtube",
-          url: "https://www.youtube.com/embed/tgbNymZ7vqY"
-        }
-      },
-      {
-        id: 4,
-        title: "Building Resilience in Times of Change",
-        media: {
-          type: "video",
-          url: "https://www.w3schools.com/html/mov_bbb.mp4"
-        }
+  // Fetch innovation data by slug
+  const fetchInnovationData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_URL}api/innovations-details/${slug}`);
+      
+      if (response.data.status) {
+        setInnovation(response.data.data);
+        setPopularInnovations(response.data.popular || []);
       }
-    ]
+    } catch (error) {
+      console.error('Error fetching innovation data:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Team Members Data
+  // Format date
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  // Function to handle HTML content
+  const createMarkup = (htmlContent) => {
+    return { __html: htmlContent };
+  };
+
+  // Extract YouTube video ID or get image URL
+  const getMediaInfo = (url) => {
+    if (!url) return { type: 'none', src: null };
+
+    // Check if it's a YouTube URL
+    const youtubeMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
+    if (youtubeMatch) {
+      return {
+        type: 'youtube',
+        src: `https://www.youtube.com/embed/${youtubeMatch[1]}`
+      };
+    }
+
+    // Check if it's an image URL
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp'];
+    const isImageUrl = imageExtensions.some(ext => url.toLowerCase().includes(ext)) || 
+                      url.includes('uploads/innovations');
+
+    if (isImageUrl) {
+      const fullImageUrl = url.startsWith('http') ? url : `${API_URL}${url}`;
+      return {
+        type: 'image',
+        src: fullImageUrl
+      };
+    }
+
+    return { type: 'none', src: null };
+  };
+
+  // Team Members Data (keeping this as it's for testimonials)
   const innovatorVoices = [
     {
       id: 1,
@@ -131,43 +123,43 @@ const InnoVationDetailsPage = () => {
     }
   ];
 
-  // Format date
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-
-  // Function to handle HTML content
-  const createMarkup = (htmlContent) => {
-    return { __html: htmlContent };
-  };
-
   useEffect(() => {
     window.scrollTo(0, 0);
-    // Simulate API call with setTimeout
-    const timer = setTimeout(() => {
-
-      setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
+    if (slug) {
+      fetchInnovationData();
+    }
+  }, [slug]);
 
   if (loading) {
-    return <Loader />
+    return <Loader />;
   }
+
+  if (!innovation) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Innovation Not Found</h2>
+          <p className="text-gray-600 mb-6">The innovation you're looking for doesn't exist.</p>
+          <Link to="/innovation" className="bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700">
+            Back to Innovations
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const mediaInfo = getMediaInfo(innovation.image_video);
 
   return (
     <>
       <Breadcrumb items={[
         { label: 'Home', path: '/', icon: 'home' },
         { label: 'Innovation', path: '/innovation', icon: 'folder' },
-        { label: 'Innovation Details' }
+        { label: innovation.page_title }
       ]}
-        pageTitle="Innovation Details"
-        // pageDescription="Discover your next great read from our curated collection"
+        pageTitle={innovation.page_title}
       />
-      <div className="container  mx-auto px-4 py-8 md:px-10">
+      <div className="container mx-auto px-4 py-8 md:px-10">
 
         <div className="flex flex-col lg:flex-row gap-8 mt-6">
           {/* Main Content */}
@@ -176,47 +168,48 @@ const InnoVationDetailsPage = () => {
               {/* Title and Metadata */}
               <div className="p-6">
                 <h1 className="text-3xl text-center font-bold text-gray-800 mb-4">
-                  {dummyInnovationData.title}
+                  {innovation.page_title}
                 </h1>
 
                 <div className="flex flex-wrap items-center justify-around text-gray-600 mb-6 gap-4">
                   <div className="flex items-center">
                     <FontAwesomeIcon icon={faCalendar} className="mr-2" />
-                    <span>{formatDate(dummyInnovationData.date)}</span>
+                    <span>{formatDate(innovation.created_at)}</span>
                   </div>
 
-                  <div className="flex items-center">
-                    <FontAwesomeIcon icon={faList} className="mr-2" />
-                    <span>List</span>
-                  </div>
+                  {innovation.catagory && (
+                    <div className="flex items-center">
+                      <FontAwesomeIcon icon={faTag} className="mr-2" />
+                      <span>{innovation.catagory}</span>
+                    </div>
+                  )}
 
-                  <div className="flex items-center">
-                    <FontAwesomeIcon icon={faMessage} className="mr-2" />
-                    <span>Comments ({dummyInnovationData.comments})</span>
-                  </div>
+                  
 
                   <div className="flex items-center">
                     <FontAwesomeIcon icon={faEye} className="mr-2" />
-                    <span>{dummyInnovationData.views} Views</span>
+                    <span>{innovation.view_count} Views</span>
                   </div>
                 </div>
 
-
                 <p className="text-lg text-gray-700 mb-6">
-                  {dummyInnovationData.paragraph1}
+                  {innovation.description}
                 </p>
               </div>
 
               {/* Featured Media */}
               <div className="w-full p-4">
-                <MediaRenderer media={dummyInnovationData.media} />
+                <MediaRenderer media={{
+                  type: mediaInfo.type,
+                  url: mediaInfo.src
+                }} />
               </div>
 
               {/* Content */}
               <div className="p-6">
                 <div
                   className="prose max-w-none"
-                  dangerouslySetInnerHTML={createMarkup(dummyInnovationData.content)}
+                  dangerouslySetInnerHTML={createMarkup(innovation.long_description)}
                 />
 
                 {/* Share Buttons */}
@@ -232,15 +225,15 @@ const InnoVationDetailsPage = () => {
                         href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 transition"
+                        className="text-yellow-600 hover:text-yellow-800 transition"
                       >
                         <FontAwesomeIcon icon={faFacebook} size="lg" />
                       </a>
                       <a
-                        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(dummyInnovationData.title)}&url=${encodeURIComponent(window.location.href)}`}
+                        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(innovation.page_title)}&url=${encodeURIComponent(window.location.href)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-400 hover:text-blue-600 transition"
+                        className="text-yellow-400 hover:text-yellow-600 transition"
                       >
                         <FontAwesomeIcon icon={faTwitter} size="lg" />
                       </a>
@@ -248,7 +241,7 @@ const InnoVationDetailsPage = () => {
                         href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-700 hover:text-blue-900 transition"
+                        className="text-yellow-700 hover:text-yellow-900 transition"
                       >
                         <FontAwesomeIcon icon={faLinkedin} size="lg" />
                       </a>
@@ -257,15 +250,30 @@ const InnoVationDetailsPage = () => {
 
                   {/* Buttons Section */}
                   <div className="flex flex-wrap gap-4">
-                    <button className="px-5 py-2 rounded-lg bg-red-500 text-white font-medium shadow-md hover:bg-red-600 transition cursor-pointer">
-                      PDF Convert
-                    </button>
-                    <button className="px-5 py-2 rounded-lg bg-indigo-500 text-white font-medium shadow-md hover:bg-indigo-600 transition cursor-pointer">
-                      PPT Convert
-                    </button>
+                    {innovation.pdf && (
+                      <a
+                        href={innovation.pdf}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-5 py-2 rounded-lg bg-red-500 text-white font-medium shadow-md hover:bg-red-600 transition cursor-pointer flex items-center gap-2"
+                      >
+                        <FontAwesomeIcon icon={faDownload} />
+                        PDF Download
+                      </a>
+                    )}
+                    {innovation.ppt && (
+                      <a
+                        href={innovation.ppt}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-5 py-2 rounded-lg bg-indigo-500 text-white font-medium shadow-md hover:bg-indigo-600 transition cursor-pointer flex items-center gap-2"
+                      >
+                        <FontAwesomeIcon icon={faDownload} />
+                        PPT Download
+                      </a>
+                    )}
                   </div>
                 </div>
-
               </div>
             </article>
 
@@ -275,57 +283,31 @@ const InnoVationDetailsPage = () => {
 
               <div className="flex flex-col sm:flex-row items-start">
                 <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-6">
-                  <img
-                    src={dummyInnovationData.innovator_info.avatar}
-                    alt={dummyInnovationData.innovator_info.name}
-                    className="w-24 h-24 rounded-full object-cover"
-                  />
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-r from-yellow-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
+                    {innovation.innovator_name?.charAt(0) || 'U'}
+                  </div>
                 </div>
 
                 <div className="flex-grow">
                   <h3 className="text-xl font-semibold">
-                    {dummyInnovationData.innovator_info.name}
+                    {innovation.innovator_name}
                   </h3>
                   <p className="text-gray-600 mt-2">
-                    {dummyInnovationData.innovator_info.bio}
+                    {innovation.innovator_desc}
                   </p>
 
-                  <div className="flex mt-4 space-x-4">
-                    <a
-                      href={dummyInnovationData.innovator_info.social.facebook}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-600 hover:text-blue-600"
-                    >
-                      <FontAwesomeIcon icon={faFacebook} size="lg" />
-                    </a>
-                    <a
-                      href={dummyInnovationData.innovator_info.social.twitter}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-600 hover:text-blue-400"
-                    >
-                      <FontAwesomeIcon icon={faTwitter} size="lg" />
-                    </a>
-                    <a
-                      href={dummyInnovationData.innovator_info.social.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-600 hover:text-blue-700"
-                    >
-                      <FontAwesomeIcon icon={faLinkedin} size="lg" />
-                    </a>
-                    <a
-                      href={dummyInnovationData.innovator_info.social.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-600 hover:text-gray-900"
-                    >
-                      <FontAwesomeIcon icon={faGithub} size="lg" />
-                    </a>
-                  </div>
+                  {innovation.innovator_email && (
+                    <div className="flex mt-4 space-x-4">
+                      <a
+                        href={`mailto:${innovation.innovator_email}`}
+                        className="text-gray-600 hover:text-yellow-600"
+                      >
+                        <FontAwesomeIcon icon={faEnvelope} size="lg" />
+                      </a>
+                    </div>
+                  )}
 
-                  <button className="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md flex items-center">
+                  <button className="mt-6 bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-md flex items-center">
                     <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
                     Contact Innovator
                   </button>
@@ -340,19 +322,31 @@ const InnoVationDetailsPage = () => {
               <h2 className="text-xl font-bold mb-6 border-b pb-2">Popular Innovations</h2>
 
               <div className="space-y-6">
-                {dummyInnovationData.popular_Innovation.map((item) => (
-                  <div key={item.id} className="flex items-start hover:bg-gray-50 p-2 rounded-md transition-colors">
-                    <div className="flex-shrink-0 mr-4 w-28">
-                      <MediaRenderer media={item.media} className="h-20" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-800 hover:text-blue-600 transition-colors">
-                        <Link to={`/innovation/${item.id}`}>{item.title}</Link>
-                      </h3>
-                    </div>
-                  </div>
-                ))}
-
+                {popularInnovations.length > 0 ? (
+                  popularInnovations.map((item, index) => {
+                    const itemMediaInfo = getMediaInfo(item.image_video);
+                    return (
+                      <div key={index} className="flex items-start hover:bg-gray-50 p-2 rounded-md transition-colors">
+                        <div className="flex-shrink-0 mr-4 w-28">
+                          <MediaRenderer 
+                            media={{
+                              type: itemMediaInfo.type,
+                              url: itemMediaInfo.src
+                            }} 
+                            className="h-20"
+                          />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-800 hover:text-yellow-600 transition-colors">
+                            <Link to={`/innovation/${item.slug}`}>{item.title}</Link>
+                          </h3>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-gray-500 text-center py-4">No popular innovations available</p>
+                )}
               </div>
             </div>
           </div>
@@ -360,7 +354,7 @@ const InnoVationDetailsPage = () => {
       </div>
 
       {/* Innovators' Voices Section */}
-      <section className="py-20 bg-white innovation-section ">
+      {/* <section className="py-20 bg-white innovation-section ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -372,13 +366,8 @@ const InnoVationDetailsPage = () => {
           </div>
 
           <InnovationTestimonial innovatorVoices={innovatorVoices} />
-
-
         </div>
-      </section>
-
-
-
+      </section> */}
     </>
   );
 }

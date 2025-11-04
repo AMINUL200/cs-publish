@@ -36,6 +36,8 @@ const UserSideViewJournal = () => {
       });
 
       if (response.data.status) {
+        console.log(response.data);
+        
         setJournalData(response.data);
       } else {
         throw new Error(
@@ -67,6 +69,21 @@ const UserSideViewJournal = () => {
       month: "long",
       day: "numeric",
     });
+  };
+
+  // Navigation items
+  const navItems = [
+    { label: "List of Issues", path: `/list-of-archive/${journalData?.journal?.id}` },
+    { label: "ASAP Article", path: "/asap-article" },
+    { label: "Current Issue", path: `/view-current-issue/${journalData?.journal?.id}` },
+    { label: "Author", path: "/author" },
+    { label: "About Journal", path: "/about-journal" },
+  ];
+
+  const handleNavClick = (path) => {
+    // You can implement navigation logic here
+    console.log(`Navigating to: ${path}`);
+    navigate(path); // Uncomment this if you want actual navigation
   };
 
   if (loading) {
@@ -125,7 +142,7 @@ const UserSideViewJournal = () => {
       {/* Header Section - Updated with Black Background and Yellow Text */}
       <div className="bg-black text-yellow-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col lg:flex-row items-center gap-8">
+          <div className="flex flex-col lg:flex-row items-center gap-8 justify-center">
             {/* Journal Image */}
             <div className="flex-shrink-0">
               <img
@@ -177,6 +194,15 @@ const UserSideViewJournal = () => {
                   </div>
                 )}
               </div>
+              {/* Journal Description */}
+              <div className="bg-inherit bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30 mb-4">
+                <h3 className="font-bold text-yellow-300 mb-2">
+                  Journal Description
+                </h3>
+                <p  className="text-yellow-200">
+                  {journal.j_description}
+                </p>
+              </div>
 
               {/* Editor Information */}
               {editor && editor.length > 0 && (
@@ -194,33 +220,27 @@ const UserSideViewJournal = () => {
                 </div>
               )}
             </div>
+
+            <div>
+              <button className="border rounded border-yellow-200 py-2 px-4 hover:bg-yellow-500 hover:text-white cursor-pointer transition-all duration-300">Submit Manuscript</button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Journal Description Section */}
-      <div className="bg-white py-12">
+      {/* Horizontal Navigation Buttons */}
+      <div className="bg-yellow-500 py-4 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Journal Description */}
-            <div className="bg-gray-50 rounded-lg p-6 border-l-4 border-yellow-500">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Journal Description
-              </h2>
-              <p className="text-gray-700 leading-relaxed">
-                {journal.j_description}
-              </p>
-            </div>
-
-            {/* Editorial Board */}
-            <div className="bg-gray-50 rounded-lg p-6 border-l-4 border-red-800">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Editorial Board
-              </h2>
-              <p className="text-gray-700 leading-relaxed">
-                {journal.editorial_board}
-              </p>
-            </div>
+          <div className="flex flex-wrap justify-between gap-4 md:gap-6 lg:gap-8">
+            {navItems.map((item, index) => (
+              <button
+                key={index}
+                onClick={() => handleNavClick(item.path)}
+                className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black hover:text-yellow-500 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg whitespace-nowrap"
+              >
+                {item.label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -344,20 +364,21 @@ const ArticleCard = ({ article, stripHtmlTags, formatDate }) => {
   const API_URL = import.meta.env.VITE_API_URL;
   const { token } = useSelector((state) => state.auth); // ✅ get token from Redux
 
-  const handleReadMore =  () => {
-      navigate(`/view-published-manuscript/${article.id}`);
-      try {
-        axios.post(`${API_URL}api/subscription/increase-view/${article.id}` ,{},{
-        headers:{Authorization: `Bearer ${token}`},
-      })
-      } catch (error) {
-        console.log(error);
-        toast.error(error.message)
-      }
-      
-  }
-
-
+  const handleReadMore = () => {
+    navigate(`/view-published-manuscript/${article.id}`);
+    try {
+      axios.post(
+        `${API_URL}api/subscription/increase-view/${article.id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 group">

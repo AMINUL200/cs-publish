@@ -27,7 +27,7 @@ const BrowseJournals = ({
           </h5>
         </div>
         <div className="grid md:grid-cols-3 gap-4 w-full ">
-          {browsJournalData.map((journal, index) => (
+          {browsJournalData.slice(0, 3).map((journal, index) => (
             <div
               key={journal.id}
               className="relative group h-[250px] md:h-[300px] overflow-hidden rounded-xl shadow-lg cursor-pointer transition-all duration-500"

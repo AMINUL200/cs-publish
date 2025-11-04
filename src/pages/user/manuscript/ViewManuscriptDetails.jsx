@@ -313,7 +313,7 @@ const ViewManuscriptDetails = () => {
   return (
     <div className="min-h-screen bg-gray-50 relative">
       {/* Fixed Header with Navigation */}
-      <div className="bg-white shadow-md border-b fixed top-0 left-0 right-0 z-50">
+      <div className="bg-white shadow-md border-b fixed mb-10 top-0 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-4">
             {/* Top Row: Breadcrumb */}
@@ -330,10 +330,10 @@ const ViewManuscriptDetails = () => {
                 <li className="flex items-center">
                   <span className="mx-2">/</span>
                   <Link
-                    to="/view-published-manuscript-list"
+                    to={`/journal/${manuscriptData?.j_title}`}
                     className="hover:text-yellow-600 transition-colors"
                   >
-                    Published Manuscripts
+                   {manuscriptData?.j_title}
                   </Link>
                 </li>
                 <li className="flex items-center">
@@ -558,7 +558,7 @@ const ViewManuscriptDetails = () => {
       )}
 
       {/* Main Content Area with Top Padding for Fixed Header */}
-      <div className="pt-44 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="pt-60 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-8 relative">
           {/* Main Content - Left Side */}
           <div

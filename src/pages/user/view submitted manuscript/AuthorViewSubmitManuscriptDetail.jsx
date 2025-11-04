@@ -9,6 +9,8 @@ const AuthorViewSubmitManuscriptDetail = () => {
   const { id } = useParams();
   const { token } = useSelector((state) => state.auth);
   const API_URL = import.meta.env.VITE_API_URL;
+  const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID;
+  
   const [manuscript, setManuscript] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [featureOptions, setFeatureOptions] = React.useState([]);
@@ -16,6 +18,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
   const [selectedFeatures, setSelectedFeatures] = React.useState([]);
   const [showFeatureModal, setShowFeatureModal] = React.useState(false);
   const [updatingFeatures, setUpdatingFeatures] = React.useState(false);
+  const [processingPayment, setProcessingPayment] = React.useState(false);
 
   const fetchManuscriptDetails = async () => {
     try {
@@ -61,7 +64,6 @@ const AuthorViewSubmitManuscriptDetail = () => {
       toast.error("Failed to fetch feature options");
     }
   };
-  // console.log("payemtne details:: ", paymentDetails);
 
   // Fetch payment details with selected features
   const fetchPaymentDetails = async () => {
@@ -95,7 +97,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
     setUpdatingFeatures(true);
     try {
       const response = await axios.post(
-        `${API_URL}api/manuscript-payment/${id}`,
+        `${API_URL}api/author-payment/create/${id}`,
         {
           author_optional_features_id: selectedFeatures,
         },
@@ -128,7 +130,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
     setUpdatingFeatures(true);
     try {
       const response = await axios.post(
-        `${API_URL}api/manuscript-payment/update/${id}`,
+        `${API_URL}api/manuscript-payment/update/${paymentDetails.payment.id}`,
         {
           author_optional_features_id: selectedFeatures,
         },
@@ -143,6 +145,8 @@ const AuthorViewSubmitManuscriptDetail = () => {
         toast.success("Features updated successfully!");
         setPaymentDetails(response.data.data);
         setShowFeatureModal(false);
+        // Refresh payment details
+        fetchPaymentDetails();
       } else {
         toast.error(response.data.message || "Failed to update features");
       }
@@ -198,21 +202,127 @@ const AuthorViewSubmitManuscriptDetail = () => {
     }
   };
 
+  // Create Razorpay order and initiate payment
+  const handlePayNow = async () => {
+    setProcessingPayment(true);
+    try {
+      // Create order
+      const orderResponse = await axios.post(
+        `${API_URL}api/author-payment/create-order/${id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (orderResponse.data.flag === 1) {
+        const orderData = orderResponse.data;
+        
+        // Razorpay options
+        const options = {
+          key: RAZORPAY_KEY_ID,
+          amount: Math.round(parseFloat(orderData.total_amount) * 100), // Amount in paise
+          currency: orderData.currency,
+          name: "Journal Publication",
+          description: "Manuscript Publication Payment",
+          order_id: orderData.order_id,
+          handler: async function (response) {
+            // Handle successful payment
+            await verifyPayment(response);
+          },
+          prefill: {
+            name: "Author",
+            email: "author@example.com", // You might want to get this from user data
+          },
+          theme: {
+            color: "#007bff",
+          },
+          modal: {
+            ondismiss: function() {
+              setProcessingPayment(false);
+              toast.info("Payment cancelled");
+            },
+          },
+        };
+
+        const razorpay = new window.Razorpay(options);
+        razorpay.open();
+      } else {
+        toast.error(orderResponse.data.message || "Failed to create payment order");
+      }
+    } catch (error) {
+      console.error("Error creating order:", error);
+      toast.error(error?.response?.data?.message || "Failed to initiate payment");
+      setProcessingPayment(false);
+    }
+  };
+
+  // Verify payment after successful transaction
+  const verifyPayment = async (paymentResponse) => {
+    try {
+      const verifyResponse = await axios.post(
+        `${API_URL}api/author-payment/verify`,
+        {
+          payment_id: paymentResponse.razorpay_payment_id,
+          order_id: paymentResponse.razorpay_order_id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (verifyResponse.data.flag === 1) {
+        toast.success("Payment successful!");
+        // Refresh payment details to update status
+        fetchPaymentDetails();
+        fetchManuscriptDetails();
+      } else {
+        toast.error(verifyResponse.data.message || "Payment verification failed");
+      }
+    } catch (error) {
+      console.error("Error verifying payment:", error);
+      toast.error("Payment verification failed");
+    } finally {
+      setProcessingPayment(false);
+    }
+  };
+
   React.useEffect(() => {
     fetchManuscriptDetails();
     fetchFeatureOptions();
     fetchPaymentDetails();
   }, [id]);
 
+  // Load Razorpay script
+  React.useEffect(() => {
+    const loadRazorpay = () => {
+      return new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
+      });
+    };
+
+    loadRazorpay();
+  }, []);
+
   // Helper function to get status badge class
   const getStatusClass = (status) => {
-    switch (status.toLowerCase()) {
+    switch (status?.toLowerCase()) {
       case "accepted":
       case "completed":
+      case "success":
         return "status-accepted";
       case "pending":
         return "status-pending";
       case "rejected":
+      case "failed":
         return "status-rejected";
       default:
         return "";
@@ -293,6 +403,10 @@ const AuthorViewSubmitManuscriptDetail = () => {
     messages,
   } = manuscript;
 
+  const paymentStatus = paymentDetails?.payment?.payment_status;
+  const showEditFeatures = paymentStatus !== "paid";
+  const showPayNow = paymentStatus === "pending" && paymentDetails;
+
   return (
     <div className="container">
       {/* Manuscript Header */}
@@ -329,12 +443,27 @@ const AuthorViewSubmitManuscriptDetail = () => {
         <div className="section-header">
           <h3>Publication Features & Payment</h3>
 
-          <button
-            className="edit-features-btn"
-            onClick={() => setShowFeatureModal(true)}
-          >
-            {paymentDetails ? "Edit Features" : "Add Features"}
-          </button>
+          {showEditFeatures && (
+            <div className="action-buttons">
+              <button
+                className="edit-features-btn"
+                onClick={() => setShowFeatureModal(true)}
+                disabled={processingPayment}
+              >
+                {paymentDetails ? "Edit Features" : "Add Features"}
+              </button>
+              
+              {showPayNow && (
+                <button
+                  className="pay-now-btn"
+                  onClick={handlePayNow}
+                  disabled={processingPayment}
+                >
+                  {processingPayment ? "Processing..." : "Pay Now"}
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {paymentDetails && (
@@ -377,6 +506,12 @@ const AuthorViewSubmitManuscriptDetail = () => {
                 {paymentDetails?.payment?.payment_status || "Pending"}
               </span>
             </div>
+
+            {paymentStatus === "paid" && (
+              <div className="payment-success-message">
+                ✅ Payment completed successfully! Your manuscript is now in the publication queue.
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -390,6 +525,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
               <button
                 className="close-btn"
                 onClick={() => setShowFeatureModal(false)}
+                disabled={updatingFeatures}
               >
                 ×
               </button>
@@ -403,6 +539,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
                       type="checkbox"
                       checked={selectedFeatures.includes(feature.id)}
                       onChange={() => handleFeatureChange(feature.id)}
+                      disabled={updatingFeatures}
                     />
                     <span className="checkmark"></span>
                     <div className="feature-info">
@@ -448,36 +585,24 @@ const AuthorViewSubmitManuscriptDetail = () => {
               <button
                 className="cancel-btn"
                 onClick={() => setShowFeatureModal(false)}
+                disabled={updatingFeatures}
               >
                 Cancel
               </button>
 
-              {paymentDetails && (
-                <button
-                  className="save-btn"
-                  onClick={updateSelectedFeatures}
-                  disabled={updatingFeatures}
-                >
-                  {updatingFeatures ? "Updating..." : "Save Features"}
-                </button>
-              )}
-
-              {!paymentDetails && (
-                <button
-                  className="save-btn"
-                  onClick={createPaymentWithFeatures}
-                  disabled={updatingFeatures}
-                >
-                  {updatingFeatures ? "Updating..." : "Add Features"}
-                </button>
-              )}
-
-              
+              <button
+                className="save-btn"
+                onClick={handleSaveFeatures}
+                disabled={updatingFeatures || selectedFeatures.length === 0}
+              >
+                {updatingFeatures ? "Saving..." : "Save Features"}
+              </button>
             </div>
           </div>
         </div>
       )}
 
+      {/* Rest of your existing JSX remains the same */}
       {/* Current Status Card */}
       <div className="current-status-card">
         <div className="card-title">Current Status</div>
@@ -695,6 +820,11 @@ const AuthorViewSubmitManuscriptDetail = () => {
           margin: 0;
         }
 
+        .action-buttons {
+          display: flex;
+          gap: 15px;
+        }
+
         .edit-features-btn {
           background: #007bff;
           color: white;
@@ -706,8 +836,33 @@ const AuthorViewSubmitManuscriptDetail = () => {
           transition: background 0.3s ease;
         }
 
-        .edit-features-btn:hover {
+        .edit-features-btn:hover:not(:disabled) {
           background: #0056b3;
+        }
+
+        .edit-features-btn:disabled {
+          background: #6c757d;
+          cursor: not-allowed;
+        }
+
+        .pay-now-btn {
+          background: #28a745;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: 500;
+          transition: background 0.3s ease;
+        }
+
+        .pay-now-btn:hover:not(:disabled) {
+          background: #218838;
+        }
+
+        .pay-now-btn:disabled {
+          background: #6c757d;
+          cursor: not-allowed;
         }
 
         .payment-summary {
@@ -750,6 +905,15 @@ const AuthorViewSubmitManuscriptDetail = () => {
           margin-top: 15px;
           padding-top: 15px;
           border-top: 1px solid #dee2e6;
+        }
+
+        .payment-success-message {
+          background: #d4edda;
+          color: #155724;
+          padding: 12px;
+          border-radius: 6px;
+          margin-top: 15px;
+          border-left: 4px solid #28a745;
         }
 
         /* Modal Styles */
@@ -795,6 +959,11 @@ const AuthorViewSubmitManuscriptDetail = () => {
           font-size: 24px;
           cursor: pointer;
           color: #6c757d;
+        }
+
+        .close-btn:disabled {
+          cursor: not-allowed;
+          opacity: 0.6;
         }
 
         .feature-checklist {
@@ -909,8 +1078,13 @@ const AuthorViewSubmitManuscriptDetail = () => {
           color: white;
         }
 
-        .cancel-btn:hover {
+        .cancel-btn:hover:not(:disabled) {
           background: #545b62;
+        }
+
+        .cancel-btn:disabled {
+          background: #adb5bd;
+          cursor: not-allowed;
         }
 
         .save-btn {
@@ -1387,6 +1561,16 @@ const AuthorViewSubmitManuscriptDetail = () => {
             flex-direction: column;
             gap: 15px;
             align-items: flex-start;
+          }
+
+          .action-buttons {
+            flex-direction: column;
+            width: 100%;
+          }
+
+          .edit-features-btn,
+          .pay-now-btn {
+            width: 100%;
           }
 
           .modal-content {

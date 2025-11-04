@@ -15,6 +15,7 @@ const AppLayout2 = () => {
   const [loading, setLoading] = useState(true);
   const [journalList, setJournalList] = useState([]);
   const [cmsPageList, setCmsPageList] = useState([]);
+  const [policyData, setPolicyData] = useState([]);
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -25,23 +26,20 @@ const AppLayout2 = () => {
       setLoading(true);
 
       // ✅ Fire all requests in parallel
-      const [settingsRes, journal, cmsPage] = await Promise.all([
+      const [settingsRes, journal, cmsPage, policy] = await Promise.all([
         axios.get(`${API_URL}api/contact-us`),
         axios.get(`${API_URL}api/show-journals`),
         axios.get(`${API_URL}api/cms-page-show`),
+        axios.get(`${API_URL}api/terms`),
       ]);
 
       // ✅ Handle each response
       if (settingsRes.data.flag === 1) setSettingsData(settingsRes.data.data);
       if (journal.data.status) setJournalList(journal.data.data);
       if (cmsPage.data.status) setCmsPageList(cmsPage.data.data);
-      // if (serviceRes.data.flag === 1) setServiceData(serviceRes.data.data);
+      if(policy.data.status) setPolicyData(policy.data.data);
 
-      // console.log({
-      //   settings: settingsRes.data.data,
-      //   journal: journal.data.data,
-      //   // services: serviceRes.data.data,
-      // });
+     
     } catch (error) {
       console.error("Parallel fetch failed:", error);
       toast.error("Failed to load site data!");
@@ -78,6 +76,7 @@ const AppLayout2 = () => {
         settingsData={settingsData}
         loading={loading}
         cmsPageList={cmsPageList}
+        policyData={policyData}
       />
     </div>
   );

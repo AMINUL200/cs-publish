@@ -140,6 +140,11 @@ export const sidebarRoutes = [
         title: "Journal",
         allowedRoles: ["0"],
       },
+      {
+        path: "/handle-volume",
+        title: "Handle Volume",
+        allowedRoles:["0"],
+      },
     ],
   },
   {
@@ -264,6 +269,12 @@ export const sidebarRoutes = [
         allowedRoles: ["0"],
         path: "/payment/subscription-history",
       },
+      {
+        title: "Author Paid",
+        icon: <FontAwesomeIcon icon={faCreditCard} />,
+        allowedRoles:["0"],
+        path: "/payment/author-paid"
+      }
     ],
   },
   {
@@ -311,6 +322,23 @@ export const sidebarRoutes = [
       },
     ],
   },
+  {
+    title: "Handle Innovation",
+    icon: <FontAwesomeIcon icon={faCog} />,
+    allowedRoles: ["0"],
+    subRoutes:[
+      {
+        path: "add-innovation",
+        title: "Add Innovation",
+        allowedRoles:["0"]
+      },
+      {
+        path: "/handle-innovation",
+        title: "List of Innovation",
+        allowedRoles:["0"]
+      }
+    ]
+  },
   // Reviewer route
   {
     path: "/list-journals",
@@ -329,18 +357,18 @@ export const sidebarRoutes = [
 
   // Author route
 
-  {
-    path: "/confirmation/view-details-manuscript",
-    title: "View Details Manuscript",
-    icon: <FontAwesomeIcon icon={faCheckCircle} />,
-    allowedRoles: ["2"],
-  },
-  {
-    path: "/confirmation/view-details-manuscript2",
-    title: "View Details Manuscript",
-    icon: <FontAwesomeIcon icon={faCheckCircle} />,
-    allowedRoles: ["2"],
-  },
+  // {
+  //   path: "/confirmation/view-details-manuscript",
+  //   title: "View Details Manuscript",
+  //   icon: <FontAwesomeIcon icon={faCheckCircle} />,
+  //   allowedRoles: ["2"],
+  // },
+  // {
+  //   path: "/confirmation/view-details-manuscript2",
+  //   title: "View Details Manuscript",
+  //   icon: <FontAwesomeIcon icon={faCheckCircle} />,
+  //   allowedRoles: ["2"],
+  // },
 
   // Publisher route
   // {

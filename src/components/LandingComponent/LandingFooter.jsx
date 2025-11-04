@@ -10,9 +10,10 @@ import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 const LandingFooter = ({
   settingsData = {},
   cmsPageList = [],
+  policyData = [],
   loading = false,
 }) => {
-  console.log(cmsPageList.policies_and_access);
+  console.log(policyData);
 
   const sections = [
     {
@@ -60,9 +61,10 @@ const LandingFooter = ({
   ];
 
   const legalLinks = [
-    { name: "Privacy & Cookies", path: "#" },
-    { name: "Terms & Conditions", path: "/terms" },
-    { name: "Legal Disclaimer", path: "#" },
+    ...policyData.map((policy) => ({
+      name: policy.page_title,
+      path: `/policy-page/${policy.slug}`,
+    })),
     { name: "Policy", path: "/policy" },
     { name: "Payment Policy", path: "/payment-policy" },
   ];

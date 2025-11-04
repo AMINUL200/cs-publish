@@ -43,7 +43,7 @@ const BlogDetails = () => {
         setBlogDetailsData(data.blog_details);
         setLatestBlogs(data.latest_blog || []);
         setMostViewedBlogs(data.most_view_blog || []);
-        
+
         // Set comments from API response if available
         if (data.blog_details?.comments) {
           setComments(data.blog_details.comments);
@@ -51,7 +51,9 @@ const BlogDetails = () => {
       }
     } catch (error) {
       console.log("Error fetching blog details:", error);
-      toast.error(error.response?.data?.message || "Failed to fetch blog details");
+      toast.error(
+        error.response?.data?.message || "Failed to fetch blog details"
+      );
     } finally {
       setLoading(false);
     }
@@ -64,37 +66,44 @@ const BlogDetails = () => {
 
   const handleSubmitComment = async (e) => {
     e.preventDefault();
-    if (!newComment.name.trim() || !newComment.email.trim() || !newComment.message.trim()) {
+    if (!token) {
+      alert("Pleas Login to comment");
+      return;
+    }
+    if (
+      !newComment.name.trim() ||
+      !newComment.email.trim() ||
+      !newComment.message.trim()
+    ) {
       toast.error("Please fill all fields");
       return;
     }
 
     try {
       // If you have API endpoint for adding comments, use this:
-      // const response = await axios.post(`${API_URL}api/blog/comments`, {
-      //   blog_page_id: id,
-      //   name: newComment.name,
-      //   email: newComment.email,
-      //   comment: newComment.message,
-      // }, {
-      //   headers: { Authorization: `Bearer ${token}` }
-      // });
+      const response = await axios.post(
+        `${API_URL}api/blog-comment`,
+        {
+          blog_page_id: id,
+          name: newComment.name,
+          email: newComment.email,
+          comment: newComment.message,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-      // For now, using local state update
-      const createdComment = {
-        id: Date.now(),
-        blog_page_id: id,
-        name: newComment.name,
-        email: newComment.email,
-        comment: newComment.message,
-        created_at: new Date().toISOString(),
-        avatar: `https://i.pravatar.cc/100?u=${encodeURIComponent(newComment.email)}`,
-      };
-
-      setComments((prev) => [createdComment, ...prev]);
-      setNewComment({ name: "", email: "", message: "" });
-      toast.success("Comment added successfully!");
-      
+      if (response.status === 201) {
+        console.log(response);
+        fetchBlogDetails();
+        setNewComment({
+          name: "",
+          email: "",
+          message: "",
+        });
+        toast.success("Comment Submit Success Full")
+      }
     } catch (error) {
       console.log("Error adding comment:", error);
       toast.error("Failed to add comment");
@@ -114,7 +123,10 @@ const BlogDetails = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-600">Blog not found</h2>
-          <Link to="/blog" className="text-blue-600 hover:underline mt-4 inline-block">
+          <Link
+            to="/blog"
+            className="text-blue-600 hover:underline mt-4 inline-block"
+          >
             Back to Blogs
           </Link>
         </div>
@@ -132,7 +144,7 @@ const BlogDetails = () => {
         ]}
         pageTitle="Blog Details"
       />
-      
+
       <div className="blog-details-section pb-8 relative">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="blog-details-section-wrap">
@@ -221,7 +233,7 @@ const BlogDetails = () => {
                       <div
                         className="blog-rich-text prose max-w-none"
                         dangerouslySetInnerHTML={{
-                          __html: blogDetailsData.long_description
+                          __html: blogDetailsData.long_description,
                         }}
                       />
                     </div>
@@ -250,7 +262,10 @@ const BlogDetails = () => {
                                 <motion.div
                                   initial={{ opacity: 0, x: -20 }}
                                   animate={{ opacity: 1, x: 0 }}
-                                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                                  transition={{
+                                    duration: 0.4,
+                                    delay: index * 0.1,
+                                  }}
                                   className="flex items-center gap-3 w-full"
                                 >
                                   <img
@@ -270,7 +285,9 @@ const BlogDetails = () => {
                               </Link>
                             ))
                           ) : (
-                            <p className="text-gray-500 text-sm py-3">No most viewed posts</p>
+                            <p className="text-gray-500 text-sm py-3">
+                              No most viewed posts
+                            </p>
                           )}
                         </div>
                       </div>
@@ -322,7 +339,9 @@ const BlogDetails = () => {
                               </Link>
                             ))
                           ) : (
-                            <p className="text-gray-500 text-sm py-3">No latest blogs</p>
+                            <p className="text-gray-500 text-sm py-3">
+                              No latest blogs
+                            </p>
                           )}
                         </div>
                       </div>
@@ -347,13 +366,21 @@ const BlogDetails = () => {
                           No comments yet. Be the first to comment.
                         </p>
                       ) : (
-                        comments.map((comment) => (
-                          <div key={comment.id} className="py-4 flex items-start gap-3">
-                            <img
-                              src={comment.avatar || `https://i.pravatar.cc/100?u=${encodeURIComponent(comment.email)}`}
+                        comments?.map((comment) => (
+                          <div
+                            key={comment.id}
+                            className="py-4 flex items-start gap-3"
+                          >
+                            {/* <img
+                              src={
+                                comment.avatar ||
+                                `https://i.pravatar.cc/100?u=${encodeURIComponent(
+                                  comment.email
+                                )}`
+                              }
                               alt={comment.name}
                               className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                            />
+                            /> */}
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
                                 <span className="text-sm font-medium">

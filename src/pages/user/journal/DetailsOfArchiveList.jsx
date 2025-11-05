@@ -317,22 +317,22 @@ const DetailsOfArchiveList = () => {
                               href={manuscript.pdf}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="bg-red-700 text-white px-4 py-2 rounded-lg font-semibold hover:bg-black hover:text-red-500 transition-all duration-300 flex items-center gap-2"
+                              className="bg-red-700 text-white px-4 py-2 rounded-lg font-semibold hover:bg-black hover:text-red-500 transition-all duration-300 flex items-center gap-2 cursor-pointer"
                             >
                               <FileText className="w-4 h-4" />
                               PDF
                             </a>
                           )}
-                          {manuscript.pdf && (
+                       
                             <a
-                              href={manuscript.pdf}
+                              onClick={()=> handleRedirect(manuscript.id)}
                               download
-                              className="bg-black text-yellow-500 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 flex items-center gap-2"
+                              className="bg-black text-yellow-500 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 flex items-center gap-2 cursor-pointer"
                             >
                               <Download className="w-4 h-4" />
                               Full Text
                             </a>
-                          )}
+                          
                         </div>
 
                         {/* Abstract Section */}

@@ -36,14 +36,11 @@ const DetailsOfCurrentIssue = () => {
     const fetchCurrentIssueDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `${API_URL}api/current-issue/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${API_URL}api/current-issue/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (response.data.flag === 1 && response.data.data) {
           const data = response.data.data;
@@ -288,9 +285,8 @@ const DetailsOfCurrentIssue = () => {
                           )}
                           {manuscript.pdf && (
                             <a
-                              href={manuscript.pdf}
-                              download
-                              className="bg-black text-yellow-500 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 flex items-center gap-2"
+                              onClick={() => handleRedirect(manuscript.id)}
+                              className="bg-black text-yellow-500 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 flex items-center gap-2 cursor-pointer"
                             >
                               <Download className="w-4 h-4" />
                               Full Text

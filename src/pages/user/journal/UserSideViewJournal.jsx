@@ -73,9 +73,9 @@ const UserSideViewJournal = () => {
 
   // Navigation items
   const navItems = [
-    { label: "List of Issues", path: `/list-of-archive/${journalData?.journal?.id}` },
-    { label: "ASAP Article", path: "/asap-article" },
-    { label: "Current Issue", path: `/view-current-issue/${journalData?.journal?.id}` },
+    { label: "Library of issues", path: `/list-of-archive/${journalData?.journal?.id}` },
+    { label: "Quick Press", path: "/asap-article" },
+    { label: "Present issue", path: `/view-current-issue/${journalData?.journal?.id}` },
     { label: "Author", path: "/author" },
     { label: "About Journal", path: "/about-journal" },
   ];

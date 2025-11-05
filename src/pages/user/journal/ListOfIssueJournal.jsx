@@ -97,7 +97,7 @@ const ListOfIssueJournal = () => {
             {/* Left Side - Page Title */}
             <div className="flex-1 text-center lg:text-left">
               <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
-                List of Issues
+                 Library of issues
               </h1>
               <div className="flex items-center justify-center lg:justify-start text-white/90">
                 <BookOpen className="w-6 h-6 mr-2" />

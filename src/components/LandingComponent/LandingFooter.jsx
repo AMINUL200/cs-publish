@@ -51,12 +51,17 @@ const LandingFooter = ({
     },
     {
       title: "Support and contact",
-      items: cmsPageList?.support_and_contact?.length
-        ? cmsPageList.support_and_contact.map((support) => ({
+      items: [
+        // ✅ Then dynamic CMS links if available
+        ...(cmsPageList?.support_and_contact?.length
+          ? cmsPageList.support_and_contact.map((support) => ({
             name: support.page_title,
             path: `/cms-page/${support.slug}`,
           }))
-        : [{ name: "No support ", path: "#" }],
+          : [{ name: "No support", path: "#" }]),
+          // ✅ Static link first (example)
+        { name: "Faq", path: "/faq" },
+      ],
     },
   ];
 

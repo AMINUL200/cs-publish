@@ -126,6 +126,10 @@ import DetailsOfArchiveList from "./pages/user/journal/DetailsOfArchiveList";
 import PaymentForAuthor from "./pages/admin/payment/PaymentForAuthor";
 import ListOfArchive from "./pages/user/journal/ListOfArchive";
 import DetailsOfCurrentIssue from "./pages/user/journal/DetailsOfCurrentIssue";
+import JournalAuthorInformation from "./pages/user/journal/JournalAuthorInformation";
+import AboutJournal from "./pages/user/journal/AboutJournal";
+import QuickPress from "./pages/user/journal/QuickPress";
+import HandleFaqs from "./pages/admin/research_service_team/HandleFaqs";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -208,6 +212,9 @@ function App() {
                 path="/view-current-issue/:id"
                 element={<DetailsOfCurrentIssue />}
               />
+              <Route path="/author-overview/:id" element={<JournalAuthorInformation/>}/>
+              <Route path="/about-journal/:id" element={<AboutJournal/>}/>
+              <Route path="/quick-press/:id" element={<QuickPress/>}/>
 
               <Route path="/my-subscription" element={<MySubscription />} />
 
@@ -338,6 +345,8 @@ function App() {
 
               <Route path="/setting/teams" element={<HandleTeams />} />
               <Route path="/setting/add-team" element={<AddTeam />} />
+              
+              <Route path="/setting/handle-faqs" element={<HandleFaqs />} />
 
               {/* user manger route */}
               <Route path="/users/add-user" element={<AddUser />} />

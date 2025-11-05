@@ -9,7 +9,7 @@ import PublisherDashboard from "../publisher/PublisherDashboard";
 const Dashboard = () => {
   const { userData } = useSelector((state) => state.auth);
 
-  console.log("User Data in Dashboard:", userData);
+  // console.log("User Data in Dashboard:", userData);
 
   return (
     <>

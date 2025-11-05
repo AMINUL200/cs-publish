@@ -129,6 +129,9 @@ const ViewJournal = () => {
                 Image
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
+                Amount
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
                 Status
               </th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
@@ -159,6 +162,9 @@ const ViewJournal = () => {
                     ) : (
                       "No Image"
                     )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
+                     ₹{journal.amount }
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
                     {journal.status ? "Active" : "Inactive"}

@@ -20,6 +20,7 @@ const PublisherDesignManuscript = () => {
   const [pdfFile, setPdfFile] = useState(null);
   const [figureFiles, setFigureFiles] = useState([]);
   const [figurePreviews, setFigurePreviews] = useState([]);
+  const [quickPress, setQuickPress] = useState("0"); // Default to false (0)
 
   const [manuscriptData, setManuscriptData] = useState({
     title: "",
@@ -101,6 +102,11 @@ const PublisherDesignManuscript = () => {
     setFigurePreviews(prev => prev.filter((_, i) => i !== index));
   };
 
+  // ✅ Handle Quick Press toggle
+  const handleQuickPressChange = (e) => {
+    setQuickPress(e.target.checked ? "1" : "0");
+  };
+
   // ✅ Handle Save (send complete body)
   const handleSave = async () => {
     try {
@@ -118,6 +124,7 @@ const PublisherDesignManuscript = () => {
       formData.append("author_contributions", manuscriptData.author_contributions);
       formData.append("conflict_of_interest_statement", manuscriptData.conflict_of_interest_statement);
       formData.append("references", manuscriptData.references);
+      formData.append("quick_press", quickPress); // ✅ Add quick_press field
 
       // ✅ Add cover image if uploaded
       if (imageFile) {
@@ -177,6 +184,39 @@ const PublisherDesignManuscript = () => {
               <p className="text-gray-600">ID: {id}</p>
             </div>
           </div>
+        </div>
+
+        {/* ✅ Quick Press Toggle Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">
+                Quick Press Feature
+              </label>
+              <p className="text-sm text-gray-600">
+                Enable this to feature the manuscript in Quick Press section for immediate visibility
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={quickPress === "1"}
+                onChange={handleQuickPressChange}
+                className="sr-only peer"
+              />
+              <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-600"></div>
+              <span className="ml-3 text-sm font-medium text-gray-900">
+                {quickPress === "1" ? "Enabled" : "Disabled"}
+              </span>
+            </label>
+          </div>
+          {quickPress === "1" && (
+            <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800">
+                <strong>Note:</strong> Quick Press articles are featured prominently and get immediate visibility on the platform.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* ✅ Image Upload Section */}
@@ -371,6 +411,9 @@ const PublisherDesignManuscript = () => {
                 </>
               )}
             </button>
+            <div className="text-sm text-gray-600">
+              <strong>Quick Press:</strong> {quickPress === "1" ? "Enabled" : "Disabled"}
+            </div>
           </div>
         </div>
       </div>

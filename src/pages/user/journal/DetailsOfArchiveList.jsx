@@ -15,6 +15,7 @@ import {
   Send,
   User,
 } from "lucide-react";
+import { toast } from "react-toastify";
 
 const DetailsOfArchiveList = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -107,8 +108,19 @@ const DetailsOfArchiveList = () => {
 
   const handleRedirect = (mId) => {
     if (!mId) return;
-    // console.log(mId);
-    navigate(`/view-published-manuscript/${mId}`);
+    try {
+      axios.post(
+        `${API_URL}api/subscription/increase-view/${mId}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      navigate(`/view-published-manuscript/${mId}`);
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
   };
 
   if (loading) {
@@ -158,7 +170,7 @@ const DetailsOfArchiveList = () => {
             <div className="flex-shrink-0">
               <div className="relative group">
                 <img
-                  src={volumeData.image}
+                  src={volumeData.image || journalData.image}
                   alt={`Volume ${volumeData.volume} ${volumeData.issue_no}`}
                   className="w-48 h-64 object-cover rounded-xl shadow-2xl border-4 border-white group-hover:scale-105 transition-transform duration-300"
                 />

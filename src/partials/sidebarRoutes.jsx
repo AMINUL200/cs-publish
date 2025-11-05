@@ -236,6 +236,11 @@ export const sidebarRoutes = [
         title: "Handle Teams",
         allowedRoles: ["0"],
       },
+      {
+        path: "/setting/handle-faqs",
+        title: "Handle Faqs",
+        allowedRoles: ["0"],
+      },
     ],
   },
   // {

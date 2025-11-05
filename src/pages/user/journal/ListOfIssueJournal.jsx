@@ -136,7 +136,7 @@ const ListOfIssueJournal = () => {
                 {/* Issue Cover */}
                 <div className="relative overflow-hidden bg-gradient-to-br from-red-900 to-red-700">
                   <img
-                    src={issue.image}
+                    src={issue.image || journalData.journalImage}
                     alt={`Volume ${issue.volume} ${issue.issue_no}`}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                   />

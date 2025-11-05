@@ -5,7 +5,7 @@ import Loader from "../../components/common/Loader";
 import TextEditor from "../../components/common/TextEditor";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { ArrowLeft, Save, Upload, X, FileText, Image, File, Eye, Download } from "lucide-react";
+import { ArrowLeft, Save, Upload, X, FileText, Image, File, Eye, Download, Zap } from "lucide-react";
 
 const PublisherEditDesignManuscript = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -24,6 +24,7 @@ const PublisherEditDesignManuscript = () => {
   const [pdfPreview, setPdfPreview] = useState(null);
   const [figureFiles, setFigureFiles] = useState([]);
   const [figurePreviews, setFigurePreviews] = useState([]);
+  const [quickPress, setQuickPress] = useState("0"); // Default to false (0)
 
   const [manuscriptData, setManuscriptData] = useState({
     title: "",
@@ -66,6 +67,11 @@ const PublisherEditDesignManuscript = () => {
           conflict_of_interest_statement: data.conflict_of_interest_statement || "",
           references: data.references || "",
         });
+
+        // Set quick_press from API response
+        if (data.quick_press !== undefined) {
+          setQuickPress(data.quick_press.toString()); // Convert to string "1" or "0"
+        }
 
         // Set image preview if image exists
         if (data.image) {
@@ -201,6 +207,11 @@ const PublisherEditDesignManuscript = () => {
     setFigurePreviews(prev => prev.filter((_, i) => i !== index));
   };
 
+  // ✅ Handle Quick Press toggle
+  const handleQuickPressChange = (e) => {
+    setQuickPress(e.target.checked ? "1" : "0");
+  };
+
   // ✅ Handle file preview (open in new tab)
   const handlePreviewFile = (url) => {
     if (url) {
@@ -225,6 +236,7 @@ const PublisherEditDesignManuscript = () => {
       formData.append("author_contributions", manuscriptData.author_contributions);
       formData.append("conflict_of_interest_statement", manuscriptData.conflict_of_interest_statement);
       formData.append("references", manuscriptData.references);
+      formData.append("quick_press", quickPress); // ✅ Add quick_press field
 
       // ✅ Add files if uploaded
       if (imageFile) formData.append("image", imageFile);
@@ -297,6 +309,47 @@ const PublisherEditDesignManuscript = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Quick Press Toggle Section */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-yellow-50 rounded-xl">
+                <Zap className="w-6 h-6 text-yellow-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 text-lg">Quick Press Feature</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  Enable to feature this manuscript prominently in the Quick Press section for immediate visibility
+                </p>
+              </div>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={quickPress === "1"}
+                onChange={handleQuickPressChange}
+                className="sr-only peer"
+              />
+              <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-yellow-500"></div>
+              <span className="ml-3 text-sm font-medium text-gray-900">
+                {quickPress === "1" ? "Enabled" : "Disabled"}
+              </span>
+            </label>
+          </div>
+          {quickPress === "1" && (
+            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-start gap-3">
+                <div className="p-1 bg-yellow-100 rounded">
+                  <Zap className="w-4 h-4 text-yellow-600" />
+                </div>
+                <div className="text-sm text-yellow-800">
+                  <strong>Quick Press Active:</strong> This manuscript will be featured prominently in the Quick Press section and get immediate visibility across the platform.
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* File Upload Sections Grid */}
@@ -585,7 +638,13 @@ const PublisherEditDesignManuscript = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="text-sm text-gray-600">
-              Review all changes before updating the manuscript
+              <div className="flex items-center gap-2">
+                <span>Quick Press:</span>
+                <span className={`font-semibold ${quickPress === "1" ? "text-yellow-600" : "text-gray-500"}`}>
+                  {quickPress === "1" ? "Enabled" : "Disabled"}
+                </span>
+              </div>
+              <div className="mt-1">Review all changes before updating the manuscript</div>
             </div>
             <div className="flex items-center gap-3">
               <button

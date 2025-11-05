@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import Loader from "../../../components/common/Loader";
 import { toast } from "react-toastify";
+import { Editor } from "@tinymce/tinymce-react";
 
 const AddJournal = () => {
     const { token } = useSelector((state) => state.auth);
@@ -30,10 +31,13 @@ const AddJournal = () => {
         issn_online_no: "",
         ugc_approved: "1",
         ugc_no: "",
-        amount: "", // Added amount field
+        amount: "",
         image: null,
         status: "1",
+        author_guide: "", // New field
+        about_the_journal: "", // New field
     });
+
     // fetch groups
     const fetchGroupData = async () => {
         try {
@@ -63,7 +67,7 @@ const AddJournal = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
             if (response.status === 200) {
-                setCategoryOptions(response.data.data); // adjust based on your API response
+                setCategoryOptions(response.data.data);
             } else {
                 toast.error(response.data.message || "Failed to fetch categories");
                 setCategoryOptions([]);
@@ -74,7 +78,6 @@ const AddJournal = () => {
             setCategoryOptions([]);
         }
     };
-
 
     useEffect(() => {
         fetchGroupData();
@@ -87,7 +90,7 @@ const AddJournal = () => {
         } else if (
             ["issn_print", "issn_online", "ugc_approved", "status"].includes(name)
         ) {
-            setFormData((prev) => ({ ...prev, [name]: Number(value) })); // 👈 store as number
+            setFormData((prev) => ({ ...prev, [name]: Number(value) }));
         } else {
             setFormData((prev) => ({ ...prev, [name]: value }));
         }
@@ -98,6 +101,13 @@ const AddJournal = () => {
         }
     };
 
+    // Handle editor changes for rich text fields
+    const handleEditorChange = (content, fieldName) => {
+        setFormData((prev) => ({
+            ...prev,
+            [fieldName]: content,
+        }));
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -136,9 +146,11 @@ const AddJournal = () => {
                     issn_online_no: "",
                     ugc_approved: "1",
                     ugc_no: "",
-                    amount: "", // Reset amount field
+                    amount: "",
                     image: null,
                     status: "1",
+                    author_guide: "", // Reset new field
+                    about_the_journal: "", // Reset new field
                 });
                 if (fileInputRef.current) {
                     fileInputRef.current.value = "";
@@ -198,9 +210,7 @@ const AddJournal = () => {
                             ))}
                         </select>
                     </div>
-
                 </div>
-
 
                 {/* Title */}
                 <div>
@@ -235,6 +245,101 @@ const AddJournal = () => {
                         value={formData.j_description}
                         onChange={handleChange}
                         className="w-full border px-3 py-2 rounded"
+                        rows="4"
+                    />
+                </div>
+
+                {/* About the Journal - Rich Text Editor */}
+                <div>
+                    <label className="block mb-1 font-medium">About the Journal</label>
+                    <Editor
+                        apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
+                        value={formData.about_the_journal}
+                        init={{
+                            height: 400,
+                            menubar: false,
+                            plugins: [
+                                "advlist",
+                                "autolink",
+                                "link",
+                                "lists",
+                                "charmap",
+                                "preview",
+                                "searchreplace",
+                                "visualblocks",
+                                "code",
+                                "fullscreen",
+                                "help",
+                                "wordcount",
+                            ],
+                            toolbar:
+                                "undo redo | blocks | " +
+                                "bold italic underline | link | " +
+                                "alignleft aligncenter alignright alignjustify | " +
+                                "bullist numlist outdent indent | " +
+                                "removeformat | help | code",
+                            content_style:
+                                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                            link_context_toolbar: true,
+                            link_assume_external_targets: true,
+                            link_title: false,
+                            default_link_target: "_blank",
+                            link_list: [
+                                { title: "Home Page", value: "/" },
+                                { title: "About Page", value: "/about" },
+                                { title: "Contact Page", value: "/contact" },
+                            ],
+                        }}
+                        onEditorChange={(content) =>
+                            handleEditorChange(content, "about_the_journal")
+                        }
+                    />
+                </div>
+
+                {/* Author Guide - Rich Text Editor */}
+                <div>
+                    <label className="block mb-1 font-medium">Author Guide</label>
+                    <Editor
+                        apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
+                        value={formData.author_guide}
+                        init={{
+                            height: 400,
+                            menubar: false,
+                            plugins: [
+                                "advlist",
+                                "autolink",
+                                "link",
+                                "lists",
+                                "charmap",
+                                "preview",
+                                "searchreplace",
+                                "visualblocks",
+                                "code",
+                                "fullscreen",
+                                "help",
+                                "wordcount",
+                            ],
+                            toolbar:
+                                "undo redo | blocks | " +
+                                "bold italic underline | link | " +
+                                "alignleft aligncenter alignright alignjustify | " +
+                                "bullist numlist outdent indent | " +
+                                "removeformat | help | code",
+                            content_style:
+                                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                            link_context_toolbar: true,
+                            link_assume_external_targets: true,
+                            link_title: false,
+                            default_link_target: "_blank",
+                            link_list: [
+                                { title: "Home Page", value: "/" },
+                                { title: "About Page", value: "/about" },
+                                { title: "Contact Page", value: "/contact" },
+                            ],
+                        }}
+                        onEditorChange={(content) =>
+                            handleEditorChange(content, "author_guide")
+                        }
                     />
                 </div>
 

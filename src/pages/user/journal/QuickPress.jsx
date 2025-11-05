@@ -1,66 +1,62 @@
-import React, { useState, useEffect } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
-import {
-  Calendar,
-  Download,
-  FileText,
-  Eye,
-  Filter,
-  ChevronDown,
-  ChevronUp,
-  BookOpen,
-  Bell,
-  Send,
-  User,
-} from "lucide-react";
+import Loader from "../../../components/common/Loader";
+import { Download } from "lucide-react";
+import { Bell } from "lucide-react";
+import { Send } from "lucide-react";
+import { User } from "lucide-react";
+import { ChevronUp } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import { FileText } from "lucide-react";
 import { toast } from "react-toastify";
 
-const DetailsOfCurrentIssue = () => {
+const QuickPress = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const { token } = useSelector((state) => state.auth);
   const { id } = useParams();
 
-  // State management
   const [journalData, setJournalData] = useState(null);
-  const [volumeData, setVolumeData] = useState(null);
   const [manuscripts, setManuscripts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedAbstract, setExpandedAbstract] = useState(null);
-  const [sortBy, setSortBy] = useState("date");
   const navigate = useNavigate();
 
   // Fetch current issue details and manuscripts
   useEffect(() => {
-    const fetchCurrentIssueDetails = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${API_URL}api/current-issue/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${API_URL}api/article/quick-press/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-        if (response.data.flag === 1 && response.data.data) {
-          const data = response.data.data;
+        if (response.data.status) {
+          const data = response.data;
+          console.log(data);
+
           setJournalData(data.journal);
-          setVolumeData(data.volume);
-          setManuscripts(data.manuscripts || []);
+          setManuscripts(data.quick_press || []);
         } else {
-          setError("No data found for this current issue");
+          setError("No data found for this Quick Press");
         }
       } catch (err) {
-        console.error("Error fetching current issue details:", err);
-        setError("Failed to load current issue details");
+        console.error("Error fetching Quick Press details:", err);
+        setError("Failed to load Quick Press details");
       } finally {
         setLoading(false);
       }
     };
 
     if (id) {
-      fetchCurrentIssueDetails();
+      fetchData();
     }
   }, [id, token, API_URL]);
 
@@ -120,17 +116,11 @@ const DetailsOfCurrentIssue = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-10 sm:pt-24 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-yellow-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading current issue details...</p>
-        </div>
-      </div>
-    );
-  }
 
+
+  if (loading) {
+    return <Loader />;
+  }
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-10 sm:pt-24 flex items-center justify-center">
@@ -143,7 +133,7 @@ const DetailsOfCurrentIssue = () => {
     );
   }
 
-  if (!journalData || !volumeData) {
+  if (!journalData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-10 sm:pt-24 flex items-center justify-center">
         <div className="text-center">
@@ -151,7 +141,7 @@ const DetailsOfCurrentIssue = () => {
           <h3 className="text-2xl font-bold text-gray-600 mb-2">
             No Data Found
           </h3>
-          <p className="text-gray-500">Current issue details not available.</p>
+          <p className="text-gray-500">Quick Press details not available.</p>
         </div>
       </div>
     );
@@ -167,13 +157,10 @@ const DetailsOfCurrentIssue = () => {
             <div className="flex-shrink-0">
               <div className="relative group">
                 <img
-                  src={volumeData.image || journalData.image}
-                  alt={`Volume ${volumeData.volume} ${volumeData.issue_no}`}
+                  src={journalData.image}
+                  alt={`Volume ${journalData.j_title} `}
                   className="w-48 h-64 object-cover rounded-xl shadow-2xl border-4 border-white group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute -bottom-2 -right-2 bg-black text-yellow-500 px-3 py-1 rounded-lg font-bold text-sm">
-                  Vol {volumeData.volume}
-                </div>
               </div>
             </div>
 
@@ -187,32 +174,10 @@ const DetailsOfCurrentIssue = () => {
                   {journalData.j_description || "No description available"}
                 </p>
               </div>
-              <div className="flex flex-wrap gap-4 justify-center lg:justify-start text-white">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
-                  <span>From: {formatDate(volumeData.from_date)}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
-                  <span>To: {formatDate(volumeData.to_date)}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
-                  <span>{volumeData.page_no}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
-                  <span>Issue No: {volumeData.issue_no || "N/A"}</span>
-                </div>
-              </div>
             </div>
 
             {/* Right Side - Action Buttons */}
             <div className="flex flex-col gap-4">
-              <button className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black hover:text-yellow-500 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2">
-                <Download className="w-5 h-5" />
-                Download Cover
-              </button>
               <button className="bg-red-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black hover:text-red-500 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2">
                 <Bell className="w-5 h-5" />
                 Get Alerts
@@ -296,14 +261,14 @@ const DetailsOfCurrentIssue = () => {
                               PDF
                             </a>
                           )}
-
-                          <a
-                            onClick={() => handleRedirect(manuscript.id)}
-                            className="bg-black text-yellow-500 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 flex items-center gap-2 cursor-pointer"
-                          >
-                            <Download className="w-4 h-4" />
-                            Full Text
-                          </a>
+                         
+                            <a
+                              onClick={() => handleRedirect(manuscript.id)}
+                              className="bg-black text-yellow-500 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 flex items-center gap-2 cursor-pointer"
+                            >
+                              <Download className="w-4 h-4" />
+                              Full Text
+                            </a>
                         </div>
 
                         {/* Abstract Section */}
@@ -359,4 +324,4 @@ const DetailsOfCurrentIssue = () => {
   );
 };
 
-export default DetailsOfCurrentIssue;
+export default QuickPress;

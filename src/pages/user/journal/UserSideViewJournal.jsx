@@ -37,7 +37,7 @@ const UserSideViewJournal = () => {
 
       if (response.data.status) {
         console.log(response.data);
-        
+
         setJournalData(response.data);
       } else {
         throw new Error(
@@ -73,11 +73,20 @@ const UserSideViewJournal = () => {
 
   // Navigation items
   const navItems = [
-    { label: "Library of issues", path: `/list-of-archive/${journalData?.journal?.id}` },
-    { label: "Quick Press", path: "/asap-article" },
-    { label: "Present issue", path: `/view-current-issue/${journalData?.journal?.id}` },
-    { label: "Author", path: "/author" },
-    { label: "About Journal", path: "/about-journal" },
+    {
+      label: "Library of issues",
+      path: `/list-of-archive/${journalData?.journal?.id}`,
+    },
+    { label: "Quick Press", path: `/quick-press/${journalData?.journal?.id}` },
+    {
+      label: "Present issue",
+      path: `/view-current-issue/${journalData?.journal?.id}`,
+    },
+    { label: "Author", path: `/author-overview/${journalData?.journal?.id}` },
+    {
+      label: "About Journal",
+      path: `/about-journal/${journalData?.journal?.id}`,
+    },
   ];
 
   const handleNavClick = (path) => {
@@ -135,6 +144,7 @@ const UserSideViewJournal = () => {
     most_viewed,
     most_downloaded,
     all_manuscripts,
+    quick_press,
   } = journalData;
 
   return (
@@ -199,9 +209,7 @@ const UserSideViewJournal = () => {
                 <h3 className="font-bold text-yellow-300 mb-2">
                   Journal Description
                 </h3>
-                <p  className="text-yellow-200">
-                  {journal.j_description}
-                </p>
+                <p className="text-yellow-200">{journal.j_description}</p>
               </div>
 
               {/* Editor Information */}
@@ -222,7 +230,9 @@ const UserSideViewJournal = () => {
             </div>
 
             <div>
-              <button className="border rounded border-yellow-200 py-2 px-4 hover:bg-yellow-500 hover:text-white cursor-pointer transition-all duration-300">Submit Manuscript</button>
+              <button className="border rounded border-yellow-200 py-2 px-4 hover:bg-yellow-500 hover:text-white cursor-pointer transition-all duration-300">
+                Submit Manuscript
+              </button>
             </div>
           </div>
         </div>
@@ -248,6 +258,14 @@ const UserSideViewJournal = () => {
       {/* Slider Sections */}
       <div className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Quick Press */}
+          <SectionSlider
+            title="Quick Press"
+            articles={quick_press}
+            stripHtmlTags={stripHtmlTags}
+            formatDate={formatDate}
+          />
+
           {/* Latest Published Slider */}
           <SectionSlider
             title="Latest Published Articles"

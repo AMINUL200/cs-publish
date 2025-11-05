@@ -208,7 +208,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
     try {
       // Create order
       const orderResponse = await axios.post(
-        `${API_URL}api/author-payment/create-order/${id}`,
+        `${API_URL}api/author-payment/create-order/${paymentDetails.payment.id}`,
         {},
         {
           headers: {
@@ -217,7 +217,9 @@ const AuthorViewSubmitManuscriptDetail = () => {
         }
       );
 
+      console.log(orderResponse.data);
       if (orderResponse.data.flag === 1) {
+        
         const orderData = orderResponse.data;
         
         // Razorpay options

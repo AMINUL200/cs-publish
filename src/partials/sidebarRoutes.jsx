@@ -344,6 +344,91 @@ export const sidebarRoutes = [
       }
     ]
   },
+  {
+    title: "Handle Who We Are",
+    icon: <FontAwesomeIcon icon={faCog} />,
+    allowedRoles: ["0"],
+    subRoutes:[
+      {
+        path: "/add-who-we-are",
+        title: "Add Who We Are",
+        allowedRoles:["0"]
+      },
+      {
+        path: "/handle-who-we-are",
+        title: "Who We Are",
+        allowedRoles:["0"]
+      }
+    ]
+  },
+  {
+    title: "Handle Mentor Hub",
+    icon: <FontAwesomeIcon icon={faCog} />,
+    allowedRoles: ["0"],
+    subRoutes:[
+      {
+        path: "/add-mentor",
+        title: "Add Mentor",
+        allowedRoles:["0"]
+      },
+      {
+        path: "/handle-mentor-hub",
+        title: "Mentor Hub",
+        allowedRoles:["0"]
+      }
+    ]
+  },
+  {
+    title: "Handle Publication Charge",
+    icon: <FontAwesomeIcon icon={faCog} />,
+    allowedRoles: ["0"],
+    subRoutes:[
+      {
+        path: "/add-publication-charge",
+        title: "Add Publication Charge",
+        allowedRoles:["0"]
+      },
+      {
+        path: "/handle-publication-charge",
+        title: "Publication Charge",
+        allowedRoles:["0"]
+      }
+    ]
+  },
+  {
+    title: "Handle Open Access Policy",
+    icon: <FontAwesomeIcon icon={faCog} />,
+    allowedRoles: ["0"],
+    subRoutes:[
+      {
+        path: "/add-open-access-policy",
+        title: "Add Open Policy",
+        allowedRoles:["0"]
+      },
+      {
+        path: "/handle-open-access-policy",
+        title: "Open Access Policy",
+        allowedRoles:["0"]
+      }
+    ]
+  },
+  {
+    title: "Handle Award",
+    icon: <FontAwesomeIcon icon={faCog} />,
+    allowedRoles: ["0"],
+    subRoutes:[
+      {
+        path: "/add-award",
+        title: "Add Award",
+        allowedRoles:["0"]
+      },
+      {
+        path: "/handle-award",
+        title: "Awards",
+        allowedRoles:["0"]
+      }
+    ]
+  },
   // Reviewer route
   {
     path: "/list-journals",

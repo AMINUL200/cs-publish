@@ -130,6 +130,23 @@ import JournalAuthorInformation from "./pages/user/journal/JournalAuthorInformat
 import AboutJournal from "./pages/user/journal/AboutJournal";
 import QuickPress from "./pages/user/journal/QuickPress";
 import HandleFaqs from "./pages/admin/research_service_team/HandleFaqs";
+import AuthorHub from "./pages/user/author_editor_hub/AuthorHub";
+import EditorHub from "./pages/user/author_editor_hub/EditorHub";
+import HandleWhoWeAre from "./pages/admin/who_we_are/HandleWhoWeAre";
+import AddWhoWeAre from "./pages/admin/who_we_are/AddWhoWeAre";
+import UserSideWhoWeAre from "./pages/user/who_we_are/UserSideWhoWeAre";
+import AuthorServices from "./pages/user/author_editor_hub/AuthorServices";
+import HandleMentorHub from "./pages/admin/mentor_hub/HandleMentorHub";
+import AddMentor from "./pages/admin/mentor_hub/AddMentor";
+import HandlePublicationCharge from "./pages/admin/handle_publication change/HandlePublicationCharge";
+import AddPublicationCharge from "./pages/admin/handle_publication change/AddPublicationCharge";
+import OpenAccessPolicy from "./pages/admin/open_acess_policy/OpenAccessPolicy";
+import AddOpenAccessPolicy from "./pages/admin/open_acess_policy/AddOpenAccessPolicy";
+import PublicationCharge from "./pages/user/journal/PublicationCharge";
+import UserSideOpenAccessPolicy from "./pages/user/journal/UserSideOpenAccessPolicy";
+import HandleAward from "./pages/admin/handle_award/HandleAward";
+import AddAward from "./pages/admin/handle_award/AddAward";
+import AwardPage from "./pages/user/award/AwardPage";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -212,9 +229,12 @@ function App() {
                 path="/view-current-issue/:id"
                 element={<DetailsOfCurrentIssue />}
               />
-              <Route path="/author-overview/:id" element={<JournalAuthorInformation/>}/>
-              <Route path="/about-journal/:id" element={<AboutJournal/>}/>
-              <Route path="/quick-press/:id" element={<QuickPress/>}/>
+              <Route
+                path="/author-overview/:id"
+                element={<JournalAuthorInformation />}
+              />
+              <Route path="/about-journal/:id" element={<AboutJournal />} />
+              <Route path="/quick-press/:id" element={<QuickPress />} />
 
               <Route path="/my-subscription" element={<MySubscription />} />
 
@@ -271,6 +291,15 @@ function App() {
               <Route path="/faq" element={<FaqPage />} />
 
               <Route path="/font-vew" element={<ArticleFrontView />} />
+              <Route path="/author-hub" element={<AuthorHub />} />
+              <Route path="/editor-hub" element={<EditorHub />} />
+              <Route path="/who-we-are/:slug" element={<UserSideWhoWeAre />} />
+              <Route path="/author-services" element={<AuthorServices/>}/>
+
+              <Route path="/publication-charge" element={<PublicationCharge/>}/>
+              <Route path="/open-access-policy" element={<UserSideOpenAccessPolicy/>}/>
+              <Route path="/award" element={<AwardPage/>}/>
+
             </Route>
           </Route>
 
@@ -345,7 +374,7 @@ function App() {
 
               <Route path="/setting/teams" element={<HandleTeams />} />
               <Route path="/setting/add-team" element={<AddTeam />} />
-              
+
               <Route path="/setting/handle-faqs" element={<HandleFaqs />} />
 
               {/* user manger route */}
@@ -410,10 +439,26 @@ function App() {
                 element={<HandlePartners />}
               />
 
+              <Route path="/handle-who-we-are" element={<HandleWhoWeAre />} />
+              <Route path="/add-who-we-are" element={<AddWhoWeAre />} />
+
               <Route path="/add-cms-page" element={<AddNewCmsPage />} />
               <Route path="/list-cms-page" element={<ViewCmsPageList />} />
               <Route path="/handle-innovation" element={<HandleInnovation />} />
               <Route path="/add-innovation" element={<AddInnovation />} />
+
+              <Route path="/handle-mentor-hub" element={<HandleMentorHub/>}/>
+              <Route path="/add-mentor" element={<AddMentor/>}/>
+
+              <Route path="/handle-publication-charge" element={<HandlePublicationCharge/>}/>
+              <Route path="/add-publication-charge" element={<AddPublicationCharge/>}/>
+
+              <Route path="/handle-open-access-policy" element={<OpenAccessPolicy/>}/>
+              <Route path="/add-open-access-policy" element={<AddOpenAccessPolicy/>}/>
+
+              <Route path="/handle-award" element={<HandleAward/>}/>
+              <Route path="/add-award" element={<AddAward/>}/>
+
 
               {/* ------------------------------------------ Admin Route End--------------------- */}
 

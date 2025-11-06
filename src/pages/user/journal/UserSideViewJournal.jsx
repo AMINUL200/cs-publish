@@ -37,7 +37,6 @@ const UserSideViewJournal = () => {
 
       if (response.data.status) {
         console.log(response.data);
-
         setJournalData(response.data);
       } else {
         throw new Error(
@@ -74,25 +73,26 @@ const UserSideViewJournal = () => {
   // Navigation items
   const navItems = [
     {
+      label: "About Journal",
+      path: `/about-journal/${journalData?.journal?.id}`,
+    },
+    {
+      label: "Scholarly domain",
+      path: `/author-overview/${journalData?.journal?.id}`,
+    },
+    {
       label: "Library of issues",
       path: `/list-of-archive/${journalData?.journal?.id}`,
     },
-    { label: "Quick Press", path: `/quick-press/${journalData?.journal?.id}` },
     {
       label: "Present issue",
       path: `/view-current-issue/${journalData?.journal?.id}`,
     },
-    { label: "Author", path: `/author-overview/${journalData?.journal?.id}` },
-    {
-      label: "About Journal",
-      path: `/about-journal/${journalData?.journal?.id}`,
-    },
+    { label: "Quick Press", path: `/quick-press/${journalData?.journal?.id}` },
   ];
 
   const handleNavClick = (path) => {
-    // You can implement navigation logic here
-    console.log(`Navigating to: ${path}`);
-    navigate(path); // Uncomment this if you want actual navigation
+    navigate(path);
   };
 
   if (loading) {
@@ -149,108 +149,107 @@ const UserSideViewJournal = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-10 sm:pt-24">
-      {/* Header Section - Updated with Black Background and Yellow Text */}
+      {/* Header Section - 3 Column Layout */}
       <div className="bg-black text-yellow-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col lg:flex-row items-center gap-8 justify-center">
-            {/* Journal Image */}
-            <div className="flex-shrink-0">
-              <img
-                src={journal.image}
-                alt={journal.j_title}
-                className="w-48 h-64 object-cover rounded-lg shadow-2xl border-4 border-yellow-500"
-              />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left Column - Navigation Links */}
+            <div className="lg:col-span-3">
+              <div className="space-y-3">
+                {navItems.map((item, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleNavClick(item.path)}
+                    className="w-full bg-yellow-500 text-black px-4 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg text-center"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Journal Information */}
-            <div className="flex-1 text-center lg:text-left">
-              <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-yellow-400">
-                {journal.j_title}
-              </h1>
-              <p className="text-xl mb-6 text-yellow-300">
-                {journal.j_categories}
-              </p>
-
-              {/* Journal Details Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                {journal.issn_print && (
-                  <div className="bg-inherit bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                    <span className="font-semibold text-yellow-300">
-                      ISSN Print:
-                    </span>
-                    <span className="ml-2 text-yellow-200">
-                      {journal.issn_print_no}
-                    </span>
+            {/* Middle Column - Journal Information */}
+            <div className="lg:col-span-6">
+              <div className="text-center lg:text-left">
+                <h1 className="text-3xl lg:text-4xl font-bold mb-4 text-yellow-400">
+                  {journal.j_title}
+                </h1>
+                <p className="text-lg mb-6 text-yellow-300 ">
+                  {journal.j_categories}
+                </p>
+                {/* Editor Information */}
+                {editor && editor.length > 0 && (
+                  <div className="bg-black bg-opacity-20 rounded-lg p-4 mb-4 border border-yellow-500 border-opacity-30">
+                    <h3 className="font-bold text-yellow-300 mb-2 text-sm">
+                      Editor-in-Chief
+                    </h3>
+                    <p className="text-yellow-200 text-sm">
+                      <span className="font-semibold text-yellow-300">
+                        {editor[0].editor_name}
+                      </span>
+                      <span className="mx-2 text-yellow-400">•</span>
+                      {editor[0].editor_email}
+                    </p>
                   </div>
                 )}
-                {journal.issn_online && (
-                  <div className="bg-inherit bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                    <span className="font-semibold text-yellow-300">
-                      ISSN Online:
-                    </span>
-                    <span className="ml-2 text-yellow-200">
-                      {journal.issn_online_no}
-                    </span>
-                  </div>
-                )}
-                {journal.ugc_approved && (
-                  <div className="bg-inherit bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                    <span className="font-semibold text-yellow-300">
-                      UGC Approved:
-                    </span>
-                    <span className="ml-2 text-yellow-200">
-                      {journal.ugc_no}
-                    </span>
-                  </div>
-                )}
-              </div>
-              {/* Journal Description */}
-              <div className="bg-inherit bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30 mb-4">
-                <h3 className="font-bold text-yellow-300 mb-2">
-                  Journal Description
-                </h3>
-                <p className="text-yellow-200">{journal.j_description}</p>
-              </div>
-
-              {/* Editor Information */}
-              {editor && editor.length > 0 && (
-                <div className="bg-inherit bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                  <h3 className="font-bold text-yellow-300 mb-2">
-                    Editor-in-Chief
+                {/* Journal Description */}
+                <div className="bg-black bg-opacity-20 rounded-lg p-4 border border-yellow-500 border-opacity-30 mb-4">
+                  <h3 className="font-bold text-yellow-300 mb-2 text-sm">
+                    Journal Description
                   </h3>
-                  <p className="text-yellow-200">
-                    <span className="font-semibold text-yellow-300">
-                      {editor[0].editor_name}
-                    </span>
-                    <span className="mx-2 text-yellow-400">•</span>
-                    {editor[0].editor_email}
+                  <p className="text-yellow-200 text-sm leading-relaxed">
+                    {journal.j_description}
                   </p>
                 </div>
-              )}
+                {/* Journal Details Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+                  {journal.issn_print && (
+                    <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
+                      <div className="font-semibold text-yellow-300 text-sm">
+                        ISSN Print
+                      </div>
+                      <div className="text-yellow-200 text-sm">
+                        {journal.issn_print_no}
+                      </div>
+                    </div>
+                  )}
+                  {journal.issn_online && (
+                    <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
+                      <div className="font-semibold text-yellow-300 text-sm">
+                        ISSN Online
+                      </div>
+                      <div className="text-yellow-200 text-sm">
+                        {journal.issn_online_no}
+                      </div>
+                    </div>
+                  )}
+                  {journal.ugc_approved && (
+                    <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
+                      <div className="font-semibold text-yellow-300 text-sm">
+                        UGC Approved
+                      </div>
+                      <div className="text-yellow-200 text-sm">
+                        {journal.ugc_no}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
-            <div>
-              <button className="border rounded border-yellow-200 py-2 px-4 hover:bg-yellow-500 hover:text-white cursor-pointer transition-all duration-300">
-                Submit Manuscript
-              </button>
+            {/* Right Column - Journal Image */}
+            <div className="lg:col-span-3 flex justify-center lg:justify-end">
+              <div className="relative">
+                <img
+                  src={journal.image}
+                  alt={journal.j_title}
+                  className="w-48 h-60 lg:w-56 lg:h-72 object-cover rounded-lg shadow-2xl border-4 border-yellow-500"
+                />
+                <div className="absolute -bottom-3 -right-3 bg-yellow-500 text-black px-3 py-1 rounded-lg font-bold text-xs shadow-lg rotate-3">
+                  Journal Cover
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Horizontal Navigation Buttons */}
-      <div className="bg-yellow-500 py-4 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap justify-between gap-4 md:gap-6 lg:gap-8">
-            {navItems.map((item, index) => (
-              <button
-                key={index}
-                onClick={() => handleNavClick(item.path)}
-                className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black hover:text-yellow-500 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg whitespace-nowrap"
-              >
-                {item.label}
-              </button>
-            ))}
           </div>
         </div>
       </div>
@@ -303,7 +302,7 @@ const UserSideViewJournal = () => {
   );
 };
 
-// Reusable Slider Component
+// Reusable Slider Component (unchanged)
 const SectionSlider = ({ title, articles, stripHtmlTags, formatDate }) => {
   const [swiperInstance, setSwiperInstance] = useState(null);
 
@@ -312,7 +311,7 @@ const SectionSlider = ({ title, articles, stripHtmlTags, formatDate }) => {
   }
 
   return (
-    <section className="mb-16 ">
+    <section className="mb-16">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-3xl font-bold text-gray-900 border-l-4 border-yellow-500 pl-4">
           {title}
@@ -376,11 +375,11 @@ const SectionSlider = ({ title, articles, stripHtmlTags, formatDate }) => {
   );
 };
 
-// Article Card Component
+// Article Card Component (unchanged)
 const ArticleCard = ({ article, stripHtmlTags, formatDate }) => {
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
-  const { token } = useSelector((state) => state.auth); // ✅ get token from Redux
+  const { token } = useSelector((state) => state.auth);
 
   const handleReadMore = () => {
     navigate(`/view-published-manuscript/${article.id}`);
@@ -428,7 +427,7 @@ const ArticleCard = ({ article, stripHtmlTags, formatDate }) => {
           <span>{formatDate(article.created_at)}</span>
         </div>
 
-        <div className="flex items-center justify-center text-sm ">
+        <div className="flex items-center justify-center text-sm">
           <button
             onClick={handleReadMore}
             className="bg-yellow-500 text-black px-4 py-2 rounded-lg text-sm font-semibold hover:bg-yellow-600 transition-colors"

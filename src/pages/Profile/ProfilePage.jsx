@@ -16,7 +16,8 @@ import { faGraduationCap } from '@fortawesome/free-solid-svg-icons';
 import { faBriefcase } from '@fortawesome/free-solid-svg-icons';
 import { faAward } from '@fortawesome/free-solid-svg-icons';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
-
+import { faGoogle, faOrcid } from '@fortawesome/free-brands-svg-icons';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 // Initial empty state
 const initialFormData = {
@@ -28,6 +29,7 @@ const initialFormData = {
     landline: '',
     address: '',
     country: '',
+    city: '',
     zip: '',
     qualification: '',
     university: '',
@@ -37,19 +39,24 @@ const initialFormData = {
     society_memberships: '',
     speciality: '',
     image: null,
-    resume: null
+    resume: null,
+    google_scroler: '',
+    orcid_link: '',
+    about: ''
 };
 
 const ProfilePage = () => {
     const API_URL = import.meta.env.VITE_API_URL;
     const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
-    const { token } = useSelector((state) => state.auth);
+    const { token, userData } = useSelector((state) => state.auth);
     const [isEditing, setIsEditing] = useState(false);
     const [tempImage, setTempImage] = useState(null);
     const [tempResume, setTempResume] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState(initialFormData);
     const [isFetching, setIsFetching] = useState(true);
+
+    console.log(userData);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -63,7 +70,14 @@ const ProfilePage = () => {
         const { name, files } = e.target;
         if (files && files.length > 0) {
             if (name === 'image') {
-                setTempImage(files[0]);
+                const file = files[0];
+                // Validate file size (2MB max)
+                if (file.size > 2 * 1024 * 1024) {
+                    toast.error('Profile image must be less than 2MB');
+                    e.target.value = ''; // Clear the file input
+                    return;
+                }
+                setTempImage(file);
             } else if (name === 'resume') {
                 setTempResume(files[0]);
             }
@@ -90,7 +104,7 @@ const ProfilePage = () => {
             if (tempResume) submitData.append('resume', tempResume);
 
             const response = await axios.post(
-                `${API_URL}api/profile`,
+                `${API_URL}api/profile/update`,
                 submitData,
                 {
                     headers: {
@@ -124,10 +138,9 @@ const ProfilePage = () => {
                 }
             });
 
-            console.log("data ",response.data.data);
+            console.log("data ", response.data.data);
             if (response.data.flag === 1) {
                 const data = response.data.data;
-
 
                 setFormData({
                     ...initialFormData, // Reset to initial state first
@@ -145,8 +158,6 @@ const ProfilePage = () => {
             setIsFetching(false);
         }
     };
-
-
 
     const handleCancel = () => {
         // Reset to initial data by fetching again
@@ -167,6 +178,7 @@ const ProfilePage = () => {
             </div>
         );
     }
+
     return (
         <div className="max-w-6xl mx-auto p-4 md:p-6">
             <div className="flex justify-between items-center mb-8">
@@ -212,7 +224,7 @@ const ProfilePage = () => {
                                         tempImage
                                             ? URL.createObjectURL(tempImage)
                                             : formData.image
-                                                ? `${STORAGE_URL}${formData.image}`
+                                                ? `${formData.image}`
                                                 : ''
                                     }
                                     alt="Profile"
@@ -241,6 +253,7 @@ const ProfilePage = () => {
                     hover:file:bg-blue-100"
                                     accept="image/*"
                                 />
+                                <p className="text-xs text-gray-500 mt-1 text-center">Max 2MB</p>
                             </div>
                         )}
                     </div>
@@ -576,6 +589,110 @@ const ProfilePage = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* About Section */}
+                    <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                        <div className="bg-blue-50 p-4 border-b">
+                            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                                <FontAwesomeIcon icon={faInfoCircle} className="text-blue-500" />
+                                About
+                            </h3>
+                        </div>
+                        <div className="p-4">
+                            <label className="block text-sm font-medium text-gray-600 mb-1">About Me</label>
+                            {isEditing ? (
+                                <textarea
+                                    name="about"
+                                    value={formData.about || ''}
+                                    onChange={handleChange}
+                                    rows="4"
+                                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Tell us about yourself..."
+                                />
+                            ) : (
+                                <div className="p-2 bg-gray-50 rounded-lg min-h-[100px]">
+                                    {formData.about || 'No information provided'}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Researcher Links - Only show for user_type = 2 */}
+                    {userData?.user_type === "2" && (
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                            <div className="bg-blue-50 p-4 border-b">
+                                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                                    <FontAwesomeIcon icon={faUsers} className="text-blue-500" />
+                                    Researcher Links
+                                </h3>
+                            </div>
+                            <div className="p-4 space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-600 mb-1 flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faGoogle} className="text-green-500" />
+                                        Google Scholar
+                                    </label>
+                                    {isEditing ? (
+                                        <input
+                                            type="url"
+                                            name="google_scroler"
+                                            value={formData.google_scroler || ''}
+                                            onChange={handleChange}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="https://scholar.google.com/..."
+                                        />
+                                    ) : (
+                                        <div className="p-2 bg-gray-50 rounded-lg">
+                                            {formData.google_scroler ? (
+                                                <a
+                                                    href={formData.google_scroler}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 hover:text-blue-800 break-all"
+                                                >
+                                                    {formData.google_scroler}
+                                                </a>
+                                            ) : (
+                                                '-'
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-600 mb-1 flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faOrcid} className="text-green-500" />
+                                        ORCID Link
+                                    </label>
+                                    {isEditing ? (
+                                        <input
+                                            type="url"
+                                            name="orcid_link"
+                                            value={formData.orcid_link || ''}
+                                            onChange={handleChange}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="https://orcid.org/..."
+                                        />
+                                    ) : (
+                                        <div className="p-2 bg-gray-50 rounded-lg">
+                                            {formData.orcid_link ? (
+                                                <a
+                                                    href={formData.orcid_link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 hover:text-blue-800 break-all"
+                                                >
+                                                    {formData.orcid_link}
+                                                </a>
+                                            ) : (
+                                                '-'
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Resume Card */}
                     <div className="bg-white rounded-xl shadow-md overflow-hidden">

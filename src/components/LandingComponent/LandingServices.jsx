@@ -10,7 +10,7 @@ const LandingServices = ({
 
  
   return (
-    <section className="bg-gray-100 py-12">
+    <section className="bg-gray-100 py-12" id="author-service">
       <div className=" mx-auto md:mx-20">
         <div className="titlebox text-center mb-12">
           {/* <h4 className="heading text-3xl font-bold mb-4">Services</h4> */}
@@ -27,7 +27,7 @@ const LandingServices = ({
 
         <div className="service_boxs">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {servicesData.map((service) => (
+            {servicesData.slice(0, 4).map((service) => (
               <div
                 key={service.id}
                 className="hover:scale-105 transition-transform duration-300"

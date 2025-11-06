@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import LandingBanner from "../../components/LandingComponent/LandingBanner";
 import LandingAbout from "../../components/LandingComponent/LandingAbout";
 import BrowseJournals from "../../components/LandingComponent/BrowseJournals";
@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import LandingPublishedJournal from "../../components/LandingComponent/LandingPublishedJournal";
 import LandingOurTeam from "../../components/LandingComponent/LandingOurTeam";
+import { useLocation } from "react-router-dom";
 
 const HomePage = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,6 +20,19 @@ const HomePage = () => {
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.scrollTo) {
+      const target = document.getElementById(location.state.scrollTo);
+      if (target) {
+        setTimeout(() => {
+          target.scrollIntoView({ behavior: "smooth" });
+        }, 300); // delay to ensure page fully rendered
+      }
+    }
+  }, [location]);
 
   const [bannerData, setBannerData] = useState([]);
   const [partnerData, setPartnerData] = useState([]);

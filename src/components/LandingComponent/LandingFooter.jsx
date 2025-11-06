@@ -23,10 +23,10 @@ const LandingFooter = ({
         { name: "Discover Journal", path: "/journal" },
         // { name: "Books Hub", path: "/products" },
         { name: "Mentors Hub", path: "/mentors" },
-        { name: "Author Services", path: "#" },
+        { name: "Author Services", path: "/author-services" },
         { name: "Blog", path: "/blog" },
-        { name: "Events", path: "#" },
-        { name: "Conference", path: "#" },
+        { name: "Events & Conference", path: "#" },
+        // { name: "Conference", path: "#" },
       ],
     },
     {
@@ -35,19 +35,24 @@ const LandingFooter = ({
         // { name: "Data Depository", path: "#" },
         // { name: "Find protocols", path: "#" },
         { name: "Innovation", path: "/innovation" },
-        { name: "Research Service", path: "/research-services" },
-        // { name: "Liberians Portal", path: "#" },
+        // { name: "Research Service", path: "/research-services" },
+        { name: "Publication Charges", path: "/publication-charge" },
+        { name: "OPen Access Policy", path: "/open-access-policy" },
         // { name: "Promote and Advertise", path: "#" }
       ],
     },
     {
       title: "Policies and access",
-      items: cmsPageList?.policies_and_access?.length
-        ? cmsPageList.policies_and_access.map((policies) => ({
-            name: policies.page_title,
-            path: `/cms-page/${policies.slug}`,
-          }))
-        : [{ name: "No Policies ", path: "#" }],
+      items: [
+        ...(cmsPageList?.policies_and_access?.length
+          ? cmsPageList.policies_and_access.map((policies) => ({
+              name: policies.page_title,
+              path: `/cms-page/${policies.slug}`,
+            }))
+          : [{ name: "No Policies ", path: "#" }]),
+          {name: "Author Hub", path:"/author-hub"},
+          {name: "Editor Hub", path:"/editor-hub"},
+      ],
     },
     {
       title: "Support and contact",
@@ -55,12 +60,13 @@ const LandingFooter = ({
         // ✅ Then dynamic CMS links if available
         ...(cmsPageList?.support_and_contact?.length
           ? cmsPageList.support_and_contact.map((support) => ({
-            name: support.page_title,
-            path: `/cms-page/${support.slug}`,
-          }))
+              name: support.page_title,
+              path: `/cms-page/${support.slug}`,
+            }))
           : [{ name: "No support", path: "#" }]),
-          // ✅ Static link first (example)
+        // ✅ Static link first (example)
         { name: "Faq", path: "/faq" },
+        { name: "Award", path: "/award" },
       ],
     },
   ];
@@ -150,18 +156,27 @@ const LandingFooter = ({
       </div>
 
       {/* Legal Links */}
-      <div className="flex flex-wrap gap-2 justify-center bg-gray-500 p-4 text-white">
-        {legalLinks.map((link, index) => (
-          <React.Fragment key={index}>
-            <a
-              href={link.path}
-              className="text-sm hover:text-[#ffba00] transition-colors text-white"
-            >
-              {link.name}
-            </a>
-            {index < legalLinks.length - 1 && <span className="mx-1">|</span>}
-          </React.Fragment>
-        ))}
+      <div className="flex flex-wrap gap-2 justify-around bg-gray-500 p-4 text-white">
+        <div>
+          <img
+            src="/public/images/creative_commons_white.png"
+            className="h-9 w-25 object-fill"
+          />
+        </div>
+        <div>
+          {legalLinks.map((link, index) => (
+            <React.Fragment key={index}>
+              <a
+                href={link.path}
+                className="text-sm hover:text-[#ffba00] transition-colors text-white"
+              >
+                {link.name}
+              </a>
+              {index < legalLinks.length - 1 && <span className="mx-1">|</span>}
+            </React.Fragment>
+          ))}
+        </div>
+        <div></div>
       </div>
 
       {/* Copyright */}

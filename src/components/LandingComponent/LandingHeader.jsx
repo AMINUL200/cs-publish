@@ -1,20 +1,24 @@
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useEffect, useRef } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 import { landingLog } from "../../assets";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { logout } from "../../features/auth/AuthSlice";
 import axios from "axios";
 import { User2Icon } from "lucide-react";
+import { id } from "date-fns/locale/id";
 
 const LandingHeader = ({
   toggleMenu,
   settingsData = {},
   journalList = [],
+  whoWeAreData = [],
   loading = false,
 }) => {
+  console.log(whoWeAreData);
+
   const [scrolled, setScrolled] = useState(false);
   const [openDropdowns, setOpenDropdowns] = useState({});
   const dropdownRefs = useRef({});
@@ -22,9 +26,25 @@ const LandingHeader = ({
     (state) => state.auth
   );
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // console.log(journalList);
+  // Handle scroll to section when coming from other routes
+  useEffect(() => {
+    // Check if we have a scroll target in location state
+    if (location.state?.scrollTo && location.pathname === "/") {
+      // Small timeout to ensure the page is fully rendered
+      const timer = setTimeout(() => {
+        scrollToSection(location.state.scrollTo);
+        // Clear the state to prevent scrolling on every render
+        window.history.replaceState({ ...location.state, scrollTo: null }, "");
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [location]);
 
   const handleLogout = async () => {
     try {
@@ -63,45 +83,13 @@ const LandingHeader = ({
     {
       id: "whoweare",
       label: "Who We Are",
-      dropdown: [
-        {
-          id: "recent-journals",
-          label: "Recent Journals",
-          path: "/journals/recent",
-        },
-        {
-          id: "published-journals",
-          label: "Published Journals",
-          path: "/journals/published",
-        },
-        {
-          id: "categories",
-          label: "Categories",
-          dropdown: [
-            {
-              id: "science",
-              label: "Science",
-              path: "/journals/categories/science",
-            },
-            {
-              id: "technology",
-              label: "Technology",
-              path: "/journals/categories/technology",
-            },
-            {
-              id: "medicine",
-              label: "Medicine",
-              path: "/journals/categories/medicine",
-            },
-            {
-              id: "engineering",
-              label: "Engineering",
-              path: "/journals/categories/engineering",
-            },
-          ],
-        },
-        { id: "archives", label: "Archives", path: "/journals/archives" },
-      ],
+      dropdown: whoWeAreData.length
+        ? whoWeAreData.map((who) => ({
+            id: `${who.id}`,
+            label: who.title,
+            path: `/who-we-are/${who.slug}`,
+          }))
+        : [{ id: "no-Who we are", label: "No Who We Are", path: "#" }],
     },
     {
       id: "journal",
@@ -114,8 +102,8 @@ const LandingHeader = ({
           }))
         : [{ id: "no-journal", label: "No Journals Available", path: "#" }],
     },
-    { id: "mentor", label: "Mentor Hub", path: "/" },
-    { id: "service", label: "Author Service", path: "/" },
+    { id: "mentor", label: "Mentor Hub", path: "/mentors" },
+    { id: "service", label: "Author Service", path: "/author-service" },
   ];
 
   // Helper function to get parent dropdown id from a sub-dropdown id
@@ -194,18 +182,30 @@ const LandingHeader = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Handle navigation click
-  const handleNavClick = (path) => {
-    if (path && path.startsWith("#")) {
-      const element = document.querySelector(path);
-      if (element) {
-        element.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-          inline: "nearest",
-        });
-      }
+  const scrollToSection = (id) => {
+    const section = document.getElementById(id);
+    if (section) {
+      section.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
+  };
+
+  const handleNavClick = (path) => {
+    if (path === "/author-service") {
+      if (location.pathname === "/") {
+        // ✅ Already on landing page → scroll to author service section
+        scrollToSection("author-service");
+      } else {
+        // ✅ Navigate to home with scroll target in state
+        navigate("/", { state: { scrollTo: "author-service" } });
+      }
+    } else {
+      // Normal route navigation
+      navigate(path);
+    }
+
     setOpenDropdowns({});
   };
 
@@ -300,13 +300,12 @@ const LandingHeader = ({
             </svg>
           </div>
         ) : (
-          <RouterLink
-            to={item.path}
+          <div
             className="text-gray-700 font-semibold hover:text-[#ffba00] cursor-pointer transition-colors px-2 py-1 flex items-center space-x-1"
-            onClick={() => setOpenDropdowns({})}
+            onClick={() => handleNavClick(item.path)}
           >
             {item.label}
-          </RouterLink>
+          </div>
         )}
 
         {hasDropdown && isOpen && (
@@ -362,7 +361,7 @@ const LandingHeader = ({
         <div className="flex items-center">
           <div
             className="text-2xl font-bold text-indigo-600 flex items-center cursor-pointer"
-            onClick={() => handleNavClick("#home")}
+            onClick={() => navigate("/")}
           >
             <img
               src={settingsData?.image}
@@ -420,33 +419,6 @@ const LandingHeader = ({
 
         {/* Mobile Menu Button */}
         <div className="md:hidden flex items-center space-x-4">
-          {/* {!isAuthenticated && (
-            <RouterLink
-              to="/signin"
-              className=" text-black px-3 py-1  text-sm border border-black rounded-4xl flex justify-center items-center"
-            >
-              <User2Icon className="inline-block w-6 h-6 ml-1 text-yellow-800" />
-            </RouterLink>
-          )}
-
-          {isAuthenticated && userData?.user_type == 4 && (
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 text-white px-3 py-1 rounded-md text-sm"
-            >
-              Logout
-            </button>
-          )}
-
-          {isAuthenticated && userData?.user_type != 4 && (
-            <RouterLink
-              to="/dashboard"
-              className="bg-[#ffba00] text-white px-3 py-1 rounded-md text-sm"
-            >
-              Dashboard
-            </RouterLink>
-          )} */}
-
           <button
             onClick={toggleMenu}
             className="text-gray-700 focus:outline-none cursor-pointer"

@@ -1008,56 +1008,7 @@ const ViewManuscriptDetails = () => {
               </div>
             </div>
 
-            {/* Additional Information */}
-            <div className="mt-8 bg-white rounded-lg shadow-sm border p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Additional Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="font-medium text-gray-600">
-                    Manuscript ID:
-                  </span>
-                  <span className="ml-2 text-gray-900">
-                    {manuscriptData.m_unique_id}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-600">Email:</span>
-                  <span className="ml-2 text-gray-900">
-                    {manuscriptData.email}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-600">
-                    Affiliation:
-                  </span>
-                  <span className="ml-2 text-gray-900">
-                    {manuscriptData.affiliation}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-600">Country:</span>
-                  <span className="ml-2 text-gray-900">
-                    {manuscriptData.country}
-                  </span>
-                </div>
-                {manuscriptData.supplementary_file && (
-                  <div className="md:col-span-2">
-                    <span className="font-medium text-gray-600">
-                      Supplementary File:
-                    </span>
-                    <button
-                      onClick={handleSupplementaryFileDownload}
-                      className="ml-2 text-yellow-600 hover:text-yellow-700 underline text-sm flex items-center gap-1"
-                    >
-                      <FileText className="w-4 h-4" />
-                      <span>Download Supplementary Materials</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
+           
           </div>
 
           {/* Overlay for mobile when sidebar is open */}

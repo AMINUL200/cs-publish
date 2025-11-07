@@ -456,9 +456,9 @@ const ViewManuscriptDetails = () => {
               </ol>
             </nav>
             {paymentFeature.length && (
-              <button className="p-2 bg-yellow-600 text-white rounded-full">
+              <span className="inline-flex p-1 bg-yellow-600 text-white rounded-full  justify-center align-center text-center text-[10px] -mb-2 ">
                 {paymentFeature[0]}
-              </button>
+              </span>
             )}
 
             {/* Bottom Row: Title and Actions */}

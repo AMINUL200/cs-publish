@@ -15,7 +15,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
   const [loading, setLoading] = React.useState(true);
   const [featureOptions, setFeatureOptions] = React.useState([]);
   const [paymentDetails, setPaymentDetails] = React.useState(null);
-  const [selectedFeatures, setSelectedFeatures] = React.useState([]);
+  const [selectedFeature, setSelectedFeature] = React.useState(null);
   const [showFeatureModal, setShowFeatureModal] = React.useState(false);
   const [updatingFeatures, setUpdatingFeatures] = React.useState(false);
   const [processingPayment, setProcessingPayment] = React.useState(false);
@@ -79,11 +79,9 @@ const AuthorViewSubmitManuscriptDetail = () => {
 
       if (response.data.flag === 1) {
         setPaymentDetails(response.data.data);
-        // Set selected features from payment details
-        if (response.data.data.selected_features) {
-          setSelectedFeatures(
-            response.data.data.selected_features.map((feature) => feature.id)
-          );
+        // Set selected feature from payment details (take the first one if multiple exist)
+        if (response.data.data.selected_features && response.data.data.selected_features.length > 0) {
+          setSelectedFeature(response.data.data.selected_features[0].id);
         }
       }
     } catch (error) {
@@ -92,14 +90,14 @@ const AuthorViewSubmitManuscriptDetail = () => {
     }
   };
 
-  // Create new payment with selected features (first time)
+  // Create new payment with selected feature (first time)
   const createPaymentWithFeatures = async () => {
     setUpdatingFeatures(true);
     try {
       const response = await axios.post(
         `${API_URL}api/author-payment/create/${id}`,
         {
-          author_optional_features_id: selectedFeatures,
+          author_optional_features_id: selectedFeature ? [selectedFeature] : [],
         },
         {
           headers: {
@@ -109,30 +107,30 @@ const AuthorViewSubmitManuscriptDetail = () => {
       );
 
       if (response.data.flag === 1) {
-        toast.success("Features added successfully!");
+        toast.success("Feature selected successfully!");
         setPaymentDetails(response.data.data);
         setShowFeatureModal(false);
         // Refresh payment details
         fetchPaymentDetails();
       } else {
-        toast.error(response.data.message || "Failed to add features");
+        toast.error(response.data.message || "Failed to select feature");
       }
     } catch (error) {
-      console.error("Error creating payment with features:", error);
-      toast.error(error?.response?.data?.message || "Failed to add features");
+      console.error("Error creating payment with feature:", error);
+      toast.error(error?.response?.data?.message || "Failed to select feature");
     } finally {
       setUpdatingFeatures(false);
     }
   };
 
-  // Update selected features
+  // Update selected feature
   const updateSelectedFeatures = async () => {
     setUpdatingFeatures(true);
     try {
       const response = await axios.post(
         `${API_URL}api/manuscript-payment/update/${paymentDetails.payment.id}`,
         {
-          author_optional_features_id: selectedFeatures,
+          author_optional_features_id: selectedFeature ? [selectedFeature] : [],
         },
         {
           headers: {
@@ -142,33 +140,27 @@ const AuthorViewSubmitManuscriptDetail = () => {
       );
 
       if (response.data.flag === 1) {
-        toast.success("Features updated successfully!");
+        toast.success("Feature updated successfully!");
         setPaymentDetails(response.data.data);
         setShowFeatureModal(false);
         // Refresh payment details
         fetchPaymentDetails();
       } else {
-        toast.error(response.data.message || "Failed to update features");
+        toast.error(response.data.message || "Failed to update feature");
       }
     } catch (error) {
-      console.error("Error updating features:", error);
+      console.error("Error updating feature:", error);
       toast.error(
-        error?.response?.data?.message || "Failed to update features"
+        error?.response?.data?.message || "Failed to update feature"
       );
     } finally {
       setUpdatingFeatures(false);
     }
   };
 
-  // Handle feature checkbox change
+  // Handle feature radio change
   const handleFeatureChange = (featureId) => {
-    setSelectedFeatures((prev) => {
-      if (prev.includes(featureId)) {
-        return prev.filter((id) => id !== featureId);
-      } else {
-        return [...prev, featureId];
-      }
-    });
+    setSelectedFeature(featureId);
   };
 
   // Calculate total amount
@@ -180,18 +172,14 @@ const AuthorViewSubmitManuscriptDetail = () => {
         paymentDetails.payment?.journal_amount ||
         0
     );
-    const selectedFeaturesAmount = selectedFeatures.reduce(
-      (total, featureId) => {
-        const feature = featureOptions.find((f) => f.id === featureId);
-        return total + (feature ? parseFloat(feature.amount) : 0);
-      },
-      0
-    );
+    
+    const selectedFeatureAmount = selectedFeature ? 
+      (featureOptions.find(f => f.id === selectedFeature)?.amount || 0) : 0;
 
-    return journalAmount + selectedFeaturesAmount;
+    return journalAmount + parseFloat(selectedFeatureAmount);
   };
 
-  // Handle save features based on whether payment exists or not
+  // Handle save feature based on whether payment exists or not
   const handleSaveFeatures = () => {
     if (!paymentDetails) {
       // First time - create new payment
@@ -452,7 +440,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
                 onClick={() => setShowFeatureModal(true)}
                 disabled={processingPayment}
               >
-                {paymentDetails ? "Edit Features" : "Add Features"}
+                {paymentDetails ? "Edit Feature" : "Select Feature"}
               </button>
               
               {showPayNow && (
@@ -483,7 +471,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
             {paymentDetails?.selected_features &&
               paymentDetails.selected_features.length > 0 && (
                 <div className="selected-features">
-                  <h4>Selected Features:</h4>
+                  <h4>Selected Feature:</h4>
                   {paymentDetails.selected_features.map((feature) => (
                     <div key={feature.id} className="feature-item">
                       <span>{feature.name}</span>
@@ -523,7 +511,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
-              <h3>Select Publication Features</h3>
+              <h3>Select Publication Feature</h3>
               <button
                 className="close-btn"
                 onClick={() => setShowFeatureModal(false)}
@@ -533,24 +521,47 @@ const AuthorViewSubmitManuscriptDetail = () => {
               </button>
             </div>
 
-            <div className="feature-checklist">
+            <div className="feature-radio-list">
               {featureOptions.map((feature) => (
-                <div key={feature.id} className="feature-checkbox-item">
-                  <label className="checkbox-label">
+                <div key={feature.id} className="feature-radio-item">
+                  <label className="radio-label">
                     <input
-                      type="checkbox"
-                      checked={selectedFeatures.includes(feature.id)}
+                      type="radio"
+                      name="feature-selection"
+                      value={feature.id}
+                      checked={selectedFeature === feature.id}
                       onChange={() => handleFeatureChange(feature.id)}
                       disabled={updatingFeatures}
                     />
-                    <span className="checkmark"></span>
+                    <span className="radiomark"></span>
                     <div className="feature-info">
                       <span className="feature-name">{feature.name}</span>
+                      <span className="feature-description">{feature.description || "Additional publication feature"}</span>
                       <span className="feature-amount">+${feature.amount}</span>
                     </div>
                   </label>
                 </div>
               ))}
+              
+              {/* None option */}
+              <div className="feature-radio-item">
+                <label className="radio-label">
+                  <input
+                    type="radio"
+                    name="feature-selection"
+                    value={null}
+                    checked={selectedFeature === null}
+                    onChange={() => handleFeatureChange(null)}
+                    disabled={updatingFeatures}
+                  />
+                  <span className="radiomark"></span>
+                  <div className="feature-info">
+                    <span className="feature-name">No Additional Features</span>
+                    <span className="feature-description">Standard publication only</span>
+                    <span className="feature-amount">+$0.00</span>
+                  </div>
+                </label>
+              </div>
             </div>
 
             <div className="modal-summary">
@@ -564,17 +575,12 @@ const AuthorViewSubmitManuscriptDetail = () => {
                 </span>
               </div>
               <div className="summary-item">
-                <span>Selected Features:</span>
+                <span>Selected Feature:</span>
                 <span>
                   +$
-                  {selectedFeatures
-                    .reduce((total, featureId) => {
-                      const feature = featureOptions.find(
-                        (f) => f.id === featureId
-                      );
-                      return total + (feature ? parseFloat(feature.amount) : 0);
-                    }, 0)
-                    .toFixed(2)}
+                  {selectedFeature ? 
+                    (featureOptions.find(f => f.id === selectedFeature)?.amount || 0) 
+                    : "0.00"}
                 </span>
               </div>
               <div className="summary-total">
@@ -595,16 +601,15 @@ const AuthorViewSubmitManuscriptDetail = () => {
               <button
                 className="save-btn"
                 onClick={handleSaveFeatures}
-                disabled={updatingFeatures || selectedFeatures.length === 0}
+                disabled={updatingFeatures}
               >
-                {updatingFeatures ? "Saving..." : "Save Features"}
+                {updatingFeatures ? "Saving..." : "Save Feature"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Rest of your existing JSX remains the same */}
       {/* Current Status Card */}
       <div className="current-status-card">
         <div className="card-title">Current Status</div>
@@ -936,7 +941,7 @@ const AuthorViewSubmitManuscriptDetail = () => {
           background: white;
           border-radius: 12px;
           padding: 0;
-          max-width: 500px;
+          max-width: 600px;
           width: 90%;
           max-height: 80vh;
           overflow-y: auto;
@@ -968,72 +973,98 @@ const AuthorViewSubmitManuscriptDetail = () => {
           opacity: 0.6;
         }
 
-        .feature-checklist {
+        /* Radio Button Styles */
+        .feature-radio-list {
           padding: 20px;
         }
 
-        .feature-checkbox-item {
+        .feature-radio-item {
           margin-bottom: 15px;
         }
 
-        .checkbox-label {
+        .radio-label {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           cursor: pointer;
-          padding: 12px;
+          padding: 15px;
           border: 2px solid #e9ecef;
           border-radius: 8px;
           transition: all 0.3s ease;
+          position: relative;
         }
 
-        .checkbox-label:hover {
+        .radio-label:hover {
           border-color: #007bff;
+          background-color: #f8f9fa;
         }
 
-        .checkbox-label input {
+        .radio-label input {
           display: none;
         }
 
-        .checkmark {
+        .radiomark {
           width: 20px;
           height: 20px;
           border: 2px solid #6c757d;
-          border-radius: 4px;
+          border-radius: 50%;
           margin-right: 15px;
+          margin-top: 2px;
           position: relative;
           transition: all 0.3s ease;
+          flex-shrink: 0;
         }
 
-        .checkbox-label input:checked + .checkmark {
+        .radio-label input:checked + .radiomark {
           background: #007bff;
           border-color: #007bff;
         }
 
-        .checkbox-label input:checked + .checkmark::after {
-          content: "✓";
+        .radio-label input:checked + .radiomark::after {
+          content: "";
           position: absolute;
-          color: white;
-          font-size: 14px;
-          font-weight: bold;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
+          width: 8px;
+          height: 8px;
+          background: white;
+          border-radius: 50%;
         }
 
         .feature-info {
           display: flex;
-          justify-content: space-between;
+          flex-direction: column;
           flex: 1;
-          align-items: center;
         }
 
         .feature-name {
-          font-weight: 500;
+          font-weight: 600;
+          font-size: 16px;
+          color: #333;
+          margin-bottom: 4px;
+        }
+
+        .feature-description {
+          font-size: 14px;
+          color: #6c757d;
+          margin-bottom: 8px;
+          line-height: 1.4;
         }
 
         .feature-amount {
           color: #28a745;
           font-weight: bold;
+          font-size: 16px;
+          align-self: flex-start;
+        }
+
+        /* Selected state */
+        .radio-label input:checked ~ .feature-info .feature-name {
+          color: #007bff;
+        }
+
+        .radio-label input:checked ~ .feature-info .feature-amount {
+          color: #218838;
         }
 
         .modal-summary {
@@ -1577,6 +1608,18 @@ const AuthorViewSubmitManuscriptDetail = () => {
 
           .modal-content {
             width: 95%;
+          }
+
+          .feature-info {
+            min-width: 0;
+          }
+
+          .feature-name {
+            font-size: 14px;
+          }
+
+          .feature-description {
+            font-size: 12px;
           }
         }
       `}</style>

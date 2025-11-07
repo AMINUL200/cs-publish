@@ -159,7 +159,7 @@ const LandingFooter = ({
       <div className="flex flex-wrap gap-2 justify-around bg-gray-500 p-4 text-white">
         <div>
           <img
-            src="/public/images/creative_commons_white.png"
+            src="/images/creative_commons_white.png"
             className="h-9 w-25 object-fill"
           />
         </div>

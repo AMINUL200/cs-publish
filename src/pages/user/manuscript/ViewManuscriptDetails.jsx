@@ -48,6 +48,7 @@ const ViewManuscriptDetails = () => {
     x: 0,
     y: 0,
   });
+  const [paymentFeature, setPaymentFeature] = useState();
 
   // Fetch manuscript data
   const fetchManuscriptData = async () => {
@@ -70,6 +71,7 @@ const ViewManuscriptDetails = () => {
         setJournalInfo(response.data.journal);
         setVolumeInfo(response.data.volume);
         setAuthorInfo(response.data.author_details.author);
+        setPaymentFeature(response.data.payment_feature);
 
         // Parse figures data
         if (data.figures) {
@@ -443,7 +445,7 @@ const ViewManuscriptDetails = () => {
                   <li className="flex items-center">
                     <span className="mx-2">/</span>
                     <a className="hover:text-yellow-600 transition-colors">
-                      {`volume ${volumeInfo?.volume}  ${volumeInfo?.issue_no}`}
+                      {`volume ${volumeInfo?.volume} / ${volumeInfo?.issue_no}`}
                     </a>
                   </li>
                 )}
@@ -453,11 +455,16 @@ const ViewManuscriptDetails = () => {
                 </li>
               </ol>
             </nav>
+            {paymentFeature.length && (
+              <button className="p-2 bg-yellow-600 text-white rounded-full">
+                {paymentFeature[0]}
+              </button>
+            )}
 
             {/* Bottom Row: Title and Actions */}
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
               {/* Title - Hidden on medium screens */}
-              <h1 className="text-2xl font-bold text-gray-900 flex-1 lg:block hidden">
+              <h1 className="text-2xl font-bold text-gray-900 flex-1 ">
                 {getCleanTitle()}
               </h1>
 
@@ -490,23 +497,23 @@ const ViewManuscriptDetails = () => {
 
                 {/* Mobile Action Buttons: Cite, Share, Expand */}
                 <div className="flex items-center gap-1">
-                  <button
+                  {/* <button
                     onClick={handleMobileCite}
                     className="flex flex-col items-center gap-1 px-2 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
                   >
                     <Quote className="w-4 h-4" />
                     <span className="text-xs">Cite</span>
-                  </button>
+                  </button> */}
                   <button
                     onClick={handleMobileShare}
-                    className="flex flex-col items-center gap-1 px-2 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
+                    className="flex flex-row items-center gap-1 px-2 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
                   >
                     <Share className="w-4 h-4" />
                     <span className="text-xs">Share</span>
                   </button>
                   <button
                     onClick={handleExpand}
-                    className="flex flex-col items-center gap-1 px-2 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
+                    className="flex flex-row items-center gap-1 px-2 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
                   >
                     <Maximize className="w-4 h-4" />
                     <span className="text-xs">Expand</span>
@@ -553,7 +560,7 @@ const ViewManuscriptDetails = () => {
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2">
-                  <div className="relative">
+                  {/* <div className="relative">
                     <button
                       onClick={() => setCiteDropdownOpen(!citeDropdownOpen)}
                       className="flex flex-col items-center gap-1 px-3 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
@@ -561,12 +568,12 @@ const ViewManuscriptDetails = () => {
                       <Quote className="w-4 h-4" />
                       <span className="text-xs">Cite</span>
                     </button>
-                  </div>
+                  </div> */}
 
                   <div className="relative">
                     <button
                       onClick={() => setShareDropdownOpen(!shareDropdownOpen)}
-                      className="flex flex-col items-center gap-1 px-3 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
+                      className="flex flex-row items-center gap-1 px-3 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
                     >
                       <Share className="w-4 h-4" />
                       <span className="text-xs">Share</span>
@@ -575,7 +582,7 @@ const ViewManuscriptDetails = () => {
 
                   <button
                     onClick={handleExpand}
-                    className="flex flex-col items-center gap-1 px-3 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
+                    className="flex flex-row items-center gap-1 px-3 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
                   >
                     <Maximize className="w-4 h-4" />
                     <span className="text-xs">Expand</span>
@@ -586,11 +593,11 @@ const ViewManuscriptDetails = () => {
                 <button
                   onClick={() => handleDownloadPDF(manuscriptData.pdf)}
                   disabled={downloadLoading}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer 
+                  className={`flex flex-row items-center gap-1 px-3 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer
                     ${
                       downloadLoading
-                        ? "bg-yellow-400 cursor-not-allowed"
-                        : "bg-yellow-600 hover:bg-yellow-700 text-white"
+                        ? " cursor-not-allowed"
+                        : " text-black"
                     }`}
                 >
                   {downloadLoading ? (
@@ -802,7 +809,7 @@ const ViewManuscriptDetails = () => {
       <div className="pt-60 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-8 relative">
           {/* Left Sidebar - Journal Info (Scrollable) + Figures & References (Fixed) */}
-          <div className="lg:w-80 flex-shrink-0">
+          <div className="lg:w-90 flex-shrink-0">
             {/* Journal Information Card - Scrollable */}
             <div className="bg-white rounded-lg shadow-sm border mb-4 hidden lg:block">
               <div className="p-4">
@@ -857,18 +864,33 @@ const ViewManuscriptDetails = () => {
                 )}
               </div>
             </div>
-
+            <div className="bg-white rounded-lg shadow-sm border mb-4 hidden lg:block">
+              <div className="flex gap-2 justify-center ">
+                <div className="flex flex-col text-center p-6">
+                  <span> Cite</span>
+                  <span> -</span>
+                </div>
+                <div className="flex flex-col text-center p-6">
+                  <span> Altmetric</span>
+                  <span> -</span>
+                </div>
+                <div className="flex flex-col text-center p-6">
+                  <span> Citations</span>
+                  <span> -</span>
+                </div>
+              </div>
+            </div>
             {/* Figures & References Section - Fixed */}
             <div
               className={`
-                lg:w-80 flex-shrink-0
+                lg:w-90 flex-shrink-0
                 fixed lg:sticky
-                top-0 lg:top-50
+                top-0 lg:top-60
                 left-0 lg:left-auto
                 h-screen lg:h-auto
                 bg-white lg:bg-transparent
                 shadow-2xl lg:shadow-none
-                z-40 lg:z-auto
+                z-999 lg:z-auto
                 transform transition-transform duration-300 ease-in-out
                 ${
                   showLeftSidebar

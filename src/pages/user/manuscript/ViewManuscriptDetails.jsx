@@ -44,7 +44,10 @@ const ViewManuscriptDetails = () => {
   const [volumeInfo, setVolumeInfo] = useState();
   const [authorInfo, setAuthorInfo] = useState([]);
   const [hoveredAuthor, setHoveredAuthor] = useState(null);
-  const [authorPopupPosition, setAuthorPopupPosition] = useState({ x: 0, y: 0 });
+  const [authorPopupPosition, setAuthorPopupPosition] = useState({
+    x: 0,
+    y: 0,
+  });
 
   // Fetch manuscript data
   const fetchManuscriptData = async () => {
@@ -61,6 +64,8 @@ const ViewManuscriptDetails = () => {
 
       if (response.data.status) {
         const data = response.data.data;
+        console.log(response.data);
+
         setManuscriptData(data);
         setJournalInfo(response.data.journal);
         setVolumeInfo(response.data.volume);
@@ -651,7 +656,7 @@ const ViewManuscriptDetails = () => {
                   style={{
                     left: `${authorPopupPosition.x}px`,
                     top: `${authorPopupPosition.y}px`,
-                    transform: 'translateX(-50%)'
+                    transform: "translateX(-50%)",
                   }}
                   onMouseEnter={() => setHoveredAuthor(hoveredAuthor)}
                   onMouseLeave={handleAuthorMouseLeave}
@@ -671,7 +676,7 @@ const ViewManuscriptDetails = () => {
                           </sup>
                         )}
                       </h3>
-                      
+
                       <div className="space-y-2">
                         {hoveredAuthor.email && (
                           <div className="flex items-center gap-2">
@@ -681,7 +686,7 @@ const ViewManuscriptDetails = () => {
                             </span>
                           </div>
                         )}
-                        
+
                         {hoveredAuthor.university && (
                           <div className="flex items-center gap-2">
                             <GraduationCap className="w-4 h-4 text-gray-400" />
@@ -690,7 +695,7 @@ const ViewManuscriptDetails = () => {
                             </span>
                           </div>
                         )}
-                        
+
                         {hoveredAuthor.affiliation && (
                           <div className="flex items-center gap-2">
                             <Building className="w-4 h-4 text-gray-400" />
@@ -702,11 +707,9 @@ const ViewManuscriptDetails = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Arrow indicator */}
-                  <div
-                    className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-white border-t border-l border-gray-200 rotate-45"
-                  />
+                  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-white border-t border-l border-gray-200 rotate-45" />
                 </div>
               )}
             </div>
@@ -830,7 +833,9 @@ const ViewManuscriptDetails = () => {
                     </div>
 
                     <div>
-                      <p className="text-sm text-gray-600">{journalInfo.j_description}</p>
+                      <p className="text-sm text-gray-600">
+                        {journalInfo.j_description}
+                      </p>
                     </div>
 
                     {volumeInfo && (
@@ -1004,11 +1009,199 @@ const ViewManuscriptDetails = () => {
                   />
                 </section>
 
+                {/* Introduction */}
+                {manuscriptData.introduction && (
+                  <section id="introduction" className="mb-12 scroll-mt-44">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
+                      Introduction
+                    </h2>
+                    <div
+                      className="blog-rich-text max-w-none text-gray-700 leading-relaxed"
+                      dangerouslySetInnerHTML={{
+                        __html: manuscriptData.introduction,
+                      }}
+                    />
+                  </section>
+                )}
+                {/* Materials and Methods */}
+                {manuscriptData.materials_and_methods && (
+                  <section
+                    id="materials-methods"
+                    className="mb-12 scroll-mt-44"
+                  >
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
+                      Materials and Methods
+                    </h2>
+                    <div
+                      className="blog-rich-text max-w-none text-gray-700 leading-relaxed"
+                      dangerouslySetInnerHTML={{
+                        __html: manuscriptData.materials_and_methods,
+                      }}
+                    />
+                  </section>
+                )}
+                {/* Results */}
+                {manuscriptData.results && (
+                  <section id="results" className="mb-12 scroll-mt-44">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
+                      Results
+                    </h2>
+                    <div
+                      className="blog-rich-text max-w-none text-gray-700 leading-relaxed"
+                      dangerouslySetInnerHTML={{
+                        __html: manuscriptData.results,
+                      }}
+                    />
+                  </section>
+                )}
+                {/* Discussion */}
+                {manuscriptData.discussion && (
+                  <section id="discussion" className="mb-12 scroll-mt-44">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
+                      Discussion
+                    </h2>
+                    <div
+                      className="blog-rich-text max-w-none text-gray-700 leading-relaxed"
+                      dangerouslySetInnerHTML={{
+                        __html: manuscriptData.discussion,
+                      }}
+                    />
+                  </section>
+                )}
+
+                {/* Conclusion */}
+                {manuscriptData.conclusion && (
+                  <section id="conclusion" className="mb-12 scroll-mt-44">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
+                      Conclusion
+                    </h2>
+                    <div
+                      className="blog-rich-text max-w-none text-gray-700 leading-relaxed"
+                      dangerouslySetInnerHTML={{
+                        __html: manuscriptData.conclusion,
+                      }}
+                    />
+                  </section>
+                )}
+                {/* Supplementary File Section */}
+                {manuscriptData.supplementary_file && (
+                  <section
+                    id="supplementary-file"
+                    className="mb-12 scroll-mt-44"
+                  >
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
+                      Supplementary File
+                    </h2>
+                    <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="p-3 bg-yellow-100 rounded-lg">
+                            <FileText className="w-6 h-6 text-yellow-600" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              Supplementary Materials
+                            </h3>
+                            <p className="text-sm text-gray-600 mt-1">
+                              Additional supporting documents and data
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={handleSupplementaryFileDownload}
+                          className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm font-medium"
+                        >
+                          <Download className="w-4 h-4" />
+                          <span>Download File</span>
+                        </button>
+                      </div>
+                      <div className="mt-4 text-sm text-gray-600">
+                        <p>
+                          This supplementary file contains additional data,
+                          methods, or supporting information related to the
+                          research.
+                        </p>
+                      </div>
+                      {/* 👇 PDF Preview Section */}
+                      <div className="mt-6">
+                        <h4 className="text-md font-semibold text-gray-900 mb-2">
+                          Preview Supplementary PDF:
+                        </h4>
+                        <div className="border border-gray-300 rounded-lg overflow-hidden shadow-sm">
+                          <iframe
+                            src={`${manuscriptData.supplementary_file}`}
+                            title="Supplementary File"
+                            className="w-full h-[600px]"
+                          ></iframe>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                )}
+
+                {/* Author Contributions */}
+                {manuscriptData.author_contributions && (
+                  <section
+                    id="author-contributions"
+                    className="mb-12 scroll-mt-44"
+                  >
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
+                      Author Contributions
+                    </h2>
+                    <div
+                      className="blog-rich-text max-w-none text-gray-700 leading-relaxed"
+                      dangerouslySetInnerHTML={{
+                        __html: manuscriptData.author_contributions,
+                      }}
+                    />
+                  </section>
+                )}
+
+                {/* Conflict of Interest */}
+                {manuscriptData.conflict_of_interest_statement && (
+                  <section
+                    id="conflict-interest"
+                    className="mb-12 scroll-mt-44"
+                  >
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
+                      Conflict of Interest
+                    </h2>
+                    <div
+                      className="blog-rich-text max-w-none text-gray-700 leading-relaxed"
+                      dangerouslySetInnerHTML={{
+                        __html: manuscriptData.conflict_of_interest_statement,
+                      }}
+                    />
+                  </section>
+                )}
+
+                {/* References - Right Section */}
+                {manuscriptData.references && (
+                  <section id="references" className="mb-12 scroll-mt-44">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
+                      References
+                    </h2>
+                    <div
+                      className="blog-rich-text max-w-none text-gray-700 leading-relaxed"
+                      dangerouslySetInnerHTML={{
+                        __html: manuscriptData.references,
+                      }}
+                    />
+                  </section>
+                )}
+
                 {/* Other sections... */}
               </div>
             </div>
-
-           
           </div>
 
           {/* Overlay for mobile when sidebar is open */}

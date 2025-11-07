@@ -31,20 +31,16 @@ const LandingHeader = ({
 
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // Handle scroll to section when coming from other routes
-  useEffect(() => {
-    // Check if we have a scroll target in location state
-    if (location.state?.scrollTo && location.pathname === "/") {
-      // Small timeout to ensure the page is fully rendered
-      const timer = setTimeout(() => {
-        scrollToSection(location.state.scrollTo);
-        // Clear the state to prevent scrolling on every render
-        window.history.replaceState({ ...location.state, scrollTo: null }, "");
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
-  }, [location]);
+  // Remove the scroll effect useEffect since we don't need it anymore
+  // useEffect(() => {
+  //   if (location.state?.scrollTo && location.pathname === "/") {
+  //     const timer = setTimeout(() => {
+  //       scrollToSection(location.state.scrollTo);
+  //       window.history.replaceState({ ...location.state, scrollTo: null }, "");
+  //     }, 100);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [location]);
 
   const handleLogout = async () => {
     try {
@@ -103,7 +99,7 @@ const LandingHeader = ({
         : [{ id: "no-journal", label: "No Journals Available", path: "#" }],
     },
     { id: "mentor", label: "Mentor Hub", path: "/mentors" },
-    { id: "service", label: "Author Service", path: "/author-service" },
+    { id: "service", label: "Author Service", path: "/author-services" }, // Simple route navigation
   ];
 
   // Helper function to get parent dropdown id from a sub-dropdown id
@@ -182,30 +178,20 @@ const LandingHeader = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const scrollToSection = (id) => {
-    const section = document.getElementById(id);
-    if (section) {
-      section.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  };
+  // Remove scrollToSection function since we don't need it anymore
+  // const scrollToSection = (id) => {
+  //   const section = document.getElementById(id);
+  //   if (section) {
+  //     section.scrollIntoView({
+  //       behavior: "smooth",
+  //       block: "start",
+  //     });
+  //   }
+  // };
 
   const handleNavClick = (path) => {
-    if (path === "/author-service") {
-      if (location.pathname === "/") {
-        // ✅ Already on landing page → scroll to author service section
-        scrollToSection("author-service");
-      } else {
-        // ✅ Navigate to home with scroll target in state
-        navigate("/", { state: { scrollTo: "author-service" } });
-      }
-    } else {
-      // Normal route navigation
-      navigate(path);
-    }
-
+    // Simple navigation without scroll behavior
+    navigate(path);
     setOpenDropdowns({});
   };
 

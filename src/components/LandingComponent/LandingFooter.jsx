@@ -13,7 +13,7 @@ const LandingFooter = ({
   policyData = [],
   loading = false,
 }) => {
-  console.log(policyData);
+  // console.log(policyData);
 
   const sections = [
     {
@@ -35,7 +35,7 @@ const LandingFooter = ({
         // { name: "Data Depository", path: "#" },
         // { name: "Find protocols", path: "#" },
         { name: "Innovation", path: "/innovation" },
-        // { name: "Research Service", path: "/research-services" },
+        { name: "Research Service", path: "/research-services" },
         { name: "Publication Charges", path: "/publication-charge" },
         { name: "OPen Access Policy", path: "/open-access-policy" },
         // { name: "Promote and Advertise", path: "#" }

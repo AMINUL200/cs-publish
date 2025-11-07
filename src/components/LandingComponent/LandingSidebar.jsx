@@ -17,7 +17,10 @@ const LandingSidebar = ({
   toggleSidebar,
   settingsData = {},
   journalList = [],
+  whoWeAreData = [],
 }) => {
+  console.log(whoWeAreData);
+
   const { isAuthenticated, userData, token } = useSelector(
     (state) => state.auth
   );
@@ -50,20 +53,13 @@ const LandingSidebar = ({
     {
       name: "Who We Are",
       path: null,
-      dropdown: [
-        { name: "Web Development", path: "#web-development" },
-        { name: "Mobile Apps", path: "#mobile-apps" },
-        {
-          name: "Digital Marketing",
-          path: null,
-          dropdown: [
-            { name: "SEO Services", path: "#seo" },
-            { name: "Social Media", path: "#social-media" },
-            { name: "Content Marketing", path: "#content-marketing" },
-          ],
-        },
-        { name: "Consulting", path: "#consulting" },
-      ],
+      dropdown: whoWeAreData.length
+        ? whoWeAreData.map((who) => ({
+            // id: `${who.id}`,
+            name: who.title,
+            path: `/who-we-are/${who.slug}`,
+          }))
+        : [{ id: "no-Who we are", label: "No Who We Are", path: "#" }],
     },
     {
       name: "Discover Journal",
@@ -77,11 +73,11 @@ const LandingSidebar = ({
     },
     {
       name: "Mentor Hub",
-      path: "/",
+      path: "/mentors",
     },
     {
-      name: "Service",
-      path: "/",
+      name: "Author Service",
+      path: "/author-services",
     },
   ];
 
@@ -349,11 +345,11 @@ const LandingSidebar = ({
             <div className="mt-8">
               {!isAuthenticated && (
                 <button
-                onClick={()=> navigate(`/signin`)}
-                //   to="/signin"
-                 className="w-full custom-btn font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                  onClick={() => navigate(`/signin`)}
+                  //   to="/signin"
+                  className="w-full custom-btn font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
                 >
-                  Login 
+                  Login
                   {/* <User2Icon className="inline-block w-6 h-6 ml-1 text-yellow-800" /> */}
                 </button>
               )}

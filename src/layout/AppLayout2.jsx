@@ -16,7 +16,7 @@ const AppLayout2 = () => {
   const [journalList, setJournalList] = useState([]);
   const [cmsPageList, setCmsPageList] = useState([]);
   const [policyData, setPolicyData] = useState([]);
-  const [whoWeAreData, setWhoWeAreData] = useState([])
+  const [whoWeAreData, setWhoWeAreData] = useState([]);
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -27,22 +27,21 @@ const AppLayout2 = () => {
       setLoading(true);
 
       // ✅ Fire all requests in parallel
-      const [settingsRes, journal, cmsPage, policy, whoWeAre] = await Promise.all([
-        axios.get(`${API_URL}api/contact-us`),
-        axios.get(`${API_URL}api/show-journals`),
-        axios.get(`${API_URL}api/cms-page-show`),
-        axios.get(`${API_URL}api/terms`),
-        axios.get(`${API_URL}api/who-we-are`),
-      ]);
+      const [settingsRes, journal, cmsPage, policy, whoWeAre] =
+        await Promise.all([
+          axios.get(`${API_URL}api/contact-us`),
+          axios.get(`${API_URL}api/show-journals`),
+          axios.get(`${API_URL}api/cms-page-show`),
+          axios.get(`${API_URL}api/terms`),
+          axios.get(`${API_URL}api/who-we-are`),
+        ]);
 
       // ✅ Handle each response
       if (settingsRes.data.flag === 1) setSettingsData(settingsRes.data.data);
       if (journal.data.status) setJournalList(journal.data.data);
       if (cmsPage.data.status) setCmsPageList(cmsPage.data.data);
-      if(policy.data.status) setPolicyData(policy.data.data);
-      if(whoWeAre.data.status) setWhoWeAreData(whoWeAre.data.data)
-
-     
+      if (policy.data.status) setPolicyData(policy.data.data);
+      if (whoWeAre.data.status) setWhoWeAreData(whoWeAre.data.data);
     } catch (error) {
       console.error("Parallel fetch failed:", error);
       toast.error("Failed to load site data!");
@@ -69,6 +68,7 @@ const AppLayout2 = () => {
         toggleSidebar={toggleSidebar}
         settingsData={settingsData}
         journalList={journalList}
+        whoWeAreData={whoWeAreData}
       />
       <BackToTop />
 

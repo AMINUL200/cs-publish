@@ -1,20 +1,27 @@
-import React from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination, EffectFade } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/effect-fade';
+import React from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination, EffectFade } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/effect-fade";
+import { useNavigate } from "react-router-dom";
 
 const LandingBanner = ({ bannerData = [], loading = false, error = null }) => {
-    // console.log("banner data:: ", bannerData);
-    // console.log("banner error:: ", error);
-    // console.log("banner loading:: ", loading);
-    
-    
+  // console.log("banner data:: ", bannerData);
+  // console.log("banner error:: ", error);
+  // console.log("banner loading:: ", loading);
+  const navigate = useNavigate();
+  const handleClick = () => {
+    navigate("/signin");
+  };
+
   // Loading Skeleton
   if (loading) {
     return (
-      <div className="relative w-full h-screen max-h-[540px] py-4 pt-20 overflow-hidden" id='home'>
+      <div
+        className="relative w-full h-screen max-h-[540px] py-4 pt-20 overflow-hidden"
+        id="home"
+      >
         <div className="h-full bg-gray-200 animate-pulse">
           <div className="absolute inset-0 bg-gray-300 z-0"></div>
           <div className="px-4 h-full flex justify-center items-center relative z-10">
@@ -35,7 +42,10 @@ const LandingBanner = ({ bannerData = [], loading = false, error = null }) => {
   // Error State
   if (error) {
     return (
-      <div className="relative w-full h-screen max-h-[540px] py-4 pt-20 overflow-hidden" id='home'>
+      <div
+        className="relative w-full h-screen max-h-[540px] py-4 pt-20 overflow-hidden"
+        id="home"
+      >
         <div className="h-full bg-gradient-to-br from-red-50 to-red-100">
           <div className="absolute inset-0 bg-red-200/20 z-0"></div>
           <div className="px-4 h-full flex justify-center items-center relative z-10">
@@ -45,9 +55,10 @@ const LandingBanner = ({ bannerData = [], loading = false, error = null }) => {
                 Oops! Something went wrong
               </h1>
               <p className="text-lg text-red-600 mb-6">
-                {error.message || 'Failed to load banner content. Please try again later.'}
+                {error.message ||
+                  "Failed to load banner content. Please try again later."}
               </p>
-              <button 
+              <button
                 className="px-6 py-3 bg-red-600 text-white font-medium rounded-3xl hover:bg-red-700 transition-all duration-300"
                 onClick={() => window.location.reload()}
               >
@@ -63,7 +74,10 @@ const LandingBanner = ({ bannerData = [], loading = false, error = null }) => {
   // Empty State
   if (!bannerData || bannerData.length === 0) {
     return (
-      <div className="relative w-full h-screen max-h-[540px] py-4 pt-20 overflow-hidden" id='home'>
+      <div
+        className="relative w-full h-screen max-h-[540px] py-4 pt-20 overflow-hidden"
+        id="home"
+      >
         <div className="h-full bg-gradient-to-br from-blue-50 to-blue-100">
           <div className="absolute inset-0 bg-blue-200/20 z-0"></div>
           <div className="px-4 h-full flex justify-center items-center relative z-10">
@@ -73,7 +87,8 @@ const LandingBanner = ({ bannerData = [], loading = false, error = null }) => {
                 No Content Available
               </h1>
               <h5 className="text-lg text-blue-600">
-                Banner content is currently unavailable. Please check back later.
+                Banner content is currently unavailable. Please check back
+                later.
               </h5>
             </div>
           </div>
@@ -84,7 +99,10 @@ const LandingBanner = ({ bannerData = [], loading = false, error = null }) => {
 
   // Normal State with Data
   return (
-    <div className="relative w-full h-screen max-h-[540px] py-4 pt-10 sm:pt-20 overflow-hidden" id='home'>
+    <div
+      className="relative w-full h-screen max-h-[540px] py-4 pt-10 sm:pt-20 overflow-hidden"
+      id="home"
+    >
       <Swiper
         modules={[Autoplay, Pagination, EffectFade]}
         autoplay={{ delay: 5000, disableOnInteraction: false }}
@@ -113,8 +131,10 @@ const LandingBanner = ({ bannerData = [], loading = false, error = null }) => {
                 <h5 className="text-lg md:text-xl text-white/90 mb-8 max-w-lg text-center mx-auto">
                   {slide.description}
                 </h5>
-                <div className="pt-6 border-t border-white/20">
-                  <button className="px-8 py-3 custom-btn font-medium rounded-3xl  transition-all duration-300 ease-in-out transform hover:scale-105">
+                <div className="pt-6 border-t border-white/20" >
+                  <button
+                  onClick={handleClick} 
+                  className="px-8 py-3 custom-btn font-medium rounded-3xl  transition-all duration-300 ease-in-out transform hover:scale-105">
                     {slide.button_name}
                   </button>
                 </div>
@@ -125,6 +145,6 @@ const LandingBanner = ({ bannerData = [], loading = false, error = null }) => {
       </Swiper>
     </div>
   );
-}
+};
 
 export default LandingBanner;

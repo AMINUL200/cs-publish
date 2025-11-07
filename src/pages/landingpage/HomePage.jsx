@@ -12,6 +12,7 @@ import axios from "axios";
 import LandingPublishedJournal from "../../components/LandingComponent/LandingPublishedJournal";
 import LandingOurTeam from "../../components/LandingComponent/LandingOurTeam";
 import { useLocation } from "react-router-dom";
+import FloatingSubmitButton from "../../components/LandingComponent/FloatingSubmitButton";
 
 const HomePage = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -170,6 +171,7 @@ const HomePage = () => {
         loading={loading.team}
         error={error.team}
       />
+      <FloatingSubmitButton/>
     </>
   );
 };

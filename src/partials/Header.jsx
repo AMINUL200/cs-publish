@@ -60,8 +60,8 @@ function Header({
               </button>
               <SearchModal id="search-modal" searchId="search" modalOpen={searchModalOpen} setModalOpen={setSearchModalOpen} />
             </div>
-            <Notifications align="right" />
-            <MaltyDropdown/>
+            {/* <Notifications align="right" /> */}
+            {/* <MaltyDropdown/> */}
             
             
             {/*  Divider */}

@@ -147,6 +147,10 @@ import UserSideOpenAccessPolicy from "./pages/user/journal/UserSideOpenAccessPol
 import HandleAward from "./pages/admin/handle_award/HandleAward";
 import AddAward from "./pages/admin/handle_award/AddAward";
 import AwardPage from "./pages/user/award/AwardPage";
+import HandleEventAndConference from "./pages/admin/event_and_confrence/HandleEventAndConference";
+import ConferenceForm from "./pages/admin/event_and_confrence/ConferenceForm";
+import EventAndConference from "./pages/user/event_conference/EventAndConference";
+import EventAndConferenceDetail from "./pages/user/event_conference/EventAndConferenceDetail";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -299,6 +303,8 @@ function App() {
               <Route path="/publication-charge" element={<PublicationCharge/>}/>
               <Route path="/open-access-policy" element={<UserSideOpenAccessPolicy/>}/>
               <Route path="/award" element={<AwardPage/>}/>
+              <Route path="/event-conference" element={<EventAndConference/>}/>
+              <Route path="/conference-detail/:slug" element={<EventAndConferenceDetail/>}/>
 
             </Route>
           </Route>
@@ -458,6 +464,9 @@ function App() {
 
               <Route path="/handle-award" element={<HandleAward/>}/>
               <Route path="/add-award" element={<AddAward/>}/>
+
+              <Route path="/handle-event-conference" element={<HandleEventAndConference/>}/>
+              <Route path="/add-event-conference" element={<ConferenceForm/>}/>
 
 
               {/* ------------------------------------------ Admin Route End--------------------- */}

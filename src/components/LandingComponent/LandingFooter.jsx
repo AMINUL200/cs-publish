@@ -25,7 +25,7 @@ const LandingFooter = ({
         { name: "Mentors Hub", path: "/mentors" },
         { name: "Author Services", path: "/author-services" },
         { name: "Blog", path: "/blog" },
-        { name: "Events & Conference", path: "#" },
+        { name: "Events & Conference", path: "/event-conference" },
         // { name: "Conference", path: "#" },
       ],
     },

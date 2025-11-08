@@ -5,6 +5,7 @@ import AuthorDashboard from "../user/dashboard/AuthorDashboard";
 import ReviewerDashboard from "../Reviewer/ReviewerDashboard";
 import EditorDashboard from "../Editor/dashboard/EditorDashboard";
 import PublisherDashboard from "../publisher/PublisherDashboard";
+import ProfilePage from "../Profile/ProfilePage";
 
 const Dashboard = () => {
   const { userData } = useSelector((state) => state.auth);
@@ -14,7 +15,8 @@ const Dashboard = () => {
   return (
     <>
       {/* Admin  */}
-      {userData.user_type == 0 && <AdminDashboard />}
+      {/* {userData.user_type == 0 && <AdminDashboard />} */}
+      {userData.user_type == 0 && <ProfilePage />}
 
       {/* Editor */}
       {userData.user_type == 1 && <EditorDashboard />}

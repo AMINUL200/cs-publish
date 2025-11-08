@@ -429,6 +429,23 @@ export const sidebarRoutes = [
       }
     ]
   },
+  {
+    title: "Handle Event & Conference",
+    icon: <FontAwesomeIcon icon={faCog} />,
+    allowedRoles: ["0"],
+    subRoutes:[
+      {
+        path: "/add-event-conference",
+        title: "Add Event ",
+        allowedRoles:["0"]
+      },
+      {
+        path: "/handle-event-conference",
+        title: "Event & Conference",
+        allowedRoles:["0"]
+      }
+    ]
+  },
   // Reviewer route
   {
     path: "/list-journals",

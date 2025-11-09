@@ -504,7 +504,7 @@ const ViewManuscriptDetails = () => {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={handleMobileCite}
-                    className="flex flex-col items-center gap-1 px-2 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
+                    className="flex flex-row items-center gap-1 px-2 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
                   >
                     <Quote className="w-4 h-4" />
                     <span className="text-xs">Cite</span>
@@ -568,7 +568,7 @@ const ViewManuscriptDetails = () => {
                   <div className="relative">
                     <button
                       onClick={() => handleCitePopup()}
-                      className="flex flex-col items-center gap-1 px-3 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
+                      className="flex flex-row items-center gap-1 px-3 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
                     >
                       <Quote className="w-4 h-4" />
                       <span className="text-xs">Cite</span>
@@ -747,7 +747,6 @@ const ViewManuscriptDetails = () => {
       </div>
 
       {/* Citation Popup */}
-      {/* Citation Popup */}
       {showCitePopup && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden animate-slideUp">
@@ -760,11 +759,11 @@ const ViewManuscriptDetails = () => {
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900">
-                      Citation Formats
+                      Cites 
                     </h2>
-                    <p className="text-sm text-gray-600 mt-1">
+                    {/* <p className="text-sm text-gray-600 mt-1">
                       Choose your preferred citation style
-                    </p>
+                    </p> */}
                   </div>
                 </div>
                 <button
@@ -796,7 +795,7 @@ const ViewManuscriptDetails = () => {
                             {cite.cite_name}
                           </h3>
                           <p className="text-xs text-gray-500 mt-0.5">
-                            Citation Format
+                            Cite
                           </p>
                         </div>
                       </div>
@@ -824,7 +823,7 @@ const ViewManuscriptDetails = () => {
                         className="flex items-center justify-center gap-2 px-4 py-2.5 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 active:scale-95 transition-all text-sm font-semibold flex-1 shadow-md hover:shadow-lg"
                       >
                         <Copy className="w-4 h-4" />
-                        Copy Citation
+                        Copy Cite
                       </button>
                       <button
                         onClick={() => handleDownloadCitation(cite)}
@@ -846,10 +845,10 @@ const ViewManuscriptDetails = () => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
                     No Citations Available
                   </h3>
-                  <p className="text-gray-500 text-sm">
-                    Citation formats have not been generated for this manuscript
+                  {/* <p className="text-gray-500 text-sm">
+                    Cite formats have not been generated for this manuscript
                     yet.
-                  </p>
+                  </p> */}
                 </div>
               )}
             </div>
@@ -858,7 +857,7 @@ const ViewManuscriptDetails = () => {
             {manuscriptData.cites && manuscriptData.cites.length > 0 && (
               <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
                 <p className="text-xs text-gray-600 text-center">
-                  💡 Tip: Click "Copy" to quickly add the citation to your
+                  💡 Tip: Click "Copy" to quickly add the cite to your
                   clipboard, or "Download" to save as a text file
                 </p>
               </div>

@@ -19,6 +19,9 @@ import {
   Mail,
   Building,
   GraduationCap,
+  Copy,
+  FileDown,
+  Zap,
 } from "lucide-react";
 import Loader from "../../../components/common/Loader";
 
@@ -49,6 +52,8 @@ const ViewManuscriptDetails = () => {
     y: 0,
   });
   const [paymentFeature, setPaymentFeature] = useState();
+  const [showCitePopup, setShowCitePopup] = useState(false);
+  const [selectedCite, setSelectedCite] = useState(null);
 
   // Fetch manuscript data
   const fetchManuscriptData = async () => {
@@ -241,31 +246,30 @@ const ViewManuscriptDetails = () => {
     }
   };
 
-  // Handle citation
-  const handleCite = (format) => {
-    const citationText = generateCitation(format);
-    navigator.clipboard.writeText(citationText);
-    toast.success(`${format} citation copied to clipboard!`);
-    setCiteDropdownOpen(false);
+  // Handle citation popup
+  const handleCitePopup = (cite = null) => {
+    if (cite) {
+      setSelectedCite(cite);
+    }
+    setShowCitePopup(true);
   };
 
-  // Generate citation based on format
-  const generateCitation = (format) => {
-    const authors = manuscriptData.username || "Unknown Author";
-    const title = getCleanTitle();
-    const year = new Date(manuscriptData.created_at).getFullYear();
-    const journal = manuscriptData.j_title || "Journal";
+  // Copy citation to clipboard
+  const handleCopyCitation = (citationText) => {
+    navigator.clipboard.writeText(citationText);
+    toast.success("Citation copied to clipboard!");
+  };
 
-    switch (format) {
-      case "apa":
-        return `${authors} (${year}). ${title}. ${journal}.`;
-      case "mla":
-        return `${authors}. "${title}." ${journal}, ${year}.`;
-      case "chicago":
-        return `${authors}. "${title}." ${journal} (${year}).`;
-      default:
-        return `${authors}. "${title}." ${journal} (${year}).`;
-    }
+  // Download citation as text file
+  const handleDownloadCitation = (cite) => {
+    const element = document.createElement("a");
+    const file = new Blob([cite.cite_address], { type: "text/plain" });
+    element.href = URL.createObjectURL(file);
+    element.download = `${cite.cite_name}_citation.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    toast.success(`${cite.cite_name} citation downloaded!`);
   };
 
   // Handle share
@@ -313,8 +317,9 @@ const ViewManuscriptDetails = () => {
 
   // Simple handlers for mobile view (without dropdowns for now)
   const handleMobileCite = () => {
-    const citationText = generateCitation("apa");
-    navigator.clipboard.writeText(citationText);
+    if (manuscriptData?.cites?.length > 0) {
+      handleCitePopup(manuscriptData.cites[0]);
+    }
   };
 
   const handleMobileShare = () => {
@@ -455,7 +460,7 @@ const ViewManuscriptDetails = () => {
                 </li>
               </ol>
             </nav>
-            {paymentFeature.length && (
+            {paymentFeature?.length && (
               <span className="inline-flex p-1 bg-yellow-600 text-white rounded-full  justify-center align-center text-center text-[10px] -mb-2 ">
                 {paymentFeature[0]}
               </span>
@@ -497,13 +502,13 @@ const ViewManuscriptDetails = () => {
 
                 {/* Mobile Action Buttons: Cite, Share, Expand */}
                 <div className="flex items-center gap-1">
-                  {/* <button
+                  <button
                     onClick={handleMobileCite}
                     className="flex flex-col items-center gap-1 px-2 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
                   >
                     <Quote className="w-4 h-4" />
                     <span className="text-xs">Cite</span>
-                  </button> */}
+                  </button>
                   <button
                     onClick={handleMobileShare}
                     className="flex flex-row items-center gap-1 px-2 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
@@ -560,15 +565,15 @@ const ViewManuscriptDetails = () => {
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2">
-                  {/* <div className="relative">
+                  <div className="relative">
                     <button
-                      onClick={() => setCiteDropdownOpen(!citeDropdownOpen)}
+                      onClick={() => handleCitePopup()}
                       className="flex flex-col items-center gap-1 px-3 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
                     >
                       <Quote className="w-4 h-4" />
                       <span className="text-xs">Cite</span>
                     </button>
-                  </div> */}
+                  </div>
 
                   <div className="relative">
                     <button
@@ -594,11 +599,7 @@ const ViewManuscriptDetails = () => {
                   onClick={() => handleDownloadPDF(manuscriptData.pdf)}
                   disabled={downloadLoading}
                   className={`flex flex-row items-center gap-1 px-3 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer
-                    ${
-                      downloadLoading
-                        ? " cursor-not-allowed"
-                        : " text-black"
-                    }`}
+                    ${downloadLoading ? " cursor-not-allowed" : " text-black"}`}
                 >
                   {downloadLoading ? (
                     <>
@@ -646,11 +647,6 @@ const ViewManuscriptDetails = () => {
                   >
                     <button className="text-blue-600 hover:text-yellow-600 hover:underline transition-colors text-sm font-medium cursor-pointer">
                       {author.name}
-                      {/* {author.order && (
-                        <sup className="ml-1 text-xs text-gray-500">
-                          {author.order}
-                        </sup>
-                      )} */}
                     </button>
                   </li>
                 ))}
@@ -737,12 +733,140 @@ const ViewManuscriptDetails = () => {
                 <span className="font-medium">Downloads:</span>
                 <span className="ml-2">{manuscriptData.download_count}</span>
               </div>
+              {manuscriptData.quick_press === "1" && (
+                <div className="flex items-center gap-1 bg-yellow-100 px-2 py-1 rounded-full">
+                  <Zap className="w-3 h-3 text-yellow-600" />
+                  <span className="text-yellow-700 text-xs font-medium">
+                    Quick Press
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Rest of your component remains the same... */}
+      {/* Citation Popup */}
+      {/* Citation Popup */}
+      {showCitePopup && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden animate-slideUp">
+            {/* Header with gradient */}
+            <div className="relative bg-gradient-to-r from-yellow-50 to-yellow-100 p-6 border-b border-yellow-200">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-yellow-600 rounded-lg">
+                    <Quote className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      Citation Formats
+                    </h2>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Choose your preferred citation style
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowCitePopup(false)}
+                  className="p-2 hover:bg-yellow-200 rounded-lg transition-colors group"
+                >
+                  <X className="w-6 h-6 text-gray-600 group-hover:text-gray-900" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 max-h-[calc(90vh-140px)] overflow-y-auto custom-scrollbar">
+              <div className="grid grid-cols-1 gap-5">
+                {manuscriptData.cites?.map((cite, index) => (
+                  <div
+                    key={cite.id}
+                    className="group relative bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border-2 border-gray-200 hover:border-yellow-400 hover:shadow-lg transition-all duration-300"
+                  >
+                    {/* Format badge and title */}
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center group-hover:bg-yellow-200 transition-colors">
+                          <span className="text-lg font-bold text-yellow-700">
+                            {cite.cite_name.substring(0, 2).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-gray-900 text-lg">
+                            {cite.cite_name}
+                          </h3>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            Citation Format
+                          </p>
+                        </div>
+                      </div>
+                      <span className="bg-yellow-100 text-yellow-800 text-xs font-semibold px-3 py-1.5 rounded-full border border-yellow-300">
+                        {cite.cite_name}
+                      </span>
+                    </div>
+
+                    {/* Citation content with enhanced styling */}
+                    <div className="relative bg-white rounded-lg p-4 border border-gray-300 mb-4 shadow-sm">
+                      <div className="absolute top-3 right-3">
+                        <div className="p-1.5 bg-gray-100 rounded-md">
+                          <FileText className="w-4 h-4 text-gray-400" />
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap pr-10 font-mono">
+                        {cite.cite_address}
+                      </p>
+                    </div>
+
+                    {/* Action buttons with enhanced design */}
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => handleCopyCitation(cite.cite_address)}
+                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 active:scale-95 transition-all text-sm font-semibold flex-1 shadow-md hover:shadow-lg"
+                      >
+                        <Copy className="w-4 h-4" />
+                        Copy Citation
+                      </button>
+                      <button
+                        onClick={() => handleDownloadCitation(cite)}
+                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-700 text-white rounded-lg hover:bg-gray-800 active:scale-95 transition-all text-sm font-semibold flex-1 shadow-md hover:shadow-lg"
+                      >
+                        <FileDown className="w-4 h-4" />
+                        Download
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {(!manuscriptData.cites || manuscriptData.cites.length === 0) && (
+                <div className="text-center py-16">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Quote className="w-10 h-10 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    No Citations Available
+                  </h3>
+                  <p className="text-gray-500 text-sm">
+                    Citation formats have not been generated for this manuscript
+                    yet.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Footer with info */}
+            {manuscriptData.cites && manuscriptData.cites.length > 0 && (
+              <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                <p className="text-xs text-gray-600 text-center">
+                  💡 Tip: Click "Copy" to quickly add the citation to your
+                  clipboard, or "Download" to save as a text file
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
         <div className="lg:hidden fixed top-24 left-4 right-4 bg-white border text-yellow-200 border-yellow-200 rounded-lg shadow-lg z-50">
@@ -864,12 +988,9 @@ const ViewManuscriptDetails = () => {
                 )}
               </div>
             </div>
+
             <div className="bg-white rounded-lg shadow-sm border mb-4 hidden lg:block">
               <div className="flex gap-2 justify-center ">
-                <div className="flex flex-col text-center p-6">
-                  <span> Cite</span>
-                  <span> -</span>
-                </div>
                 <div className="flex flex-col text-center p-6">
                   <span> Altmetric</span>
                   <span> -</span>
@@ -880,6 +1001,70 @@ const ViewManuscriptDetails = () => {
                 </div>
               </div>
             </div>
+            {/* Quick Press Status */}
+            {manuscriptData.quick_press === "1" && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 hidden lg:block">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-yellow-100 rounded-lg">
+                    <Zap className="w-5 h-5 text-yellow-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-yellow-800 text-sm">
+                      Quick Press
+                    </h4>
+                    <p className="text-yellow-700 text-xs">
+                      Featured article for immediate visibility
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Keywords Section */}
+            {manuscriptData.keywords && manuscriptData.keywords.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm border mb-4 hidden lg:block">
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                    Keywords
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {manuscriptData.keywords.map((keyword, index) => (
+                      <span
+                        key={index}
+                        className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full"
+                      >
+                        {keyword}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Stats Card */}
+            <div className="bg-white rounded-lg shadow-sm border mb-4 hidden lg:block">
+              <div className="grid grid-cols-3 gap-4 p-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold text-blue-600">
+                    {manuscriptData.view_count}
+                  </div>
+                  <div className="text-xs text-gray-600">Views</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-green-600">
+                    {manuscriptData.download_count}
+                  </div>
+                  <div className="text-xs text-gray-600">Downloads</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-purple-600">
+                    {manuscriptData.cites?.length || 0}
+                  </div>
+                  <div className="text-xs text-gray-600">Citations</div>
+                </div>
+              </div>
+            </div>
+
             {/* Figures & References Section - Fixed */}
             <div
               className={`

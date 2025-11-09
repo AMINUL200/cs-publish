@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import Loader from '../../components/common/Loader';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { Zap, FileText, Download, ArrowLeft, Eye, File, Image } from 'lucide-react';
 
 const PublisherViewDesignManuscript = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -41,13 +42,17 @@ const PublisherViewDesignManuscript = () => {
   }, [id]);
 
   const handleDownloadPDF = () => {
-    toast.info('Download PDF functionality to be implemented');
-    // Implement PDF download logic here
+    if (manuscriptData.pdf) {
+      window.open(manuscriptData.pdf, '_blank');
+    } else {
+      toast.info('No PDF available for download');
+    }
   };
 
-  const handleApprove = () => {
-    toast.info('Approve manuscript functionality to be implemented');
-    // Implement approve logic here
+  const handleViewFile = (fileUrl) => {
+    if (fileUrl) {
+      window.open(fileUrl, '_blank');
+    }
   };
 
   const handleBack = () => {
@@ -68,6 +73,39 @@ const PublisherViewDesignManuscript = () => {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  // Parse figures data
+  const parseFigures = (figures) => {
+    if (!figures) return [];
+    try {
+      return typeof figures === 'string' ? JSON.parse(figures) : figures;
+    } catch (error) {
+      console.error('Error parsing figures:', error);
+      return Array.isArray(figures) ? figures : [];
+    }
+  };
+
+  // Parse cites data
+  const parseCites = (cites) => {
+    if (!cites) return [];
+    try {
+      return typeof cites === 'string' ? JSON.parse(cites) : cites;
+    } catch (error) {
+      console.error('Error parsing cites:', error);
+      return Array.isArray(cites) ? cites : [];
+    }
+  };
+
+  // Parse keywords data
+  const parseKeywords = (keywords) => {
+    if (!keywords) return [];
+    try {
+      return typeof keywords === 'string' ? JSON.parse(keywords) : keywords;
+    } catch (error) {
+      console.error('Error parsing keywords:', error);
+      return Array.isArray(keywords) ? keywords : [];
+    }
   };
 
   if (loading) {
@@ -92,6 +130,10 @@ const PublisherViewDesignManuscript = () => {
     );
   }
 
+  const figures = parseFigures(manuscriptData.figures);
+  const cites = parseCites(manuscriptData.cites);
+  const keywords = parseKeywords(manuscriptData.keywords);
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -102,23 +144,27 @@ const PublisherViewDesignManuscript = () => {
               <div className="flex items-center gap-3 mb-4">
                 <button
                   onClick={handleBack}
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
+                  <ArrowLeft className="w-4 h-4" />
                   Back
                 </button>
                 <div className="bg-green-100 px-3 py-1 rounded-full">
                   <span className="text-green-800 text-sm font-medium">Published</span>
                 </div>
+                {manuscriptData.quick_press === 1 && (
+                  <div className="bg-yellow-100 px-3 py-1 rounded-full flex items-center gap-1">
+                    <Zap className="w-3 h-3 text-yellow-600" />
+                    <span className="text-yellow-800 text-sm font-medium">Quick Press</span>
+                  </div>
+                )}
               </div>
               
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
                 Manuscript Details
               </h1>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm mb-4">
                 <div>
                   <span className="font-semibold text-gray-600">Manuscript ID:</span>
                   <p className="text-gray-900">{manuscriptData.m_unique_id}</p>
@@ -144,23 +190,178 @@ const PublisherViewDesignManuscript = () => {
                   <p className="text-gray-900">{formatDate(manuscriptData.created_at)}</p>
                 </div>
               </div>
+
+              {/* Keywords */}
+              {keywords.length > 0 && (
+                <div className="mt-4">
+                  <span className="font-semibold text-gray-600 block mb-2">Keywords:</span>
+                  <div className="flex flex-wrap gap-2">
+                    {keywords.map((keyword, index) => (
+                      <span
+                        key={index}
+                        className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"
+                      >
+                        {keyword}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             
             {/* Stats */}
             <div className="bg-gray-50 rounded-lg p-4 min-w-[200px]">
               <div className="space-y-3">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{manuscriptData.view_count}</div>
+                  <div className="text-2xl font-bold text-blue-600">{manuscriptData.view_count || 0}</div>
                   <div className="text-sm text-gray-600">Views</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{manuscriptData.download_count}</div>
+                  <div className="text-2xl font-bold text-green-600">{manuscriptData.download_count || 0}</div>
                   <div className="text-sm text-gray-600">Downloads</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Quick Press Status */}
+        {manuscriptData.quick_press === 1 && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-yellow-100 rounded-lg">
+                <Zap className="w-5 h-5 text-yellow-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-yellow-800 text-lg">Quick Press Featured</h3>
+                <p className="text-yellow-700 mt-1">
+                  This manuscript is featured in the Quick Press section for immediate visibility across the platform.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Files Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          {/* PDF File */}
+          {manuscriptData.pdf && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-red-50 rounded-lg">
+                  <FileText className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">PDF Document</h3>
+                  <p className="text-sm text-gray-500">Manuscript PDF</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleViewFile(manuscriptData.pdf)}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm"
+                >
+                  <Eye className="w-4 h-4" />
+                  View
+                </button>
+                <button
+                  onClick={handleDownloadPDF}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-sm"
+                >
+                  <Download className="w-4 h-4" />
+                  Download
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Supplementary File */}
+          {manuscriptData.supplementary_file && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-green-50 rounded-lg">
+                  <File className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Supplementary File</h3>
+                  <p className="text-sm text-gray-500">Additional documents</p>
+                </div>
+              </div>
+              <button
+                onClick={() => handleViewFile(manuscriptData.supplementary_file)}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors text-sm"
+              >
+                <Eye className="w-4 h-4" />
+                View File
+              </button>
+            </div>
+          )}
+
+          {/* Figures Count */}
+          {figures.length > 0 && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-purple-50 rounded-lg">
+                  <Image className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Figures</h3>
+                  <p className="text-sm text-gray-500">{figures.length} figure(s)</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {figures.slice(0, 3).map((figure, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={figure}
+                      alt={`Figure ${index + 1}`}
+                      className="w-full h-16 object-cover rounded-lg border border-gray-200 cursor-pointer"
+                      onClick={() => handleViewFile(figure)}
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-lg flex items-center justify-center">
+                      <Eye className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </div>
+                ))}
+                {figures.length > 3 && (
+                  <div className="flex items-center justify-center bg-gray-100 rounded-lg border border-gray-200">
+                    <span className="text-sm text-gray-600">+{figures.length - 3} more</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Citation Styles Section */}
+        {cites.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-purple-50 rounded-lg">
+                <FileText className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Citation Styles</h2>
+                <p className="text-sm text-gray-600">Available citation formats for this manuscript</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {cites.map((cite, index) => (
+                <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-semibold text-gray-900 bg-white px-3 py-1 rounded-full text-sm border">
+                      {cite.cite_name} Format
+                    </span>
+                  </div>
+                  <div className="text-gray-700 text-sm leading-relaxed bg-white p-3 rounded border">
+                    {cite.cite_address || `No ${cite.cite_name} citation available`}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Manuscript Content */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
@@ -304,24 +505,10 @@ const PublisherViewDesignManuscript = () => {
               onClick={handleDownloadPDF}
               className="flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+              <Download className="w-5 h-5" />
               Download PDF
             </button>
           </div>
-          
-          {/* <div className="flex gap-3">
-            <button
-              onClick={handleApprove}
-              className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              Approve Manuscript
-            </button>
-          </div> */}
         </div>
       </div>
 

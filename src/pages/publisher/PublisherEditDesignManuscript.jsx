@@ -5,7 +5,7 @@ import Loader from "../../components/common/Loader";
 import TextEditor from "../../components/common/TextEditor";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { ArrowLeft, Save, Upload, X, FileText, Image, File, Eye, Download, Zap } from "lucide-react";
+import { ArrowLeft, Save, Upload, X, FileText, Image, File, Eye, Download, Zap, Plus, Trash2 } from "lucide-react";
 
 const PublisherEditDesignManuscript = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -24,7 +24,7 @@ const PublisherEditDesignManuscript = () => {
   const [pdfPreview, setPdfPreview] = useState(null);
   const [figureFiles, setFigureFiles] = useState([]);
   const [figurePreviews, setFigurePreviews] = useState([]);
-  const [quickPress, setQuickPress] = useState("0"); // Default to false (0)
+  const [quickPress, setQuickPress] = useState("0");
 
   const [manuscriptData, setManuscriptData] = useState({
     title: "",
@@ -37,7 +37,15 @@ const PublisherEditDesignManuscript = () => {
     author_contributions: "",
     conflict_of_interest_statement: "",
     references: "",
+    keywords: [],
   });
+
+  const [cites, setCites] = useState([
+    { cite_name: "AMA", cite_address: "" },
+    { cite_name: "APA", cite_address: "" },
+    { cite_name: "MLA", cite_address: "" },
+    { cite_name: "NLM", cite_address: "" }
+  ]);
 
   // ✅ Fetch manuscript data on component mount
   const fetchManuscriptData = async () => {
@@ -66,11 +74,31 @@ const PublisherEditDesignManuscript = () => {
           author_contributions: data.author_contributions || "",
           conflict_of_interest_statement: data.conflict_of_interest_statement || "",
           references: data.references || "",
+          keywords: data.keywords || [],
         });
 
         // Set quick_press from API response
         if (data.quick_press !== undefined) {
-          setQuickPress(data.quick_press.toString()); // Convert to string "1" or "0"
+          setQuickPress(data.quick_press.toString());
+        }
+
+        // Set cites data if exists
+        if (data.cites && Array.isArray(data.cites)) {
+          // Create default cites structure
+          const defaultCites = [
+            { cite_name: "AMA", cite_address: "" },
+            { cite_name: "APA", cite_address: "" },
+            { cite_name: "MLA", cite_address: "" },
+            { cite_name: "NLM", cite_address: "" }
+          ];
+
+          // Merge with existing cites data
+          const mergedCites = defaultCites.map(defaultCite => {
+            const existingCite = data.cites.find(cite => cite.cite_name === defaultCite.cite_name);
+            return existingCite ? { ...defaultCite, cite_address: existingCite.cite_address } : defaultCite;
+          });
+
+          setCites(mergedCites);
         }
 
         // Set image preview if image exists
@@ -91,7 +119,6 @@ const PublisherEditDesignManuscript = () => {
         // Set figures preview if figures exist
         if (data.figures) {
           try {
-            // Parse the figures string if it's a JSON string
             const figuresArray = typeof data.figures === 'string' 
               ? JSON.parse(data.figures) 
               : data.figures;
@@ -101,7 +128,6 @@ const PublisherEditDesignManuscript = () => {
             }
           } catch (error) {
             console.error("Error parsing figures:", error);
-            // If parsing fails, check if it's already an array
             if (Array.isArray(data.figures)) {
               setFigurePreviews(data.figures);
             }
@@ -132,18 +158,34 @@ const PublisherEditDesignManuscript = () => {
     }));
   };
 
+  // ✅ Handle cite changes
+  const handleCiteChange = (index, field, value) => {
+    const updatedCites = cites.map((cite, i) => 
+      i === index ? { ...cite, [field]: value } : cite
+    );
+    setCites(updatedCites);
+  };
+
+  // ✅ Handle keywords changes
+  const handleKeywordsChange = (e) => {
+    const inputValue = e.target.value;
+    const keywordsArray = inputValue.split(',').map(keyword => keyword.trim()).filter(keyword => keyword);
+    setManuscriptData(prev => ({
+      ...prev,
+      keywords: keywordsArray
+    }));
+  };
+
   // ✅ Handle image file change
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       toast.error("Please select a valid image file");
       return;
     }
 
-    // Validate file size (5MB limit)
     if (file.size > 5 * 1024 * 1024) {
       toast.error("Image size should be less than 5MB");
       return;
@@ -236,7 +278,20 @@ const PublisherEditDesignManuscript = () => {
       formData.append("author_contributions", manuscriptData.author_contributions);
       formData.append("conflict_of_interest_statement", manuscriptData.conflict_of_interest_statement);
       formData.append("references", manuscriptData.references);
-      formData.append("quick_press", quickPress); // ✅ Add quick_press field
+      formData.append("quick_press", quickPress);
+      
+      // ✅ Add keywords as array (append each keyword individually)
+      if (manuscriptData.keywords && manuscriptData.keywords.length > 0) {
+        manuscriptData.keywords.forEach((keyword, index) => {
+          formData.append(`keywords[${index}]`, keyword);
+        });
+      }
+
+      // ✅ Add cites as array (append each cite individually)
+      cites.forEach((cite, index) => {
+        formData.append(`cites[${index}][cite_name]`, cite.cite_name);
+        formData.append(`cites[${index}][cite_address]`, cite.cite_address);
+      });
 
       // ✅ Add files if uploaded
       if (imageFile) formData.append("image", imageFile);
@@ -247,6 +302,12 @@ const PublisherEditDesignManuscript = () => {
         formData.append(`figures[${index}]`, file);
       });
 
+      // Log form data for debugging
+      console.log("FormData contents:");
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
+
       const response = await axios.post(`${API_URL}api/published-manuscripts/${id}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -255,6 +316,53 @@ const PublisherEditDesignManuscript = () => {
       });
       
       console.log("Update response:", response);
+
+      if (response.data.status) {
+        toast.success("Manuscript updated successfully!");
+        navigate(-1);
+      } else {
+        toast.error(response.data.message || "Failed to update manuscript!");
+      }
+    } catch (error) {
+      console.error("Update error:", error);
+      console.error("Error details:", error.response?.data);
+      toast.error(error.response?.data?.message || "Failed to update manuscript!");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // ✅ Alternative save method if the above doesn't work
+  const handleSaveAlternative = async () => {
+    try {
+      setSaving(true);
+
+      // Create a plain object instead of FormData
+      const payload = {
+        manuscript_id: id,
+        title: manuscriptData.title,
+        abstract: manuscriptData.abstract,
+        introduction: manuscriptData.introduction,
+        materials_and_methods: manuscriptData.materials_and_methods,
+        results: manuscriptData.results,
+        discussion: manuscriptData.discussion,
+        conclusion: manuscriptData.conclusion,
+        author_contributions: manuscriptData.author_contributions,
+        conflict_of_interest_statement: manuscriptData.conflict_of_interest_statement,
+        references: manuscriptData.references,
+        quick_press: quickPress,
+        keywords: manuscriptData.keywords,
+        cites: cites
+      };
+
+      console.log("Payload:", payload);
+
+      const response = await axios.post(`${API_URL}api/published-manuscripts/${id}`, payload, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response.data.status) {
         toast.success("Manuscript updated successfully!");
@@ -350,6 +458,84 @@ const PublisherEditDesignManuscript = () => {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Keywords Section */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-indigo-50 rounded-lg">
+              <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Keywords</h3>
+              <p className="text-sm text-gray-500">Enter keywords separated by commas</p>
+            </div>
+          </div>
+          <input
+            type="text"
+            value={manuscriptData.keywords?.join(', ') || ''}
+            onChange={handleKeywordsChange}
+            placeholder="e.g., quantum, biology, research, physics"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          {manuscriptData.keywords && manuscriptData.keywords.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {manuscriptData.keywords.map((keyword, index) => (
+                <span key={index} className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                  {keyword}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Citation Styles Section */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-purple-50 rounded-lg">
+              <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900 text-lg">Citation Styles</h3>
+              <p className="text-sm text-gray-600">Manage different citation formats for this manuscript</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {cites.map((cite, index) => (
+              <div key={cite.cite_name} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-semibold text-gray-900 bg-white px-3 py-1 rounded-full text-sm border">
+                    {cite.cite_name} Format
+                  </span>
+                </div>
+                <textarea
+                  value={cite.cite_address}
+                  onChange={(e) => handleCiteChange(index, 'cite_address', e.target.value)}
+                  placeholder={`Enter ${cite.cite_name} citation format...`}
+                  rows={4}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-vertical"
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+            <div className="flex items-start gap-3">
+              <div className="p-1 bg-purple-100 rounded">
+                <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="text-sm text-purple-800">
+                <strong>Citation Formats:</strong> Provide complete citation information in AMA, APA, MLA, and NLM formats. This helps readers cite your work correctly in different academic contexts.
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* File Upload Sections Grid */}

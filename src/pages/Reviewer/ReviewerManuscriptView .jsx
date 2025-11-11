@@ -594,7 +594,7 @@ const ReviewerManuscriptView = () => {
                         onClick={() =>
                           downloadImage(
                             figurePath,
-                            `Figure_${index + 1}.${figurePath.split(".").pop()}`
+                            `Figure_${index + 1}.${figurePath?.split(".").pop()}`
                           )
                         }
                         className="text-green-600 hover:text-green-800 text-sm flex items-center px-2 py-1 rounded hover:bg-green-50 transition-colors"
@@ -605,7 +605,7 @@ const ReviewerManuscriptView = () => {
                     </div>
                   </div>
                   <div className="text-xs text-gray-500 mt-1 truncate">
-                    {figurePath.split("/").pop()}
+                    {figurePath?.split("/").pop()}
                   </div>
                 </div>
               </div>

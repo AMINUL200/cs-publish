@@ -272,10 +272,10 @@ const ReviewerPermission = () => {
                         />
                         <div className="flex flex-wrap gap-2 text-xs mb-3">
                           <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                            ID: {manuscript.journal_id}
+                            J ID: {manuscript.journal_id}
                           </span>
                           <span className="bg-purple-100 text-purple-600 px-2 py-1 rounded">
-                            {manuscript.journal_title}
+                            Manuscript ID : {manuscript.unique_id}
                           </span>
                           {manuscript.assigned_reviewer && (
                             <span className="bg-green-100 text-green-600 px-2 py-1 rounded">

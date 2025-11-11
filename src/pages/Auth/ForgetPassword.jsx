@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, CheckCircle } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, CheckCircle, Key } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -15,10 +15,14 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const API_BASE_URL = 'https://api.cspublishinghouse.com/public/api';
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
 
   const validateEmail = (e) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+  };
+
+  const validateResetCode = (code) => {
+    return /^[A-Za-z0-9]{6}$/.test(code);
   };
 
   const handleEmailSubmit = async () => {
@@ -36,26 +40,25 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${API_BASE_URL}/forgot-password`, {
+      const response = await axios.post(`${API_BASE_URL}api/forgot-password`, {
         email: email.trim()
       });
 
       if (response.data.status) {
         setStep(2);
         setErrors({});
-        // You might want to show the reset code to the user for testing
-        console.log('Reset Code:', response.data.reset_code);
-        setResetCode(response.data.reset_code || '');
+        toast.success(response.data.message || 'Reset code sent to your email!');
       } else {
         setErrors({ email: response.data.message || 'Failed to send reset code' });
+        toast.error(response.data.message || 'Failed to send reset code');
       }
     } catch (error) {
       console.error('Forgot password error:', error);
-      setErrors({ 
-        email: error.response?.data?.message || 
-               error.response?.data?.error || 
-               'Something went wrong. Please try again.' 
-      });
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          'Something went wrong. Please try again.';
+      setErrors({ email: errorMessage });
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -66,6 +69,8 @@ const ForgotPassword = () => {
     
     if (!resetCode.trim()) {
       newErrors.resetCode = 'Reset code is required';
+    } else if (!validateResetCode(resetCode)) {
+      newErrors.resetCode = 'Reset code must be 6 characters (letters and numbers only)';
     }
 
     if (!password.trim()) {
@@ -87,7 +92,7 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${API_BASE_URL}/reset-password`, {
+      const response = await axios.post(`${API_BASE_URL}api/reset-password`, {
         email: email.trim(),
         reset_code: resetCode.trim(),
         password: password,
@@ -97,18 +102,18 @@ const ForgotPassword = () => {
       if (response.data.status) {
         setStep(3);
         setErrors({});
-        toast.success(response.data.message ||'Password updated successfully!');
+        toast.success(response.data.message || 'Password updated successfully!');
       } else {
         setErrors({ resetCode: response.data.message || 'Failed to reset password' });
+        toast.error(response.data.message || 'Failed to reset password');
       }
     } catch (error) {
       console.error('Reset password error:', error);
-      setErrors({ 
-        resetCode: error.response?.data?.message || 
-                  error.response?.data?.error || 
-                  'Something went wrong. Please try again.' 
-      });
-      toast.error(error.message || 'Failed to reset password');
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          'Something went wrong. Please try again.';
+      setErrors({ resetCode: errorMessage });
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -116,6 +121,27 @@ const ForgotPassword = () => {
 
   const handleBackToLogin = () => {
     window.location.href = '/signin';
+  };
+
+  const handleResendCode = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(`${API_BASE_URL}api/forgot-password`, {
+        email: email.trim()
+      });
+
+      if (response.data.status) {
+        toast.success('Reset code sent again! Check your email.');
+        setResetCode(''); // Clear the reset code field
+      } else {
+        toast.error(response.data.message || 'Failed to resend code');
+      }
+    } catch (error) {
+      console.error('Resend code error:', error);
+      toast.error(error.response?.data?.message || 'Failed to resend code');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -186,28 +212,43 @@ const ForgotPassword = () => {
                   <p className="text-gray-600 text-sm">Enter the reset code and create a new password</p>
                 </div>
 
-                {/* <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Reset Code</label>
+                {/* Reset Code Input */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="block text-sm font-medium text-gray-700">Reset Code</label>
+                    <button
+                      type="button"
+                      onClick={handleResendCode}
+                      disabled={loading}
+                      className="text-xs text-yellow-600 hover:text-yellow-700 font-medium disabled:opacity-50"
+                    >
+                      Resend Code
+                    </button>
+                  </div>
                   <div className="relative">
+                    <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="text"
                       value={resetCode}
                       onChange={(e) => {
-                        setResetCode(e.target.value);
+                        const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                        setResetCode(value.slice(0, 6));
                         if (errors.resetCode) setErrors({...errors, resetCode: ''});
                       }}
-                      placeholder="Enter reset code"
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition ${
+                      placeholder="Enter 6-digit code"
+                      className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition text-center tracking-widest font-mono text-lg ${
                         errors.resetCode
                           ? 'border-red-500 focus:ring-red-500'
-                          : 'border-gray-300 focus:ring-blue-500'
+                          : 'border-yellow-300 focus:ring-yellow-500'
                       }`}
+                      maxLength={6}
                     />
                   </div>
                   {errors.resetCode && <p className="text-red-500 text-sm mt-2">{errors.resetCode}</p>}
-                  <p className="text-gray-500 text-xs mt-1">Check your email for the reset code</p>
-                </div> */}
+                  <p className="text-gray-500 text-xs mt-1">Enter the 6-character code sent to your email</p>
+                </div>
 
+                {/* New Password Input */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">New Password</label>
                   <div className="relative">
@@ -237,6 +278,7 @@ const ForgotPassword = () => {
                   {errors.password && <p className="text-red-500 text-sm mt-2">{errors.password}</p>}
                 </div>
 
+                {/* Confirm Password Input */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">Confirm Password</label>
                   <div className="relative">
@@ -266,20 +308,23 @@ const ForgotPassword = () => {
                   {errors.confirmPassword && <p className="text-red-500 text-sm mt-2">{errors.confirmPassword}</p>}
                 </div>
 
-                <button
-                  onClick={handlePasswordUpdate}
-                  disabled={loading}
-                  className="w-full bg-gradient-to-r from-[#8B0000] to-[#ffba00] hover:from-[#ffba00] hover:to-[#8B0000] text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? 'Updating...' : 'Update Password'}
-                </button>
+                <div className="space-y-3">
+                  <button
+                    onClick={handlePasswordUpdate}
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-[#8B0000] to-[#ffba00] hover:from-[#ffba00] hover:to-[#8B0000] text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? 'Updating...' : 'Update Password'}
+                  </button>
 
-                <button
-                  onClick={() => setStep(1)}
-                  className="w-full text-gray-600 hover:text-gray-900 font-medium py-2"
-                >
-                  Back
-                </button>
+                  <button
+                    onClick={() => setStep(1)}
+                    disabled={loading}
+                    className="w-full text-gray-600 hover:text-gray-900 font-medium py-2 transition disabled:opacity-50"
+                  >
+                    Back to Email
+                  </button>
+                </div>
               </div>
             )}
 
@@ -310,9 +355,9 @@ const ForgotPassword = () => {
         </div>
 
         {/* Footer */}
-        {/* <p className="text-center text-gray-600 text-sm mt-6">
-          Having trouble? <a href="/support" className="text-blue-600 hover:text-blue-700 font-semibold">Contact support</a>
-        </p> */}
+        <p className="text-center text-gray-600 text-sm mt-6">
+          Need help? <Link to="/contact" className="text-yellow-600 hover:text-yellow-700 font-semibold">Contact support</Link>
+        </p>
       </div>
 
       <style>{`

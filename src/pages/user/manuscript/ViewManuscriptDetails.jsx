@@ -733,14 +733,14 @@ const ViewManuscriptDetails = () => {
                 <span className="font-medium">Downloads:</span>
                 <span className="ml-2">{manuscriptData.download_count}</span>
               </div>
-              {manuscriptData.quick_press === "1" && (
+              {/* {manuscriptData.quick_press === "1" && (
                 <div className="flex items-center gap-1 bg-yellow-100 px-2 py-1 rounded-full">
                   <Zap className="w-3 h-3 text-yellow-600" />
                   <span className="text-yellow-700 text-xs font-medium">
                     Quick Press
                   </span>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         </div>
@@ -1001,7 +1001,7 @@ const ViewManuscriptDetails = () => {
               </div>
             </div>
             {/* Quick Press Status */}
-            {manuscriptData.quick_press === "1" && (
+            {/* {manuscriptData.quick_press === "1" && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 hidden lg:block">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-yellow-100 rounded-lg">
@@ -1017,7 +1017,7 @@ const ViewManuscriptDetails = () => {
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Keywords Section */}
             {manuscriptData.keywords && manuscriptData.keywords.length > 0 && (
@@ -1041,7 +1041,7 @@ const ViewManuscriptDetails = () => {
             )}
 
             {/* Stats Card */}
-            <div className="bg-white rounded-lg shadow-sm border mb-4 hidden lg:block">
+            {/* <div className="bg-white rounded-lg shadow-sm border mb-4 hidden lg:block">
               <div className="grid grid-cols-3 gap-4 p-4 text-center">
                 <div>
                   <div className="text-2xl font-bold text-blue-600">
@@ -1062,7 +1062,7 @@ const ViewManuscriptDetails = () => {
                   <div className="text-xs text-gray-600">Citations</div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Figures & References Section - Fixed */}
             <div

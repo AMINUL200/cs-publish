@@ -1,7 +1,8 @@
 import React from "react";
-import { Editor } from "@tinymce/tinymce-react";
+// import TextEditor from "./TextEditor"; // Adjust the import path as needed
 import ArrayInput from "../../form/ArrayInput";
 import { toast } from "react-toastify";
+import TextEditor from "../../common/TextEditor";
 
 const StepThree = ({ formData, setFormData, handleChange, isUpdateMode = false }) => {
   const apikey = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
@@ -233,52 +234,13 @@ const StepThree = ({ formData, setFormData, handleChange, isUpdateMode = false }
       {/* References - Rich Text Editor */}
       <div className="mb-6">
         <label className="block mb-1 font-medium">References</label>
-        <Editor
-          apiKey={apikey}
-          value={formData.references}
-          init={{
-            height: 200,
-            menubar: true,
-            plugins: [
-              "image",
-              "advlist",
-              "autolink",
-              "lists",
-              "link",
-              "image",
-              "charmap",
-              "preview",
-              "anchor",
-              "searchreplace",
-              "visualblocks",
-              "code",
-              "fullscreen",
-              "insertdatetime",
-              "media",
-              "table",
-              "code",
-              "help",
-              "wordcount",
-              "anchor",
-            ],
-            toolbar:
-              "undo redo | blocks | image | bold italic forecolor | alignleft aligncenter bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent |removeformat | help",
-            content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-            font_formats: `
-          Arial=arial,helvetica,sans-serif;
-          Courier New=courier new,courier,monospace;
-          Georgia=georgia,palatino;
-          Tahoma=tahoma,arial,helvetica,sans-serif;
-          Times New Roman=times new roman,times;
-          Verdana=verdana,geneva;
-        `,
-            fontsize_formats: "8pt 10pt 12pt 14pt 18pt 24pt 36pt", // font sizes
-            image_uploadtab: true, // image insert dialog
-            automatic_uploads: true,
-            file_picker_types: "image",
-          }}
-          onEditorChange={(content) => handleEditorChange("references", content)}
-        />
+        <div style={{ height: "600px" }}>
+          <TextEditor
+            apiKey={apikey}
+            value={formData.references}
+            onChange={(content) => handleEditorChange("references", content)}
+          />
+        </div>
       </div>
 
       {/* Keywords */}

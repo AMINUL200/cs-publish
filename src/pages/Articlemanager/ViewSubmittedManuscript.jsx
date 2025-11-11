@@ -1,7 +1,7 @@
 import { faEdit, faTrash, faSearch, faPlus, faFileAlt, faCheckCircle, faTimesCircle, faClock, faEye, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -11,24 +11,31 @@ import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { faComments } from '@fortawesome/free-solid-svg-icons';
 import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
+import PaginationControls from '../../components/common/PaginationControls';
+import RecordsPerPageSelector from '../../components/common/RecordsPerPageSelector';
+import SearchInput from '../../components/common/SearchInput';
 
 const ViewSubmittedManuscript = () => {
     const { token } = useSelector((state) => state.auth);
     const API_URL = import.meta.env.VITE_API_URL;
-    const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [manuscripts, setManuscripts] = useState([]);
-    const [perPage, setPerPage] = useState(5);
+    
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [recordsPerPage, setRecordsPerPage] = useState(10);
+    const [searchTerm, setSearchTerm] = useState('');
+    
     const [selectedManuscript, setSelectedManuscript] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const statusStyles = {
-    completed: 'bg-green-100 text-green-800',
-    accepted: 'bg-green-100 text-green-800',
-    rejected: 'bg-red-100 text-red-800',
-    pending: 'bg-yellow-100 text-yellow-800'
-}
+        completed: 'bg-green-100 text-green-800',
+        accepted: 'bg-green-100 text-green-800',
+        rejected: 'bg-red-100 text-red-800',
+        pending: 'bg-yellow-100 text-yellow-800'
+    }
 
     const statusIcons = {
         completed: <FontAwesomeIcon icon={faCheckCircle} className="text-green-500 mr-1" />,
@@ -62,6 +69,36 @@ const ViewSubmittedManuscript = () => {
         fetchManuscripts();
     }, [token]);
 
+    // Filter manuscripts based on search term
+    const filteredManuscripts = useMemo(() => {
+        if (!searchTerm) return manuscripts;
+        const term = searchTerm.toLowerCase();
+        return manuscripts.filter((m) => {
+            const editorName = m.manuscript.journal.editor?.name?.toLowerCase() || '';
+            const reviewerNames = m.reviewers.map(r => r.name.toLowerCase()).join(' ');
+
+            return (
+                m.manuscript.title?.toLowerCase().includes(term) ||
+                m.manuscript.journal.name?.toLowerCase().includes(term) ||
+                editorName.includes(term) ||
+                reviewerNames.includes(term) ||
+                m.manuscript.status?.toLowerCase().includes(term)
+            );
+        });
+    }, [manuscripts, searchTerm]);
+
+    // Calculate pagination values
+    const totalRecords = filteredManuscripts.length;
+    const totalPages = Math.ceil(totalRecords / recordsPerPage);
+    const startIndex = (currentPage - 1) * recordsPerPage;
+    const endIndex = Math.min(startIndex + recordsPerPage, totalRecords);
+    const currentRecords = filteredManuscripts.slice(startIndex, endIndex);
+
+    // Reset to first page when search term or records per page changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, recordsPerPage]);
+
     const openModal = (manuscript) => {
         setSelectedManuscript(manuscript);
         setIsModalOpen(true);
@@ -70,6 +107,22 @@ const ViewSubmittedManuscript = () => {
     const closeModal = () => {
         setIsModalOpen(false);
         setSelectedManuscript(null);
+    };
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        // Scroll to top when page changes
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleRecordsPerPageChange = (value) => {
+        setRecordsPerPage(value);
+        setCurrentPage(1); // Reset to first page
+    };
+
+    const handleSearchChange = (value) => {
+        setSearchTerm(value);
+        setCurrentPage(1); // Reset to first page when searching
     };
 
     const getStatusIcon = (status) => {
@@ -124,47 +177,6 @@ const ViewSubmittedManuscript = () => {
             </div>
         );
     };
-
-    // Flatten messages and problems from all reviewers for the modal
-    const getAllMessages = (reviewers) => {
-        return reviewers.flatMap(reviewer =>
-            reviewer.all_messages.map(message => ({
-                ...message,
-                sender: {
-                    name: reviewer.name,
-                    id: reviewer.reviewer_id
-                }
-            }))
-        );
-    };
-
-    const getAllProblems = (reviewers) => {
-        return reviewers.flatMap(reviewer =>
-            reviewer.all_problems.map(problem => ({
-                ...problem,
-                reviewer: {
-                    name: reviewer.name,
-                    id: reviewer.reviewer_id
-                }
-            }))
-        );
-    };
-
-    const filteredManuscripts = manuscripts.filter((m) => {
-        const term = searchTerm.toLowerCase();
-        const editorName = m.manuscript.journal.editor?.name?.toLowerCase() || '';
-        const reviewerNames = m.reviewers.map(r => r.name.toLowerCase()).join(' ');
-
-        return (
-            m.manuscript.title?.toLowerCase().includes(term) ||
-            m.manuscript.journal.name?.toLowerCase().includes(term) ||
-            editorName.includes(term) ||
-            reviewerNames.includes(term) ||
-            m.manuscript.status?.toLowerCase().includes(term)
-        );
-    });
-
-    const visibleManuscripts = filteredManuscripts.slice(0, perPage);
 
     if (loading) {
         return <Loader />
@@ -299,16 +311,6 @@ const ViewSubmittedManuscript = () => {
                                                                                 <p className="text-xs font-medium text-gray-500">Message to Author</p>
                                                                                 <p className="text-sm text-gray-900">{message.message_to_author}</p>
                                                                             </div>
-                                                                            {/* <div className="mb-1">
-                                                                                <p className="text-xs font-medium text-gray-500">Recommendation</p>
-                                                                                <p className="text-sm text-gray-900">{recommendationMap[message.recommendation] || 'N/A'}</p>
-                                                                            </div> */}
-                                                                            {/* <div>
-                                                                                <p className="text-xs font-medium text-gray-500">Attached File</p>
-                                                                                {message.image
-                                                                                    ? <a href={`${VITE_STORAGE_URL}${message.image}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Download File</a>
-                                                                                    : <span className="text-sm text-gray-600">No file attached</span>}
-                                                                            </div> */}
                                                                         </div>
                                                                     ))}
                                                                 </div>
@@ -336,8 +338,6 @@ const ViewSubmittedManuscript = () => {
                                                 ))}
                                             </div>
                                         </div>
-
-                                       
                                     </div>
                                 </div>
                             </div>
@@ -366,48 +366,22 @@ const ViewSubmittedManuscript = () => {
             </div>
 
             {/* Search & Per-page selector */}
-            <div className="flex justify-between mb-6 items-center mt-8">
-                <div className="flex items-center space-x-2">
-                    <label htmlFor="perPage" className="text-sm font-medium text-gray-700 hidden sm:block">
-                        Show per page:
-                    </label>
-                    <div className="relative">
-                        <select
-                            id="perPage"
-                            value={perPage}
-                            onChange={(e) => setPerPage(Number(e.target.value))}
-                            className="appearance-none bg-white border border-gray-300 rounded-lg pl-4 pr-10 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer transition-all duration-200 hover:border-blue-400"
-                        >
-                            {[3, 5, 10, 20, 50].map((option) => (
-                                <option key={option} value={option}>
-                                    {option}
-                                </option>
-                            ))}
-                        </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+            <div className="mt-8 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
+                <RecordsPerPageSelector
+                    value={recordsPerPage}
+                    onChange={handleRecordsPerPageChange}
+                    options={[5, 10, 25, 50]}
+                />
 
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <FontAwesomeIcon icon={faSearch} className="text-gray-400" />
-                    </div>
-                    <input
-                        type="search"
-                        placeholder="Search manuscripts..."
-                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64 transition-all duration-300"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
+                <SearchInput
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    placeholder="Search manuscripts..."
+                />
             </div>
 
             {/* Table */}
-            <div className="mt-8 flow-root">
+            <div className="mt-4 flow-root">
                 <div className="-my-2 -mx-4 overflow-x-auto custom-scrollbar sm:-mx-6 lg:-mx-8">
                     <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
@@ -434,13 +408,13 @@ const ViewSubmittedManuscript = () => {
                                         </th>
                                         <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                                             <span className="sr-only">View</span>
-                                            <span >View</span>
+                                            <span>View</span>
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 bg-white">
-                                    {visibleManuscripts.length > 0 ? (
-                                        visibleManuscripts.map((m) => (
+                                    {currentRecords.length > 0 ? (
+                                        currentRecords.map((m) => (
                                             <tr key={m.manuscript.id} className="hover:bg-gray-50">
                                                 <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                                                     {m.manuscript.id}
@@ -490,8 +464,10 @@ const ViewSubmittedManuscript = () => {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
-                                                No manuscripts found matching your search criteria.
+                                            <td colSpan="7" className="px-6 py-8 text-center text-sm text-gray-500">
+                                                {searchTerm
+                                                    ? "No matching manuscripts found"
+                                                    : "No manuscripts available"}
                                             </td>
                                         </tr>
                                     )}
@@ -502,12 +478,20 @@ const ViewSubmittedManuscript = () => {
                 </div>
             </div>
 
-            {/* Footer info */}
-            <div className="flex items-center justify-between mt-4 text-sm text-gray-600">
-                <div>
-                    Showing {visibleManuscripts.length > 0 ? 1 : 0} to {visibleManuscripts.length} of{' '}
-                    {filteredManuscripts.length} filtered / {manuscripts.length} total
+            {/* Pagination Controls */}
+            <div className="mt-6 flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+                <div className="text-sm text-gray-700">
+                    Showing {startIndex + 1} to {endIndex} of {totalRecords} entries
+                    {searchTerm && ` (filtered from ${manuscripts.length} total entries)`}
                 </div>
+
+                {totalPages > 1 && (
+                    <PaginationControls
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                    />
+                )}
             </div>
         </div>
     );

@@ -99,8 +99,13 @@ const LandingHeader = ({
         : [{ id: "no-journal", label: "No Journals Available", path: "#" }],
     },
     { id: "mentor", label: "Mentor Hub", path: "/mentors" },
-    { id: "service", label: "Author Service", path: "/author-services" }, // Simple route navigation
-  ];
+    { id: "service", label: "Service",
+      dropdown:[
+        { id: "author-services", label: "Author Services", path: "/author-services" },
+        { id: "research-service", label: "Research Services", path: "/research-services" },
+        // { id: "translation-services", label: "Translation Services", path: "/translation-services" },
+      ]
+    },];
 
   // Helper function to get parent dropdown id from a sub-dropdown id
   const getParentDropdownId = (dropdownId) => {

@@ -19,8 +19,8 @@ export default function SignIn() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
-    email: "admin@gmail.com",
-    password: "password123",
+    email: "",
+    password: "",
     userRole: "author",
   });
   const [showPassword, setShowPassword] = useState(false);

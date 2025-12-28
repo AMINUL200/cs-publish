@@ -52,6 +52,7 @@ const LandingFooter = ({
           : [{ name: "No Policies ", path: "#" }]),
           {name: "Author Hub", path:"/author-hub"},
           {name: "Editor Hub", path:"/editor-hub"},
+          {name: "Subscription", path:"/subscription"},
       ],
     },
     {

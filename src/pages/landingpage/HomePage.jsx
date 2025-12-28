@@ -151,11 +151,11 @@ const HomePage = () => {
         loading={loading.research}
         error={error.research}
       />
-      <LandingPricing
+      {/* <LandingPricing
         pricingData={pricingData}
         loading={loading.pricing}
         error={error.pricing}
-      />
+      /> */}
       <LandingServices
         servicesData={servicesData}
         loading={loading.service}

@@ -89,6 +89,10 @@ const UserSideViewJournal = () => {
       path: `/view-current-issue/${journalData?.journal?.id}`,
     },
     { label: "Quick Press", path: `/quick-press/${journalData?.journal?.id}` },
+    {
+      label: "Journal Description",
+      path: `/journal-description/${journalData?.journal?.id}`,
+    },
   ];
 
   const handleNavClick = (path) => {
@@ -153,21 +157,19 @@ const UserSideViewJournal = () => {
       <div className="bg-black text-yellow-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column - Navigation Links */}
-            <div className="lg:col-span-3">
-              <div className="space-y-3">
-                {navItems.map((item, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleNavClick(item.path)}
-                    className="w-full bg-yellow-500 text-black px-4 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg text-center"
-                  >
-                    {item.label}
-                  </button>
-                ))}
+            {/* Right Column - Journal Image */}
+            <div className="lg:col-span-3 flex justify-center lg:justify-end">
+              <div className="relative">
+                <img
+                  src={journal.image}
+                  alt={journal.j_title}
+                  className="w-48 h-60 lg:w-56 lg:h-72 object-cover rounded-lg shadow-2xl border-4 border-yellow-500"
+                />
+                <div className="absolute -bottom-3 -right-3 bg-yellow-500 text-black px-3 py-1 rounded-lg font-bold text-xs shadow-lg rotate-3">
+                  Journal Cover
+                </div>
               </div>
             </div>
-
             {/* Middle Column - Journal Information */}
             <div className="lg:col-span-6">
               <div className="text-center lg:text-left">
@@ -192,17 +194,9 @@ const UserSideViewJournal = () => {
                     </p>
                   </div>
                 )}
-                {/* Journal Description */}
-                <div className="bg-black bg-opacity-20 rounded-lg p-4 border border-yellow-500 border-opacity-30 mb-4">
-                  <h3 className="font-bold text-yellow-300 mb-2 text-sm">
-                    Journal Description
-                  </h3>
-                  <p className="text-yellow-200 text-sm leading-relaxed">
-                    {journal.j_description}
-                  </p>
-                </div>
+
                 {/* Journal Details Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
                   {journal.issn_print && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
@@ -233,21 +227,30 @@ const UserSideViewJournal = () => {
                       </div>
                     </div>
                   )}
+
+                  <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-sm">
+                      Impact Factor
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {journal?.impact_factor || "456"}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-
-            {/* Right Column - Journal Image */}
-            <div className="lg:col-span-3 flex justify-center lg:justify-end">
-              <div className="relative">
-                <img
-                  src={journal.image}
-                  alt={journal.j_title}
-                  className="w-48 h-60 lg:w-56 lg:h-72 object-cover rounded-lg shadow-2xl border-4 border-yellow-500"
-                />
-                <div className="absolute -bottom-3 -right-3 bg-yellow-500 text-black px-3 py-1 rounded-lg font-bold text-xs shadow-lg rotate-3">
-                  Journal Cover
-                </div>
+            {/* Left Column - Navigation Links */}
+            <div className="lg:col-span-3">
+              <div className="space-y-3">
+                {navItems.map((item, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleNavClick(item.path)}
+                    className="w-full bg-yellow-500 text-black px-4 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg text-center"
+                  >
+                    {item.label}
+                  </button>
+                ))}
               </div>
             </div>
           </div>

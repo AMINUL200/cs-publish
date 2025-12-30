@@ -48,8 +48,8 @@ const PublisherViewManuscript = () => {
 
       if (response.data.flag === 1) {
         // Handle the manuscript data
-        console.log("Manuscript Data:", response.data.data[0]);
-        setManuscriptData(response.data.data[0]);
+        console.log("Manuscript Data:", response.data.data);
+        setManuscriptData(response.data.data);
       }
     } catch (error) {
       console.error("Error fetching manuscript details:", error);

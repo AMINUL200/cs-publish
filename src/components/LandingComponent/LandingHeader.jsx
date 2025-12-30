@@ -1,14 +1,11 @@
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useEffect, useRef } from "react";
-import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
-import { landingLog } from "../../assets";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../features/auth/AuthSlice";
 import axios from "axios";
-import { User2Icon } from "lucide-react";
-import { id } from "date-fns/locale/id";
+import { ChevronDown, UserCircle, User, Package, LogOut, Settings, CreditCard } from "lucide-react";
 
 const LandingHeader = ({
   toggleMenu,
@@ -17,157 +14,35 @@ const LandingHeader = ({
   whoWeAreData = [],
   loading = false,
 }) => {
-  console.log(whoWeAreData);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [scrolled, setScrolled] = useState(false);
-  const [openDropdowns, setOpenDropdowns] = useState({});
-  const dropdownRefs = useRef({});
   const { isAuthenticated, userData, token } = useSelector(
     (state) => state.auth
   );
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // Remove the scroll effect useEffect since we don't need it anymore
-  // useEffect(() => {
-  //   if (location.state?.scrollTo && location.pathname === "/") {
-  //     const timer = setTimeout(() => {
-  //       scrollToSection(location.state.scrollTo);
-  //       window.history.replaceState({ ...location.state, scrollTo: null }, "");
-  //     }, 100);
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [location]);
+  const [scrolled, setScrolled] = useState(false);
+  const [openDropdowns, setOpenDropdowns] = useState({});
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [mobileUserDropdownOpen, setMobileUserDropdownOpen] = useState(false);
+  
+  const dropdownRefs = useRef({});
+  const userDropdownRef = useRef(null);
+  const mobileUserDropdownRef = useRef(null);
 
-  const handleLogout = async () => {
-    try {
-      const response = await axios.post(`${API_URL}api/logout`, null, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      dispatch(logout());
-      // toast.info(response.data.message);
-      navigate("/");
-    } catch (error) {
-      console.log(error);
-      // toast.error(error.message)
-      dispatch(logout());
-    }
-  };
-
+  /* ================= SCROLL EFFECT ================= */
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Updated navLinks with dropdown support
-  const navLinks = [
-    { id: "home", label: "Home", path: "/" },
-    {
-      id: "whoweare",
-      label: "Who We Are",
-      dropdown: whoWeAreData.length
-        ? whoWeAreData.map((who) => ({
-            id: `${who.id}`,
-            label: who.title,
-            path: `/who-we-are/${who.slug}`,
-          }))
-        : [{ id: "no-Who we are", label: "No Who We Are", path: "#" }],
-    },
-    {
-      id: "journal",
-      label: "Discover Journal",
-      dropdown: journalList.length
-        ? journalList.map((journal) => ({
-            id: `${journal.id}`,
-            label: journal.j_title,
-            path: `/journal/${journal.j_title}`,
-          }))
-        : [{ id: "no-journal", label: "No Journals Available", path: "#" }],
-    },
-    { id: "mentor", label: "Mentor Hub", path: "/mentors" },
-    { id: "service", label: "Service",
-      dropdown:[
-        { id: "author-services", label: "Author Services", path: "/author-services" },
-        { id: "research-service", label: "Research Services", path: "/research-services" },
-        // { id: "translation-services", label: "Translation Services", path: "/translation-services" },
-      ]
-    },];
-
-  // Helper function to get parent dropdown id from a sub-dropdown id
-  const getParentDropdownId = (dropdownId) => {
-    if (dropdownId.includes("-sub-")) {
-      // Extract the parent id from sub-dropdown id
-      const parts = dropdownId.split("-sub-");
-      return parts[0];
-    }
-    return null;
-  };
-
-  // Helper function to check if one dropdown is a child of another
-  const isChildDropdown = (childId, parentId) => {
-    return childId.startsWith(parentId + "-sub-");
-  };
-
-  // Toggle dropdown function
-  const toggleDropdown = (dropdownId) => {
-    setOpenDropdowns((prev) => {
-      const newState = { ...prev };
-
-      // Close other main-level dropdowns (but not if we're opening a sub-dropdown)
-      if (!dropdownId.includes("-sub-")) {
-        // We're toggling a main dropdown, close other main dropdowns
-        Object.keys(newState).forEach((key) => {
-          if (key !== dropdownId && !key.includes("-sub-")) {
-            newState[key] = false;
-            // Also close all sub-dropdowns of the closed main dropdown
-            Object.keys(newState).forEach((subKey) => {
-              if (isChildDropdown(subKey, key)) {
-                newState[subKey] = false;
-              }
-            });
-          }
-        });
-      } else {
-        // We're toggling a sub-dropdown
-        const parentId = getParentDropdownId(dropdownId);
-
-        // Close other sub-dropdowns at the same level (same parent)
-        Object.keys(newState).forEach((key) => {
-          if (key !== dropdownId && getParentDropdownId(key) === parentId) {
-            newState[key] = false;
-            // Also close nested sub-dropdowns
-            Object.keys(newState).forEach((nestedKey) => {
-              if (isChildDropdown(nestedKey, key)) {
-                newState[nestedKey] = false;
-              }
-            });
-          }
-        });
-      }
-
-      // Toggle the current dropdown
-      newState[dropdownId] = !prev[dropdownId];
-      return newState;
-    });
-  };
-
-  // Close dropdowns when clicking outside
+  /* ================= CLOSE DROPDOWNS ON OUTSIDE CLICK ================= */
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Close nav dropdowns
       let clickedOutside = true;
       Object.values(dropdownRefs.current).forEach((ref) => {
         if (ref && ref.contains(event.target)) {
@@ -177,88 +52,120 @@ const LandingHeader = ({
       if (clickedOutside) {
         setOpenDropdowns({});
       }
+
+      // Close user dropdown (desktop)
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+        setUserDropdownOpen(false);
+      }
+
+      // Close user dropdown (mobile)
+      if (mobileUserDropdownRef.current && !mobileUserDropdownRef.current.contains(event.target)) {
+        setMobileUserDropdownOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Remove scrollToSection function since we don't need it anymore
-  // const scrollToSection = (id) => {
-  //   const section = document.getElementById(id);
-  //   if (section) {
-  //     section.scrollIntoView({
-  //       behavior: "smooth",
-  //       block: "start",
-  //     });
-  //   }
-  // };
-
-  const handleNavClick = (path) => {
-    // Simple navigation without scroll behavior
-    navigate(path);
-    setOpenDropdowns({});
+  /* ================= LOGOUT ================= */
+  const handleLogout = async () => {
+    try {
+      await axios.post(`${API_URL}api/logout`, null, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      dispatch(logout());
+      setUserDropdownOpen(false);
+      setMobileUserDropdownOpen(false);
+      navigate("/");
+    }
   };
 
-  // Render dropdown items recursively
-  const renderDropdownItem = (item, level = 1) => {
-    const hasSubDropdown = item.dropdown && item.dropdown.length > 0;
-    const dropdownKey = `${item.id}-sub-${level}`;
-    const isOpen = openDropdowns[dropdownKey];
+  /* ================= USER MENU ITEMS ================= */
+  const userMenuItems = [
+    {
+      icon: UserCircle,
+      label: "My Profile",
+      path: "/my-profile",
+    },
+    {
+      icon: Package,
+      label: "My Subscription",
+      path: "/my-subscription",
+    },
+   
+  ];
 
-    return (
-      <div key={item.id} className="relative group">
-        {hasSubDropdown ? (
-          <div
-            className={`flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#ffba00] cursor-pointer transition-colors ${
-              level > 1 ? "pl-8" : ""
-            }`}
-            onClick={() => toggleDropdown(dropdownKey)}
-          >
-            <span>{item.label}</span>
-            <svg
-              className={`w-4 h-4 transition-transform duration-200 ${
-                isOpen ? "rotate-180" : ""
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </div>
-        ) : (
-          <RouterLink
-            to={item.path}
-            className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#ffba00] transition-colors ${
-              level > 1 ? "pl-8" : ""
-            }`}
-            onClick={() => setOpenDropdowns({})}
-          >
-            {item.label}
-          </RouterLink>
-        )}
-
-        {hasSubDropdown && isOpen && (
-          <div className="bg-gray-50 border-l-2 border-[#ffba00] ml-2">
-            {item.dropdown.map((subItem) =>
-              renderDropdownItem(subItem, level + 1)
-            )}
-          </div>
-        )}
-      </div>
-    );
+  /* ================= HANDLE USER MENU CLICK ================= */
+  const handleUserMenuClick = (item) => {
+    if (item.path) {
+      navigate(item.path);
+    }
+    setUserDropdownOpen(false);
+    setMobileUserDropdownOpen(false);
   };
 
-  // Render navigation item
+  /* ================= GET USER INITIALS ================= */
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  /* ================= NAV LINKS ================= */
+  const navLinks = [
+    { id: "home", label: "Home", path: "/" },
+    {
+      id: "whoweare",
+      label: "Who We Are",
+      dropdown: whoWeAreData.length
+        ? whoWeAreData.map((w) => ({
+            id: w.id,
+            label: w.title,
+            path: `/who-we-are/${w.slug}`,
+          }))
+        : [{ id: "no-who", label: "No Who We Are", path: "#" }],
+    },
+    {
+      id: "journal",
+      label: "Discover Journal",
+      dropdown: journalList.length
+        ? journalList.map((j) => ({
+            id: j.id,
+            label: j.j_title,
+            path: `/journal/${j.j_title}`,
+          }))
+        : [{ id: "no-journal", label: "No Journals", path: "#" }],
+    },
+    { id: "mentor", label: "Mentor Hub", path: "/mentors" },
+    {
+      id: "service",
+      label: "Service",
+      dropdown: [
+        { id: "author-services", label: "Author Services", path: "/author-services" },
+        { id: "research-service", label: "Research Services", path: "/research-services" },
+      ],
+    },
+  ];
+
+  const toggleDropdown = (id) => {
+    setOpenDropdowns((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  /* ================= RENDER NAV ITEM ================= */
   const renderNavItem = (item) => {
-    const hasDropdown = item.dropdown && item.dropdown.length > 0;
     const isOpen = openDropdowns[item.id];
+    const hasDropdown = item.dropdown?.length > 0;
 
     return (
       <div
@@ -267,69 +174,56 @@ const LandingHeader = ({
         ref={(el) => (dropdownRefs.current[item.id] = el)}
       >
         {hasDropdown ? (
-          <div
-            className={`text-gray-700 font-semibold hover:text-[#ffba00] cursor-pointer transition-colors px-2 py-1 flex items-center space-x-1 ${
-              isOpen ? "text-[#ffba00]" : ""
-            }`}
+          <button
             onClick={() => toggleDropdown(item.id)}
-          >
-            <span>{item.label}</span>
-            <svg
-              className={`w-4 h-4 transition-transform duration-200 ${
-                isOpen ? "rotate-180" : ""
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </div>
-        ) : (
-          <div
-            className="text-gray-700 font-semibold hover:text-[#ffba00] cursor-pointer transition-colors px-2 py-1 flex items-center space-x-1"
-            onClick={() => handleNavClick(item.path)}
+            className={`flex items-center gap-1 font-semibold transition-colors ${
+              isOpen ? "text-[#ffba00]" : "text-gray-700 hover:text-[#ffba00]"
+            }`}
           >
             {item.label}
-          </div>
+            <ChevronDown
+              size={16}
+              className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+        ) : (
+          <RouterLink
+            to={item.path}
+            className="font-semibold text-gray-700 hover:text-[#ffba00] transition-colors"
+          >
+            {item.label}
+          </RouterLink>
         )}
 
         {hasDropdown && isOpen && (
-          <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-            <div className="py-2">
-              {item.dropdown.map((dropdownItem) =>
-                renderDropdownItem(dropdownItem)
-              )}
-            </div>
+          <div className="absolute top-full left-0 mt-2 w-60 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+            {item.dropdown.map((d) => (
+              <RouterLink
+                key={d.id}
+                to={d.path}
+                onClick={() => setOpenDropdowns({})}
+                className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#ffba00] first:rounded-t-lg last:rounded-b-lg"
+              >
+                {d.label}
+              </RouterLink>
+            ))}
           </div>
         )}
       </div>
     );
   };
 
+  /* ================= LOADING STATE ================= */
   if (loading) {
     return (
       <header className="fixed w-full z-50 bg-white/90 backdrop-blur-sm shadow-md py-3">
         <div className="px-8 flex justify-between items-center animate-pulse">
-          {/* Skeleton for logo */}
-          <div className="flex items-center">
-            <div className="h-10 w-40 bg-gray-200 rounded-md"></div>
-          </div>
-
-          {/* Skeleton for nav links */}
+          <div className="h-10 w-40 bg-gray-200 rounded-md"></div>
           <div className="hidden md:flex space-x-6">
-            <div className="h-5 w-16 bg-gray-200 rounded"></div>
-            <div className="h-5 w-20 bg-gray-200 rounded"></div>
-            <div className="h-5 w-24 bg-gray-200 rounded"></div>
-            <div className="h-5 w-16 bg-gray-200 rounded"></div>
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-5 w-16 bg-gray-200 rounded"></div>
+            ))}
           </div>
-
-          {/* Skeleton for button */}
           <div className="hidden md:block h-9 w-20 bg-gray-200 rounded"></div>
         </div>
       </header>
@@ -337,93 +231,226 @@ const LandingHeader = ({
   }
 
   return (
-    <header
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-white shadow-md py-2"
-          : "bg-white/90 backdrop-blur-sm py-4"
-      }`}
-    >
-      <div
-        className="px-8 flex justify-between items-center"
-        style={{ margin: "0 auto" }}
+    <>
+      <header
+        className={`fixed w-full z-50 transition-all duration-300 ${
+          scrolled ? "bg-white shadow-md py-2" : "bg-white/90 backdrop-blur-sm py-4"
+        }`}
       >
-        {/* Logo */}
-        <div className="flex items-center">
-          <div
-            className="text-2xl font-bold text-indigo-600 flex items-center cursor-pointer"
-            onClick={() => navigate("/")}
-          >
-            <img
-              src={settingsData?.image}
-              alt="logo"
-              height={10}
-              className="h-8 md:h-14"
-            />
+        <div className="px-4 md:px-8 flex justify-between items-center">
+          {/* Logo */}
+          <div className="cursor-pointer" onClick={() => navigate("/")}>
+            <img src={settingsData?.image} alt="logo" className="h-8 md:h-12" />
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-6">
+            {navLinks.map(renderNavItem)}
+
+            {/* Auth Section */}
+            {!isAuthenticated ? (
+              <RouterLink
+                to="/signin"
+                className="ml-4 bg-[#ffba00] text-white px-4 py-2 rounded-md hover:bg-black transition-all"
+              >
+                Login
+              </RouterLink>
+            ) : (
+              <div className="flex items-center gap-3 ml-4">
+                {/* Dashboard Button */}
+                {userData?.user_type != 4 && (
+                  <RouterLink
+                    to="/dashboard"
+                    className="px-4 py-2 rounded-md bg-[#ffba00] text-white hover:bg-black transition-all"
+                  >
+                    Dashboard
+                  </RouterLink>
+                )}
+
+                {/* User Dropdown (Desktop) */}
+                <div className="relative" ref={userDropdownRef}>
+                  <button
+                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all hover:bg-gray-100 ${
+                      userDropdownOpen ? "bg-gray-100" : ""
+                    }`}
+                  >
+                    {/* User Avatar */}
+                    <div className="w-9 h-9 rounded-full bg-[#ffba00] flex items-center justify-center text-white font-semibold text-sm">
+                      {getInitials(userData?.name)}
+                    </div>
+
+                    {/* User Info */}
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-gray-800 leading-tight">
+                        {userData?.name || "User"}
+                      </p>
+                      <p className="text-xs text-gray-500 leading-tight">
+                        {userData?.email || "user@example.com"}
+                      </p>
+                    </div>
+
+                    {/* Dropdown Icon */}
+                    <ChevronDown
+                      size={16}
+                      className={`text-gray-600 transition-transform ${
+                        userDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {/* User Dropdown Menu */}
+                  {userDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-xl z-50 animate-fadeIn">
+                      {/* User Info Header */}
+                      <div className="p-4 border-b border-gray-200">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-[#ffba00] flex items-center justify-center text-white font-bold">
+                            {getInitials(userData?.name)}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-800 text-sm">
+                              {userData?.name || "User"}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {userData?.email || "user@example.com"}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Menu Items */}
+                      <div className="p-2">
+                        {userMenuItems.map((item) => (
+                          <button
+                            key={item.label}
+                            onClick={() => handleUserMenuClick(item)}
+                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-700 hover:bg-gray-100 transition-all text-left"
+                          >
+                            <item.icon size={18} className="text-gray-600" />
+                            <span className="text-sm font-medium">{item.label}</span>
+                          </button>
+                        ))}
+
+                        {/* Logout Button */}
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-red-600 hover:bg-red-50 transition-all text-left mt-1 border-t border-gray-200"
+                        >
+                          <LogOut size={18} />
+                          <span className="text-sm font-medium">Logout</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </nav>
+
+          {/* Mobile Section */}
+          <div className="md:hidden flex items-center space-x-3">
+            {!isAuthenticated ? (
+              <RouterLink
+                to="/signin"
+                className="px-3 py-1.5 text-sm bg-[#ffba00] text-white rounded-md"
+              >
+                Login
+              </RouterLink>
+            ) : (
+              <>
+                {/* Dashboard Button (Mobile) */}
+                {userData?.user_type != 4 && (
+                  <RouterLink
+                    to="/dashboard"
+                    className="px-3 py-1.5 text-sm bg-[#ffba00] text-white rounded-md"
+                  >
+                    Dashboard
+                  </RouterLink>
+                )}
+
+                {/* User Dropdown (Mobile) */}
+                <div className="relative" ref={mobileUserDropdownRef}>
+                  <button
+                    onClick={() => setMobileUserDropdownOpen(!mobileUserDropdownOpen)}
+                    className="w-9 h-9 rounded-full bg-[#ffba00] flex items-center justify-center text-white font-semibold text-sm"
+                  >
+                    {getInitials(userData?.name)}
+                  </button>
+
+                  {/* Mobile User Dropdown Menu */}
+                  {mobileUserDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-xl z-50 animate-fadeIn">
+                      {/* User Info Header */}
+                      <div className="p-4 border-b border-gray-200">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-full bg-[#ffba00] flex items-center justify-center text-white font-bold text-base">
+                            {getInitials(userData?.name)}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-800">
+                              {userData?.name || "User"}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {userData?.email || "user@example.com"}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Menu Items */}
+                      <div className="p-2">
+                        {userMenuItems.map((item) => (
+                          <button
+                            key={item.label}
+                            onClick={() => handleUserMenuClick(item)}
+                            className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-gray-700 hover:bg-gray-100 transition-all text-left"
+                          >
+                            <item.icon size={18} className="text-gray-600" />
+                            <span className="text-sm font-medium">{item.label}</span>
+                          </button>
+                        ))}
+
+                        {/* Logout Button */}
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-red-600 hover:bg-red-50 transition-all text-left mt-1 border-t border-gray-200"
+                        >
+                          <LogOut size={18} />
+                          <span className="text-sm font-medium">Logout</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
+            <button onClick={toggleMenu} aria-label="Toggle menu">
+              <FontAwesomeIcon icon={faBars} className="w-6 h-6 text-gray-700" />
+            </button>
           </div>
         </div>
+      </header>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          {navLinks.map((item) => renderNavItem(item))}
-
-          {/* ✅ Auth Button Logic */}
-          {!isAuthenticated && (
-            <RouterLink
-              to="/signin"
-              className="ml-4 custom-btn px-4 py-2 rounded-md  transition-all duration-300"
-            >
-              Login
-            </RouterLink>
-          )}
-
-          {isAuthenticated && userData?.user_type == 4 && (
-            <button
-              onClick={handleLogout}
-              className="ml-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-black transition-all duration-300 cursor-pointer"
-            >
-              Logout
-            </button>
-          )}
-
-          {isAuthenticated && userData?.user_type != 4 && (
-            <RouterLink
-              to="/dashboard"
-              className="ml-4 bg-[#ffba00] text-white px-4 py-2 rounded-md hover:bg-black transition-all duration-300"
-            >
-              Dashboard
-            </RouterLink>
-          )}
-
-          <button
-            onClick={toggleMenu}
-            className="md:hidden  text-gray-700 focus:outline-none cursor-pointer"
-            aria-label="Toggle menu"
-          >
-            <FontAwesomeIcon
-              className="w-8 h-8"
-              icon={faBars}
-              style={{ height: "1.5rem" }}
-            />
-          </button>
-        </nav>
-
-        {/* Mobile Menu Button */}
-        <div className="md:hidden flex items-center space-x-4">
-          <button
-            onClick={toggleMenu}
-            className="text-gray-700 focus:outline-none cursor-pointer"
-            aria-label="Toggle menu"
-          >
-            <FontAwesomeIcon
-              className="w-8 h-8"
-              icon={faBars}
-              style={{ height: "1.5rem" }}
-            />
-          </button>
-        </div>
-      </div>
-    </header>
+      {/* CSS Animations */}
+      <style>{`
+        @keyframes fadeIn {
+          from { 
+            opacity: 0; 
+            transform: translateY(-10px); 
+          }
+          to { 
+            opacity: 1; 
+            transform: translateY(0); 
+          }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out forwards;
+        }
+      `}</style>
+    </>
   );
 };
 

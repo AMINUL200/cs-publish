@@ -152,6 +152,7 @@ import ConferenceForm from "./pages/admin/event_and_confrence/ConferenceForm";
 import EventAndConference from "./pages/user/event_conference/EventAndConference";
 import EventAndConferenceDetail from "./pages/user/event_conference/EventAndConferenceDetail";
 import Subscription from "./pages/user/subscription/Subscription";
+import JournalDescription from "./pages/user/journal/JournalDescription";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -214,11 +215,12 @@ function App() {
           >
             <Route element={<AppLayout2 />}>
               <Route index path="/" element={<HomePage />} />
-              <Route path="/user-profile" element={<SubscriberProfile />} />
+              <Route path="/my-profile" element={<SubscriberProfile />} />
               <Route path="/subscription" element={<Subscription />} />
 
               <Route path="/journal" element={<ViewJournalList />} />
               <Route path="/journal/:id" element={<UserSideViewJournal />} />
+              <Route path="/journal-description/:id" element={<JournalDescription/>}/>
               <Route
                 path="/list-of-archive/:id"
                 element={<ListOfIssueJournal />}

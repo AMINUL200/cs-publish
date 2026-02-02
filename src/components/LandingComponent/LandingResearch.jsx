@@ -20,7 +20,7 @@ const LandingResearch = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {researchInfo.map((research) => (
+          {researchInfo.slice(0, 3).map((research) => (
             <div key={research.id}>
               <div className="research_box !mb-0">
                 <div className="research_top">

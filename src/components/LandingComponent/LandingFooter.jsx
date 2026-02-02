@@ -37,7 +37,7 @@ const LandingFooter = ({
         { name: "Innovation", path: "/innovation" },
         { name: "Research Service", path: "/research-services" },
         { name: "Publication Charges", path: "/publication-charge" },
-        { name: "OPen Access Policy", path: "/open-access-policy" },
+        { name: "Open Access Policy", path: "/open-access-policy" },
         // { name: "Promote and Advertise", path: "#" }
       ],
     },
@@ -82,7 +82,7 @@ const LandingFooter = ({
   ];
 
   return (
-    <footer className="text-gray-800 relative bottom-0">
+    <footer className="bg-gray-800 text-white relative bottom-0">
       <div className="mx-auto px-6 pt-12">
         {/* Main Links Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-6">
@@ -138,13 +138,13 @@ const LandingFooter = ({
 
           {sections.map((section, index) => (
             <div key={index}>
-              <h2 className="text-lg font-semibold mb-4">{section.title}</h2>
+              <h2 className="text-2xl font-semibold mb-4">{section.title}</h2>
               <ul className="space-y-2 pl-3">
                 {section.items.map((item, itemIndex) => (
                   <li key={itemIndex} className="mb-0">
                     <Link
                       to={item.path}
-                      className="text-[0.8rem] hover:text-[#ffba00] transition-colors"
+                      className="text-[1rem] font-semibold hover:text-[#ffba00] transition-colors"
                     >
                       {item.name}
                     </Link>

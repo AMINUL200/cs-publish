@@ -4,7 +4,7 @@ import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // import "./LandingOurTeam.css"; // Optional custom CSS
 
 const LandingOurTeam = ({
@@ -13,6 +13,7 @@ const LandingOurTeam = ({
   error = null,
 }) => {
   // console.log(ourTeamData);
+  const navigate = useNavigate();
 
   // Loading state
   if (loading) {
@@ -149,7 +150,10 @@ const LandingOurTeam = ({
 
               return (
                 <SwiperSlide key={member.id}>
-                  <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden group">
+                  <div 
+                  onClick={()=> navigate(`/cms/${member.slug}`)}
+                  className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden group cursor-pointer">
+
                     {/* Image Container */}
                     <div className="relative overflow-hidden">
                       <img

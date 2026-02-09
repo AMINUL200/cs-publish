@@ -37,14 +37,16 @@ const JournalDescription = () => {
   const [journalData, setJournalData] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const API_URL = import.meta.env.VITE_API_URL;
 
   // Fetch journal data
   useEffect(() => {
     const fetchJournalData = async () => {
       try {
         setLoading(true);
-        // Replace with your actual API endpoint
-        const response = await axios.get(`/api/journal/${id}/description`);
+        const response = await axios.get(`${API_URL}api/about_the_journal/${id}`);
+        console.log(response);
+        
         setJournalData(response.data.data);
       } catch (error) {
         console.error('Error fetching journal data:', error);

@@ -40,7 +40,7 @@ const UserSideViewJournal = () => {
         setJournalData(response.data);
       } else {
         throw new Error(
-          response.data.message || "Failed to fetch journal data"
+          response.data.message || "Failed to fetch journal data",
         );
       }
     } catch (error) {
@@ -49,6 +49,10 @@ const UserSideViewJournal = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleViewEditor = () => {
+    navigate(`/editor-hub?journalId=${journal?.id}`);
   };
 
   useEffect(() => {
@@ -181,17 +185,39 @@ const UserSideViewJournal = () => {
                 </p>
                 {/* Editor Information */}
                 {editor && editor.length > 0 && (
-                  <div className="bg-black bg-opacity-20 rounded-lg p-4 mb-4 border border-yellow-500 border-opacity-30">
-                    <h3 className="font-bold text-yellow-300 mb-2 text-sm">
-                      Editor-in-Chief
-                    </h3>
+                  <div className="bg-black bg-opacity-20 rounded-lg p-4 mb-4 border border-yellow-500 border-opacity-30 group">
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="font-bold text-yellow-300 text-sm">
+                        Editor-in-Chief
+                      </h3>
+
+                      {/* 👉 NEW VIEW LINK */}
+                      <button
+                        onClick={handleViewEditor}
+                        className="text-xs text-yellow-400 hover:text-yellow-200 
+                   hover:underline hover:underline-offset-2 transition-all 
+                   flex items-center gap-1"
+                      >
+                        View Editor Info →
+                      </button>
+                    </div>
+
                     <p className="text-yellow-200 text-sm">
                       <span className="font-semibold text-yellow-300">
                         {editor[0].editor_name}
                       </span>
+
                       <span className="mx-2 text-yellow-400">•</span>
+
                       {editor[0].editor_email}
                     </p>
+
+                    {/* 👉 Optional short bio if exists */}
+                    {editor[0]?.designation && (
+                      <p className="text-yellow-300 text-xs mt-1 opacity-80">
+                        {editor[0].designation}
+                      </p>
+                    )}
                   </div>
                 )}
 
@@ -392,7 +418,7 @@ const ArticleCard = ({ article, stripHtmlTags, formatDate }) => {
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
     } catch (error) {
       console.log(error);

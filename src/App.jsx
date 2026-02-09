@@ -160,10 +160,19 @@ function App() {
   // console.log("app:: ", userData);
 
   // Protected Route Component
-  const ProtectedRoute = ({ isAuthenticated, redirectPath = "/" }) => {
+  const ProtectedRoute = ({ isAuthenticated, userData, allowTypes = [] }) => {
+    // Not logged in → go to signin
     if (!isAuthenticated) {
-      return <Navigate to={redirectPath} replace />;
+      return <Navigate to="/signin" replace />;
     }
+
+    // If allowTypes passed → check user type
+    if (allowTypes.length > 0) {
+      if (!allowTypes.includes(userData?.user_type)) {
+        return <Navigate to="/" replace />;
+      }
+    }
+
     return <Outlet />;
   };
 
@@ -205,14 +214,14 @@ function App() {
       <ToastContainer />
       <Router>
         <Routes>
-          <Route
+          {/* <Route
             element={
               <PublicOrType4Route
                 isAuthenticated={isAuthenticated}
                 userData={userData}
               />
             }
-          >
+          > */}
             <Route element={<AppLayout2 />}>
               <Route index path="/" element={<HomePage />} />
               <Route path="/my-profile" element={<SubscriberProfile />} />
@@ -220,7 +229,10 @@ function App() {
 
               <Route path="/journal" element={<ViewJournalList />} />
               <Route path="/journal/:id" element={<UserSideViewJournal />} />
-              <Route path="/journal-description/:id" element={<JournalDescription/>}/>
+              <Route
+                path="/journal-description/:id"
+                element={<JournalDescription />}
+              />
               <Route
                 path="/list-of-archive/:id"
                 element={<ListOfIssueJournal />}
@@ -302,16 +314,27 @@ function App() {
               <Route path="/author-hub" element={<AuthorHub />} />
               <Route path="/editor-hub" element={<EditorHub />} />
               <Route path="/who-we-are/:slug" element={<UserSideWhoWeAre />} />
-              <Route path="/author-services" element={<AuthorServices/>}/>
+              <Route path="/author-services" element={<AuthorServices />} />
 
-              <Route path="/publication-charge" element={<PublicationCharge/>}/>
-              <Route path="/open-access-policy" element={<UserSideOpenAccessPolicy/>}/>
-              <Route path="/award" element={<AwardPage/>}/>
-              <Route path="/event-conference" element={<EventAndConference/>}/>
-              <Route path="/conference-detail/:slug" element={<EventAndConferenceDetail/>}/>
-
+              <Route
+                path="/publication-charge"
+                element={<PublicationCharge />}
+              />
+              <Route
+                path="/open-access-policy"
+                element={<UserSideOpenAccessPolicy />}
+              />
+              <Route path="/award" element={<AwardPage />} />
+              <Route
+                path="/event-conference"
+                element={<EventAndConference />}
+              />
+              <Route
+                path="/conference-detail/:slug"
+                element={<EventAndConferenceDetail />}
+              />
             </Route>
-          </Route>
+          {/* </Route> */}
 
           <Route
             element={
@@ -332,7 +355,15 @@ function App() {
 
           {/* Protected routes - only accessible when authenticated */}
           {/* <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}> */}
-          <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+          <Route
+            element={
+              <ProtectedRoute
+                isAuthenticated={isAuthenticated}
+                userData={userData}
+                allowTypes={["0", "1", "2", "3", "5", "6", "7"]} // 👈 ONLY admin/editor/reviewer types
+              />
+            }
+          >
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<ProfilePage />} />
@@ -457,21 +488,38 @@ function App() {
               <Route path="/handle-innovation" element={<HandleInnovation />} />
               <Route path="/add-innovation" element={<AddInnovation />} />
 
-              <Route path="/handle-mentor-hub" element={<HandleMentorHub/>}/>
-              <Route path="/add-mentor" element={<AddMentor/>}/>
+              <Route path="/handle-mentor-hub" element={<HandleMentorHub />} />
+              <Route path="/add-mentor" element={<AddMentor />} />
 
-              <Route path="/handle-publication-charge" element={<HandlePublicationCharge/>}/>
-              <Route path="/add-publication-charge" element={<AddPublicationCharge/>}/>
+              <Route
+                path="/handle-publication-charge"
+                element={<HandlePublicationCharge />}
+              />
+              <Route
+                path="/add-publication-charge"
+                element={<AddPublicationCharge />}
+              />
 
-              <Route path="/handle-open-access-policy" element={<OpenAccessPolicy/>}/>
-              <Route path="/add-open-access-policy" element={<AddOpenAccessPolicy/>}/>
+              <Route
+                path="/handle-open-access-policy"
+                element={<OpenAccessPolicy />}
+              />
+              <Route
+                path="/add-open-access-policy"
+                element={<AddOpenAccessPolicy />}
+              />
 
-              <Route path="/handle-award" element={<HandleAward/>}/>
-              <Route path="/add-award" element={<AddAward/>}/>
+              <Route path="/handle-award" element={<HandleAward />} />
+              <Route path="/add-award" element={<AddAward />} />
 
-              <Route path="/handle-event-conference" element={<HandleEventAndConference/>}/>
-              <Route path="/add-event-conference" element={<ConferenceForm/>}/>
-
+              <Route
+                path="/handle-event-conference"
+                element={<HandleEventAndConference />}
+              />
+              <Route
+                path="/add-event-conference"
+                element={<ConferenceForm />}
+              />
 
               {/* ------------------------------------------ Admin Route End--------------------- */}
 

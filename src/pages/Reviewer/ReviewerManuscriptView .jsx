@@ -590,7 +590,7 @@ const ReviewerManuscriptView = () => {
                         View
                       </a>
 
-                      <button
+                      {/* <button
                         onClick={() =>
                           downloadImage(
                             figurePath,
@@ -601,7 +601,7 @@ const ReviewerManuscriptView = () => {
                       >
                         <Download className="h-3 w-3 mr-1" />
                         Download
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                   <div className="text-xs text-gray-500 mt-1 truncate">

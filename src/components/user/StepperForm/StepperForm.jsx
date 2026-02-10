@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom"; // Add this import
+import { useNavigate, useSearchParams } from "react-router-dom"; // Add this import
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepThree from "./StepThree";
@@ -15,6 +15,7 @@ const StepperForm = () => {
   const [searchParams] = useSearchParams(); // Add this hook
   const [step, setStep] = useState(1);
   const [journalData, setJournalData] = useState([]);
+  const navigate = useNavigate();
 
   // ✅ Check if we're in update mode
   const updateId = searchParams.get("update");
@@ -357,12 +358,14 @@ const StepperForm = () => {
               journalData
             );
             toast.success(`PDF generated successfully: ${filename}`);
+            
           } catch (error) {
             console.error("PDF generation error:", error);
             toast.error(
               "PDF generation failed, but manuscript was submitted successfully"
             );
           }
+          navigate("/dashboard"); 
         } else {
           toast.error(response.data.message || "Update failed");
         }
@@ -465,6 +468,7 @@ const StepperForm = () => {
         } else {
           toast.error(response.data.message || "Submission failed");
         }
+        navigate("/dashboard");
       }
     } catch (error) {
       toast.error(

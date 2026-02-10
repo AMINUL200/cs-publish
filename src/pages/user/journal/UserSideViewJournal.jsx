@@ -51,8 +51,8 @@ const UserSideViewJournal = () => {
     }
   };
 
-  const handleViewEditor = () => {
-    navigate(`/editor-hub?journalId=${journal?.id}`);
+  const handleViewEditor = (edId) => {
+    navigate(`/editor-info/${edId}`);
   };
 
   useEffect(() => {
@@ -193,7 +193,7 @@ const UserSideViewJournal = () => {
 
                       {/* 👉 NEW VIEW LINK */}
                       <button
-                        onClick={handleViewEditor}
+                        onClick={() => handleViewEditor(editor[0].user_id)}
                         className="text-xs text-yellow-400 hover:text-yellow-200 
                    hover:underline hover:underline-offset-2 transition-all 
                    flex items-center gap-1"

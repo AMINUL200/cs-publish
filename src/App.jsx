@@ -153,6 +153,7 @@ import EventAndConference from "./pages/user/event_conference/EventAndConference
 import EventAndConferenceDetail from "./pages/user/event_conference/EventAndConferenceDetail";
 import Subscription from "./pages/user/subscription/Subscription";
 import JournalDescription from "./pages/user/journal/JournalDescription";
+import EditorInfo from "./pages/user/author_editor_hub/EditorInfo";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -232,6 +233,10 @@ function App() {
               <Route
                 path="/journal-description/:id"
                 element={<JournalDescription />}
+              />
+              <Route
+                path="/editor-info/:editorId"
+                element={<EditorInfo />}
               />
               <Route
                 path="/list-of-archive/:id"

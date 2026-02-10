@@ -7,6 +7,8 @@ import {
   faTwitter,
   faLinkedinIn,
   faGithub,
+  // faFilePdf,
+  // faDownload,
 } from "@fortawesome/free-brands-svg-icons";
 import Loader from "../../../components/common/Loader";
 import { formatDate } from "../../../lib/utils";
@@ -40,11 +42,12 @@ const BlogDetails = () => {
 
       if (response.status === 200) {
         const data = response.data;
+        console.log("Blog data:", data);
+
         setBlogDetailsData(data.blog_details);
         setLatestBlogs(data.latest_blog || []);
         setMostViewedBlogs(data.most_view_blog || []);
 
-        // Set comments from API response if available
         if (data.blog_details?.comments) {
           setComments(data.blog_details.comments);
         }
@@ -52,7 +55,7 @@ const BlogDetails = () => {
     } catch (error) {
       console.log("Error fetching blog details:", error);
       toast.error(
-        error.response?.data?.message || "Failed to fetch blog details"
+        error.response?.data?.message || "Failed to fetch blog details",
       );
     } finally {
       setLoading(false);
@@ -67,7 +70,7 @@ const BlogDetails = () => {
   const handleSubmitComment = async (e) => {
     e.preventDefault();
     if (!token) {
-      alert("Pleas Login to comment");
+      alert("Please Login to comment");
       return;
     }
     if (
@@ -80,7 +83,6 @@ const BlogDetails = () => {
     }
 
     try {
-      // If you have API endpoint for adding comments, use this:
       const response = await axios.post(
         `${API_URL}api/blog-comment`,
         {
@@ -91,7 +93,7 @@ const BlogDetails = () => {
         },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       if (response.status === 201) {
@@ -102,12 +104,36 @@ const BlogDetails = () => {
           email: "",
           message: "",
         });
-        toast.success("Comment Submit Success Full")
+        toast.success("Comment Submit Success Full");
       }
     } catch (error) {
       console.log("Error adding comment:", error);
       toast.error("Failed to add comment");
     }
+  };
+
+  // Function to handle PDF download
+  const handlePdfDownload = () => {
+    if (blogDetailsData?.blog_pdf) {
+      // Create a temporary anchor element
+      const link = document.createElement("a");
+      link.href = blogDetailsData.blog_pdf;
+      link.download = `blog-${blogDetailsData.title.replace(/\s+/g, "-").toLowerCase()}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success("Downloading PDF...");
+    } else {
+      toast.error("No PDF available for download");
+    }
+  };
+
+  // Function to get PDF file name from URL
+  const getPdfFileName = (pdfUrl) => {
+    if (!pdfUrl) return "Blog PDF";
+    const fileName = pdfUrl.split("/").pop();
+    return fileName.replace(".pdf", "").replace(/[-_]/g, " ");
   };
 
   if (loading) {
@@ -207,6 +233,32 @@ const BlogDetails = () => {
                 </motion.p>
               </div>
 
+              {/* PDF Download Button - Added here */}
+              {blogDetailsData.blog_pdf && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                  className="pdf-download-section flex justify-center mb-6"
+                >
+                  <button
+                    onClick={handlePdfDownload}
+                    className="group flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                  >
+                  
+                    <span className="font-medium">Download PDF Version</span>
+                    {/* <FontAwesomeIcon
+                      icon={faDownload}
+                      className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-0 group-hover:translate-x-1"
+                    /> */}
+                    {/* <FontAwesomeIcon
+                      icon={byPrefixAndName.fas["circle-down"]}
+                      className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-0 group-hover:translate-x-1"
+                    /> */}
+                  </button>
+                </motion.div>
+              )}
+
               <div className="blog-details-thumbnail-box flex justify-center items-center w-full h-96 md:h-[450px] mb-10 mx-auto relative">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -229,6 +281,43 @@ const BlogDetails = () => {
                 {/* Main Content */}
                 <div className="lg:col-span-2">
                   <div className="blog-detail-content-block">
+                    {/* PDF Card - Added here for better visibility */}
+                    {blogDetailsData.blog_pdf && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        viewport={{ once: true }}
+                        className="pdf-card bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 p-5 rounded-lg mb-6 shadow-sm"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="bg-red-500 p-3 rounded-lg">
+                             
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-gray-900">
+                                {getPdfFileName(blogDetailsData.blog_pdf)}
+                              </h4>
+                              <p className="text-sm text-gray-600 mt-1">
+                                PDF version of this blog is available
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={handlePdfDownload}
+                            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                          >
+                            {/* <FontAwesomeIcon
+                              icon={faDownload}
+                              className="w-3 h-3"
+                            /> */}
+                            Download
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+
                     <div className="blog-rich-text-block-1">
                       <div
                         className="blog-rich-text prose max-w-none"
@@ -237,12 +326,84 @@ const BlogDetails = () => {
                         }}
                       />
                     </div>
+
+                    {/* PDF Info at the bottom */}
+                    {blogDetailsData.blog_pdf && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        viewport={{ once: true }}
+                        className="pdf-info-section mt-8 pt-6 border-t border-gray-200"
+                      >
+                        <div className="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="bg-red-100 p-2 rounded-lg">
+                              
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">
+                                Need an offline copy?
+                              </p>
+                              <p className="text-xs text-gray-600">
+                                Download the PDF version for reading offline
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={handlePdfDownload}
+                            className="text-red-600 hover:text-red-700 font-medium text-sm flex items-center gap-2"
+                          >
+                            <span>Get PDF</span>
+                            {/* <FontAwesomeIcon
+                              icon={faDownload}
+                              className="w-3 h-3"
+                            /> */}
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
                 </div>
 
                 {/* Sidebar */}
                 <div className="lg:col-span-1">
                   <div className="blog-sidebar flex flex-col gap-6">
+                    {/* PDF Download in Sidebar */}
+                    {blogDetailsData.blog_pdf && (
+                      <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5 }}
+                        viewport={{ once: true }}
+                        className="blog-sidebar-content-block bg-gradient-to-br from-red-500 to-red-600 text-white p-5 rounded-lg shadow-lg"
+                      >
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="bg-white p-2 rounded-lg">
+                          
+                          </div>
+                          <h3 className="font-medium text-lg">PDF Download</h3>
+                        </div>
+                        <p className="text-red-100 text-sm mb-4">
+                          Download the complete blog in PDF format for offline
+                          reading.
+                        </p>
+                        <button
+                          onClick={handlePdfDownload}
+                          className="w-full bg-white text-red-600 hover:bg-gray-100 font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                        >
+                          {/* <FontAwesomeIcon
+                            icon={faDownload}
+                            className="w-4 h-4"
+                          /> */}
+                          Download PDF
+                        </button>
+                        <p className="text-xs text-red-200 text-center mt-3">
+                          File size: ~2MB
+                        </p>
+                      </motion.div>
+                    )}
+
                     {/* Most Viewed Posts */}
                     <div className="blog-sidebar-content-block bg-gray-50 p-6 rounded-lg">
                       <div className="blog-author-detail-box">
@@ -371,16 +532,6 @@ const BlogDetails = () => {
                             key={comment.id}
                             className="py-4 flex items-start gap-3"
                           >
-                            {/* <img
-                              src={
-                                comment.avatar ||
-                                `https://i.pravatar.cc/100?u=${encodeURIComponent(
-                                  comment.email
-                                )}`
-                              }
-                              alt={comment.name}
-                              className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                            /> */}
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
                                 <span className="text-sm font-medium">

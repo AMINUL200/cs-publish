@@ -129,7 +129,7 @@ const AuthorViewSubmittedManuscript = () => {
                                     <span>Submitted: {formatDate(item.created_at)}</span>
                                 </div>
 
-                                {/* {Array.isArray(item?.assignmen) && item.assignmen.length > 0 && (
+                                {Array.isArray(item?.assignmen) && item.assignmen.length > 0 && (
                                     <div className="mt-4 border-t border-gray-100 pt-3">
                                         <div className="text-sm font-medium mb-2">Assignments</div>
                                         <div className="flex flex-col gap-3">
@@ -172,7 +172,7 @@ const AuthorViewSubmittedManuscript = () => {
                                             })}
                                         </div>
                                     </div>
-                                )} */}
+                                )}
                             </div>
                         );
                     })}

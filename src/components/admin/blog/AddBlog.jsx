@@ -15,12 +15,14 @@ const AddBlog = () => {
     long_description: "",
     image: null,
     image_alt: "",
+    blog_pdf: null,
     date: "",
     most_view: 0,
   });
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  const [pdfFileName, setPdfFileName] = useState("");
   const API_URL = import.meta.env.VITE_API_URL;
 
   // Fetch categories on component mount
@@ -67,13 +69,11 @@ const AddBlog = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith("image/")) {
         toast.error("Please select a valid image file");
         return;
       }
 
-      // Validate file size (5MB)
       if (file.size > 5 * 1024 * 1024) {
         toast.error("Image size should be less than 5MB");
         return;
@@ -84,12 +84,35 @@ const AddBlog = () => {
         image: file,
       }));
 
-      // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePdfChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (file.type !== "application/pdf") {
+        toast.error("Please select a valid PDF file");
+        return;
+      }
+
+      // Validate file size (2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("PDF file size should be less than 2MB");
+        return;
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        blog_pdf: file,
+      }));
+      
+      setPdfFileName(file.name);
     }
   };
 
@@ -101,8 +124,20 @@ const AddBlog = () => {
     }));
     setImagePreview(null);
 
-    // Reset file input
-    const fileInput = document.querySelector('input[type="file"]');
+    const fileInput = document.querySelector('input[type="file"][accept="image/*"]');
+    if (fileInput) {
+      fileInput.value = "";
+    }
+  };
+
+  const handleRemovePdf = () => {
+    setFormData((prev) => ({
+      ...prev,
+      blog_pdf: null,
+    }));
+    setPdfFileName("");
+
+    const fileInput = document.querySelector('input[type="file"][accept=".pdf"]');
     if (fileInput) {
       fileInput.value = "";
     }
@@ -125,6 +160,11 @@ const AddBlog = () => {
 
       if (formData.image) {
         submitData.append("image", formData.image);
+      }
+
+      // Add PDF file to form data if exists
+      if (formData.blog_pdf) {
+        submitData.append("blog_pdf", formData.blog_pdf);
       }
 
       const response = await axios.post(
@@ -150,10 +190,12 @@ const AddBlog = () => {
           long_description: "",
           image: null,
           image_alt: "",
+          blog_pdf: null,
           date: "",
           most_view: 0,
         });
         setImagePreview(null);
+        setPdfFileName("");
       }
     } catch (err) {
       const errorMessage = err.response?.data?.message || "Failed to add blog";
@@ -262,31 +304,7 @@ const AddBlog = () => {
           />
         </div>
 
-        {/* Most Views */}
-        {/* <div>
-          <label
-            htmlFor="most_view"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Most Views
-          </label>
-          <input
-            type="number"
-            id="most_view"
-            name="most_view"
-            value={formData.most_view}
-            onChange={handleChange}
-            min="0"
-            disabled={loading}
-            className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Enter view count"
-          />
-          <p className="text-sm text-gray-500 mt-1">
-            Number of times this blog has been viewed
-          </p>
-        </div> */}
-
-        {/* Image Upload */}
+        {/* Image Upload Section */}
         <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <label className="block text-sm font-medium text-gray-700 mb-4">
             Blog Image
@@ -385,6 +403,105 @@ const AddBlog = () => {
           </div>
         </div>
 
+        {/* PDF Upload Section */}
+        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+          <label className="block text-sm font-medium text-gray-700 mb-4">
+            Blog PDF (Optional)
+          </label>
+
+          {/* Upload Area */}
+          {!pdfFileName && (
+            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center transition-all duration-300 hover:border-green-400 hover:bg-green-50 mb-4">
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={handlePdfChange}
+                className="hidden"
+                id="pdf-upload"
+                disabled={loading}
+              />
+              <label
+                htmlFor="pdf-upload"
+                className="cursor-pointer flex flex-col items-center justify-center"
+              >
+                <svg
+                  className="w-12 h-12 text-gray-400 mb-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                <span className="text-sm font-medium text-gray-600 mb-1">
+                  Click to upload PDF
+                </span>
+                <span className="text-xs text-gray-400">
+                  PDF file up to 2MB
+                </span>
+              </label>
+            </div>
+          )}
+
+          {/* PDF Preview */}
+          {pdfFileName && (
+            <div className="mb-4">
+              <p className="text-sm font-medium text-gray-700 mb-2">PDF File:</p>
+              <div className="flex items-center justify-between bg-white border border-gray-300 rounded-lg p-4">
+                <div className="flex items-center space-x-3">
+                  <svg
+                    className="w-8 h-8 text-red-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 truncate max-w-xs">
+                      {pdfFileName}
+                    </p>
+                    <p className="text-xs text-gray-500">PDF file selected</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemovePdf}
+                  disabled={loading}
+                  className="text-red-500 hover:text-red-700 transition-colors"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
+
+          <p className="text-sm text-gray-500 mt-2">
+            Upload a PDF version of your blog (maximum size: 2MB)
+          </p>
+        </div>
+
         {/* Description */}
         <div>
           <label
@@ -422,8 +539,8 @@ const AddBlog = () => {
               menubar: false,
               plugins: [
                 "advlist",
-                "autolink", // Added autolink plugin for automatic link detection
-                "link", // Added link plugin for link functionality
+                "autolink",
+                "link",
                 "lists",
                 "charmap",
                 "preview",
@@ -436,18 +553,16 @@ const AddBlog = () => {
               ],
               toolbar:
                 "undo redo | blocks | " +
-                "bold italic underline | link | " + // Added link button to toolbar
+                "bold italic underline | link | " +
                 "alignleft aligncenter alignright alignjustify | " +
                 "bullist numlist outdent indent | " +
                 "removeformat | help | code",
               content_style:
                 "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-              // Optional: Configure link options
               link_context_toolbar: true,
               link_assume_external_targets: true,
               link_title: false,
-              default_link_target: "_blank", // Opens links in new tab by default
-              // Link dialog configuration
+              default_link_target: "_blank",
               link_list: [
                 { title: "Home Page", value: "/" },
                 { title: "About Page", value: "/about" },

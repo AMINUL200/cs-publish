@@ -55,6 +55,8 @@ const PublisherViewPublishedManuscriptList = () => {
 
       if (response.data.status) {
         setManuscripts(response.data.data);
+        console.log(response.data.data);
+        
       } else {
         throw new Error(response.data.message || "Failed to fetch manuscripts");
       }
@@ -575,6 +577,7 @@ const PublisherViewPublishedManuscriptList = () => {
                         <img
                           src={manuscript.image}
                           alt={manuscript.title}
+                           loading="lazy"
                           className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                           onError={(e) => {
                             e.target.src = "https://via.placeholder.com/300x200?text=No+Image";

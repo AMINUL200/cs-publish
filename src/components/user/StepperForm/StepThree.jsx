@@ -262,7 +262,7 @@ const StepThree = ({ formData, setFormData, handleChange, isUpdateMode = false }
       {/* ✅ FIGURES - Multiple Image Upload */}
       <div className="mb-6">
         <label className="block mb-1 font-medium">
-          Figures {isUpdateMode && "(Upload new images to replace current figures)"}
+          Figures {isUpdateMode && "(Upload new images )"}
         </label>
 
         {/* Current Figures Display */}

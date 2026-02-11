@@ -43,7 +43,7 @@ const PublisherViewManuscript = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.data.flag === 1) {
@@ -54,7 +54,7 @@ const PublisherViewManuscript = () => {
     } catch (error) {
       console.error("Error fetching manuscript details:", error);
       toast.error(
-        error.message || "An error occurred while fetching manuscript details."
+        error.message || "An error occurred while fetching manuscript details.",
       );
     } finally {
       setLoading(false);
@@ -271,7 +271,7 @@ const PublisherViewManuscript = () => {
                     {section.title}
                   </h2>
                   <p
-                    className="text-gray-700 leading-relaxed"
+                    className="blog-rich-text text-gray-700 leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: section.content }}
                   ></p>
                 </div>
@@ -325,22 +325,15 @@ const PublisherViewManuscript = () => {
                                 Figure {index + 1}
                               </span>
                               <div className="flex items-center space-x-2">
-                               
-
-                                <button
-                                  onClick={() =>
-                                    downloadImage(
-                                      figurePath,
-                                      `Figure_${index + 1}.${figurePath
-                                        .split(".")
-                                        .pop()}`
-                                    )
-                                  }
-                                  className="text-green-600 hover:text-green-800 text-sm flex items-center px-2 py-1 rounded hover:bg-green-50 transition-colors"
+                                <a
+                                  href={`${STORAGE_URL}${figurePath}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:text-blue-800 text-sm flex items-center px-2 py-1 rounded hover:bg-blue-50 transition-colors"
                                 >
-                                  <Download className="h-3 w-3 mr-1" />
-                                  Download
-                                </button>
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  View
+                                </a>
                               </div>
                             </div>
                             <div className="text-xs text-gray-500 mt-1 truncate">
@@ -348,7 +341,7 @@ const PublisherViewManuscript = () => {
                             </div>
                           </div>
                         </div>
-                      )
+                      ),
                     )}
                   </div>
                 </div>

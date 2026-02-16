@@ -1,12 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import { Plus, Edit, Trash2, Eye, Download, Calendar, Users, Clock, Youtube, Image as ImageIcon } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { toast } from "react-toastify";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  Download,
+  Calendar,
+  Users,
+  Clock,
+  Youtube,
+  Image as ImageIcon,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const HandleInnovation = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
@@ -14,9 +26,9 @@ const HandleInnovation = () => {
   const [innovations, setInnovations] = useState({
     upcoming: [],
     popular: [],
-    recent: []
+    recent: [],
   });
-  const [activeTab, setActiveTab] = useState('upcoming');
+  const [activeTab, setActiveTab] = useState("upcoming");
   const [deleteLoading, setDeleteLoading] = useState(null);
 
   // Fetch innovations data
@@ -25,20 +37,21 @@ const HandleInnovation = () => {
       setLoading(true);
       const response = await axios.get(`${API_URL}api/innovations`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (response.data.status) {
+        console.log("Fetched innovations:", response.data);
         setInnovations({
           upcoming: response.data.upcoming || [],
           popular: response.data.popular || [],
-          recent: response.data.recent || []
+          recent: response.data.recent || [],
         });
       }
     } catch (error) {
-      console.error('Error fetching innovations:', error);
-      toast.error('Failed to load innovations');
+      console.error("Error fetching innovations:", error);
+      toast.error("Failed to load innovations");
     } finally {
       setLoading(false);
     }
@@ -46,7 +59,7 @@ const HandleInnovation = () => {
 
   // Delete innovation
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this innovation?')) {
+    if (!window.confirm("Are you sure you want to delete this innovation?")) {
       return;
     }
 
@@ -54,17 +67,17 @@ const HandleInnovation = () => {
       setDeleteLoading(id);
       const response = await axios.delete(`${API_URL}api/innovations/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (response.data.status) {
-        toast.success('Innovation deleted successfully');
+        toast.success("Innovation deleted successfully");
         fetchInnovations(); // Refresh the list
       }
     } catch (error) {
-      console.error('Error deleting innovation:', error);
-      toast.error('Failed to delete innovation');
+      console.error("Error deleting innovation:", error);
+      toast.error("Failed to delete innovation");
     } finally {
       setDeleteLoading(null);
     }
@@ -77,46 +90,53 @@ const HandleInnovation = () => {
 
   // Navigate to add page
   const handleAdd = () => {
-    navigate('/add-innovation');
+    navigate("/add-innovation");
   };
 
   // Format date
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   // Extract YouTube video ID or check if it's an image
   const getMediaInfo = (url) => {
-    if (!url) return { type: 'none', src: null };
+    if (!url) return { type: "none", src: null };
 
-    // Check if it's a YouTube URL
-    const youtubeMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
+    // ✅ YouTube check
+    const youtubeMatch = url.match(
+      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/,
+    );
+
     if (youtubeMatch) {
       return {
-        type: 'youtube',
-        src: `https://img.youtube.com/vi/${youtubeMatch[1]}/hqdefault.jpg`
+        type: "youtube",
+        src: `https://img.youtube.com/vi/${youtubeMatch[1]}/hqdefault.jpg`,
       };
     }
 
-    // Check if it's an image URL (ends with common image extensions or contains uploads/innovations)
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp'];
-    const isImageUrl = imageExtensions.some(ext => url.toLowerCase().includes(ext)) || 
-                      url.includes('uploads/innovations');
+    // ✅ Image check
+    const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"];
+
+    const isImageUrl =
+      imageExtensions.some((ext) => url.toLowerCase().includes(ext)) ||
+      url.includes("innovations");
 
     if (isImageUrl) {
-      // If it's a relative path, prepend the API URL
-      const fullImageUrl = url.startsWith('http') ? url : `${API_URL}${url}`;
+      const fullImageUrl = url.startsWith("http")
+        ? url
+        : `${STORAGE_URL}${url}`;
+
       return {
-        type: 'image',
-        src: fullImageUrl
+        type: "image",
+        src: fullImageUrl,
       };
     }
 
-    return { type: 'none', src: null };
+    return { type: "none", src: null };
   };
 
   useEffect(() => {
@@ -138,8 +158,12 @@ const HandleInnovation = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Manage Innovations</h1>
-          <p className="text-gray-600 mt-2">Create, edit, and manage innovation content</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Manage Innovations
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Create, edit, and manage innovation content
+          </p>
         </div>
         <button
           onClick={handleAdd}
@@ -154,17 +178,29 @@ const HandleInnovation = () => {
       <div className="border-b border-gray-200 mb-6">
         <nav className="-mb-px flex space-x-8">
           {[
-            { key: 'upcoming', label: 'Upcoming', count: innovations.upcoming.length },
-            { key: 'popular', label: 'Popular', count: innovations.popular.length },
-            { key: 'recent', label: 'Recent', count: innovations.recent.length }
+            {
+              key: "upcoming",
+              label: "Upcoming",
+              count: innovations.upcoming.length,
+            },
+            {
+              key: "popular",
+              label: "Popular",
+              count: innovations.popular.length,
+            },
+            {
+              key: "recent",
+              label: "Recent",
+              count: innovations.recent.length,
+            },
           ].map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === tab.key
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
             >
               <span>{tab.label}</span>
@@ -182,10 +218,12 @@ const HandleInnovation = () => {
           <div className="col-span-full text-center py-12">
             <div className="bg-gray-50 rounded-lg p-8">
               <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No innovations found</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No innovations found
+              </h3>
               <p className="text-gray-600 mb-4">
-                {activeTab === 'upcoming' 
-                  ? 'No upcoming innovations scheduled.' 
+                {activeTab === "upcoming"
+                  ? "No upcoming innovations scheduled."
                   : `No ${activeTab} innovations available.`}
               </p>
               <button
@@ -200,7 +238,7 @@ const HandleInnovation = () => {
         ) : (
           currentData.map((innovation) => {
             const mediaInfo = getMediaInfo(innovation.image_video);
-            
+
             return (
               <div
                 key={innovation.id}
@@ -208,7 +246,7 @@ const HandleInnovation = () => {
               >
                 {/* Image/Video Thumbnail */}
                 <div className="relative h-48 bg-gray-200">
-                  {mediaInfo.type === 'youtube' && mediaInfo.src ? (
+                  {mediaInfo.type === "youtube" && mediaInfo.src ? (
                     <div className="relative w-full h-full">
                       <img
                         src={mediaInfo.src}
@@ -219,7 +257,7 @@ const HandleInnovation = () => {
                         <Youtube className="w-12 h-12 text-red-600" />
                       </div>
                     </div>
-                  ) : mediaInfo.type === 'image' && mediaInfo.src ? (
+                  ) : mediaInfo.type === "image" && mediaInfo.src ? (
                     <div className="relative w-full h-full">
                       <img
                         src={mediaInfo.src}
@@ -227,8 +265,8 @@ const HandleInnovation = () => {
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           // If image fails to load, show fallback
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
+                          e.target.style.display = "none";
+                          e.target.nextSibling.style.display = "flex";
                         }}
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-0 flex items-center justify-center hidden">
@@ -239,21 +277,23 @@ const HandleInnovation = () => {
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
                       <div className="text-center">
                         <ImageIcon className="w-12 h-12 text-blue-400 mx-auto mb-2" />
-                        <span className="text-blue-600 font-medium">No Media</span>
+                        <span className="text-blue-600 font-medium">
+                          No Media
+                        </span>
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Status Badge */}
                   <div className="absolute top-3 left-3">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
                         innovation.is_upcomming
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-green-100 text-green-800'
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-green-100 text-green-800"
                       }`}
                     >
-                      {innovation.is_upcomming ? 'Upcoming' : 'Published'}
+                      {innovation.is_upcomming ? "Upcoming" : "Published"}
                     </span>
                   </div>
 
@@ -267,15 +307,20 @@ const HandleInnovation = () => {
 
                   {/* Media Type Badge */}
                   <div className="absolute bottom-3 left-3">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      mediaInfo.type === 'youtube' 
-                        ? 'bg-red-100 text-red-800'
-                        : mediaInfo.type === 'image'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {mediaInfo.type === 'youtube' ? 'Video' : 
-                       mediaInfo.type === 'image' ? 'Image' : 'No Media'}
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        mediaInfo.type === "youtube"
+                          ? "bg-red-100 text-red-800"
+                          : mediaInfo.type === "image"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {mediaInfo.type === "youtube"
+                        ? "Video"
+                        : mediaInfo.type === "image"
+                          ? "Image"
+                          : "No Media"}
                     </span>
                   </div>
                 </div>
@@ -372,27 +417,33 @@ const HandleInnovation = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-blue-800">Upcoming</p>
-              <p className="text-2xl font-bold text-blue-900">{innovations.upcoming.length}</p>
+              <p className="text-2xl font-bold text-blue-900">
+                {innovations.upcoming.length}
+              </p>
             </div>
             <Calendar className="w-8 h-8 text-blue-600" />
           </div>
         </div>
-        
+
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-green-800">Popular</p>
-              <p className="text-2xl font-bold text-green-900">{innovations.popular.length}</p>
+              <p className="text-2xl font-bold text-green-900">
+                {innovations.popular.length}
+              </p>
             </div>
             <Users className="w-8 h-8 text-green-600" />
           </div>
         </div>
-        
+
         <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-purple-800">Recent</p>
-              <p className="text-2xl font-bold text-purple-900">{innovations.recent.length}</p>
+              <p className="text-2xl font-bold text-purple-900">
+                {innovations.recent.length}
+              </p>
             </div>
             <Clock className="w-8 h-8 text-purple-600" />
           </div>

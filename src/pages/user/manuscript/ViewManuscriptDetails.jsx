@@ -27,6 +27,7 @@ import Loader from "../../../components/common/Loader";
 
 const ViewManuscriptDetails = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token, userData } = useSelector((state) => state.auth);
   const isLoggedIn = Boolean(token);
   const hasActiveSubscription = Boolean(
@@ -934,7 +935,8 @@ const ViewManuscriptDetails = () => {
                     {journalInfo.image && (
                       <div className="flex justify-center mb-3">
                         <img
-                          src={journalInfo.image}
+                          src={`${STORAGE_URL}${journalInfo.image}`}
+                          // srcSet={`${STORAGE_URL}${journalInfo.image} 1x, ${STORAGE_URL}${journalInfo.image} 2x`}
                           alt={journalInfo.j_title}
                           className="h-20 w-auto object-cover rounded-lg"
                         />

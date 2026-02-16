@@ -8,6 +8,7 @@ import Loader from "../../components/common/Loader";
 
 const CmsTemplate = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const { slug } = useParams();
 
@@ -150,7 +151,7 @@ const CmsTemplate = () => {
                   {content.image ? (
                     <div className="relative">
                       <img
-                        src={content.image}
+                        src={`${STORAGE_URL}${content.image}`}
                         alt={teamInfo ? teamInfo.name : content.title}
                         className="w-full h-80 lg:h-96 object-cover rounded-2xl shadow-xl"
                       />

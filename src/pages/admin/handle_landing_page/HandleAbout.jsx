@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const HandleAbout = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   
@@ -159,7 +160,8 @@ const HandleAbout = () => {
                           {about.image1 ? (
                             <div className="relative group">
                               <img
-                                src={about?.image1}
+                                // src={about?.image1}
+                                src={`${STORAGE_URL}${about.image1}`}
                                 alt={about.image1_alt || "About image 1"}
                                 className="h-12 w-12 object-cover rounded-lg shadow-sm"
                               />
@@ -177,7 +179,7 @@ const HandleAbout = () => {
                           {about.image2 ? (
                             <div className="relative group">
                               <img
-                                src={about.image2}
+                                src={`${STORAGE_URL}${about.image2}`}
                                 alt={about.image2_alt || "About image 2"}
                                 className="h-12 w-12 object-cover rounded-lg shadow-sm"
                               />
@@ -195,7 +197,8 @@ const HandleAbout = () => {
                           {about.image3 ? (
                             <div className="relative group">
                               <img
-                                src={about.image3}
+                                src={`${STORAGE_URL}${about.image3}`}
+                                
                                 alt={about.image3_alt || "About image 3"}
                                 className="h-12 w-12 object-cover rounded-lg shadow-sm"
                               />

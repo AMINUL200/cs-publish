@@ -38,6 +38,7 @@ const JournalDescription = () => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
   // Fetch journal data
   useEffect(() => {
@@ -199,7 +200,8 @@ const JournalDescription = () => {
               <div className="w-48 h-64 rounded-lg overflow-hidden bg-gray-100">
                 {journalData.image ? (
                   <img
-                    src={journalData.image}
+                    // src={journalData.image}
+                    src={`${STORAGE_URL}${journalData.image}`}
                     alt={journalData.j_title}
                     className="w-full h-full object-cover"
                     onError={(e) => {

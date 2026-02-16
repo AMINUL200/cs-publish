@@ -7,6 +7,7 @@ const LandingResearch = ({
   error = null,
 }) => {
 
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
 
   return (
@@ -31,7 +32,7 @@ const LandingResearch = ({
                 </div>
                 <div className="research_img_box">
                   <img
-                    src={research.image}
+                    src={`${STORAGE_URL}${research.image}`}
                     className="w-[100%] h-[300px] object-cover"
                     alt={research.title}
                   />

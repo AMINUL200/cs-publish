@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const AddWhoWeAre = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -53,7 +54,7 @@ const AddWhoWeAre = () => {
       const data = await response.json();
       if (data.status && data.data) {
         setId(data.data.id);
-        setCurrentImage(data.data.image);
+        setCurrentImage(`${STORAGE_URL}${data.data.image}`);
         setLastUpdated(data.data.updated_at || data.data.created_at);
         
         setFormData({

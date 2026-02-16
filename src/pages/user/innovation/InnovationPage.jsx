@@ -30,9 +30,10 @@ const InnovationPage = () => {
   const [innovations, setInnovations] = useState({
     upcoming: [],
     popular: [],
-    recent: []
+    recent: [],
   });
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const navigation = useNavigate();
 
   // Fetch innovations data
@@ -45,72 +46,80 @@ const InnovationPage = () => {
         setInnovations({
           upcoming: response.data.upcoming || [],
           popular: response.data.popular || [],
-          recent: response.data.recent || []
+          recent: response.data.recent || [],
         });
       }
     } catch (error) {
-      console.error('Error fetching innovations:', error);
+      console.error("Error fetching innovations:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRead =(innovation) =>{
-    if(!innovation) return;
+  const handleRead = (innovation) => {
+    if (!innovation) return;
     try {
       axios.get(`${API_URL}api/innovations/${innovation.id}/view`);
-      navigation(`/innovation/${innovation.slug}`)
+      navigation(`/innovation/${innovation.slug}`);
     } catch (error) {
       console.log(error);
       toast.error(error.message);
     }
-  }
+  };
 
   // Extract YouTube video ID or get image URL
   const getMediaInfo = (url) => {
-    if (!url) return { type: 'none', src: null };
+    if (!url) return { type: "none", src: null };
 
-    // Check if it's a YouTube URL
-    const youtubeMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
+    // ✅ YouTube check
+    const youtubeMatch = url.match(
+      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/,
+    );
+
     if (youtubeMatch) {
       return {
-        type: 'youtube',
-        src: `https://img.youtube.com/vi/${youtubeMatch[1]}/hqdefault.jpg`
+        type: "youtube",
+        src: `https://img.youtube.com/vi/${youtubeMatch[1]}/hqdefault.jpg`,
       };
     }
 
-    // Check if it's an image URL
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp'];
-    const isImageUrl = imageExtensions.some(ext => url.toLowerCase().includes(ext)) || 
-                      url.includes('uploads/innovations');
+    // ✅ Image check
+    const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"];
+
+    const isImageUrl =
+      imageExtensions.some((ext) => url.toLowerCase().includes(ext)) ||
+      url.includes("innovations");
 
     if (isImageUrl) {
-      const fullImageUrl = url.startsWith('http') ? url : `${API_URL}${url}`;
+      const fullImageUrl = url.startsWith("http")
+        ? url
+        : `${STORAGE_URL}${url}`;
+
       return {
-        type: 'image',
-        src: fullImageUrl
+        type: "image",
+        src: fullImageUrl,
       };
     }
 
-    return { type: 'none', src: null };
+    return { type: "none", src: null };
   };
 
   // Format date
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   const InnovationCard = ({ innovation, type = "recent" }) => {
     const mediaInfo = getMediaInfo(innovation.image_video);
-    
+
     return (
       <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-200">
         <div className="relative overflow-hidden">
-          {mediaInfo.type === 'youtube' && mediaInfo.src ? (
+          {mediaInfo.type === "youtube" && mediaInfo.src ? (
             <div className="relative w-full h-48">
               <img
                 src={mediaInfo.src}
@@ -123,30 +132,33 @@ const InnovationPage = () => {
                 </div>
               </div>
             </div>
-          ) : mediaInfo.type === 'image' && mediaInfo.src ? (
+          ) : mediaInfo.type === "image" && mediaInfo.src ? (
             <img
               src={mediaInfo.src}
               alt={innovation.image_alt_tag}
               className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
               onError={(e) => {
-                e.target.style.display = 'none';
+                e.target.style.display = "none";
               }}
             />
           ) : (
             <div className="w-full h-48 bg-gradient-to-br from-yellow-50 to-amber-100 flex items-center justify-center">
               <div className="text-center">
-                <FontAwesomeIcon icon={faUser} className="w-12 h-12 text-amber-600 mb-2" />
+                <FontAwesomeIcon
+                  icon={faUser}
+                  className="w-12 h-12 text-amber-600 mb-2"
+                />
                 <span className="text-amber-700 font-medium">No Media</span>
               </div>
             </div>
           )}
-          
+
           <div className="absolute top-4 left-4">
             <span className="bg-gradient-to-r from-amber-600 to-red-800 text-white px-3 py-1 rounded-full text-xs font-medium">
               {innovation.catagory || "Innovation"}
             </span>
           </div>
-          
+
           {type === "popular" && (
             <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
               <FontAwesomeIcon
@@ -156,7 +168,7 @@ const InnovationPage = () => {
               <span className="text-xs font-medium text-white">4.8</span>
             </div>
           )}
-          
+
           {type === "recent" && (
             <div className="absolute top-4 right-4 bg-black/80 text-white px-2 py-1 rounded-full text-xs">
               <FontAwesomeIcon icon={faEye} className="w-3 h-3 mr-1" />
@@ -201,7 +213,10 @@ const InnovationPage = () => {
           {/* Innovator Info */}
           <div className="flex items-center gap-3 mb-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
             <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
-              <FontAwesomeIcon icon={faUser} className="w-4 h-4 text-amber-700" />
+              <FontAwesomeIcon
+                icon={faUser}
+                className="w-4 h-4 text-amber-700"
+              />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">
@@ -215,7 +230,7 @@ const InnovationPage = () => {
 
           <button
             // to={`/innovation/${innovation.slug}`}
-            onClick={()=> handleRead(innovation)}
+            onClick={() => handleRead(innovation)}
             className="w-full bg-gradient-to-r from-amber-600 to-red-800 text-white py-3 px-4 rounded-lg hover:from-amber-700 hover:to-red-900 transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer font-medium"
           >
             Read More
@@ -360,10 +375,16 @@ const InnovationPage = () => {
             ) : (
               <div className="text-center py-12">
                 <div className="bg-amber-50 rounded-2xl p-8 border border-amber-200">
-                  <FontAwesomeIcon icon={faUser} className="w-16 h-16 text-amber-400 mb-4" />
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">No Recent Innovations</h3>
+                  <FontAwesomeIcon
+                    icon={faUser}
+                    className="w-16 h-16 text-amber-400 mb-4"
+                  />
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    No Recent Innovations
+                  </h3>
                   <p className="text-gray-600 mb-4">
-                    Check back later for the latest innovations and breakthroughs.
+                    Check back later for the latest innovations and
+                    breakthroughs.
                   </p>
                 </div>
               </div>
@@ -408,8 +429,13 @@ const InnovationPage = () => {
             ) : (
               <div className="text-center py-12">
                 <div className="bg-amber-50 rounded-2xl p-8 border border-amber-200">
-                  <FontAwesomeIcon icon={faStar} className="w-16 h-16 text-amber-400 mb-4" />
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">No Popular Innovations</h3>
+                  <FontAwesomeIcon
+                    icon={faStar}
+                    className="w-16 h-16 text-amber-400 mb-4"
+                  />
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    No Popular Innovations
+                  </h3>
                   <p className="text-gray-600 mb-4">
                     The most viewed innovations will appear here.
                   </p>
@@ -456,8 +482,13 @@ const InnovationPage = () => {
             ) : (
               <div className="text-center py-12">
                 <div className="bg-white rounded-2xl p-8 border border-amber-200">
-                  <FontAwesomeIcon icon={faCalendar} className="w-16 h-16 text-amber-400 mb-4" />
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">No Upcoming Innovations</h3>
+                  <FontAwesomeIcon
+                    icon={faCalendar}
+                    className="w-16 h-16 text-amber-400 mb-4"
+                  />
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    No Upcoming Innovations
+                  </h3>
                   <p className="text-gray-600 mb-4">
                     Exciting new innovations are on the horizon. Stay tuned!
                   </p>

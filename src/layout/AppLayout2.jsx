@@ -38,6 +38,7 @@ const AppLayout2 = () => {
 
       // ✅ Handle each response
       if (settingsRes.data.flag === 1) setSettingsData(settingsRes.data.data);
+      console.log("Settings Data:", settingsRes.data.data);
       if (journal.data.status) setJournalList(journal.data.data);
       if (cmsPage.data.status) setCmsPageList(cmsPage.data.data);
       if (policy.data.status) setPolicyData(policy.data.data);

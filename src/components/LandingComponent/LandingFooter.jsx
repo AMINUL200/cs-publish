@@ -14,6 +14,7 @@ const LandingFooter = ({
   loading = false,
 }) => {
   // console.log(policyData);
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
   const sections = [
     {
@@ -88,7 +89,7 @@ const LandingFooter = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-6">
           <div className="mb-2 md:mb-16">
             <img
-              src={settingsData?.image}
+              src={`${STORAGE_URL}${settingsData?.image}`}
               alt="Company Logo"
               className="text-center mx-auto sm:mx-0"
             />

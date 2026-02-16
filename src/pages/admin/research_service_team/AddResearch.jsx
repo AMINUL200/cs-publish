@@ -9,6 +9,7 @@ import { Editor } from "@tinymce/tinymce-react";
 
 const AddResearch = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -52,6 +53,7 @@ const AddResearch = () => {
 
       if (res.data.status) {
         const research = res.data.data;
+        console.log("Fetched research data for edit:", research);
         setFormData({
           type: research.type || "research",
           title: research.title || "",
@@ -67,7 +69,7 @@ const AddResearch = () => {
 
         // Set image preview if image exists
         if (research.image) {
-          setImagePreview(research.image);
+          setImagePreview(`${STORAGE_URL}${research.image}`);
         }
       }
     } catch (err) {

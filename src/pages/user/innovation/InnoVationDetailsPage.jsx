@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import Breadcrumb from '../../../components/common/Breadcrumb';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import Breadcrumb from "../../../components/common/Breadcrumb";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendar,
   faUser,
@@ -11,17 +11,17 @@ import {
   faMessage,
   faEye,
   faTag,
-  faDownload
-} from '@fortawesome/free-solid-svg-icons';
+  faDownload,
+} from "@fortawesome/free-solid-svg-icons";
 import {
   faFacebook,
   faTwitter,
-  faLinkedin
-} from '@fortawesome/free-brands-svg-icons';
-import Loader from '../../../components/common/Loader';
-import InnovationTestimonial from '../../../components/common/InnovationTestimonial';
-import MediaRenderer from '../../../components/common/MediaRenderer';
-import { Link } from 'react-router-dom';
+  faLinkedin,
+} from "@fortawesome/free-brands-svg-icons";
+import Loader from "../../../components/common/Loader";
+import InnovationTestimonial from "../../../components/common/InnovationTestimonial";
+import MediaRenderer from "../../../components/common/MediaRenderer";
+import { Link } from "react-router-dom";
 
 const InnoVationDetailsPage = () => {
   const { slug } = useParams(); // Extract slug from URL
@@ -29,19 +29,22 @@ const InnoVationDetailsPage = () => {
   const [innovation, setInnovation] = useState(null);
   const [popularInnovations, setPopularInnovations] = useState([]);
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
   // Fetch innovation data by slug
   const fetchInnovationData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}api/innovations-details/${slug}`);
-      
+      const response = await axios.get(
+        `${API_URL}api/innovations-details/${slug}`,
+      );
+
       if (response.data.status) {
         setInnovation(response.data.data);
         setPopularInnovations(response.data.popular || []);
       }
     } catch (error) {
-      console.error('Error fetching innovation data:', error);
+      console.error("Error fetching innovation data:", error);
     } finally {
       setLoading(false);
     }
@@ -49,7 +52,7 @@ const InnoVationDetailsPage = () => {
 
   // Format date
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
@@ -60,31 +63,39 @@ const InnoVationDetailsPage = () => {
 
   // Extract YouTube video ID or get image URL
   const getMediaInfo = (url) => {
-    if (!url) return { type: 'none', src: null };
+    if (!url) return { type: "none", src: null };
 
-    // Check if it's a YouTube URL
-    const youtubeMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
+    // ✅ YouTube check
+    const youtubeMatch = url.match(
+      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/,
+    );
+
     if (youtubeMatch) {
       return {
-        type: 'youtube',
-        src: `https://www.youtube.com/embed/${youtubeMatch[1]}`
+        type: "youtube",
+        src: `https://img.youtube.com/vi/${youtubeMatch[1]}/hqdefault.jpg`,
       };
     }
 
-    // Check if it's an image URL
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp'];
-    const isImageUrl = imageExtensions.some(ext => url.toLowerCase().includes(ext)) || 
-                      url.includes('uploads/innovations');
+    // ✅ Image check
+    const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"];
+
+    const isImageUrl =
+      imageExtensions.some((ext) => url.toLowerCase().includes(ext)) ||
+      url.includes("innovations");
 
     if (isImageUrl) {
-      const fullImageUrl = url.startsWith('http') ? url : `${API_URL}${url}`;
+      const fullImageUrl = url.startsWith("http")
+        ? url
+        : `${STORAGE_URL}${url}`;
+
       return {
-        type: 'image',
-        src: fullImageUrl
+        type: "image",
+        src: fullImageUrl,
       };
     }
 
-    return { type: 'none', src: null };
+    return { type: "none", src: null };
   };
 
   // Team Members Data (keeping this as it's for testimonials)
@@ -93,34 +104,38 @@ const InnoVationDetailsPage = () => {
       id: 1,
       name: "Sarah Mitchell",
       role: "Editor-in-Chief",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop",
       bio: "Award-winning journalist with 15+ years in digital publishing",
-      social: "@sarahmitchell"
+      social: "@sarahmitchell",
     },
     {
       id: 2,
       name: "Marcus Johnson",
       role: "Senior Writer",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop",
       bio: "Bestselling author and writing coach specializing in fiction",
-      social: "@marcusjwrites"
+      social: "@marcusjwrites",
     },
     {
       id: 3,
       name: "Lisa Chen",
       role: "Content Strategist",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop",
       bio: "Digital marketing expert helping authors build their online presence",
-      social: "@lisachen_media"
+      social: "@lisachen_media",
     },
     {
       id: 4,
       name: "James Rivera",
       role: "Community Manager",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop",
       bio: "Passionate about connecting writers and fostering creative communities",
-      social: "@jamesrivera"
-    }
+      social: "@jamesrivera",
+    },
   ];
 
   useEffect(() => {
@@ -138,9 +153,16 @@ const InnoVationDetailsPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Innovation Not Found</h2>
-          <p className="text-gray-600 mb-6">The innovation you're looking for doesn't exist.</p>
-          <Link to="/innovation" className="bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Innovation Not Found
+          </h2>
+          <p className="text-gray-600 mb-6">
+            The innovation you're looking for doesn't exist.
+          </p>
+          <Link
+            to="/innovation"
+            className="bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700"
+          >
             Back to Innovations
           </Link>
         </div>
@@ -152,15 +174,15 @@ const InnoVationDetailsPage = () => {
 
   return (
     <>
-      <Breadcrumb items={[
-        { label: 'Home', path: '/', icon: 'home' },
-        { label: 'Innovation', path: '/innovation', icon: 'folder' },
-        { label: innovation.page_title }
-      ]}
+      <Breadcrumb
+        items={[
+          { label: "Home", path: "/", icon: "home" },
+          { label: "Innovation", path: "/innovation", icon: "folder" },
+          { label: innovation.page_title },
+        ]}
         pageTitle={innovation.page_title}
       />
       <div className="container mx-auto px-4 py-8 md:px-10">
-
         <div className="flex flex-col lg:flex-row gap-8 mt-6">
           {/* Main Content */}
           <div className="w-full lg:w-8/12">
@@ -184,8 +206,6 @@ const InnoVationDetailsPage = () => {
                     </div>
                   )}
 
-                  
-
                   <div className="flex items-center">
                     <FontAwesomeIcon icon={faEye} className="mr-2" />
                     <span>{innovation.view_count} Views</span>
@@ -199,17 +219,21 @@ const InnoVationDetailsPage = () => {
 
               {/* Featured Media */}
               <div className="w-full p-4">
-                <MediaRenderer media={{
-                  type: mediaInfo.type,
-                  url: mediaInfo.src
-                }} />
+                <MediaRenderer
+                  media={{
+                    type: mediaInfo.type,
+                    url: mediaInfo.src,
+                  }}
+                />
               </div>
 
               {/* Content */}
               <div className="p-6">
                 <div
                   className="prose max-w-none"
-                  dangerouslySetInnerHTML={createMarkup(innovation.long_description)}
+                  dangerouslySetInnerHTML={createMarkup(
+                    innovation.long_description,
+                  )}
                 />
 
                 {/* Share Buttons */}
@@ -252,7 +276,7 @@ const InnoVationDetailsPage = () => {
                   <div className="flex flex-wrap gap-4">
                     {innovation.pdf && (
                       <a
-                        href={innovation.pdf}
+                        href={`${STORAGE_URL}${innovation.pdf}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="px-5 py-2 rounded-lg bg-red-500 text-white font-medium shadow-md hover:bg-red-600 transition cursor-pointer flex items-center gap-2"
@@ -263,7 +287,7 @@ const InnoVationDetailsPage = () => {
                     )}
                     {innovation.ppt && (
                       <a
-                        href={innovation.ppt}
+                        href={`${STORAGE_URL}${innovation.ppt}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="px-5 py-2 rounded-lg bg-indigo-500 text-white font-medium shadow-md hover:bg-indigo-600 transition cursor-pointer flex items-center gap-2"
@@ -284,7 +308,7 @@ const InnoVationDetailsPage = () => {
               <div className="flex flex-col sm:flex-row items-start">
                 <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-6">
                   <div className="w-24 h-24 rounded-full bg-gradient-to-r from-yellow-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
-                    {innovation.innovator_name?.charAt(0) || 'U'}
+                    {innovation.innovator_name?.charAt(0) || "U"}
                   </div>
                 </div>
 
@@ -319,33 +343,42 @@ const InnoVationDetailsPage = () => {
           {/* Sidebar */}
           <div className="w-full lg:w-4/12">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
-              <h2 className="text-xl font-bold mb-6 border-b pb-2">Popular Innovations</h2>
+              <h2 className="text-xl font-bold mb-6 border-b pb-2">
+                Popular Innovations
+              </h2>
 
               <div className="space-y-6">
                 {popularInnovations.length > 0 ? (
                   popularInnovations.map((item, index) => {
                     const itemMediaInfo = getMediaInfo(item.image_video);
                     return (
-                      <div key={index} className="flex items-start hover:bg-gray-50 p-2 rounded-md transition-colors">
+                      <div
+                        key={index}
+                        className="flex items-start hover:bg-gray-50 p-2 rounded-md transition-colors"
+                      >
                         <div className="flex-shrink-0 mr-4 w-28">
-                          <MediaRenderer 
+                          <MediaRenderer
                             media={{
                               type: itemMediaInfo.type,
-                              url: itemMediaInfo.src
-                            }} 
+                              url: itemMediaInfo.src,
+                            }}
                             className="h-20"
                           />
                         </div>
                         <div>
                           <h3 className="font-semibold text-gray-800 hover:text-yellow-600 transition-colors">
-                            <Link to={`/innovation/${item.slug}`}>{item.title}</Link>
+                            <Link to={`/innovation/${item.slug}`}>
+                              {item.title}
+                            </Link>
                           </h3>
                         </div>
                       </div>
                     );
                   })
                 ) : (
-                  <p className="text-gray-500 text-center py-4">No popular innovations available</p>
+                  <p className="text-gray-500 text-center py-4">
+                    No popular innovations available
+                  </p>
                 )}
               </div>
             </div>
@@ -370,6 +403,6 @@ const InnoVationDetailsPage = () => {
       </section> */}
     </>
   );
-}
+};
 
 export default InnoVationDetailsPage;

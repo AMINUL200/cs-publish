@@ -6,6 +6,7 @@ import { BookOpen } from "lucide-react";
 
 const ListOfIssueJournal = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const { id } = useParams();
 
@@ -33,7 +34,7 @@ const ListOfIssueJournal = () => {
         if (response.data.flag === 1 && response.data.data.length > 0) {
           const data = response.data.data;
           setIssues(data);
-          
+          console.log("Issues Data:", data);
           // Use first item to get journal info
           setJournalData({
             title: data[0].j_title,
@@ -109,7 +110,7 @@ const ListOfIssueJournal = () => {
             {journalData && (
               <div className="flex flex-col sm:flex-row items-center gap-4 bg-white/20 rounded-xl p-4 backdrop-blur-sm">
                 <img
-                  src={journalData.journalImage}
+                  src={`${STORAGE_URL}${journalData.journalImage}`}
                   alt={journalData.title}
                   className="w-20 h-28 object-cover rounded-lg shadow-lg border-2 border-white"
                 />
@@ -136,7 +137,8 @@ const ListOfIssueJournal = () => {
                 {/* Issue Cover */}
                 <div className="relative overflow-hidden bg-gradient-to-br from-red-900 to-red-700">
                   <img
-                    src={issue.image || journalData.journalImage}
+                    // src={issue.image || journalData.journalImage}
+                    src={issue.image ? `${STORAGE_URL}${issue.image}` : `${STORAGE_URL}${journalData.journalImage}`}
                     alt={`Volume ${issue.volume} ${issue.issue_no}`}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                   />

@@ -14,6 +14,7 @@ const LandingOurTeam = ({
 }) => {
   // console.log(ourTeamData);
   const navigate = useNavigate();
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
   // Loading state
   if (loading) {
@@ -157,7 +158,7 @@ const LandingOurTeam = ({
                     {/* Image Container */}
                     <div className="relative overflow-hidden">
                       <img
-                        src={member.image}
+                        src={`${STORAGE_URL}${member.image}`}
                         alt={name}
                         className="w-full h-80 object-cover group-hover:scale-110 transition-transform duration-500"
                         onError={(e) => {

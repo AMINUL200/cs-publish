@@ -21,6 +21,7 @@ import { ArrowRight } from "lucide-react";
 
 const AboutJournal = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const { id } = useParams();
 
@@ -103,7 +104,7 @@ const AboutJournal = () => {
       <section
         className="relative h-96 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(139, 69, 19, 0.7)), url(${data.image})`,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(139, 69, 19, 0.7)), url(${STORAGE_URL}${data.image})`,
           backdropFilter: "blur(8px)",
         }}
       >

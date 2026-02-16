@@ -11,6 +11,7 @@ const EditJournal = () => {
     const navigate = useNavigate();
     const { token } = useSelector((state) => state.auth);
     const API_URL = import.meta.env.VITE_API_URL;
+      const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
     const [loading, setLoading] = useState(true);
     const [handleLoading, setHandleLoading] = useState(false);
@@ -63,7 +64,7 @@ const EditJournal = () => {
                 // Set current image URL for preview
                 if (j.image) {
                     setCurrentImageUrl(j.image);
-                    setImagePreview(j.image);
+                    setImagePreview(`${STORAGE_URL}${j.image}`);
                 }
                 
                 // set editable fields
@@ -498,6 +499,7 @@ const EditJournal = () => {
                             <div className="relative inline-block">
                                 <img 
                                     src={imagePreview} 
+                                    // src={`${STORAGE_URL}${currentImageUrl}`}
                                     alt="Journal preview" 
                                     className="w-32 h-32 object-cover rounded-lg border shadow-sm"
                                 />

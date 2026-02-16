@@ -7,7 +7,7 @@ const LandingServices = ({
   error = null,
 }) => {
   // console.log(servicesData);
-
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
  
   return (
     <section className="bg-gray-100 py-12" id="author-service">
@@ -35,7 +35,7 @@ const LandingServices = ({
                 <div className="card rounded-2xl border service_info bg-white shadow-md hover:shadow-lg">
                   <div className="service_imgbox">
                     <img
-                      src={service.image}
+                      src={`${STORAGE_URL}${service.image}`}
                       className="img-fluid w-full h-48 object-cover"
                       alt={service.title}
                     />

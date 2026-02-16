@@ -8,6 +8,7 @@ const BrowseJournals = ({
   loading = false,
   error = null,
 }) => {
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   if (loading)
     return <p className="text-center py-10 text-gray-500">Loading...</p>;
   if (error) return <p className="text-center py-10 text-red-500">{error}</p>;
@@ -32,7 +33,7 @@ const BrowseJournals = ({
               key={journal.id}
               className="relative group h-[250px] md:h-[300px] overflow-hidden rounded-xl shadow-lg cursor-pointer transition-all duration-500"
               style={{
-                backgroundImage: `url(${journal.image})`,
+                backgroundImage: `url(${STORAGE_URL}${journal.image})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}

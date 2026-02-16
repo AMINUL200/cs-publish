@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 
 const Contact = () => {
     const API_URL = import.meta.env.VITE_API_URL;
+    const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
     const { token } = useSelector((state) => state.auth);
     const [loading, setLoading] = useState(true);
     const [updateLoading, setUpdateLoading] = useState(false);
@@ -55,14 +56,14 @@ const Contact = () => {
                     whatsapp: contactData.whatsapp || '',
                     address_line1: contactData.address_line1 || '',
                     address_line2: contactData.address_line2 || '',
-                    image: contactData.image || null,
+                    image: contactData.image ? `${STORAGE_URL}${contactData.image}` : null,
                     status: contactData.status === true || contactData.status === 'true',
                     id: contactData.id,
                 });
 
                 // Set image preview if image exists
                 if (contactData.image) {
-                    setImagePreview(contactData.image);
+                    setImagePreview(`${STORAGE_URL}${contactData.image}`);
                 }
             } else {
                 toast.error(response.data.message);

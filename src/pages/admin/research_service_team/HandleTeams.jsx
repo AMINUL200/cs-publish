@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 const HandleTeams = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   
@@ -28,6 +29,7 @@ const HandleTeams = () => {
 
       if (res.data.status) {
         setTeamsData(res.data.data);
+        console.log('Fetched teams data:', res.data.data);
         setSectionTitle(res.data.section || 'Our Team');
       }
     } catch (err) {
@@ -174,7 +176,7 @@ const HandleTeams = () => {
                   <div className="relative">
                     {member.image ? (
                       <img
-                        src={member.image}
+                        src={`${STORAGE_URL}${member.image}`}
                         alt={member.title}
                         className="w-full h-48 object-cover"
                         onError={(e) => {

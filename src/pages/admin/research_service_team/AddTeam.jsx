@@ -8,6 +8,7 @@ import { Editor } from "@tinymce/tinymce-react";
 
 const AddTeam = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -66,7 +67,7 @@ const AddTeam = () => {
 
         // Set image preview if image exists
         if (team.image) {
-          setImagePreview(team.image);
+          setImagePreview(`${STORAGE_URL}${team.image}`);
         }
       }
     } catch (err) {

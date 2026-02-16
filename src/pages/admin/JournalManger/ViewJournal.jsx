@@ -11,6 +11,7 @@ const ViewJournal = () => {
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.auth);
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
   const [journalData, setJournalData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,6 +29,8 @@ const ViewJournal = () => {
 
       if (response.status === 200 && response.data.success) {
         setJournalData(response.data.data);
+        console.log(response.data.data);
+        
       } else {
         toast.error(response.data.message || "Failed to fetch journals");
       }
@@ -155,7 +158,7 @@ const ViewJournal = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-2 text-center">
                     {journal.image ? (
                       <img
-                        src={`${journal.image}`}
+                        src={`${STORAGE_URL}${journal.image}`}
                         alt={journal.j_title}
                         className="h-12 w-12 object-cover rounded mx-auto"
                       />

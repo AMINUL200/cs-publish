@@ -17,6 +17,7 @@ const partners = [
 
 const OurPartner = ({partnerData =[], loading = false, error=null}) => {
   // console.log(partnerData);
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   
   return (
     <section className="our-partner">
@@ -50,7 +51,7 @@ const OurPartner = ({partnerData =[], loading = false, error=null}) => {
             <SwiperSlide key={index}>
               <div className="partnear-area">
                 <div className="prtn_img">
-                  <img src={partner.images} alt={partner.image_alt} className="img-fluid" />
+                  <img src={`${STORAGE_URL}${partner.images}`} alt={partner.image_alt} className="img-fluid" />
                 </div>
                 <p className="prtn_name">{partner.name}</p>
               </div>

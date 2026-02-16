@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 
 const UserSideViewJournal = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const [journalData, setJournalData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -165,7 +166,8 @@ const UserSideViewJournal = () => {
             <div className="lg:col-span-3 flex justify-center lg:justify-end">
               <div className="relative">
                 <img
-                  src={journal.image}
+                  // src={journal.image}
+                  src={`${STORAGE_URL}${journal.image}`}
                   alt={journal.j_title}
                   className="w-48 h-60 lg:w-56 lg:h-86 object-cover rounded-lg shadow-2xl border-4 border-yellow-500"
                 />

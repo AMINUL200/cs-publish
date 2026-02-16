@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 
 const QuickPress = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const { id } = useParams();
 
@@ -157,7 +158,8 @@ const QuickPress = () => {
             <div className="flex-shrink-0">
               <div className="relative group">
                 <img
-                  src={journalData.image}
+                  // src={journalData.image}
+                  src={`${STORAGE_URL}${journalData.image}`}
                   alt={`Volume ${journalData.j_title} `}
                   className="w-48 h-64 object-cover rounded-xl shadow-2xl border-4 border-white group-hover:scale-105 transition-transform duration-300"
                 />

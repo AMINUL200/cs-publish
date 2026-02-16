@@ -4,6 +4,7 @@ import axios from "axios";
 
 const HandleVolume = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   
   const [volumes, setVolumes] = useState([]);
@@ -33,6 +34,8 @@ const HandleVolume = () => {
       
       if (response.data.status) {
         setVolumes(response.data.data);
+        console.log(response.data.data);
+        
       } else {
         setError("Failed to fetch volumes");
       }
@@ -282,7 +285,8 @@ const HandleVolume = () => {
               {/* Volume Image */}
               <div className="h-48 overflow-hidden">
                 <img 
-                  src={volume.image} 
+                  src={`${STORAGE_URL}${volume.image}`} 
+                  
                   alt={`Volume ${volume.volume}`}
                   className="w-full h-full object-cover"
                   onError={(e) => {

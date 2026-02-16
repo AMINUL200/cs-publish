@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const LandingAbout = ({ aboutData = {}, loading = false, error = null }) => {
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   if (loading) {
     return (
       <section className="py-10 sm:py-16 bg-white" id="about">
@@ -56,7 +57,7 @@ const LandingAbout = ({ aboutData = {}, loading = false, error = null }) => {
                 <div className="aspect-[4/3] overflow-hidden rounded-2xl">
                   <img
                     className="w-full h-full object-fill hover:scale-105 transition-transform duration-300"
-                    src={aboutData?.image1}
+                    src={`${STORAGE_URL}${aboutData?.image1}`}
                     alt={aboutData?.image1_alt || "About us image 1"}
                   />
                 </div>
@@ -65,7 +66,7 @@ const LandingAbout = ({ aboutData = {}, loading = false, error = null }) => {
                 <div className="aspect-[4/3] overflow-hidden rounded-2xl">
                   <img
                     className="w-full h-full object-fill hover:scale-105 transition-transform duration-300"
-                    src={aboutData?.image2}
+                    src={`${STORAGE_URL}${aboutData?.image2}`}
                     alt={aboutData?.image2_alt || "About us image 2"}
                   />
                 </div>
@@ -74,7 +75,7 @@ const LandingAbout = ({ aboutData = {}, loading = false, error = null }) => {
                 <div className="aspect-video overflow-hidden rounded-2xl">
                   <img
                     className="w-full h-full object-fill hover:scale-105 transition-transform duration-300"
-                    src={aboutData?.image3}
+                    src={`${STORAGE_URL}${aboutData?.image3}`}
                     alt={aboutData?.image3_alt || "About us image 3"}
                   />
                 </div>

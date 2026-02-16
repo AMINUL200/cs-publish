@@ -14,6 +14,7 @@ const ViewJournalList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const navigate = useNavigate();
 
   // Fetch journals data from API
@@ -251,7 +252,8 @@ const ViewJournalList = () => {
                   {/* Journal Image */}
                   <div className="relative h-48 overflow-hidden">
                     <img
-                      src={journal.image}
+                      src={`${STORAGE_URL}${journal.image}`}
+                      
                       alt={journal.j_title}
                       className="w-full h-full object-cover"
                       onError={(e) => {

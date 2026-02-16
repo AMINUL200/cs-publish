@@ -22,6 +22,7 @@ const LandingHeader = ({
   );
 
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
   const [scrolled, setScrolled] = useState(false);
   const [openDropdowns, setOpenDropdowns] = useState({});
@@ -240,7 +241,7 @@ const LandingHeader = ({
         <div className="px-4 md:px-8 flex justify-between items-center">
           {/* Logo */}
           <div className="cursor-pointer" onClick={() => navigate("/")}>
-            <img src={settingsData?.image} alt="logo" className="h-8 md:h-12" />
+            <img src={`${STORAGE_URL}${settingsData?.image}`} alt="logo" className="h-8 md:h-12" />
           </div>
 
           {/* Desktop Navigation */}

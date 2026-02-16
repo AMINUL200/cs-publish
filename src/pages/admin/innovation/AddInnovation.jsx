@@ -16,6 +16,7 @@ import { Editor } from "@tinymce/tinymce-react";
 
 const AddInnovation = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const apikey = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -87,7 +88,7 @@ const AddInnovation = () => {
 
         // Set image preview if it's an image URL
         if (!isYouTube && data.image_video) {
-          setImagePreview(`${API_URL}${data.image_video}`);
+          setImagePreview(`${STORAGE_URL}${data.image_video}`);
         }
       }
     } catch (error) {

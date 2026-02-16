@@ -11,6 +11,7 @@ const UserProfilePage = () => {
   const [error, setError] = useState(null);
 
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
 
   const fetchProfileData = async () => {
@@ -110,7 +111,7 @@ const UserProfilePage = () => {
               {/* Main Image */}
               <div className="aspect-w-16 aspect-h-12 rounded-2xl overflow-hidden shadow-lg">
                 <img
-                  src={profileData.image1}
+                  src={`${STORAGE_URL}${profileData.image1}`}
                   alt={profileData.image1_alt || "Profile main image"}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
@@ -120,14 +121,14 @@ const UserProfilePage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="aspect-square rounded-2xl overflow-hidden shadow-md">
                   <img
-                    src={profileData.image2}
+                    src={`${STORAGE_URL}${profileData.image2}`}
                     alt={profileData.image2_alt || "Profile secondary image"}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
                 </div>
                 <div className="aspect-square rounded-2xl overflow-hidden shadow-md">
                   <img
-                    src={profileData.image3}
+                    src={`${STORAGE_URL}${profileData.image3}`}
                     alt={profileData.image3_alt || "Profile tertiary image"}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />

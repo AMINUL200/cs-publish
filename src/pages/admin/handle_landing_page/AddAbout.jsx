@@ -7,6 +7,7 @@ import { Editor } from "@tinymce/tinymce-react";
 
 const AddAbout = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,6 +53,8 @@ const AddAbout = () => {
 
       if (response.data.status === true) {
         const about = response.data.data;
+        console.log(about);
+        
         setFormData({
           title: about.title || "",
           description: about.description || "",
@@ -64,9 +67,9 @@ const AddAbout = () => {
           image3_alt: about.image3_alt || "",
         });
         setImagePreviews({
-          image1: about.image1,
-          image2: about.image2,
-          image3: about.image3,
+          image1: `${STORAGE_URL}${about.image1}`,
+          image2: `${STORAGE_URL}${about.image2}`,
+          image3: `${STORAGE_URL}${about.image3}`,
         });
       }
     } catch (error) {

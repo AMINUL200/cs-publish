@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 const HandleResearch = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   
@@ -29,6 +30,8 @@ const HandleResearch = () => {
       if (res.data.status) {
         setResearchData(res.data.data);
         setSectionTitle(res.data.section || 'Research & Innovation');
+        console.log(res.data.data);
+        
       }
     } catch (err) {
       console.error('Error fetching research data:', err);
@@ -174,7 +177,8 @@ const HandleResearch = () => {
                   <div className="relative">
                     {research.image ? (
                       <img
-                        src={research.image}
+                        // src={research.image}
+                        src={`${STORAGE_URL}${research.image}`}
                         alt={research.title}
                         className="w-full h-48 object-cover"
                         onError={(e) => {

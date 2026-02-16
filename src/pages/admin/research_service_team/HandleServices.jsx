@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 const HandleServices = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   
@@ -27,6 +28,7 @@ const HandleServices = () => {
       });
 
       if (res.data.status) {
+        console.log('Fetched services data:', res.data.data);
         setServicesData(res.data.data);
         setSectionTitle(res.data.section || 'Our Services');
       }
@@ -174,7 +176,8 @@ const HandleServices = () => {
                   <div className="relative">
                     {service.image ? (
                       <img
-                        src={service.image}
+                        // src={service.image}
+                        src={`${STORAGE_URL}${service.image}`}
                         alt={service.title}
                         className="w-full h-48 object-cover"
                         onError={(e) => {

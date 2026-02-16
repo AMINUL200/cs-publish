@@ -8,6 +8,7 @@ import Loader from "../../../components/common/Loader";
 
 const JournalAuthorInformation = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const {id} = useParams();
   
@@ -93,7 +94,8 @@ const JournalAuthorInformation = () => {
             <div className="hidden lg:flex items-center justify-end">
               <div className="relative w-full h-80">
                 <img
-                  src={data.image}
+                  src={`${STORAGE_URL}${data.image}`}
+                  
                   alt={data.j_title}
                   className="w-full h-full object-cover rounded-2xl shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-300"
                 />

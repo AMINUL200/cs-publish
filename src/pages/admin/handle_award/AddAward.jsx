@@ -169,9 +169,9 @@ const AddAward = () => {
       // For Laravel, we need to use POST with _method for updates
       const method = 'POST';
       
-      if (isEdit) {
-        submitData.append('_method', 'PUT');
-      }
+      // if (isEdit) {
+      //   submitData.append('_method', 'PUT');
+      // }
 
       const response = await axios({
         method: method,

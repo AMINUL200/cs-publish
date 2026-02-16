@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const HandleWhoWeAre = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   
@@ -29,6 +30,7 @@ const HandleWhoWeAre = () => {
       const data = await response.json();
       if (data.status) {
         setWhoWeAreList(data.data);
+        // console.log(data.data);
       }
     } catch (err) {
       setError(err.message);
@@ -140,7 +142,7 @@ const HandleWhoWeAre = () => {
                   <tr key={item.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <img
-                        src={item.image}
+                        src={`${STORAGE_URL}${item.image}`}
                         alt={item.title}
                         className="h-12 w-12 object-cover rounded"
                         onError={(e) => {

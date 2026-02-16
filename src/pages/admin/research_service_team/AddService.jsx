@@ -8,6 +8,7 @@ import { Editor } from "@tinymce/tinymce-react";
 
 const AddService = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -66,7 +67,7 @@ const AddService = () => {
 
         // Set image preview if image exists
         if (service.image) {
-          setImagePreview(service.image);
+          setImagePreview(`${STORAGE_URL}${service.image}`);
         }
       }
     } catch (err) {

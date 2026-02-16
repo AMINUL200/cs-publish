@@ -8,6 +8,7 @@ const UserSideWhoWeAre = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -181,7 +182,7 @@ const UserSideWhoWeAre = () => {
           {pageData.image && (
             <div className="relative">
               <img
-                src={pageData.image}
+                src={`${STORAGE_URL}${pageData.image}`}
                 alt={pageData.title}
                 className="w-full h-64 md:h-96 object-cover"
               />

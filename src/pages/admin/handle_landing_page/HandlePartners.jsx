@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const HandlePartners = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   
   const [partners, setPartners] = useState([]);
@@ -34,6 +35,7 @@ const HandlePartners = () => {
       });
       
       if (response.data.status === true) {
+        console.log("Fetched partners:", response.data.data);
         setPartners(response.data.data);
         toast.success(response.data.message);
       }
@@ -125,7 +127,7 @@ const HandlePartners = () => {
         image_alt: partner.image_alt || "",
         images: null
       });
-      setImagePreview(partner.images || null);
+      setImagePreview(`${STORAGE_URL}${partner.images}`);
     } else {
       // Add mode
       resetForm();
@@ -258,7 +260,7 @@ const HandlePartners = () => {
                 <div className="h-48 bg-gray-100 flex items-center justify-center relative">
                   {partner.images ? (
                     <img
-                      src={partner.images}
+                      src={`${STORAGE_URL}${partner.images}`}
                       alt={partner.image_alt || partner.title}
                       className="h-full w-full object-cover"
                     />

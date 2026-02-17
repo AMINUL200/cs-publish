@@ -32,6 +32,7 @@ const MentorHubDetails = () => {
     const [error, setError] = useState(null);
 
     const API_URL = import.meta.env.VITE_API_URL;
+    const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
     // Fetch event details and popular mentors
     useEffect(() => {
@@ -41,6 +42,7 @@ const MentorHubDetails = () => {
                 const response = await axios.get(`${API_URL}api/events/detail/${id}`);
                 
                 if (response.data.status) {
+                    // console.log("Fetched event details:", response.data);
                     setEventDetails(response.data.event_details);
                     setPopularMentors(response.data.most_view || []);
                 } else {
@@ -87,9 +89,10 @@ const MentorHubDetails = () => {
         id: mentor.id,
         id: mentor.id,
         title: mentor.title,
+        slug: mentor.slug,
         media: {
             type: getMediaType(mentor.image_video),
-            url: mentor.image_video
+            url: `${STORAGE_URL}${mentor.image_video}`
         },
         category: mentor.catagory,
         views: mentor.view_count,
@@ -203,7 +206,7 @@ const MentorHubDetails = () => {
                                     <MediaRenderer 
                                         media={{
                                             type: getMediaType(eventDetails.image_video),
-                                            url: eventDetails.image_video
+                                            url: `${STORAGE_URL}${eventDetails.image_video}`
                                         }} 
                                     />
                                 </div>
@@ -237,7 +240,7 @@ const MentorHubDetails = () => {
                                     <div className="flex flex-wrap gap-4">
                                         {eventDetails.pdf && (
                                             <a
-                                                href={eventDetails.pdf}
+                                                href={`${STORAGE_URL}${eventDetails.pdf}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
@@ -248,7 +251,7 @@ const MentorHubDetails = () => {
                                         )}
                                         {eventDetails.ppt && (
                                             <a
-                                                href={eventDetails.ppt}
+                                                href={`${STORAGE_URL}${eventDetails.ppt}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
@@ -384,7 +387,7 @@ const MentorHubDetails = () => {
                                             </div>
                                             <div>
                                                 <h3 className="font-semibold text-gray-800 hover:text-yellow-600 transition-colors text-sm leading-tight">
-                                                    <Link to={`/mentors/${item.id}`}>{item.title}</Link>
+                                                    <Link to={`/mentors/${item.slug}`}>{item.title}</Link>
                                                 </h3>
                                                 <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
                                                     <FontAwesomeIcon icon={faEye} className="w-3 h-3" />

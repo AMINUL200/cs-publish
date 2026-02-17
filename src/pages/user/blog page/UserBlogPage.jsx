@@ -8,6 +8,7 @@ import { formatDate } from "../../../lib/utils";
 
 const UserBlogPage = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const [blogData, setBlogData] = useState([]);
   const [filteredBlogs, setFilteredBlogs] = useState([]);
@@ -173,7 +174,7 @@ const UserBlogPage = () => {
                       {/* Image */}
                       <div className="relative overflow-hidden h-48">
                         <img
-                          src={blog.image}
+                          src={`${STORAGE_URL}${blog.image}`}
                           alt={blog.image_alt || blog.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />

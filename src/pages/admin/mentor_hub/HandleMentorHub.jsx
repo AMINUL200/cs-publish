@@ -21,6 +21,7 @@ import { toast } from "react-toastify";
 
 const HandleMentorHub = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   
@@ -43,6 +44,7 @@ const HandleMentorHub = () => {
 
       if (response.data.status) {
         setMentors(response.data.data);
+        // console.log("Fetched mentors:", response.data.data);
       } else {
         throw new Error("Failed to fetch mentors data");
       }
@@ -289,7 +291,7 @@ const HandleMentorHub = () => {
                 <div className="relative h-48 bg-gray-100">
                   {mentor.image_video ? (
                     <img
-                      src={mentor.image_video}
+                      src={`${STORAGE_URL}${mentor.image_video}`}
                       alt={mentor.image_alt_tag || mentor.title}
                       className="w-full h-full object-cover"
                       onError={(e) => {

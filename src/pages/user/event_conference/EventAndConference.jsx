@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const EventAndConference = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   
   const [conferences, setConferences] = useState([]);
@@ -162,7 +163,7 @@ const EventAndConference = () => {
                     {/* Conference Image */}
                     {conference.image ? (
                       <img
-                        src={conference.image}
+                        src={`${STORAGE_URL}${conference.image}`}
                         alt={conference.image_alt}
                         className="w-full h-48 object-cover"
                       />

@@ -20,6 +20,7 @@ import { useSelector } from "react-redux";
 const BlogDetails = () => {
   const { id } = useParams();
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const [blogDetailsData, setBlogDetailsData] = useState(null);
   const [latestBlogs, setLatestBlogs] = useState([]);
@@ -117,7 +118,7 @@ const BlogDetails = () => {
     if (blogDetailsData?.blog_pdf) {
       // Create a temporary anchor element
       const link = document.createElement("a");
-      link.href = blogDetailsData.blog_pdf;
+      link.href = `${STORAGE_URL}${blogDetailsData.blog_pdf}`;
       link.download = `blog-${blogDetailsData.title.replace(/\s+/g, "-").toLowerCase()}.pdf`;
       document.body.appendChild(link);
       link.click();
@@ -268,7 +269,7 @@ const BlogDetails = () => {
                 >
                   <img
                     className="blog-single-image object-cover w-full h-full rounded-lg"
-                    src={blogDetailsData.image}
+                    src={`${STORAGE_URL}${blogDetailsData.image}`}
                     alt={blogDetailsData.image_alt || blogDetailsData.title}
                   />
                 </motion.div>
@@ -430,7 +431,7 @@ const BlogDetails = () => {
                                   className="flex items-center gap-3 w-full"
                                 >
                                   <img
-                                    src={post.image}
+                                    src={`${STORAGE_URL}${post.image}`}
                                     alt={post.image_alt || post.title}
                                     className="w-12 h-12 rounded-full object-cover shadow-lg flex-shrink-0"
                                   />
@@ -484,7 +485,7 @@ const BlogDetails = () => {
                                   className="flex items-center gap-3 w-full group-hover:gap-4 transition-all duration-300"
                                 >
                                   <img
-                                    src={latest.image}
+                                    src={`${STORAGE_URL}${latest.image}`}
                                     alt={latest.image_alt || latest.title}
                                     className="w-12 h-12 rounded object-cover shadow-lg flex-shrink-0"
                                   />

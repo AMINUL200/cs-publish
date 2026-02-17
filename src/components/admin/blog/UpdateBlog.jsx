@@ -29,6 +29,7 @@ const UpdateBlog = () => {
   const [pdfFileName, setPdfFileName] = useState("");
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
   const fetchCategories = async () => {
     try {
@@ -85,7 +86,7 @@ const UpdateBlog = () => {
 
         // Set image preview if image exists
         if (blogData.image) {
-          setImagePreview(blogData.image);
+          setImagePreview(`${STORAGE_URL}${blogData.image}`);
         }
 
         // Set PDF file name if exists

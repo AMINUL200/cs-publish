@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const HandleEventAndConference = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   
@@ -147,7 +148,7 @@ const HandleEventAndConference = () => {
                         <div className="flex-shrink-0 h-10 w-10">
                           <img
                             className="h-10 w-10 rounded-lg object-cover"
-                            src={conference.image}
+                            src={`${STORAGE_URL}${conference.image}`}
                             alt={conference.image_alt}
                           />
                         </div>

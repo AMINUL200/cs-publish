@@ -5,6 +5,7 @@ import axios from "axios";
 
 const EventAndConferenceDetail = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const { slug } = useParams(); // Extract slug from URL
   
@@ -114,7 +115,7 @@ const EventAndConferenceDetail = () => {
               {/* Conference Image */}
               {conference.image ? (
                 <img
-                  src={conference.image}
+                  src={`${STORAGE_URL}${conference.image}`}
                   alt={conference.image_alt}
                   className="w-full h-64 lg:h-80 object-cover"
                 />
@@ -201,7 +202,7 @@ const EventAndConferenceDetail = () => {
                   >
                     {conf.image ? (
                       <img
-                        src={conf.image}
+                        src={`${STORAGE_URL}${conf.image}`}
                         alt={conf.image_alt}
                         className="w-16 h-16 object-cover rounded flex-shrink-0"
                       />
@@ -235,7 +236,7 @@ const EventAndConferenceDetail = () => {
                   >
                     {conf.image ? (
                       <img
-                        src={conf.image}
+                        src={`${STORAGE_URL}${conf.image}`}
                         alt={conf.image_alt}
                         className="w-16 h-16 object-cover rounded flex-shrink-0"
                       />

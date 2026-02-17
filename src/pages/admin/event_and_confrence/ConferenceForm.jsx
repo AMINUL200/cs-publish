@@ -263,7 +263,7 @@ const ConferenceForm = () => {
           <div className="flex justify-end space-x-4 mt-6">
             <button
               type="button"
-              onClick={() => navigate("/admin/conferences")}
+              onClick={() => navigate("/handle-event-conference")}
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition duration-200"
             >
               Cancel

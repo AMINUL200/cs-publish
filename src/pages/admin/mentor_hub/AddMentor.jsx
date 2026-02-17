@@ -21,6 +21,7 @@ import { toast } from "react-toastify";
 
 const AddMentor = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -76,15 +77,15 @@ const AddMentor = () => {
         
         // Set current image for preview
         if (mentor.image_video) {
-          setCurrentImage(mentor.image_video);
+          setCurrentImage(`${STORAGE_URL}${mentor.image_video}`);
         }
 
         // Set current files if they exist
         if (mentor.pdf) {
-          setPdfFile({ name: "Current PDF", url: mentor.pdf });
+          setPdfFile({ name: "Current PDF", url: `${STORAGE_URL}${mentor.pdf}` });
         }
         if (mentor.ppt) {
-          setPptFile({ name: "Current PPT", url: mentor.ppt });
+          setPptFile({ name: "Current PPT", url: `${STORAGE_URL}${mentor.ppt}` });
         }
 
         // Set form data

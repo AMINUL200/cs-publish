@@ -16,6 +16,7 @@ const MentorsHubPage = () => {
     const [error, setError] = useState(null);
 
     const API_URL = import.meta.env.VITE_API_URL;
+    const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
     // Fetch real data from API
     useEffect(() => {
@@ -41,7 +42,7 @@ const MentorsHubPage = () => {
                         title: article.title,
                         media: {
                             type: getMediaType(article.image_video),
-                            url: article.image_video
+                            url: `${STORAGE_URL}${article.image_video}`
                         },
                         category: article.catagory,
                         views: Math.floor(Math.random() * 2000) + 500, // Random views for demo

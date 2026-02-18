@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const HandleAward = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   
@@ -27,6 +28,7 @@ const HandleAward = () => {
       
       if (response.data.status) {
         setAwards(response.data.data);
+        console.log("Fetched awards:", response.data.data);
       } else {
         throw new Error('Failed to fetch data');
       }
@@ -176,7 +178,7 @@ const HandleAward = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <img
-                          src={award.image}
+                          src={`${STORAGE_URL}${award.image}`}
                           alt={award.image_alt}
                           className="h-16 w-16 object-cover rounded-lg border border-gray-200"
                           onError={(e) => {

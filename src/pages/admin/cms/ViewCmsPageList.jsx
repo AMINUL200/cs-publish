@@ -40,6 +40,7 @@ const ViewCmsPageList = () => {
       );
       
       setCmsPages(response.data.data || []);
+      console.log("Fetched CMS pages:", response.data.data);
     } catch (error) {
       console.error("Error fetching CMS pages:", error);
       alert("Failed to fetch CMS pages");

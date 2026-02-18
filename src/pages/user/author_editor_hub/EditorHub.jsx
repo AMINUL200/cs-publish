@@ -15,6 +15,7 @@ import {
 
 const EditorHub = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const [editors, setEditors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -205,7 +206,7 @@ const EditorHub = () => {
                       <div className="flex flex-col items-center text-center h-full justify-center">
                         <div className={`w-32 h-32 rounded-full flex items-center justify-center text-white font-bold text-2xl mb-4 ${getAvatarColor(editor.id)}`}>
                           {/* {getInitials(editor.email)} */}
-                          <img src={editor.image} alt="" className="w-full h-full rounded-full" />
+                          <img src={`${STORAGE_URL}${editor.image}`} alt="" className="w-full h-full rounded-full" />
                         </div>
                         
                         <h3 className="text-2xl font-bold mb-2">

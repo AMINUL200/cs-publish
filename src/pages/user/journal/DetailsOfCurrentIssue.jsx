@@ -330,7 +330,7 @@ const DetailsOfCurrentIssue = () => {
                       {manuscript.image && (
                         <div className="flex-shrink-0">
                           <img
-                            src={manuscript.image}
+                            src={`${STORAGE_URL}${manuscript.image}`}
                             alt={getCleanTitle(manuscript.title)}
                             className="w-40 h-28 object-cover rounded-lg shadow-md"
                           />

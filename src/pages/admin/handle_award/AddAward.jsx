@@ -8,6 +8,7 @@ import { Editor } from "@tinymce/tinymce-react";
 
 const AddAward = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -46,7 +47,7 @@ const AddAward = () => {
       
       if (response.data.status && response.data.data) {
         const data = response.data.data;
-        setCurrentImage(data.image);
+        setCurrentImage(`${STORAGE_URL}${data.image}`);
         
         setFormData({
           image: null,
@@ -417,7 +418,7 @@ const AddAward = () => {
                     .then(response => response.json())
                     .then(result => {
                       if (result.url) {
-                        resolve(result.url);
+                        resolve(`${STORAGE_URL}${result.url}`);
                       } else {
                         reject('Upload failed');
                       }

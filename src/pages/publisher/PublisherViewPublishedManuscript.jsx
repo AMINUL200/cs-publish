@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 const PublisherViewPublishedManuscriptList = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
 
   const [manuscripts, setManuscripts] = useState([]);
@@ -575,7 +576,7 @@ const PublisherViewPublishedManuscriptList = () => {
                     <div className="lg:ml-6">
                       <div className="w-48 h-32 overflow-hidden rounded-xl shadow-md">
                         <img
-                          src={manuscript.image}
+                          src={`${STORAGE_URL}${manuscript.image}`}
                           alt={manuscript.title}
                            loading="lazy"
                           className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"

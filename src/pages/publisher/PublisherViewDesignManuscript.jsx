@@ -8,6 +8,7 @@ import { Zap, FileText, Download, ArrowLeft, Eye, File, Image } from 'lucide-rea
 
 const PublisherViewDesignManuscript = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const [loading, setLoading] = useState(true);
   const { token } = useSelector((state) => state.auth);
   const [manuscriptData, setManuscriptData] = useState(null);
@@ -22,8 +23,8 @@ const PublisherViewDesignManuscript = () => {
         },
       });
 
-      console.log(response);
       if (response.data.status) {
+        console.log('Manuscript data:', response.data.data);
         setManuscriptData(response.data.data);
         toast.success(response.data.message);
       } else {
@@ -43,7 +44,7 @@ const PublisherViewDesignManuscript = () => {
 
   const handleDownloadPDF = () => {
     if (manuscriptData.pdf) {
-      window.open(manuscriptData.pdf, '_blank');
+      window.open(`${STORAGE_URL}${manuscriptData.pdf}`, '_blank');
     } else {
       toast.info('No PDF available for download');
     }
@@ -258,7 +259,7 @@ const PublisherViewDesignManuscript = () => {
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => handleViewFile(manuscriptData.pdf)}
+                  onClick={() => handleViewFile(`${STORAGE_URL}${manuscriptData.pdf}`)}
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm"
                 >
                   <Eye className="w-4 h-4" />
@@ -288,7 +289,7 @@ const PublisherViewDesignManuscript = () => {
                 </div>
               </div>
               <button
-                onClick={() => handleViewFile(manuscriptData.supplementary_file)}
+                onClick={() => handleViewFile(`${STORAGE_URL}${manuscriptData.supplementary_file}`)}
                 className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors text-sm"
               >
                 <Eye className="w-4 h-4" />
@@ -313,12 +314,12 @@ const PublisherViewDesignManuscript = () => {
                 {figures.slice(0, 3).map((figure, index) => (
                   <div key={index} className="relative group">
                     <img
-                      src={figure}
+                      src={`${STORAGE_URL}${figure}`}
                       alt={`Figure ${index + 1}`}
                       className="w-full h-16 object-cover rounded-lg border border-gray-200 cursor-pointer"
-                      onClick={() => handleViewFile(figure)}
+                      onClick={() => handleViewFile(`${STORAGE_URL}${figure}`)}
                     />
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-lg flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/10 bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-lg flex items-center justify-center">
                       <Eye className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                   </div>

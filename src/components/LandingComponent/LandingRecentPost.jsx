@@ -16,7 +16,7 @@ const LandingRecentPost = ({
   error = null,
 }) => {
 
-  
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
 
   return (
@@ -61,7 +61,7 @@ const LandingRecentPost = ({
                         <h5 className="card-title">{post.title}</h5>
                       </div>
                       <img
-                        src={post.image}
+                        src={`${STORAGE_URL}${post.image}`}
                         className="w-full h-80"
                         alt={post.image_alt}
                       />

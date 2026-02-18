@@ -141,7 +141,7 @@ const ProfilePage = () => {
             console.log("data ", response.data.data);
             if (response.data.flag === 1) {
                 const data = response.data.data;
-
+                console.log("Fetched profile data:", data);
                 setFormData({
                     ...initialFormData, // Reset to initial state first
                     ...data // Override with API data
@@ -224,7 +224,7 @@ const ProfilePage = () => {
                                         tempImage
                                             ? URL.createObjectURL(tempImage)
                                             : formData.image
-                                                ? `${formData.image}`
+                                                ? `${STORAGE_URL}${formData.image}`
                                                 : ''
                                     }
                                     alt="Profile"

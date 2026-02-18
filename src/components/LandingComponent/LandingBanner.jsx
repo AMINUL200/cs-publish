@@ -7,6 +7,7 @@ import "swiper/css/effect-fade";
 import { useNavigate } from "react-router-dom";
 
 const LandingBanner = ({ bannerData = [], loading = false, error = null }) => {
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   // console.log("banner data:: ", bannerData);
   // console.log("banner error:: ", error);
   // console.log("banner loading:: ", loading);
@@ -117,7 +118,7 @@ const LandingBanner = ({ bannerData = [], loading = false, error = null }) => {
             {/* Background Image */}
             <div
               className="absolute inset-0 bg-cover bg-center z-0"
-              style={{ backgroundImage: `url(${slide.image})` }}
+              style={{ backgroundImage: `url(${STORAGE_URL}${slide.image})` }}
             >
               <div className="absolute inset-0 bg-black/30"></div>
             </div>

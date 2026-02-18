@@ -9,6 +9,7 @@ import { ArrowLeft, Save, Upload, X, FileText, Image, File, Eye, Download, Zap, 
 
 const PublisherEditDesignManuscript = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const apikey = import.meta.env.VITE_TEXT_EDITOR_API_KEY;
   const { id } = useParams();
   const { token } = useSelector((state) => state.auth);
@@ -103,17 +104,17 @@ const PublisherEditDesignManuscript = () => {
 
         // Set image preview if image exists
         if (data.image) {
-          setImagePreview(data.image);
+          setImagePreview(`${STORAGE_URL}${data.image}`);
         }
 
         // Set PDF preview if PDF exists
         if (data.pdf) {
-          setPdfPreview(data.pdf);
+          setPdfPreview(`${STORAGE_URL}${data.pdf}`);
         }
 
         // Set supplementary file preview if exists
         if (data.supplementary_file) {
-          setSupplementaryPreview(data.supplementary_file);
+          setSupplementaryPreview(`${STORAGE_URL}${data.supplementary_file}`);
         }
 
         // Set figures preview if figures exist
@@ -124,12 +125,12 @@ const PublisherEditDesignManuscript = () => {
               : data.figures;
             
             if (Array.isArray(figuresArray) && figuresArray.length > 0) {
-              setFigurePreviews(figuresArray);
+              setFigurePreviews(figuresArray.map(fig => `${STORAGE_URL}${fig}`));
             }
           } catch (error) {
             console.error("Error parsing figures:", error);
             if (Array.isArray(data.figures)) {
-              setFigurePreviews(data.figures);
+              setFigurePreviews(data.figures.map(fig => `${STORAGE_URL}${fig}`));
             }
           }
         }

@@ -78,7 +78,7 @@ const ViewManuscriptDetails = () => {
 
       if (response.data.status) {
         const data = response.data.data;
-        console.log(response.data);
+        console.log("Fetched manuscript data:", data);
         setManuscriptData(data);
         setJournalInfo(response.data.journal);
         setVolumeInfo(response.data.volume);
@@ -98,7 +98,7 @@ const ViewManuscriptDetails = () => {
 
             const formattedFigures = figuresArray.map((figureUrl, index) => ({
               id: index + 1,
-              image: figureUrl,
+              image: `${STORAGE_URL}${figureUrl}`,
               title: `Figure ${index + 1}`,
               description: `Figure ${index + 1} from the manuscript`,
             }));

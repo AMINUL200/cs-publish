@@ -7,6 +7,7 @@ import Loader from "../../../components/common/Loader";
 
 const CmsPage = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const { slug } = useParams();
   
@@ -127,7 +128,7 @@ const CmsPage = () => {
           {pageData.image1 && (
             <div className="mb-12 text-center">
               <img
-                src={pageData.image1}
+                src={`${STORAGE_URL}${pageData.image1}`}
                 alt={pageData.image1_alt}
                 className="w-full max-w-4xl h-80 object-cover rounded-2xl shadow-2xl mx-auto"
               />
@@ -171,7 +172,7 @@ const CmsPage = () => {
           {pageData.image2 && (
             <div className="mb-12 text-center">
               <img
-                src={pageData.image2}
+                src={`${STORAGE_URL}${pageData.image2}`}
                 alt={pageData.image2_alt}
                 className="w-full max-w-2xl h-64 object-cover rounded-2xl shadow-2xl mx-auto"
               />

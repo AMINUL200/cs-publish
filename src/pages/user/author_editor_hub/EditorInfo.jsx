@@ -25,6 +25,7 @@ import { Link } from "react-router-dom";
 const EditorInfo = () => {
   const { editorId } = useParams();
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const [editor, setEditor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -202,7 +203,7 @@ const EditorInfo = () => {
                 <div className={`w-48 h-48 rounded-full overflow-hidden border-4 border-white shadow-lg mb-6 ${getAvatarColor(editor.id)}`}>
                   {editor.image ? (
                     <img
-                      src={editor.image}
+                      src={`${STORAGE_URL}${editor.image}`}
                       alt={`${editor.first_name} ${editor.last_name}`}
                       className="w-full h-full object-cover"
                       onError={(e) => {

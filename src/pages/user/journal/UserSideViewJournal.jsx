@@ -410,6 +410,7 @@ const SectionSlider = ({ title, articles, stripHtmlTags, formatDate }) => {
 const ArticleCard = ({ article, stripHtmlTags, formatDate }) => {
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
 
   const handleReadMore = () => {
@@ -433,7 +434,7 @@ const ArticleCard = ({ article, stripHtmlTags, formatDate }) => {
       {/* Article Image */}
       <div className="relative overflow-hidden">
         <img
-          src={article.image}
+          src={`${STORAGE_URL}${article.image}`}
           alt={stripHtmlTags(article.title)}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />

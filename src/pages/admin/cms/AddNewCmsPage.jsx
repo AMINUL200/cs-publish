@@ -7,6 +7,7 @@ import { Editor } from "@tinymce/tinymce-react";
 
 const AddNewCmsPage = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -81,8 +82,8 @@ const AddNewCmsPage = () => {
 
       // Set image previews for existing images
       setImagePreviews({
-        image1: pageData.image1 || "",
-        image2: pageData.image2 || "",
+        image1: pageData.image1 ? `${STORAGE_URL}${pageData.image1}` : "",
+        image2: pageData.image2 ? `${STORAGE_URL}${pageData.image2}` : "",
       });
     } catch (error) {
       console.error("Error fetching CMS page:", error);

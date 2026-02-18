@@ -4,6 +4,7 @@ import axios from "axios";
 
 const TextEditor = ({ apiKey, value, onChange }) => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   
   return (
     <Editor
@@ -62,7 +63,7 @@ const TextEditor = ({ apiKey, value, onChange }) => {
             const formData = new FormData();
             formData.append("file", blobInfo.blob(), blobInfo.filename());
 
-            axios.post(`https://api.cspublishinghouse.com/public/api/image-upload`, formData, {
+            axios.post(`${API_URL}api/image-upload`, formData, {
               headers: {
                 'Content-Type': 'multipart/form-data',
               },
@@ -73,7 +74,7 @@ const TextEditor = ({ apiKey, value, onChange }) => {
               .then(res => {
                 console.log('Upload response:', res.data);
                 if (res.data?.data?.url) {
-                  resolve(res.data.data.url);
+                  resolve(`${STORAGE_URL}${res.data.data.url}`);
                 } else {
                   console.error('Invalid response structure:', res.data);
                   reject("Upload failed: Invalid response structure");

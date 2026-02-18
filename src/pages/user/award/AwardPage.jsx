@@ -18,6 +18,7 @@ import { Pagination, Navigation, Autoplay, EffectCoverflow } from "swiper/module
 
 const AwardPage = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   
   const [awards, setAwards] = useState([]);
@@ -174,7 +175,7 @@ const AwardPage = () => {
                       {/* Award Image */}
                       <div className="relative h-64 bg-gradient-to-br from-amber-100 to-amber-200 overflow-hidden">
                         <img
-                          src={award.image}
+                          src={`${STORAGE_URL}${award.image}`}
                           alt={award.image_alt}
                           className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
                           onError={(e) => {

@@ -62,7 +62,7 @@ export const sidebarRoutes = [
   {
     title: "Permission",
     icon: <FontAwesomeIcon icon={faLock} />,
-    allowedRoles: ["0", "1"],
+    allowedRoles: [ "1"],
     subRoutes: [
       {
         path: "/permission/editor",
@@ -196,16 +196,16 @@ export const sidebarRoutes = [
         title: "Setting",
         allowedRoles: ["0"],
       },
-      {
-        path: "/setting/news",
-        title: "Latest News",
-        allowedRoles: ["0"],
-      },
-      {
-        path: "/setting/add-news",
-        title: "Add News",
-        allowedRoles: ["0"],
-      },
+      // {
+      //   path: "/setting/news",
+      //   title: "Latest News",
+      //   allowedRoles: ["0"],
+      // },
+      // {
+      //   path: "/setting/add-news",
+      //   title: "Add News",
+      //   allowedRoles: ["0"],
+      // },
       {
         path: "/setting/terms",
         title: "Terms & Condition",
@@ -282,12 +282,12 @@ export const sidebarRoutes = [
       }
     ],
   },
-  {
-    path: "/email-setting",
-    title: "Email Setting",
-    icon: <FontAwesomeIcon icon={faCog} />,
-    allowedRoles: ["0"],
-  },
+  // {
+  //   path: "/email-setting",
+  //   title: "Email Setting",
+  //   icon: <FontAwesomeIcon icon={faCog} />,
+  //   allowedRoles: ["0"],
+  // },
   {
     title: "Handle Landing Page",
     icon: <FontAwesomeIcon icon={faCog} />,

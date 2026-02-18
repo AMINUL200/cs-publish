@@ -15,6 +15,7 @@ import {
 
 const AuthorServices = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const navigate = useNavigate();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -170,7 +171,7 @@ const AuthorServices = () => {
                   {/* Service Image */}
                   <div className="relative overflow-hidden">
                     <img
-                      src={service.image}
+                      src={`${STORAGE_URL}${service.image}`}
                       alt={service.title}
                       className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                       onError={(e) => {

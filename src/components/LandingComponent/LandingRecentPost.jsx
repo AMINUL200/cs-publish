@@ -24,7 +24,7 @@ const LandingRecentPost = ({
       <div className="container-fluid ">
         <div className="titlebox text-center pb-8">
           <h4 className="heading">
-            Recent <span className="color_yellow">Blogs</span>
+            Research  <span className="color_yellow">Snapshot</span>
           </h4>
           <p>
            The CS Data Repository ensures your research data is safely stored, properly cited, and easily discoverable by other scholars.

@@ -337,6 +337,11 @@ const ViewManuscriptDetails = () => {
     
     if (!pdf) {
       toast.info("PDF Not Found");
+      return;
+    }
+    if(!isLoggedIn){
+      toast.error("Please log in to download the PDF");
+      return;
     }
     try {
       setDownloadLoading(true);

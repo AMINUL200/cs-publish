@@ -13,6 +13,10 @@ const PaymentForAuthor = () => {
   const [filterStatus, setFilterStatus] = React.useState("all");
   const [itemsPerPage, setItemsPerPage] = React.useState(10);
   const [currentPage, setCurrentPage] = React.useState(1);
+  
+  // State for modal
+  const [selectedPayment, setSelectedPayment] = React.useState(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   const fetchPayments = async () => {
     try {
@@ -32,6 +36,7 @@ const PaymentForAuthor = () => {
           new Date(b.created_at) - new Date(a.created_at)
         );
         setPayments(sortedPayments);
+        console.log("Fetched payments:", sortedPayments);
         setTotalCollection(response.data.total_collection);
       } else {
         toast.error(response.data.message || "Failed to fetch payments");
@@ -99,6 +104,18 @@ const PaymentForAuthor = () => {
     }
   };
 
+  // View details function
+  const handleViewDetails = (payment) => {
+    setSelectedPayment(payment);
+    setIsModalOpen(true);
+  };
+
+  // Close modal function
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedPayment(null);
+  };
+
   // Helper function to strip HTML tags
   const stripHtml = (html) => {
     if (!html) return "N/A";
@@ -141,6 +158,185 @@ const PaymentForAuthor = () => {
     });
   };
 
+  // Payment Details Modal Component
+  const PaymentDetailsModal = ({ payment, onClose }) => {
+    if (!payment) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+        <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          {/* Modal Header */}
+          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-gray-900">Payment Details</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Modal Body */}
+          <div className="p-6">
+            {/* Payment Status Banner */}
+            <div className={`mb-6 p-4 rounded-lg border ${getStatusClass(payment.payment_status)}`}>
+              <div className="flex items-center justify-between">
+                <span className="text-lg font-semibold">Payment Status:</span>
+                <span className="px-4 py-2 rounded-full text-sm font-semibold bg-white bg-opacity-50">
+                  {payment.payment_status?.toUpperCase()}
+                </span>
+              </div>
+            </div>
+
+            {/* Payment Information Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {/* Payment ID Section */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">Payment Information</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Payment ID:</span>
+                    <span className="font-medium text-blue-600">#{payment.id}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Manuscript ID:</span>
+                    <span className="font-medium">#{payment.manuscript_id}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Created Date:</span>
+                    <span className="font-medium">{formatDate(payment.created_at)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Last Updated:</span>
+                    <span className="font-medium">{formatDate(payment.updated_at)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Amount Summary */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">Amount Summary</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Journal Amount:</span>
+                    <span className="font-medium">{formatCurrency(payment.journal_amount)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Features Total:</span>
+                    <span className="font-medium text-green-600">{formatCurrency(payment.optional_feature_total)}</span>
+                  </div>
+                  <div className="border-t border-gray-200 my-2 pt-2">
+                    <div className="flex justify-between font-bold">
+                      <span className="text-gray-800">Total Amount:</span>
+                      <span className="text-green-600 text-lg">{formatCurrency(payment.total_amount)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Manuscript Details */}
+            {payment.manuscript && (
+              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">Manuscript Details</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-600">Title:</p>
+                    <p className="font-medium mb-2">{stripHtml(payment.manuscript.title)}</p>
+                    
+                    <p className="text-sm text-gray-600">Unique ID:</p>
+                    <p className="font-medium mb-2">{payment.manuscript.unique_id}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Author:</p>
+                    <p className="font-medium mb-2">{payment.manuscript.username}</p>
+                    
+                    <p className="text-sm text-gray-600">Email:</p>
+                    <p className="font-medium mb-2">{payment.manuscript.email}</p>
+                    
+                    <p className="text-sm text-gray-600">Contact:</p>
+                    <p className="font-medium">{payment.manuscript.contact_number}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Journal Details */}
+            {payment.journal && (
+              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">Journal Details</h3>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-gray-600">Journal ID:</p>
+                    <p className="font-medium">{payment.journal.id}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-gray-600">Journal Title:</p>
+                    <p className="font-medium">{payment.journal.j_title}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Optional Features */}
+            <div className="bg-gray-50 p-4 rounded-lg mb-6">
+              <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">Selected Features</h3>
+              {payment.optional_features && payment.optional_features.length > 0 ? (
+                <div className="space-y-2">
+                  {payment.optional_features.map((feature) => (
+                    <div key={feature.id} className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200">
+                      <span className="font-medium text-gray-800">{feature.name}</span>
+                      <span className="text-green-600 font-semibold">{formatCurrency(feature.amount)}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 italic">No optional features selected</p>
+              )}
+            </div>
+
+            {/* Feature IDs */}
+            {payment.author_optional_features_id && payment.author_optional_features_id.length > 0 && (
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">Feature IDs</h3>
+                <div className="flex flex-wrap gap-2">
+                  {payment.author_optional_features_id.map((id, index) => (
+                    <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                      Feature #{id}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Modal Footer */}
+          <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+            >
+              Close
+            </button>
+            {/* {payment.payment_status === "pending" && (
+              <button
+                onClick={() => {
+                  handleSendInvoice(payment.id, payment.manuscript_id);
+                  onClose();
+                }}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+              >
+                Send Invoice
+              </button>
+            )} */}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
@@ -156,6 +352,14 @@ const PaymentForAuthor = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      {/* Modal */}
+      {isModalOpen && (
+        <PaymentDetailsModal 
+          payment={selectedPayment} 
+          onClose={closeModal}
+        />
+      )}
+
       {/* Header */}
       <div className="bg-white rounded-xl shadow-sm p-8 mb-8 text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-3">
@@ -443,13 +647,11 @@ const PaymentForAuthor = () => {
                         <div className="flex flex-col gap-2">
                           <button 
                             className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors duration-200"
-                            onClick={() => {
-                              console.log("View details for payment:", payment.id);
-                            }}
+                            onClick={() => handleViewDetails(payment)}
                           >
                             View Details
                           </button>
-                          
+{/*                           
                           {payment.payment_status === "pending" && (
                             <button 
                               className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors duration-200"
@@ -457,7 +659,7 @@ const PaymentForAuthor = () => {
                             >
                               Send Invoice
                             </button>
-                          )}
+                          )} */}
                         </div>
                       </td>
                     </tr>

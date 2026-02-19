@@ -15,6 +15,7 @@ const ViewBlog = () => {
     const [deleteLoading, setDeleteLoading] = useState(false)
     const navigate = useNavigate();
     const API_URL = import.meta.env.VITE_API_URL;
+    const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
     // Filter blogs based on search term (title or author)
     const filteredBlogs = blogData.filter(blog => {
@@ -132,7 +133,7 @@ const ViewBlog = () => {
                                 Author
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
-                                Comments
+                                Image
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-2">
                                 Action
@@ -151,7 +152,8 @@ const ViewBlog = () => {
                                         {blog.author}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 hover:text-blue-800 cursor-pointer border-2">
-                                        {blog.content}
+                                        {/* {blog.image} */}
+                                        <img src={`${STORAGE_URL}${blog.image}`} alt="Blog Image" className="w-16 h-16 object-cover mt-1" />
                                     </td>
                                     <td className="text-center px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
                                         <button

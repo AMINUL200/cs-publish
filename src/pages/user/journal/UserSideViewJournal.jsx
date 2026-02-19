@@ -95,7 +95,8 @@ const UserSideViewJournal = () => {
     },
     { label: "Quick Press", path: `/quick-press/${journalData?.journal?.id}` },
     {
-      label: "Journal Description",
+      // label: "Journal Description",
+      label: "Quick Insight (A-Z)",
       path: `/journal-description/${journalData?.journal?.id}`,
     },
   ];
@@ -196,11 +197,25 @@ const UserSideViewJournal = () => {
                       {/* 👉 NEW VIEW LINK */}
                       <button
                         onClick={() => handleViewEditor(editor[0].user_id)}
-                        className="text-xs text-yellow-400 hover:text-yellow-200 
-                   hover:underline hover:underline-offset-2 transition-all 
-                   flex items-center gap-1"
+                        className="inline-flex items-center px-3 py-1.5 bg-yellow-500 hover:bg-yellow-400 
+                     text-black font-semibold text-xs rounded-md transition-all duration-200 
+                     transform hover:scale-105 focus:outline-none focus:ring-2 
+                     focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-black"
                       >
-                        View Editor Info →
+                        <span>Editor Info</span>
+                        <svg
+                          className="w-3.5 h-3.5 ml-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
                       </button>
                     </div>
 

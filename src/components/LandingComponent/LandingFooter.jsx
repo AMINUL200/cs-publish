@@ -25,7 +25,7 @@ const LandingFooter = ({
         // { name: "Books Hub", path: "/products" },
         { name: "Mentors Hub", path: "/mentors" },
         { name: "Author Services", path: "/author-services" },
-        { name: "Blog", path: "/blog" },
+        { name: "Research Snapshot", path: "/blog" },
         { name: "Events & Conference", path: "/event-conference" },
         // { name: "Conference", path: "#" },
       ],
@@ -67,7 +67,7 @@ const LandingFooter = ({
             }))
           : [{ name: "No support", path: "#" }]),
         // ✅ Static link first (example)
-        { name: "Faq", path: "/faq" },
+        { name: "FAQ", path: "/faq" },
         { name: "Award", path: "/award" },
       ],
     },

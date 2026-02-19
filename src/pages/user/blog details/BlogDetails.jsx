@@ -116,17 +116,11 @@ const BlogDetails = () => {
   // Function to handle PDF download
   const handlePdfDownload = () => {
     if (blogDetailsData?.blog_pdf) {
-      // Create a temporary anchor element
-      const link = document.createElement("a");
-      link.href = `${STORAGE_URL}${blogDetailsData.blog_pdf}`;
-      link.download = `blog-${blogDetailsData.title.replace(/\s+/g, "-").toLowerCase()}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
+      const pdfUrl = `${STORAGE_URL}${blogDetailsData.blog_pdf}`;
+      window.open(pdfUrl, "_blank");
       toast.success("Downloading PDF...");
     } else {
-      toast.error("No PDF available for download");
+      toast.error("No PDF available");
     }
   };
 
@@ -246,7 +240,6 @@ const BlogDetails = () => {
                     onClick={handlePdfDownload}
                     className="group flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                   >
-                  
                     <span className="font-medium">Download PDF Version</span>
                     {/* <FontAwesomeIcon
                       icon={faDownload}
@@ -293,9 +286,7 @@ const BlogDetails = () => {
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            <div className="bg-red-500 p-3 rounded-lg">
-                             
-                            </div>
+                            <div className="bg-red-500 p-3 rounded-lg"></div>
                             <div>
                               <h4 className="font-medium text-gray-900">
                                 {getPdfFileName(blogDetailsData.blog_pdf)}
@@ -339,9 +330,7 @@ const BlogDetails = () => {
                       >
                         <div className="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
                           <div className="flex items-center gap-3">
-                            <div className="bg-red-100 p-2 rounded-lg">
-                              
-                            </div>
+                            <div className="bg-red-100 p-2 rounded-lg"></div>
                             <div>
                               <p className="text-sm font-medium text-gray-900">
                                 Need an offline copy?
@@ -380,9 +369,7 @@ const BlogDetails = () => {
                         className="blog-sidebar-content-block bg-gradient-to-br from-red-500 to-red-600 text-white p-5 rounded-lg shadow-lg"
                       >
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="bg-white p-2 rounded-lg">
-                          
-                          </div>
+                          <div className="bg-white p-2 rounded-lg"></div>
                           <h3 className="font-medium text-lg">PDF Download</h3>
                         </div>
                         <p className="text-red-100 text-sm mb-4">

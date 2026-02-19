@@ -47,7 +47,7 @@ const SignUp = () => {
   const userTypeOptions = [
     { value: "2", label: "Author" },
     { value: "3", label: "Reviewer" },
-    { value: "4", label: "Subscriber" }
+    { value: "4", label: "User" }
   ];
 
   const titleOptions = ["Mr", "Mrs", "Miss", "Dr", "Prof"];

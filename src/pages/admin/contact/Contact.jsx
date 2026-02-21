@@ -213,7 +213,7 @@ const Contact = () => {
                         {/* Image Preview */}
                         <div className="flex flex-col items-center">
                             {imagePreview ? (
-                                <div className="relative ">
+                                <div className="relative "> 
                                     <img 
                                         src={imagePreview} 
                                         alt="Contact preview" 

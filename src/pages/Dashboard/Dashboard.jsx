@@ -15,8 +15,8 @@ const Dashboard = () => {
   return (
     <>
       {/* Admin  */}
-      {/* {userData.user_type == 0 && <AdminDashboard />} */}
-      {userData.user_type == 0 && <ProfilePage />}
+      {userData.user_type == 0 && <AdminDashboard />}
+      {/* {userData.user_type == 0 && <ProfilePage />} */}
 
       {/* Editor */}
       {userData.user_type == 1 && <EditorDashboard />}

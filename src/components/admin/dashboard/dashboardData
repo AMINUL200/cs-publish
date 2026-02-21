@@ -1,0 +1,60 @@
+// dashboardData.js (optional separate file)
+import {
+  Users,
+  Briefcase,
+  FileText,
+  Settings,
+  BarChart3,
+  MessageSquare,
+} from "lucide-react";
+
+export const dashboardCards = [
+  {
+    id: 1,
+    title: "Users",
+    description: "Manage all users",
+    icon: Users,
+    path: "/view-users",
+    color: "bg-blue-500",
+  },
+  {
+    id: 2,
+    title: "Journals",
+    description: "Manage journal ",
+    icon: Briefcase,
+    path: "/article-manger/journal",
+    color: "bg-green-500",
+  },
+  {
+    id: 3,
+    title: "Blogs",
+    description: "Manage blog content",
+    icon: FileText,
+    path: "/blog/view",
+    color: "bg-purple-500",
+  },
+  {
+    id: 4,
+    title: "Subscriptions",
+    description: "View subscription History",
+    icon: BarChart3,
+    path: "/payment/subscription-history",
+    color: "bg-orange-500",
+  },
+  {
+    id: 5,
+    title: "Awards",
+    description: "Manage awards",
+    icon: FileText,
+    path: "/handle-award",
+    color: "bg-pink-500",
+  },
+  {
+    id: 6,
+    title: "Settings",
+    description: "System settings",
+    icon: Settings,
+    path: "/setting/setting",
+    color: "bg-gray-600",
+  },
+];

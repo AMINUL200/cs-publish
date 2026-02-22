@@ -243,7 +243,7 @@ const ViewManuscriptDetails = () => {
   const handleSupplementaryFileDownload = () => {
     if (manuscriptData?.supplementary_file) {
       window.open(
-        manuscriptData.supplementary_file,
+        `${STORAGE_URL}${manuscriptData.supplementary_file}`,
         "_blank",
         "noopener,noreferrer",
       );
@@ -279,41 +279,30 @@ const ViewManuscriptDetails = () => {
   };
 
   // Handle share
-  const handleShare = (platform) => {
+  const handleShare = async () => {
     const title = getCleanTitle();
     const url = window.location.href;
+    const text = "Check out this research article";
 
-    switch (platform) {
-      case "twitter":
-        window.open(
-          `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-            title,
-          )}&url=${encodeURIComponent(url)}`,
-          "_blank",
-        );
-        break;
-      case "linkedin":
-        window.open(
-          `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-            url,
-          )}`,
-          "_blank",
-        );
-        break;
-      case "facebook":
-        window.open(
-          `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-            url,
-          )}`,
-          "_blank",
-        );
-        break;
-      case "copy":
-        navigator.clipboard.writeText(url);
-        toast.success("Link copied to clipboard!");
-        break;
+    try {
+      // ✅ Copy link automatically
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied! Choose where to share.");
+
+      // ✅ Open native share popup (mobile + supported browsers)
+      if (navigator.share) {
+        await navigator.share({
+          title: title,
+          text: text,
+          url: url,
+        });
+      } else {
+        // ✅ Fallback popup if browser doesn't support Web Share API
+        setShareDropdownOpen(true);
+      }
+    } catch (error) {
+      console.error("Share failed:", error);
     }
-    setShareDropdownOpen(false);
   };
 
   // Handle expand
@@ -334,13 +323,13 @@ const ViewManuscriptDetails = () => {
 
   const handleDownloadPDF = async (pdf) => {
     console.log("click");
-    
+
     if (!pdf) {
       toast.info("PDF Not Found");
       return;
     }
-    if(!isLoggedIn){
-      toast.error("Please log in to download the PDF");
+    if (!isLoggedIn) {
+      toast.info("Please log in to download the PDF");
       return;
     }
     try {
@@ -356,9 +345,9 @@ const ViewManuscriptDetails = () => {
       );
 
       console.log(response);
-      
+
       if (response.data.status) {
-        window.open(pdf, "_blank", "noopener,noreferrer");
+        window.open(`${STORAGE_URL}${pdf}`, "_blank", "noopener,noreferrer");
         toast.success("PDF downloaded successfully!");
       } else {
         toast.error(response.data.message || "Failed to download PDF");
@@ -528,7 +517,7 @@ const ViewManuscriptDetails = () => {
                     <span className="text-xs">Cite</span>
                   </button>
                   <button
-                    onClick={handleMobileShare}
+                    onClick={handleShare}
                     className="flex flex-row items-center gap-1 px-2 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
                   >
                     <Share className="w-4 h-4" />
@@ -595,7 +584,7 @@ const ViewManuscriptDetails = () => {
 
                   <div className="relative">
                     <button
-                      onClick={() => setShareDropdownOpen(!shareDropdownOpen)}
+                      onClick={handleShare}
                       className="flex flex-row items-center gap-1 px-3 py-2 bg-inherit/10 border border-yellow-300 rounded-lg hover:bg-yellow-50 transition-colors text-gray-700 cursor-pointer"
                     >
                       <Share className="w-4 h-4" />
@@ -1153,7 +1142,7 @@ const ViewManuscriptDetails = () => {
                 </section>
 
                 {/* Introduction */}
-                {manuscriptData.introduction && hasActiveSubscription  && (
+                {manuscriptData.introduction && hasActiveSubscription && (
                   <section id="introduction" className="mb-12 scroll-mt-44">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
                       <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
@@ -1169,23 +1158,24 @@ const ViewManuscriptDetails = () => {
                 )}
 
                 {/* Materials and Methods */}
-                {manuscriptData.materials_and_methods && hasActiveSubscription && (
-                  <section
-                    id="materials-methods"
-                    className="mb-12 scroll-mt-44"
-                  >
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
-                      Materials and Methods
-                    </h2>
-                    <div
-                      className="blog-rich-text max-w-none text-gray-700 leading-relaxed"
-                      dangerouslySetInnerHTML={{
-                        __html: manuscriptData.materials_and_methods,
-                      }}
-                    />
-                  </section>
-                )}
+                {manuscriptData.materials_and_methods &&
+                  hasActiveSubscription && (
+                    <section
+                      id="materials-methods"
+                      className="mb-12 scroll-mt-44"
+                    >
+                      <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                        <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
+                        Materials and Methods
+                      </h2>
+                      <div
+                        className="blog-rich-text max-w-none text-gray-700 leading-relaxed"
+                        dangerouslySetInnerHTML={{
+                          __html: manuscriptData.materials_and_methods,
+                        }}
+                      />
+                    </section>
+                  )}
 
                 {/* Results */}
                 {manuscriptData.results && hasActiveSubscription && (
@@ -1282,7 +1272,7 @@ const ViewManuscriptDetails = () => {
                         </h4>
                         <div className="border border-gray-300 rounded-lg overflow-hidden shadow-sm">
                           <iframe
-                            src={`${manuscriptData.supplementary_file}`}
+                            src={`${STORAGE_URL}${manuscriptData.supplementary_file}`}
                             title="Supplementary File"
                             className="w-full h-[600px]"
                           ></iframe>
@@ -1293,42 +1283,44 @@ const ViewManuscriptDetails = () => {
                 )}
 
                 {/* Author Contributions */}
-                {manuscriptData.author_contributions && hasActiveSubscription && (
-                  <section
-                    id="author-contributions"
-                    className="mb-12 scroll-mt-44"
-                  >
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
-                      Author Contributions
-                    </h2>
-                    <div
-                      className="blog-rich-text max-w-none text-gray-700 leading-relaxed"
-                      dangerouslySetInnerHTML={{
-                        __html: manuscriptData.author_contributions,
-                      }}
-                    />
-                  </section>
-                )}
+                {manuscriptData.author_contributions &&
+                  hasActiveSubscription && (
+                    <section
+                      id="author-contributions"
+                      className="mb-12 scroll-mt-44"
+                    >
+                      <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                        <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
+                        Author Contributions
+                      </h2>
+                      <div
+                        className="blog-rich-text max-w-none text-gray-700 leading-relaxed"
+                        dangerouslySetInnerHTML={{
+                          __html: manuscriptData.author_contributions,
+                        }}
+                      />
+                    </section>
+                  )}
 
                 {/* Conflict of Interest */}
-                {manuscriptData.conflict_of_interest_statement && hasActiveSubscription && (
-                  <section
-                    id="conflict-interest"
-                    className="mb-12 scroll-mt-44"
-                  >
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                      <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
-                      Conflict of Interest
-                    </h2>
-                    <div
-                      className="blog-rich-text max-w-none text-gray-700 leading-relaxed"
-                      dangerouslySetInnerHTML={{
-                        __html: manuscriptData.conflict_of_interest_statement,
-                      }}
-                    />
-                  </section>
-                )}
+                {manuscriptData.conflict_of_interest_statement &&
+                  hasActiveSubscription && (
+                    <section
+                      id="conflict-interest"
+                      className="mb-12 scroll-mt-44"
+                    >
+                      <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                        <span className="w-1 h-6 bg-yellow-600 rounded mr-3"></span>
+                        Conflict of Interest
+                      </h2>
+                      <div
+                        className="blog-rich-text max-w-none text-gray-700 leading-relaxed"
+                        dangerouslySetInnerHTML={{
+                          __html: manuscriptData.conflict_of_interest_statement,
+                        }}
+                      />
+                    </section>
+                  )}
 
                 {/* References - Right Section */}
                 {manuscriptData.references && hasActiveSubscription && (

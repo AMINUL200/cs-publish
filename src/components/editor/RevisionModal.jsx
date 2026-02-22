@@ -1,9 +1,7 @@
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { faUpload } from "@fortawesome/free-solid-svg-icons";
-import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faTimes, faUpload, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 const recommendationMap = {
   minor_revisions: "Minor Revisions",
@@ -12,12 +10,12 @@ const recommendationMap = {
   reject: "Reject",
 };
 
-
 const RevisionModal = ({
   isOpen,
   onClose,
   manuscript,
   reviewer,
+  selectedMessage,
   onSendRevision,
 }) => {
   const [editorMessage, setEditorMessage] = useState("");
@@ -28,6 +26,20 @@ const RevisionModal = ({
     useState(true);
   const [includeReviewerFile, setIncludeReviewerFile] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  
+  console.log("RevisionModal Props:", { selectedMessage });
+
+  // Reset form when modal opens with new message
+  useEffect(() => {
+    if (isOpen) {
+      setEditorMessage("");
+      setEditorRecommendation("");
+      setAttachedFile(null);
+      setIncludeReviewerMessage(true);
+      setIncludeReviewerRecommendation(true);
+      setIncludeReviewerFile(true);
+    }
+  }, [isOpen, selectedMessage]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -44,34 +56,30 @@ const RevisionModal = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!editorMessage.trim() && !includeReviewerMessage) {
+    // Validate based on includeReviewerMessage checkbox
+    if (!includeReviewerMessage && !editorMessage.trim()) {
       toast.error(
-        "Please provide either an editor message or include reviewer message"
+        "Please provide an editor message when not including the reviewer's message",
       );
       return;
     }
 
     setIsLoading(true);
 
-    const formData = new FormData();
-    formData.append("manuscript_id", manuscript.manuscript_id);
-    formData.append("reviewer_id", reviewer.reviewer.id);
-    formData.append("assignment_id", reviewer.assignment_id);
-    formData.append("editor_message", editorMessage);
-    formData.append("editor_recommendation", editorRecommendation);
-    formData.append("include_reviewer_message", includeReviewerMessage);
-    formData.append(
-      "include_reviewer_recommendation",
-      includeReviewerRecommendation
-    );
-    formData.append("include_reviewer_file", includeReviewerFile);
+    // Create request body according to API requirements
+    const requestBody = {
+      message_id: selectedMessage.id,
+      is_editor_approved: includeReviewerMessage ? 0 : 1,
+    };
 
-    if (attachedFile) {
-      formData.append("editor_file", attachedFile);
+    // Only include message_to_author when not including reviewer's message
+    if (!includeReviewerMessage && editorMessage.trim()) {
+      requestBody.message_to_author = editorMessage;
     }
 
     try {
-      await onSendRevision(formData);
+      console.log("Request Body to be sent:", requestBody);
+      await onSendRevision(requestBody);
       handleClose();
     } catch (error) {
       console.error("Error sending revision:", error);
@@ -92,7 +100,8 @@ const RevisionModal = ({
 
   if (!isOpen) return null;
 
-  const reviewerMessage = reviewer.messages?.[0];
+  // Use the selected message if provided, otherwise use the first message
+  const reviewerMessage = selectedMessage || reviewer?.messages?.[0];
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -112,6 +121,11 @@ const RevisionModal = ({
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg leading-6 font-medium text-gray-900">
                   Send Revision to Author
+                  {selectedMessage && (
+                    <span className="ml-2 text-sm font-normal text-gray-500">
+                      (Message ID: {selectedMessage.id})
+                    </span>
+                  )}
                 </h3>
                 <button
                   type="button"
@@ -130,7 +144,7 @@ const RevisionModal = ({
                   </h4>
                   <p
                     className="text-sm text-gray-700"
-                    dangerouslySetInnerHTML={{ __html: manuscript.title }}
+                    dangerouslySetInnerHTML={{ __html: manuscript?.title }}
                   />
                 </div>
 
@@ -144,11 +158,38 @@ const RevisionModal = ({
                   </p>
                 </div>
 
-                {/* Reviewer's Response (if available) */}
+                {/* Status Indicator */}
+                <div className={`p-4 rounded-lg ${
+                  includeReviewerMessage 
+                    ? 'bg-green-50 border border-green-200' 
+                    : 'bg-yellow-50 border border-yellow-200'
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-2 h-2 rounded-full ${
+                        includeReviewerMessage ? 'bg-green-500' : 'bg-yellow-500'
+                      }`}></div>
+                      <span className="text-sm font-medium text-gray-900">
+                        {includeReviewerMessage 
+                          ? 'Approved: Using reviewer\'s message' 
+                          : 'Not Approved: You need to provide a message'
+                        }
+                      </span>
+                    </div>
+                    <span className="text-xs text-gray-500">
+                      is_editor_approved: {includeReviewerMessage ? '1' : '0'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Selected Reviewer's Message */}
                 {reviewerMessage && (
                   <div className="bg-green-50 p-4 rounded-lg">
-                    <h4 className="text-md font-medium text-gray-900 mb-3">
-                      Reviewer's Response
+                    <h4 className="text-md font-medium text-gray-900 mb-3 flex items-center justify-between">
+                      <span>Reviewer's Response</span>
+                      <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded">
+                        Message from {new Date(reviewerMessage.created_at).toLocaleDateString()}
+                      </span>
                     </h4>
 
                     <div className="space-y-4">
@@ -157,17 +198,22 @@ const RevisionModal = ({
                           <input
                             type="checkbox"
                             checked={includeReviewerMessage}
-                            onChange={(e) =>
-                              setIncludeReviewerMessage(e.target.checked)
-                            }
-                            className="rounded border-gray-300"
+                            onChange={(e) => {
+                              setIncludeReviewerMessage(e.target.checked);
+                              // Clear editor message when switching to approved
+                              if (e.target.checked) {
+                                setEditorMessage("");
+                              }
+                            }}
+                            className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                           />
                           <span className="text-sm font-medium text-gray-700">
-                            Include message to author
+                            Include this message to author (is_editor_approved = 1)
                           </span>
                         </label>
                         {includeReviewerMessage && (
                           <div className="mt-2 p-3 bg-white rounded border">
+                            <p className="text-sm font-medium text-gray-700 mb-1">Message to Author:</p>
                             <p className="text-sm text-gray-900">
                               {reviewerMessage.message_to_author}
                             </p>
@@ -175,7 +221,7 @@ const RevisionModal = ({
                         )}
                       </div>
 
-                      <div>
+                      {/* <div>
                         <label className="flex items-center space-x-2">
                           <input
                             type="checkbox"
@@ -191,16 +237,17 @@ const RevisionModal = ({
                         </label>
                         {includeReviewerRecommendation && (
                           <div className="mt-2 p-3 bg-white rounded border">
+                            <p className="text-sm font-medium text-gray-700 mb-1">Recommendation:</p>
                             <p className="text-sm text-gray-900">
                               {recommendationMap[
                                 reviewerMessage.recommendation
-                              ] || "N/A"}
+                              ] || reviewerMessage.recommendation}
                             </p>
                           </div>
                         )}
-                      </div>
+                      </div> */}
 
-                      {reviewerMessage.image && (
+                      {/* {reviewerMessage.image && (
                         <div>
                           <label className="flex items-center space-x-2">
                             <input
@@ -218,36 +265,49 @@ const RevisionModal = ({
                           {includeReviewerFile && (
                             <div className="mt-2 p-3 bg-white rounded border">
                               <p className="text-sm text-gray-900">
-                                Reviewer's attached file will be included
+                                <a 
+                                  href={`${import.meta.env.VITE_STORAGE_URL}${reviewerMessage.image}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  View attached file
+                                </a>
                               </p>
                             </div>
                           )}
                         </div>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 )}
 
-                {/* Editor's Message */}
-                <div>
-                  <label
-                    htmlFor="editorMessage"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Editor's Message to Author
-                  </label>
-                  <textarea
-                    id="editorMessage"
-                    rows={4}
-                    value={editorMessage}
-                    onChange={(e) => setEditorMessage(e.target.value)}
-                    placeholder="Add your message to the author..."
-                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
+                {/* Editor's Message - Only show when NOT including reviewer's message */}
+                {!includeReviewerMessage && (
+                  <div>
+                    <label
+                      htmlFor="editorMessage"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Editor's Message to Author <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      id="editorMessage"
+                      rows={4}
+                      value={editorMessage}
+                      onChange={(e) => setEditorMessage(e.target.value)}
+                      placeholder="Add your message to the author (required when not including reviewer's message)..."
+                      className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      required={!includeReviewerMessage}
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      This will be sent as message_to_author in the API
+                    </p>
+                  </div>
+                )}
 
                 {/* Editor's Recommendation */}
-                <div>
+                {/* <div>
                   <label
                     htmlFor="editorRecommendation"
                     className="block text-sm font-medium text-gray-700 mb-2"
@@ -266,10 +326,10 @@ const RevisionModal = ({
                     <option value="major_revisions">Major Revisions</option>
                     <option value="reject">Reject</option>
                   </select>
-                </div>
+                </div> */}
 
                 {/* File Upload */}
-                <div>
+                {/* <div>
                   <label
                     htmlFor="editorFile"
                     className="block text-sm font-medium text-gray-700 mb-2"
@@ -307,7 +367,7 @@ const RevisionModal = ({
                     Supported formats: PDF, DOC, DOCX, TXT, PNG, JPG, JPEG (Max:
                     10MB)
                   </p>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -325,7 +385,7 @@ const RevisionModal = ({
                 ) : (
                   <>
                     <FontAwesomeIcon icon={faPaperPlane} className="mr-2" />
-                    Send to Author
+                    {includeReviewerMessage ? 'Send Approved Review' : 'Send Custom Message'}
                   </>
                 )}
               </button>
@@ -337,6 +397,22 @@ const RevisionModal = ({
               >
                 Cancel
               </button>
+            </div>
+
+            {/* Request Body Preview */}
+            <div className="px-6 pb-4">
+              <details className="text-xs">
+                <summary className="text-gray-500 cursor-pointer hover:text-gray-700">
+                  Preview API Request Body
+                </summary>
+                <pre className="mt-2 p-2 bg-gray-100 rounded overflow-x-auto">
+                  {JSON.stringify({
+                    message_id: selectedMessage?.id,
+                    ...(!includeReviewerMessage && editorMessage.trim() && { message_to_author: editorMessage }),
+                    is_editor_approved: includeReviewerMessage ? 1 : 0
+                  }, null, 2)}
+                </pre>
+              </details>
             </div>
           </form>
         </div>

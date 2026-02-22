@@ -60,14 +60,14 @@ const AssignedManuscript = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [publisherInfo, setPublisherInfo] = useState([]);
 
-  // Add these new state variables to your component (around line 35)
   const [isPublisherModalOpen, setIsPublisherModalOpen] = useState(false);
   const [selectedPublisher, setSelectedPublisher] = useState("");
   const [assigningPublisher, setAssigningPublisher] = useState(false);
 
-  // New state for revision modal
+  // Updated state for revision modal - now includes selected message
   const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
   const [selectedReviewer, setSelectedReviewer] = useState(null);
+  const [selectedMessage, setSelectedMessage] = useState(null);
 
   // Pagination and search state
   const [currentPage, setCurrentPage] = useState(1);
@@ -160,7 +160,6 @@ const AssignedManuscript = () => {
     setSelectedManuscript(null);
   };
 
-  // Add functions to handle publisher modal
   const openPublisherModal = () => {
     setIsPublisherModalOpen(true);
     setSelectedPublisher("");
@@ -175,7 +174,6 @@ const AssignedManuscript = () => {
     setCurrentPage(page);
   };
 
-  // Add this function to handle publisher assignment
   const handleAssignPublisher = async () => {
     if (!selectedPublisher || !selectedManuscript?.manuscript_id) {
       toast.error("Please select a publisher");
@@ -185,7 +183,7 @@ const AssignedManuscript = () => {
     setAssigningPublisher(true);
     try {
       const response = await axios.post(
-        `${API_URL}api/permission/publisher`, // Update this endpoint as needed
+        `${API_URL}api/permission/publisher`,
         {
           manuscript_id: selectedManuscript.manuscript_id,
           publisher_id: selectedPublisher,
@@ -201,7 +199,7 @@ const AssignedManuscript = () => {
         toast.success(
           response.data.message || "Publisher assigned successfully"
         );
-        fetchAssignedManuscripts(); // Refresh the data
+        fetchAssignedManuscripts();
         closePublisherModal();
       } else {
         toast.error(response.data.message || "Failed to assign publisher");
@@ -214,12 +212,6 @@ const AssignedManuscript = () => {
     } finally {
       setAssigningPublisher(false);
     }
-  };
-
-  const handlePublish = async (manuscriptId) => {
-    if (!manuscriptId) return;
-    console.log("Publishing manuscript ID:", manuscriptId);
-    // Add your publish logic here
   };
 
   const handleNeedRevision = async (manuscriptId) => {
@@ -260,11 +252,11 @@ const AssignedManuscript = () => {
     }
   };
 
-  // New function to handle sending individual reviewer revision to author
   const handleSendRevisionToAuthor = async (formData) => {
+    console.log("Form data received for sending revision:", formData);
     try {
       const response = await axios.post(
-        `${API_URL}api/editor/send-revision-to-author`,
+        `${API_URL}api/editor/editor-permision-message-send`,
         formData,
         {
           headers: {
@@ -294,14 +286,17 @@ const AssignedManuscript = () => {
     }
   };
 
-  const openRevisionModal = (reviewer) => {
+  // Updated function to open revision modal with specific message
+  const openRevisionModal = (reviewer, message = null) => {
     setSelectedReviewer(reviewer);
+    setSelectedMessage(message);
     setIsRevisionModalOpen(true);
   };
 
   const closeRevisionModal = () => {
     setIsRevisionModalOpen(false);
     setSelectedReviewer(null);
+    setSelectedMessage(null);
   };
 
   if (loading) {
@@ -310,12 +305,13 @@ const AssignedManuscript = () => {
 
   return (
     <div className="px-4 py-6 sm:px-6 lg:px-8">
-      {/* Revision Modal */}
+      {/* Revision Modal - Now passing selectedMessage */}
       <RevisionModal
         isOpen={isRevisionModalOpen}
         onClose={closeRevisionModal}
         manuscript={selectedManuscript}
         reviewer={selectedReviewer}
+        selectedMessage={selectedMessage}
         onSendRevision={handleSendRevisionToAuthor}
       />
 
@@ -354,7 +350,6 @@ const AssignedManuscript = () => {
                         publication.
                       </p>
 
-                      {/* Manuscript Info */}
                       <div className="bg-gray-50 p-3 rounded-lg mb-4">
                         <h4 className="text-sm font-medium text-gray-900 mb-2">
                           Manuscript:
@@ -370,7 +365,6 @@ const AssignedManuscript = () => {
                         </p>
                       </div>
 
-                      {/* Publisher Selection */}
                       <div>
                         <label
                           htmlFor="publisher-select"
@@ -444,7 +438,6 @@ const AssignedManuscript = () => {
                         )}
                       </div>
 
-                      {/* Selected Publisher Summary */}
                       {selectedPublisher && (
                         <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                           <div className="flex items-center">
@@ -552,7 +545,6 @@ const AssignedManuscript = () => {
                     </div>
 
                     <div className="mt-6 grid grid-cols-1 gap-6">
-                      {/* Manuscript Details */}
                       <div className="bg-gray-50 p-4 rounded-lg">
                         <h4 className="text-md font-medium text-gray-900 mb-3 flex items-center">
                           <FontAwesomeIcon icon={faFileAlt} className="mr-2" />
@@ -584,7 +576,6 @@ const AssignedManuscript = () => {
                         </div>
                       </div>
 
-                      {/* Reviewer Details (List) */}
                       <div className="bg-gray-50 p-4 rounded-lg">
                         <h4 className="text-md font-medium text-gray-900 mb-3 flex items-center">
                           <FontAwesomeIcon icon={faUser} className="mr-2" />
@@ -625,23 +616,6 @@ const AssignedManuscript = () => {
                                         {assignment.status}
                                       </span>
                                     </span>
-
-                                    {/* Send Revision Button - Only for completed reviews */}
-                                    {assignment.status === "completed" &&
-                                      assignment.messages?.length > 0 && (
-                                        <button
-                                          onClick={() =>
-                                            openRevisionModal(assignment)
-                                          }
-                                          className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                        >
-                                          <FontAwesomeIcon
-                                            icon={faPaperPlane}
-                                            className="mr-1"
-                                          />
-                                          Send to Author
-                                        </button>
-                                      )}
                                   </div>
                                 </div>
 
@@ -680,17 +654,18 @@ const AssignedManuscript = () => {
                                                 <button
                                                   onClick={() =>
                                                     openRevisionModal(
-                                                      assignment
+                                                      assignment,
+                                                      message
                                                     )
                                                   }
                                                   className="text-blue-600 hover:text-blue-800 text-xs font-medium"
-                                                  title="Send this review to author"
+                                                  title="Send this specific review to author"
                                                 >
                                                   <FontAwesomeIcon
                                                     icon={faPaperPlane}
                                                     className="mr-1"
                                                   />
-                                                  Send
+                                                  Send to Author
                                                 </button>
                                               </div>
                                             </div>
@@ -765,7 +740,6 @@ const AssignedManuscript = () => {
                                   </div>
                                 )}
 
-                                {/* Problems for this reviewer */}
                                 {(assignment.problems || []).length > 0 && (
                                   <div className="mt-3 bg-white rounded">
                                     <h5 className="text-sm font-medium text-gray-800 mb-2 flex items-center">
@@ -795,7 +769,6 @@ const AssignedManuscript = () => {
                                   </div>
                                 )}
 
-                                {/* Status indicator for empty reviews */}
                                 {assignment.status === "pending" &&
                                   (!assignment.messages ||
                                     assignment.messages.length === 0) && (
@@ -828,7 +801,6 @@ const AssignedManuscript = () => {
                         </div>
                       </div>
 
-                      {/* Summary Section */}
                       {(selectedManuscript.reviewers || []).length > 0 && (
                         <div className="bg-blue-50 p-4 rounded-lg">
                           <h4 className="text-md font-medium text-gray-900 mb-3 flex items-center">
@@ -935,7 +907,6 @@ const AssignedManuscript = () => {
                     </button>
                   )}
 
-                  {/* Quick Send All Reviews Button */}
                   {(selectedManuscript.reviewers || []).some(
                     (r) => r.status === "completed" && r.messages?.length > 0
                   ) && (
@@ -943,7 +914,6 @@ const AssignedManuscript = () => {
                       type="button"
                       className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white text-sm font-semibold shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition cursor-pointer"
                       onClick={() => {
-                        // You can implement a bulk send function here
                         toast.info(
                           "Select individual reviews to send to author"
                         );

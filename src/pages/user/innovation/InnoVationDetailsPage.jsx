@@ -40,6 +40,7 @@ const InnoVationDetailsPage = () => {
       );
 
       if (response.data.status) {
+        console.log("Innovation data fetched successfully:", response.data);
         setInnovation(response.data.data);
         setPopularInnovations(response.data.popular || []);
       }

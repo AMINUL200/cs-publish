@@ -35,7 +35,7 @@ const LandingFooter = ({
       items: [
         // { name: "Data Depository", path: "#" },
         // { name: "Find protocols", path: "#" },
-        { name: "Innovation", path: "/innovation" },
+        { name: "Research & Innovation", path: "/innovation" },
         { name: "Research Service", path: "/research-services" },
         { name: "Publication Charges", path: "/publication-charge" },
         { name: "Open Access Policy", path: "/open-access-policy" },

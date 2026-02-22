@@ -156,6 +156,11 @@ const UserSideViewJournal = () => {
     all_manuscripts,
     quick_press,
   } = journalData;
+  if( all_manuscripts.length === 0 ){
+      console.log("Latest Published:", latest_published);
+  }
+
+  console.log("Most Viewed:", all_manuscripts.length > 0);
 
   return (
     <div className="min-h-screen bg-gray-50 pt-10 sm:pt-24">
@@ -303,6 +308,16 @@ const UserSideViewJournal = () => {
       {/* Slider Sections */}
       <div className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          { all_manuscripts.length === 0 && (
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-gray-900 border-l-4 border-yellow-500 pl-4 inline-block">
+                Explore Our Journal
+              </h2>
+              <p className="mt-4 text-gray-600">Discover the latest articles and research in our journal.</p>
+            </div>
+          )}
+
           {/* Quick Press */}
           <SectionSlider
             title="Quick Press"

@@ -298,9 +298,9 @@ const InnovationPage = () => {
       <Breadcrumb
         items={[
           { label: "Home", path: "/", icon: "home" },
-          { label: "Innovation" },
+          { label: "Research And Innovation" },
         ]}
-        pageTitle="Innovation"
+        pageTitle=" Research And Innovation"
       />
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-red-50">
         {/* Search Section */}

@@ -80,7 +80,7 @@ const HomePage = () => {
       pricing: axios.get(`${API_URL}api/plan`),
       // publishedJournal: axios.get(`${API_URL}api/published-manuscripts-list`),
       browsJournal: axios.get(`${API_URL}api/show-journals`),
-      research: axios.get(`${API_URL}api/research`),
+      research: axios.get(`${API_URL}api/innovations`),
       service: axios.get(`${API_URL}api/services`),
       team: axios.get(`${API_URL}api/team`),
     };
@@ -101,7 +101,7 @@ const HomePage = () => {
           // if (key === "publishedJournal")
           //   setPublishedJournalData(response.data.data);
           if (key === "browsJournal") setBrowsJournalData(response.data.data);
-          if (key === "research") setResearchData(response.data.data);
+          if (key === "research") setResearchData(response.data.recent);
           if (key === "service") setServicesData(response.data.data);
           if (key === "team") setOurTeamData(response.data.data);
         }

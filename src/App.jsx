@@ -5,6 +5,7 @@ import {
   Route,
   Outlet,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 
 import "./css/style.css";
@@ -162,12 +163,16 @@ function App() {
 
   // Protected Route Component
   const ProtectedRoute = ({ isAuthenticated, userData, allowTypes = [] }) => {
-    // Not logged in → go to signin
+    const location = useLocation();
+
+    // Not logged in → go to signin AND remember page
     if (!isAuthenticated) {
-      return <Navigate to="/signin" replace />;
+      return (
+        <Navigate to="/signin" state={{ from: location.pathname }} replace />
+      );
     }
 
-    // If allowTypes passed → check user type
+    // Role check
     if (allowTypes.length > 0) {
       if (!allowTypes.includes(userData?.user_type)) {
         return <Navigate to="/" replace />;
@@ -183,14 +188,20 @@ function App() {
     redirectPath = "/dashboard",
     userData,
   }) => {
-    if (isAuthenticated) {
-      // return <Navigate to={redirectPath} replace />;
+    const location = useLocation();
+
+    // ⭐ IMPORTANT: check if redirected from protected page
+    const hasRedirectBack = location.state?.from;
+
+    // Only auto redirect when user directly opens /signin
+    if (isAuthenticated && !hasRedirectBack) {
       if (userData?.user_type == 4) {
         return <Navigate to="/" replace />;
       } else {
         return <Navigate to={redirectPath} replace />;
       }
     }
+
     return <Outlet />;
   };
 
@@ -223,122 +234,113 @@ function App() {
               />
             }
           > */}
-            <Route element={<AppLayout2 />}>
-              <Route index path="/" element={<HomePage />} />
-              <Route path="/my-profile" element={<SubscriberProfile />} />
-              <Route path="/subscription" element={<Subscription />} />
+          <Route element={<AppLayout2 />}>
+            <Route index path="/" element={<HomePage />} />
+            <Route path="/my-profile" element={<SubscriberProfile />} />
+            <Route path="/subscription" element={<Subscription />} />
 
-              <Route path="/journal" element={<ViewJournalList />} />
-              <Route path="/journal/:id" element={<UserSideViewJournal />} />
-              <Route
-                path="/journal-description/:id"
-                element={<JournalDescription />}
-              />
-              <Route
-                path="/editor-info/:editorId"
-                element={<EditorInfo />}
-              />
-              <Route
-                path="/list-of-archive/:id"
-                element={<ListOfIssueJournal />}
-              />
-              {/* <Route
+            <Route path="/journal" element={<ViewJournalList />} />
+            <Route path="/journal/:id" element={<UserSideViewJournal />} />
+            <Route
+              path="/journal-description/:id"
+              element={<JournalDescription />}
+            />
+            <Route path="/editor-info/:editorId" element={<EditorInfo />} />
+            <Route
+              path="/list-of-archive/:id"
+              element={<ListOfIssueJournal />}
+            />
+            {/* <Route
                 path="/list-of-archive/"
                 element={<ListOfArchive />}
               /> */}
-              <Route
-                path="/view-archive/:j_id/:v_id"
-                element={<DetailsOfArchiveList />}
-              />
-              <Route
-                path="/view-current-issue/:id"
-                element={<DetailsOfCurrentIssue />}
-              />
-              <Route
-                path="/author-overview/:id"
-                element={<JournalAuthorInformation />}
-              />
-              <Route path="/about-journal/:id" element={<AboutJournal />} />
-              <Route path="/quick-press/:id" element={<QuickPress />} />
+            <Route
+              path="/view-archive/:j_id/:v_id"
+              element={<DetailsOfArchiveList />}
+            />
+            <Route
+              path="/view-current-issue/:id"
+              element={<DetailsOfCurrentIssue />}
+            />
+            <Route
+              path="/author-overview/:id"
+              element={<JournalAuthorInformation />}
+            />
+            <Route path="/about-journal/:id" element={<AboutJournal />} />
+            <Route path="/quick-press/:id" element={<QuickPress />} />
 
-              <Route path="/my-subscription" element={<MySubscription />} />
+            <Route path="/my-subscription" element={<MySubscription />} />
 
-              <Route
-                path="/view-published-manuscript-list"
-                element={<ViewManuscriptPage />}
-              />
-              <Route
-                path="/view-published-manuscript/:id"
-                element={<ViewManuscriptDetails />}
-              />
-              <Route path="/about" element={<UserProfilePage />} />
-              <Route path="/blog" element={<UserBlogPage />} />
-              <Route path="/blog/:id" element={<BlogDetails />} />
-              <Route path="/cms/:slug" element={<CmsTemplate />} />
-              <Route path="/cms-page/:slug" element={<CmsPage />} />
+            <Route
+              path="/view-published-manuscript-list"
+              element={<ViewManuscriptPage />}
+            />
+            <Route
+              path="/view-published-manuscript/:id"
+              element={<ViewManuscriptDetails />}
+            />
+            <Route path="/about" element={<UserProfilePage />} />
+            <Route path="/blog" element={<UserBlogPage />} />
+            <Route path="/blog/:id" element={<BlogDetails />} />
+            <Route path="/cms/:slug" element={<CmsTemplate />} />
+            <Route path="/cms-page/:slug" element={<CmsPage />} />
 
-              <Route path="/innovation" element={<InnovationPage />} />
-              <Route
-                path="/innovation/:slug"
-                element={<InnoVationDetailsPage />}
-              />
+            <Route path="/innovation" element={<InnovationPage />} />
+            <Route
+              path="/innovation/:slug"
+              element={<InnoVationDetailsPage />}
+            />
 
-              {/* Book Related route */}
-              <Route path="/products" element={<BookStorePage />} />
-              <Route path="/products/:id" element={<BookDetailsPage />} />
-              <Route path="/cart" element={<BookCartPage />} />
-              <Route path="/checkout" element={<BookCheckoutPage />} />
+            {/* Book Related route */}
+            <Route path="/products" element={<BookStorePage />} />
+            <Route path="/products/:id" element={<BookDetailsPage />} />
+            <Route path="/cart" element={<BookCartPage />} />
+            <Route path="/checkout" element={<BookCheckoutPage />} />
 
-              {/* Mentors route */}
-              <Route path="/mentors" element={<MentorsHubPage />} />
-              <Route path="/mentors/:id" element={<MentorHubDetails />} />
+            {/* Mentors route */}
+            <Route path="/mentors" element={<MentorsHubPage />} />
+            <Route path="/mentors/:id" element={<MentorHubDetails />} />
 
-              {/* Research Services */}
-              <Route
-                path="/research-services"
-                element={<ResearchAndServicePage />}
-              />
-              <Route
-                path="/research-services/:serviceId"
-                element={<ResearchAndServicePageDetail />}
-              />
+            {/* Research Services */}
+            <Route
+              path="/research-services"
+              element={<ResearchAndServicePage />}
+            />
+            <Route
+              path="/research-services/:serviceId"
+              element={<ResearchAndServicePageDetail />}
+            />
 
-              {/* company policy */}
-              <Route path="/terms" element={<TermsAndCondition />} />
-              <Route
-                path="/policy-page/:slug"
-                element={<CompanyPolicyCmsPage />}
-              />
+            {/* company policy */}
+            <Route path="/terms" element={<TermsAndCondition />} />
+            <Route
+              path="/policy-page/:slug"
+              element={<CompanyPolicyCmsPage />}
+            />
 
-              <Route path="/policy" element={<CompanyPolicy />} />
-              <Route path="/payment-policy" element={<PaymentPolicy />} />
+            <Route path="/policy" element={<CompanyPolicy />} />
+            <Route path="/payment-policy" element={<PaymentPolicy />} />
 
-              <Route path="/faq" element={<FaqPage />} />
+            <Route path="/faq" element={<FaqPage />} />
 
-              <Route path="/font-vew" element={<ArticleFrontView />} />
-              <Route path="/author-hub" element={<AuthorHub />} />
-              <Route path="/editor-hub" element={<EditorHub />} />
-              <Route path="/who-we-are/:slug" element={<UserSideWhoWeAre />} />
-              <Route path="/author-services" element={<AuthorServices />} />
+            <Route path="/font-vew" element={<ArticleFrontView />} />
+            <Route path="/author-hub" element={<AuthorHub />} />
+            <Route path="/editor-hub" element={<EditorHub />} />
+            <Route path="/who-we-are/:slug" element={<UserSideWhoWeAre />} />
+            <Route path="/author-services" element={<AuthorServices />} />
 
-              <Route
-                path="/publication-charge"
-                element={<PublicationCharge />}
-              />
-              <Route
-                path="/open-access-policy"
-                element={<UserSideOpenAccessPolicy />}
-              />
-              <Route path="/award" element={<AwardPage />} />
-              <Route
-                path="/event-conference"
-                element={<EventAndConference />}
-              />
-              <Route
-                path="/conference-detail/:slug"
-                element={<EventAndConferenceDetail />}
-              />
-            </Route>
+            <Route path="/publication-charge" element={<PublicationCharge />} />
+            <Route
+              path="/open-access-policy"
+              element={<UserSideOpenAccessPolicy />}
+            />
+            <Route path="/award" element={<AwardPage />} />
+            <Route path="/event-conference" element={<EventAndConference />} />
+            <Route
+              path="/conference-detail/:slug"
+              element={<EventAndConferenceDetail />}
+            />
+          </Route>
           {/* </Route> */}
 
           <Route

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import {
   ChevronDown,
   Download,
@@ -37,6 +37,7 @@ const ViewManuscriptDetails = () => {
   );
 
   const { id } = useParams();
+  const location = useLocation();
 
   const [manuscriptData, setManuscriptData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1352,6 +1353,7 @@ const ViewManuscriptDetails = () => {
                 </p>
                 <Link
                   to="/signin"
+                  state={{ from: location.pathname }}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-medium"
                 >
                   Login to Read Full Article

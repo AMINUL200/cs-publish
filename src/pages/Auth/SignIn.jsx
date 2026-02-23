@@ -13,10 +13,13 @@ import { login } from "../../features/auth/AuthSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectPath = location.state?.from || "/";
+  console.log("Redirect path:", redirectPath);
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     email: "",
@@ -54,16 +57,14 @@ export default function SignIn() {
 
       if (response.data.flag === 1 || response.data) {
         dispatch(
-          login({ userData: response.data.user, token: response.data.token })
+          login({ userData: response.data.user, token: response.data.token }),
         );
         toast.success(response.data.message);
 
         if (response.data.user.user_type == 4) {
-          navigate("/");
-          return;
+          navigate(redirectPath, { replace: true });
         } else {
-          navigate("/dashboard");
-          return;
+          navigate(redirectPath || "/dashboard", { replace: true });
         }
       } else {
         toast.error(response.data.message);

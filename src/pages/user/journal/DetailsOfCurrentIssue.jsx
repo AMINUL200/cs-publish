@@ -185,9 +185,9 @@ const DetailsOfCurrentIssue = () => {
                 {journalData.j_title}
               </h1>
               <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-4">
-                <p className="text-white text-lg leading-relaxed">
+                {/* <p className="text-white text-lg leading-relaxed">
                   {journalData.j_description || "No description available"}
-                </p>
+                </p> */}
               </div>
               <div className="flex flex-wrap gap-4 justify-center lg:justify-start text-white">
                 <div className="flex items-center gap-2">

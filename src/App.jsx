@@ -155,6 +155,9 @@ import EventAndConferenceDetail from "./pages/user/event_conference/EventAndConf
 import Subscription from "./pages/user/subscription/Subscription";
 import JournalDescription from "./pages/user/journal/JournalDescription";
 import EditorInfo from "./pages/user/author_editor_hub/EditorInfo";
+import HandleResearchAndServices from "./pages/admin/research_services/HandleResearchAndServices";
+import HandleResearchAndServicesDetails from "./pages/admin/research_services/HandleResearchAndServicesDetails";
+import HandleManuscriptProcess from "./pages/admin/research_services/HandleManuscriptProcess";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -527,6 +530,10 @@ function App() {
                 path="/add-event-conference"
                 element={<ConferenceForm />}
               />
+
+              <Route path="/handle-research-and-services" element={<HandleResearchAndServices/>}/>
+              <Route path="/handle-research-and-services-details" element={<HandleResearchAndServicesDetails/>}/>
+              <Route path="/handle-manuscript-process" element={<HandleManuscriptProcess/>}/>
 
               {/* ------------------------------------------ Admin Route End--------------------- */}
 

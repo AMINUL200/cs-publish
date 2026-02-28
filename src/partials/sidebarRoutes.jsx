@@ -34,7 +34,7 @@ export const sidebarRoutes = [
     path: "/profile",
     title: "Profile",
     icon: <FontAwesomeIcon icon={faUser} />,
-    allowedRoles: [ "1", "2", "3", "4", "5"],
+    allowedRoles: ["1", "2", "3", "4", "5"],
   },
   // Admin only routes
   {
@@ -62,7 +62,7 @@ export const sidebarRoutes = [
   {
     title: "Permission",
     icon: <FontAwesomeIcon icon={faLock} />,
-    allowedRoles: [ "1"],
+    allowedRoles: ["1"],
     subRoutes: [
       {
         path: "/permission/editor",
@@ -143,7 +143,7 @@ export const sidebarRoutes = [
       {
         path: "/handle-volume",
         title: "Handle Volume",
-        allowedRoles:["0"],
+        allowedRoles: ["0"],
       },
     ],
   },
@@ -277,9 +277,9 @@ export const sidebarRoutes = [
       {
         title: "Author Paid",
         icon: <FontAwesomeIcon icon={faCreditCard} />,
-        allowedRoles:["0"],
-        path: "/payment/author-paid"
-      }
+        allowedRoles: ["0"],
+        path: "/payment/author-paid",
+      },
     ],
   },
   // {
@@ -331,121 +331,144 @@ export const sidebarRoutes = [
     title: "Handle Innovation",
     icon: <FontAwesomeIcon icon={faCog} />,
     allowedRoles: ["0"],
-    subRoutes:[
+    subRoutes: [
       {
         path: "add-innovation",
         title: "Add Innovation",
-        allowedRoles:["0"]
+        allowedRoles: ["0"],
       },
       {
         path: "/handle-innovation",
         title: "List of Innovation",
-        allowedRoles:["0"]
-      }
-    ]
+        allowedRoles: ["0"],
+      },
+    ],
   },
   {
     title: "Handle Who We Are",
     icon: <FontAwesomeIcon icon={faCog} />,
     allowedRoles: ["0"],
-    subRoutes:[
+    subRoutes: [
       {
         path: "/add-who-we-are",
         title: "Add Who We Are",
-        allowedRoles:["0"]
+        allowedRoles: ["0"],
       },
       {
         path: "/handle-who-we-are",
         title: "Who We Are",
-        allowedRoles:["0"]
-      }
-    ]
+        allowedRoles: ["0"],
+      },
+    ],
   },
   {
     title: "Handle Mentor Hub",
     icon: <FontAwesomeIcon icon={faCog} />,
     allowedRoles: ["0"],
-    subRoutes:[
+    subRoutes: [
       {
         path: "/add-mentor",
         title: "Add Mentor",
-        allowedRoles:["0"]
+        allowedRoles: ["0"],
       },
       {
         path: "/handle-mentor-hub",
         title: "Mentor Hub",
-        allowedRoles:["0"]
-      }
-    ]
+        allowedRoles: ["0"],
+      },
+    ],
   },
   {
     title: "Handle Publication Charge",
     icon: <FontAwesomeIcon icon={faCog} />,
     allowedRoles: ["0"],
-    subRoutes:[
+    subRoutes: [
       {
         path: "/add-publication-charge",
         title: "Add Publication Charge",
-        allowedRoles:["0"]
+        allowedRoles: ["0"],
       },
       {
         path: "/handle-publication-charge",
         title: "Publication Charge",
-        allowedRoles:["0"]
-      }
-    ]
+        allowedRoles: ["0"],
+      },
+    ],
   },
   {
     title: "Handle Open Access Policy",
     icon: <FontAwesomeIcon icon={faCog} />,
     allowedRoles: ["0"],
-    subRoutes:[
+    subRoutes: [
       {
         path: "/add-open-access-policy",
         title: "Add Open Policy",
-        allowedRoles:["0"]
+        allowedRoles: ["0"],
       },
       {
         path: "/handle-open-access-policy",
         title: "Open Access Policy",
-        allowedRoles:["0"]
-      }
-    ]
+        allowedRoles: ["0"],
+      },
+    ],
   },
   {
     title: "Handle Award",
     icon: <FontAwesomeIcon icon={faCog} />,
     allowedRoles: ["0"],
-    subRoutes:[
+    subRoutes: [
       {
         path: "/add-award",
         title: "Add Award",
-        allowedRoles:["0"]
+        allowedRoles: ["0"],
       },
       {
         path: "/handle-award",
         title: "Awards",
-        allowedRoles:["0"]
-      }
-    ]
+        allowedRoles: ["0"],
+      },
+    ],
   },
   {
     title: "Handle Event & Conference",
     icon: <FontAwesomeIcon icon={faCog} />,
     allowedRoles: ["0"],
-    subRoutes:[
+    subRoutes: [
       {
         path: "/add-event-conference",
         title: "Add Event ",
-        allowedRoles:["0"]
+        allowedRoles: ["0"],
       },
       {
         path: "/handle-event-conference",
         title: "Event & Conference",
-        allowedRoles:["0"]
-      }
-    ]
+        allowedRoles: ["0"],
+      },
+    ],
   },
+  {
+    title: "Research And Services",
+    icon: <FontAwesomeIcon icon={faCog} />,
+    allowedRoles: ["0"],
+    subRoutes: [
+      {
+        path: "/handle-research-and-services",
+        title: "Research and Services Page",
+        allowedRoles: ["0"],
+      },
+      {
+        path: "/handle-research-and-services-details",
+        title: "Details Page",
+        allowedRoles: ["0"],
+      },
+      {
+        path: "/handle-manuscript-process",
+        title: "Manuscript Process",
+        allowedRoles: ["0"],
+      },
+    ],
+  },
+
   // Reviewer route
   {
     path: "/list-journals",

@@ -92,15 +92,15 @@ const ListOfIssueJournal = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-10 sm:pt-24">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 shadow-lg">
+      <div className="bg-black text-yellow-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
             {/* Left Side - Page Title */}
             <div className="flex-1 text-center lg:text-left">
-              <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+              <h1 className="text-4xl lg:text-5xl font-bold text-yellow-500 mb-4">
                  Library of issues
               </h1>
-              <div className="flex items-center justify-center lg:justify-start text-white/90">
+              <div className="flex items-center justify-center lg:justify-start text-yellow-500">
                 <BookOpen className="w-6 h-6 mr-2" />
                 <span className="text-lg">Journal Archive Collection</span>
               </div>
@@ -114,7 +114,7 @@ const ListOfIssueJournal = () => {
                   alt={journalData.title}
                   className="w-20 h-28 object-cover rounded-lg shadow-lg border-2 border-white"
                 />
-                <div className="text-white text-center sm:text-left">
+                <div className="text-yellow-500 text-center sm:text-left">
                   <h3 className="font-bold text-lg mb-1">{journalData.title}</h3>
                   {/* Add other journal information here if available in API response */}
                 </div>

@@ -45,6 +45,7 @@ const DetailsOfCurrentIssue = () => {
         });
 
         if (response.data.flag === 1 && response.data.data) {
+          console.log("Current Issue Response:", response.data);
           const data = response.data.data;
           setJournalData(data.journal);
           setVolumeData(data.volume);
@@ -112,13 +113,30 @@ const DetailsOfCurrentIssue = () => {
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       navigate(`/view-published-manuscript/${mId}`);
     } catch (error) {
       console.log(error);
       toast.error(error.message);
     }
+  };
+
+  const handleDownloadCover = () => {
+    const imageUrl = `${STORAGE_URL}${volumeData?.image || journalData?.image}`;
+
+    if (!imageUrl) {
+      toast.error("Cover image not available");
+      return;
+    }
+
+    // Open image in new browser tab
+    window.open(imageUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const handleSubmit = () => {
+    toast.info("Please Register To Author");
+    // navigate("/signup");
   };
 
   if (loading) {
@@ -161,7 +179,7 @@ const DetailsOfCurrentIssue = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-10 sm:pt-24">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-yellow-500 via-yellow-600 to-red-700 shadow-2xl">
+      <div className="bg-black text-yellow-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col lg:flex-row gap-8 items-center">
             {/* Left Side - Cover Image */}
@@ -173,7 +191,7 @@ const DetailsOfCurrentIssue = () => {
                   alt={`Volume ${volumeData.volume} ${volumeData.issue_no}`}
                   className="w-48 h-64 object-cover rounded-xl shadow-2xl border-4 border-white group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute -bottom-2 -right-2 bg-black text-yellow-500 px-3 py-1 rounded-lg font-bold text-sm">
+                <div className="absolute -bottom-2 -right-2 bg-yellow-500 text-white  px-3 py-1 rounded-lg font-bold text-sm">
                   Vol {volumeData.volume}
                 </div>
               </div>
@@ -181,7 +199,7 @@ const DetailsOfCurrentIssue = () => {
 
             {/* Center - Issue Details */}
             <div className="flex-1 text-center lg:text-left">
-              <h1 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+              <h1 className="text-3xl lg:text-4xl font-bold text-yellow-500 mb-4">
                 {journalData.j_title}
               </h1>
               <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-4">
@@ -189,7 +207,7 @@ const DetailsOfCurrentIssue = () => {
                   {journalData.j_description || "No description available"}
                 </p> */}
               </div>
-              <div className="flex flex-wrap gap-4 justify-center lg:justify-start text-white">
+              <div className="flex flex-wrap gap-4 justify-center lg:justify-start text-yellow-500">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-5 h-5" />
                   <span>From: {formatDate(volumeData.from_date)}</span>
@@ -211,15 +229,20 @@ const DetailsOfCurrentIssue = () => {
 
             {/* Right Side - Action Buttons */}
             <div className="flex flex-col gap-4">
-              <button className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black hover:text-yellow-500 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2">
+              <button
+                onClick={handleDownloadCover}
+                className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2"
+              >
                 <Download className="w-5 h-5" />
                 Download Cover
               </button>
-              <button className="bg-red-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black hover:text-red-500 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2">
+              <button className="bg-red-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2">
                 <Bell className="w-5 h-5" />
                 Get Alerts
               </button>
-              <button className="bg-black text-yellow-500 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2">
+              <button 
+              onClick={handleSubmit}
+              className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2">
                 <Send className="w-5 h-5" />
                 Submit Manuscript
               </button>
@@ -289,7 +312,7 @@ const DetailsOfCurrentIssue = () => {
                           </button>
                           {manuscript.pdf && (
                             <a
-                              href={manuscript.pdf}
+                              href={`${STORAGE_URL}${manuscript.pdf}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="bg-red-700 text-white px-4 py-2 rounded-lg font-semibold hover:bg-black hover:text-red-500 transition-all duration-300 flex items-center gap-2"

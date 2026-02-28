@@ -27,6 +27,7 @@ const JournalAuthorInformation = () => {
 
       if (response.data.success) {
         setData(response.data.data);
+        console.log("Author Guide Data:", response.data.data);
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch author information");
@@ -74,14 +75,14 @@ const JournalAuthorInformation = () => {
     <div className="min-h-screen bg-white py-10 sm:py-25">
       {/* Hero Section */}
       <section className="relative h-96 bg-gradient-to-r from-yellow-400 via-brown-red to-black">
-        <div className="absolute inset-0 bg-yellow-400 bg-opacity-40"></div>
+        <div className="absolute inset-0 bg-black text-yellow-500"></div>
         <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 h-full">
             {/* Left Content */}
             <div className="flex flex-col justify-center text-white z-10 py-12">
               <div className="mb-6">
                 
-                <h1 className="text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+                <h1 className="text-4xl lg:text-5xl font-bold mb-4 leading-tight text-yellow-500">
                   {data.j_title}
                 </h1>
                

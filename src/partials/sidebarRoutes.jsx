@@ -466,6 +466,11 @@ export const sidebarRoutes = [
         title: "Manuscript Process",
         allowedRoles: ["0"],
       },
+      {
+        path:"/handle-research-and-services-feature",
+        title:"Service Feature",
+        allowedRoles: ["0"]
+      }
     ],
   },
 

@@ -158,6 +158,7 @@ import EditorInfo from "./pages/user/author_editor_hub/EditorInfo";
 import HandleResearchAndServices from "./pages/admin/research_services/HandleResearchAndServices";
 import HandleResearchAndServicesDetails from "./pages/admin/research_services/HandleResearchAndServicesDetails";
 import HandleManuscriptProcess from "./pages/admin/research_services/HandleManuscriptProcess";
+import HandleResearchAndServicesFeature from "./pages/admin/research_services/HandleResearchAndServicesFeature";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -534,6 +535,7 @@ function App() {
               <Route path="/handle-research-and-services" element={<HandleResearchAndServices/>}/>
               <Route path="/handle-research-and-services-details" element={<HandleResearchAndServicesDetails/>}/>
               <Route path="/handle-manuscript-process" element={<HandleManuscriptProcess/>}/>
+              <Route path="/handle-research-and-services-feature" element={<HandleResearchAndServicesFeature/>}/>
 
               {/* ------------------------------------------ Admin Route End--------------------- */}
 

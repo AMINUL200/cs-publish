@@ -38,15 +38,15 @@ const HandleResearchAndServices = () => {
   const fetchResearchData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}api/research-services`, {
+      const response = await axios.get(`${API_URL}api/admin/research-services/edit`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
 
-      const result = response.data.data;
-      console.log(response);
+      const result = response.data;
+      console.log("Response:: ",result);
 
       if (result.status && result.data) {
         setHasData(true);
@@ -131,6 +131,7 @@ const HandleResearchAndServices = () => {
           hasData ? "Data updated successfully!" : "Data created successfully!",
         );
         setHasData(true);
+        fetchResearchData();
       } else {
         setError(result.message || "Operation failed");
       }

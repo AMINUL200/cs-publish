@@ -159,6 +159,7 @@ import HandleResearchAndServices from "./pages/admin/research_services/HandleRes
 import HandleResearchAndServicesDetails from "./pages/admin/research_services/HandleResearchAndServicesDetails";
 import HandleManuscriptProcess from "./pages/admin/research_services/HandleManuscriptProcess";
 import HandleResearchAndServicesFeature from "./pages/admin/research_services/HandleResearchAndServicesFeature";
+import TeamPage from "./pages/user/team/TeamPage";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -242,6 +243,7 @@ function App() {
             <Route index path="/" element={<HomePage />} />
             <Route path="/my-profile" element={<SubscriberProfile />} />
             <Route path="/subscription" element={<Subscription />} />
+            <Route path="/team" element={<TeamPage/>}/>
 
             <Route path="/journal" element={<ViewJournalList />} />
             <Route path="/journal/:id" element={<UserSideViewJournal />} />

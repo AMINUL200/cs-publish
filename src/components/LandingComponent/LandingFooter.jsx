@@ -69,6 +69,7 @@ const LandingFooter = ({
         // ✅ Static link first (example)
         { name: "FAQ", path: "/faq" },
         { name: "Award", path: "/award" },
+        {name: "Team", path: "/team"},
       ],
     },
   ];

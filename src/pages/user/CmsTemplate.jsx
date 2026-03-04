@@ -153,7 +153,7 @@ const CmsTemplate = () => {
                       <img
                         src={`${STORAGE_URL}${content.image}`}
                         alt={teamInfo ? teamInfo.name : content.title}
-                        className="w-full h-80 lg:h-96 object-cover rounded-2xl shadow-xl"
+                        className="w-full h-80 lg:h-96 object-fill rounded-2xl shadow-xl"
                       />
                       <div className="absolute -bottom-4 -right-4 bg-white rounded-full p-4 shadow-lg">
                         <span className="text-3xl">{typeConfig.icon}</span>

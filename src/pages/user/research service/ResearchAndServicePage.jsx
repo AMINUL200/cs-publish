@@ -61,68 +61,7 @@ const ResearchAndServicePage = () => {
     },
   ];
 
-  const services = [
-    {
-      id: 1,
-      title: "Scientific Research Services",
-      description:
-        "Comprehensive research support from conception to publication with expert guidance throughout the entire research lifecycle.",
-      icon: FileText,
-      features: [
-        "Research Design",
-        "Data Analysis",
-        "Statistical Support",
-        "Methodology Consultation",
-      ],
-      color: "from-blue-500 to-cyan-500",
-      bgPattern: "bg-gradient-to-br from-blue-50 to-cyan-50",
-    },
-    {
-      id: 2,
-      title: "Scientific Publication Support",
-      description:
-        "End-to-end publication assistance including journal selection, submission process, and peer review management.",
-      icon: BookOpen,
-      features: [
-        "Journal Selection",
-        "Submission Management",
-        "Peer Review Process",
-        "Publication Strategy",
-      ],
-      color: "from-purple-500 to-pink-500",
-      bgPattern: "bg-gradient-to-br from-purple-50 to-pink-50",
-    },
-    {
-      id: 3,
-      title: "Manuscript Writing/Editing Services",
-      description:
-        "Professional manuscript preparation and editing services to ensure your research meets the highest publication standards.",
-      icon: Users,
-      features: [
-        "Professional Writing",
-        "Language Editing",
-        "Format Compliance",
-        "Quality Assurance",
-      ],
-      color: "from-green-500 to-teal-500",
-      bgPattern: "bg-gradient-to-br from-green-50 to-teal-50",
-    },
-    {
-      id: 4,
-      title: "Industrial Consultation",
-      description:
-        "Expert consultation services bridging academia and industry with practical solutions for real-world challenges.",
-      icon: Building,
-      features: [
-        "Industry Analysis",
-        "Technical Consultation",
-        "Project Management",
-        "Strategic Planning",
-      ],
-      color: "from-orange-500 to-red-500",
-      bgPattern: "bg-gradient-to-br from-orange-50 to-red-50",
-    },
-  ];
+  
 
   const fetchData = async () => {
     try {
@@ -131,7 +70,6 @@ const ResearchAndServicePage = () => {
       });
 
       if (response.data.status) {
-        console.log(response);
         setHeroData(response.data.data.service);
         setServiceData(response.data.data.rs_products);
         setProcessData(response.data.data.manuscript_processes);

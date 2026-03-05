@@ -55,7 +55,7 @@ const CmsTemplate = () => {
 
   // Extract name and position from title (for team type)
   const getTeamMemberInfo = (title) => {
-    const parts = title.split("—");
+    const parts = title.split("--");
     if (parts.length === 2) {
       return {
         name: parts[0].trim(),

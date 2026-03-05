@@ -82,7 +82,8 @@ const LandingOurTeam = ({
 
   // Extract name and position from title
   const getTeamMemberInfo = (title) => {
-    const parts = title.split("—");
+    const parts = title.split("--");
+    console.log(parts)
     if (parts.length === 2) {
       return {
         name: parts[0].trim(),
@@ -253,9 +254,9 @@ const LandingOurTeam = ({
                        className="text-xl font-bold text-gray-800 mb-2 hover:text-yellow-600">
                         {name}
                       </Link>
-                      {/* <p className="text-yellow-600 font-semibold mb-3">
+                      <p className="text-yellow-600 font-semibold mb-3">
                         {position}
-                      </p> */}
+                      </p>
                       <p className="text-gray-600 text-sm leading-relaxed">
                         {member.short_description}
                       </p>

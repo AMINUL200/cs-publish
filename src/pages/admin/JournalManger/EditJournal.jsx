@@ -40,8 +40,12 @@ const EditJournal = () => {
         ugc_no: "",
         image: null,
         status: "1",
-        author_guide: "", // New field
-        about_the_journal: "", // New field
+        author_guide: "",
+        about_the_journal: "",
+        total_citations: "",
+        h_index: "",
+        acceptance_rate: "",
+        total_articles: "", // New field
     });
 
     const [imagePreview, setImagePreview] = useState(null);
@@ -83,10 +87,14 @@ const EditJournal = () => {
                     issn_online_no: j.issn_online_no || "",
                     ugc_approved: j.ugc_approved ? "1" : "0",
                     ugc_no: j.ugc_no || "",
-                    image: null, // Keep as null initially, we'll handle file separately
+                    image: null,
                     status: j.status ? "1" : "0",
-                    author_guide: j.author_guide || "", // New field
-                    about_the_journal: j.about_the_journal || "", // New field
+                    author_guide: j.author_guide || "",
+                    about_the_journal: j.about_the_journal || "",
+                    total_citations: j.total_citations || "",
+                    h_index: j.h_index || "",
+                    acceptance_rate: j.acceptance_rate || "",
+                    total_articles: j.total_articles || "", // New field
                 });
             }
         } catch (err) {
@@ -241,6 +249,88 @@ const EditJournal = () => {
                         className="w-full border px-3 py-2 rounded"
                         rows="4"
                     />
+                </div>
+
+                {/* Journal Metrics Section */}
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h2 className="text-lg font-semibold mb-4 text-gray-700">Journal Metrics</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        {/* Total Articles */}
+                        <div>
+                            <label className="block mb-1 font-medium">
+                                Total Articles
+                                <span className="text-xs text-gray-500 ml-1">(Optional)</span>
+                            </label>
+                            <input
+                                type="number"
+                                name="total_articles"
+                                value={formData.total_articles}
+                                onChange={handleChange}
+                                min="0"
+                                step="1"
+                                placeholder="e.g., 500"
+                                className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
+                        {/* Total Citations */}
+                        <div>
+                            <label className="block mb-1 font-medium">
+                                Total Citations
+                                <span className="text-xs text-gray-500 ml-1">(Optional)</span>
+                            </label>
+                            <input
+                                type="number"
+                                name="total_citations"
+                                value={formData.total_citations}
+                                onChange={handleChange}
+                                min="0"
+                                step="1"
+                                placeholder="e.g., 1250"
+                                className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
+                        {/* H-Index */}
+                        <div>
+                            <label className="block mb-1 font-medium">
+                                H-Index
+                                <span className="text-xs text-gray-500 ml-1">(Optional)</span>
+                            </label>
+                            <input
+                                type="number"
+                                name="h_index"
+                                value={formData.h_index}
+                                onChange={handleChange}
+                                min="0"
+                                step="1"
+                                placeholder="e.g., 45"
+                                className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
+                        {/* Acceptance Rate */}
+                        <div>
+                            <label className="block mb-1 font-medium">
+                                Acceptance Rate (%)
+                                <span className="text-xs text-gray-500 ml-1">(Optional)</span>
+                            </label>
+                            <input
+                                type="number"
+                                name="acceptance_rate"
+                                value={formData.acceptance_rate}
+                                onChange={handleChange}
+                                min="0"
+                                max="100"
+                                step="0.1"
+                                placeholder="e.g., 25.5"
+                                className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                        These metrics help authors evaluate the journal's impact, volume, and selectivity.
+                    </p>
                 </div>
 
                 {/* About the Journal - Rich Text Editor */}
@@ -499,7 +589,6 @@ const EditJournal = () => {
                             <div className="relative inline-block">
                                 <img 
                                     src={imagePreview} 
-                                    // src={`${STORAGE_URL}${currentImageUrl}`}
                                     alt="Journal preview" 
                                     className="w-32 h-32 object-cover rounded-lg border shadow-sm"
                                 />

@@ -257,19 +257,19 @@ const JournalDescription = () => {
           {/* Simple Stats based on available data */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 mt-6 border-t border-b border-gray-200">
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">--</div>
+              <div className="text-2xl font-bold text-gray-900">{journalData?.total_articles}+</div>
               <div className="text-sm text-gray-600">Total Articles</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">--</div>
+              <div className="text-2xl font-bold text-gray-900">{journalData?.total_citations}</div>
               <div className="text-sm text-gray-600">Total Citations</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">--</div>
+              <div className="text-2xl font-bold text-gray-900">{journalData?.h_index}</div>
               <div className="text-sm text-gray-600">h-Index</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">--</div>
+              <div className="text-2xl font-bold text-gray-900">{journalData?.acceptance_rate}%</div>
               <div className="text-sm text-gray-600">Acceptance Rate</div>
             </div>
           </div>

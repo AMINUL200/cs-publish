@@ -59,7 +59,7 @@ const TeamPage = () => {
 
   // Extract name and position from title
   const getTeamMemberInfo = (title) => {
-    const parts = title.split("—");
+    const parts = title.split("--");
     if (parts.length === 2) {
       return {
         name: parts[0].trim(),
@@ -325,9 +325,9 @@ const TeamPage = () => {
                       >
                         {name}
                       </Link>
-                      {/* <p className="text-yellow-600 font-semibold mb-3">
+                      <p className="text-yellow-600 font-semibold mb-3">
                         {position}
-                      </p> */}
+                      </p>
                       <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
                         {member.short_description}
                       </p>

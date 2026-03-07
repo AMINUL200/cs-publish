@@ -36,9 +36,10 @@ const AddJournal = () => {
         status: "1",
         author_guide: "",
         about_the_journal: "",
-        total_citations: "", // New field
-        h_index: "", // New field
-        acceptance_rate: "", // New field
+        total_citations: "",
+        h_index: "",
+        acceptance_rate: "",
+        total_articles: "", // New field
     });
 
     // fetch groups
@@ -157,6 +158,7 @@ const AddJournal = () => {
                     total_citations: "",
                     h_index: "",
                     acceptance_rate: "",
+                    total_articles: "",
                 });
                 if (fileInputRef.current) {
                     fileInputRef.current.value = "";
@@ -258,7 +260,25 @@ const AddJournal = () => {
                 {/* Journal Metrics Section */}
                 <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                     <h2 className="text-lg font-semibold mb-4 text-gray-700">Journal Metrics</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        {/* Total Articles */}
+                        <div>
+                            <label className="block mb-1 font-medium">
+                                Total Articles
+                                <span className="text-xs text-gray-500 ml-1">(Optional)</span>
+                            </label>
+                            <input
+                                type="number"
+                                name="total_articles"
+                                value={formData.total_articles}
+                                onChange={handleChange}
+                                min="0"
+                                step="1"
+                                placeholder="e.g., 500"
+                                className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
                         {/* Total Citations */}
                         <div>
                             <label className="block mb-1 font-medium">
@@ -315,7 +335,7 @@ const AddJournal = () => {
                         </div>
                     </div>
                     <p className="text-xs text-gray-500 mt-2">
-                        These metrics help authors evaluate the journal's impact and selectivity.
+                        These metrics help authors evaluate the journal's impact, volume, and selectivity.
                     </p>
                 </div>
 

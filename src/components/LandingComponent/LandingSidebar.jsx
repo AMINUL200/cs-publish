@@ -19,7 +19,6 @@ const LandingSidebar = ({
   journalList = [],
   whoWeAreData = [],
 }) => {
-  console.log(whoWeAreData);
 
   const { isAuthenticated, userData, token } = useSelector(
     (state) => state.auth

@@ -57,7 +57,7 @@ const AddNewCmsPage = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       const pageData = response.data.data;
@@ -108,7 +108,7 @@ const AddNewCmsPage = () => {
       }));
     }
   };
-   const handleEditorChange = (fieldName, content) => {
+  const handleEditorChange = (fieldName, content) => {
     setFormData((prev) => ({
       ...prev,
       [fieldName]: content,
@@ -261,7 +261,7 @@ const AddNewCmsPage = () => {
         await axios.post(
           `${API_URL}api/cms-pages/${updateSlug}`,
           formDataToSend,
-          config
+          config,
         );
         alert("CMS page updated successfully!");
       } else {
@@ -504,6 +504,10 @@ const AddNewCmsPage = () => {
                   accept="image/*"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
+                <p className="text-xs text-gray-500">
+                  Recommended image size:{" "}
+                  <span className="font-medium">560 × 400 px</span>
+                </p>
                 <input
                   type="text"
                   name="image1_alt"
@@ -558,6 +562,10 @@ const AddNewCmsPage = () => {
                   accept="image/*"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
+                <p className="text-xs text-gray-500">
+                  Recommended image size:{" "}
+                  <span className="font-medium">560 × 400 px</span>
+                </p>
                 <input
                   type="text"
                   name="image2_alt"
@@ -678,8 +686,8 @@ const AddNewCmsPage = () => {
               {submitting
                 ? "Processing..."
                 : isEditMode
-                ? "Update Page"
-                : "Create Page"}
+                  ? "Update Page"
+                  : "Create Page"}
             </button>
           </div>
         </form>

@@ -485,8 +485,8 @@ const AddWhoWeAre = () => {
             </h4>
             <ul className="text-xs text-yellow-700 list-disc list-inside space-y-1">
               <li>Supported formats: JPG, PNG, JPEG, GIF, WEBP</li>
-              <li>Maximum file size: 5MB</li>
-              <li>Recommended dimensions: 1200x800px or similar ratio</li>
+              <li>Maximum file size: 2MB</li>
+              <li>Recommended dimensions: 1200x600px or similar ratio</li>
               <li>Optimal format: WebP for better performance</li>
               <li>Upload time: {getCurrentDateTime()}</li>
             </ul>

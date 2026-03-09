@@ -80,7 +80,7 @@ const ViewUser = () => {
         if (!id) return;
         setDeleteLoading(true);
         try {
-            const response = await axios.delete(`/api/admin/users/${id}`, {
+            const response = await axios.delete(`${API_URL}api/admin-delete-user/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

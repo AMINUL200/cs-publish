@@ -70,7 +70,7 @@ const AddUser = () => {
       console.log("Submitting data:", submitData);
 
       // Here you would typically make your API call
-      const response = await axios.post(`${API_URL}api/admin/add-users`, submitData, {
+      const response = await axios.post(`${API_URL}api/admin-register`, submitData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

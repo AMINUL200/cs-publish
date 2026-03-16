@@ -36,10 +36,11 @@ const AddJournal = () => {
         status: "1",
         author_guide: "",
         about_the_journal: "",
+        impact_factor: "", // New field
         total_citations: "",
         h_index: "",
         acceptance_rate: "",
-        total_articles: "", // New field
+        total_articles: "",
     });
 
     // fetch groups
@@ -94,7 +95,7 @@ const AddJournal = () => {
         } else if (
             ["issn_print", "issn_online", "ugc_approved", "status"].includes(name)
         ) {
-            setFormData((prev) => ({ ...prev, [name]: Number(value) }));
+            setFormData((prev) => ({ ...prev, [name]: value }));
         } else {
             setFormData((prev) => ({ ...prev, [name]: value }));
         }
@@ -155,6 +156,7 @@ const AddJournal = () => {
                     status: "1",
                     author_guide: "",
                     about_the_journal: "",
+                    impact_factor: "",
                     total_citations: "",
                     h_index: "",
                     acceptance_rate: "",
@@ -260,7 +262,23 @@ const AddJournal = () => {
                 {/* Journal Metrics Section */}
                 <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                     <h2 className="text-lg font-semibold mb-4 text-gray-700">Journal Metrics</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        {/* Impact Factor - New Field */}
+                        <div>
+                            <label className="block mb-1 font-medium">
+                                Impact Factor
+                                <span className="text-xs text-gray-500 ml-1">(Optional)</span>
+                            </label>
+                            <input
+                                type="text"
+                                name="impact_factor"
+                                value={formData.impact_factor}
+                                onChange={handleChange}
+                                placeholder="e.g., 2.5"
+                                className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
                         {/* Total Articles */}
                         <div>
                             <label className="block mb-1 font-medium">
@@ -268,12 +286,10 @@ const AddJournal = () => {
                                 <span className="text-xs text-gray-500 ml-1">(Optional)</span>
                             </label>
                             <input
-                                type="number"
+                                type="text"
                                 name="total_articles"
                                 value={formData.total_articles}
                                 onChange={handleChange}
-                                min="0"
-                                step="1"
                                 placeholder="e.g., 500"
                                 className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
@@ -286,12 +302,10 @@ const AddJournal = () => {
                                 <span className="text-xs text-gray-500 ml-1">(Optional)</span>
                             </label>
                             <input
-                                type="number"
+                                type="text"
                                 name="total_citations"
                                 value={formData.total_citations}
                                 onChange={handleChange}
-                                min="0"
-                                step="1"
                                 placeholder="e.g., 1250"
                                 className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
@@ -304,12 +318,10 @@ const AddJournal = () => {
                                 <span className="text-xs text-gray-500 ml-1">(Optional)</span>
                             </label>
                             <input
-                                type="number"
+                                type="text"
                                 name="h_index"
                                 value={formData.h_index}
                                 onChange={handleChange}
-                                min="0"
-                                step="1"
                                 placeholder="e.g., 45"
                                 className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
@@ -322,13 +334,10 @@ const AddJournal = () => {
                                 <span className="text-xs text-gray-500 ml-1">(Optional)</span>
                             </label>
                             <input
-                                type="number"
+                                type="text"
                                 name="acceptance_rate"
                                 value={formData.acceptance_rate}
                                 onChange={handleChange}
-                                min="0"
-                                max="100"
-                                step="0.1"
                                 placeholder="e.g., 25.5"
                                 className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
@@ -500,11 +509,12 @@ const AddJournal = () => {
                 <div>
                     <label className="block mb-1 font-medium">ISSN Print No</label>
                     <input
-                        type="number"
+                        type="text"
                         name="issn_print_no"
                         value={formData.issn_print_no}
                         onChange={handleChange}
                         className="w-full border px-3 py-2 rounded"
+                        placeholder="Enter ISSN Print Number"
                     />
                 </div>
 
@@ -538,11 +548,12 @@ const AddJournal = () => {
                 <div>
                     <label className="block mb-1 font-medium">ISSN Online No</label>
                     <input
-                        type="number"
+                        type="text"
                         name="issn_online_no"
                         value={formData.issn_online_no}
                         onChange={handleChange}
                         className="w-full border px-3 py-2 rounded"
+                        placeholder="Enter ISSN Online Number"
                     />
                 </div>
 
@@ -581,6 +592,7 @@ const AddJournal = () => {
                         value={formData.ugc_no}
                         onChange={handleChange}
                         className="w-full border px-3 py-2 rounded"
+                        placeholder="Enter UGC Number"
                     />
                 </div>
 

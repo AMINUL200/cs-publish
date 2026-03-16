@@ -15,19 +15,19 @@ const AddReviewer = () => {
         email: "",
         password: "",
         user_type: "3",
-        journal_id:"",
+        // journal_id:"",
     });
     // console.log("journal id: ",userData?.journal_id);
     
      // Use useEffect to set journal_id when userData is available
-    useEffect(() => {
-        if (userData && userData.journal_id) {
-            setFormData(prev => ({
-                ...prev,
-                journal_id: userData.journal_id
-            }));
-        }
-    }, [userData]);
+    // useEffect(() => {
+    //     if (userData && userData.journal_id) {
+    //         setFormData(prev => ({
+    //             ...prev,
+    //             journal_id: userData.journal_id
+    //         }));
+    //     }
+    // }, [userData]);
 
     const [showPassword, setShowPassword] = useState(false);
     const togglePasswordVisibility = () => setShowPassword(!showPassword);

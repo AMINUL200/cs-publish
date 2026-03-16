@@ -6,6 +6,7 @@ import ReviewerDashboard from "../Reviewer/ReviewerDashboard";
 import EditorDashboard from "../Editor/dashboard/EditorDashboard";
 import PublisherDashboard from "../publisher/PublisherDashboard";
 import ProfilePage from "../Profile/ProfilePage";
+import ReviewerPermission from "../Editor/permission/ReviewerPermission";
 
 const Dashboard = () => {
   const { userData } = useSelector((state) => state.auth);
@@ -19,7 +20,8 @@ const Dashboard = () => {
       {/* {userData.user_type == 0 && <ProfilePage />} */}
 
       {/* Editor */}
-      {userData.user_type == 1 && <EditorDashboard />}
+      {/* {userData.user_type == 1 && <EditorDashboard />} */}
+      {userData.user_type == 1 && <ReviewerPermission />}
 
       {/* Author */}
       {userData.user_type == 2 && <AuthorDashboard />}

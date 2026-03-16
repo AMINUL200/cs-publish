@@ -40,7 +40,7 @@ const AddReviewer = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        // console.log("Form Data:", formData);
+        console.log("Form Data:", formData);
         try {
 
             const response = await axios.post(`${API_URL}api/editor/create-reviewer`, formData, {

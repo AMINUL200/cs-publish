@@ -37,7 +37,7 @@ const QuickPress = () => {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         if (response.data.status) {
@@ -109,13 +109,16 @@ const QuickPress = () => {
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       navigate(`/view-published-manuscript/${mId}`);
     } catch (error) {
       console.log(error);
       toast.error(error.message);
     }
+  };
+  const handleSubmitButton = () => {
+    toast.warning("Please sign in as an author to access this feature.");
   };
 
   const handleViewEditor = (edId) => {
@@ -258,7 +261,9 @@ const QuickPress = () => {
                     <Bell className="w-5 h-5" />
                     Get Alerts
                   </button>
-                  <button className="bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 flex items-center gap-2 shadow-lg">
+                  <button 
+                  onClick={handleSubmitButton}
+                  className="bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 flex items-center gap-2 shadow-lg">
                     <Send className="w-5 h-5" />
                     Submit Manuscript
                   </button>
@@ -354,14 +359,14 @@ const QuickPress = () => {
                               PDF
                             </a>
                           )}
-                         
-                            <a
-                              onClick={() => handleRedirect(manuscript.id)}
-                              className="bg-black text-yellow-500 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 flex items-center gap-2 cursor-pointer"
-                            >
-                              <Download className="w-4 h-4" />
-                              Full Text
-                            </a>
+
+                          <a
+                            onClick={() => handleRedirect(manuscript.id)}
+                            className="bg-black text-yellow-500 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 flex items-center gap-2 cursor-pointer"
+                          >
+                            <Download className="w-4 h-4" />
+                            Full Text
+                          </a>
                         </div>
 
                         {/* Abstract Section */}

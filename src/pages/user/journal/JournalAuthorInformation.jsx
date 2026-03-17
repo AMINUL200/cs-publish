@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import { BookOpen, Users, FileText, Award, Mail, Globe, Bell, Send } from "lucide-react";
+import {
+  BookOpen,
+  Users,
+  FileText,
+  Award,
+  Mail,
+  Globe,
+  Bell,
+  Send,
+} from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import Loader from "../../../components/common/Loader";
 import { toast } from "react-toastify";
@@ -12,7 +21,7 @@ const JournalAuthorInformation = () => {
   const { token } = useSelector((state) => state.auth);
   const { id } = useParams();
   const navigate = useNavigate();
-  
+
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
@@ -53,22 +62,30 @@ const JournalAuthorInformation = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}api/journal/author_guide/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.get(
+        `${API_URL}api/journal/author_guide/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (response.data.success) {
         setData(response.data.data);
         console.log("Author Guide Data:", response.data.data);
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch author information");
+      setError(
+        err.response?.data?.message || "Failed to fetch author information",
+      );
       console.error("Error fetching author guide:", err);
     } finally {
       setLoading(false);
     }
+  };
+  const handleSubmitButton = () => {
+    toast.warning("Please sign in as an author to access this feature.");
   };
 
   useEffect(() => {
@@ -84,7 +101,7 @@ const JournalAuthorInformation = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="text-red-600 text-lg mb-4">{error}</div>
-          <button 
+          <button
             onClick={fetchData}
             className="bg-yellow-500 text-black px-6 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition-colors"
           >
@@ -219,7 +236,9 @@ const JournalAuthorInformation = () => {
                     <Bell className="w-5 h-5" />
                     Get Alerts
                   </button>
-                  <button className="bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 flex items-center gap-2 shadow-lg">
+                  <button 
+                  onClick={handleSubmitButton}
+                  className="bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 flex items-center gap-2 shadow-lg">
                     <Send className="w-5 h-5" />
                     Submit Manuscript
                   </button>
@@ -283,9 +302,11 @@ const JournalAuthorInformation = () => {
                         <Globe className="w-5 h-5 text-yellow-500" />
                         About the Journal
                       </h3>
-                      <div 
+                      <div
                         className="prose max-w-none text-gray-700 leading-relaxed bg-gray-50 p-6 rounded-lg border border-gray-200"
-                        dangerouslySetInnerHTML={{ __html: data.about_the_journal }}
+                        dangerouslySetInnerHTML={{
+                          __html: data.about_the_journal,
+                        }}
                       />
                     </div>
                   )}
@@ -296,7 +317,7 @@ const JournalAuthorInformation = () => {
                       <FileText className="w-5 h-5 text-yellow-500" />
                       Author Guidelines
                     </h3>
-                    <div 
+                    <div
                       className="prose max-w-none text-gray-700 leading-relaxed bg-gray-50 p-6 rounded-lg border border-gray-200"
                       dangerouslySetInnerHTML={{ __html: data.author_guide }}
                     />
@@ -314,7 +335,9 @@ const JournalAuthorInformation = () => {
                           <div className="flex items-start gap-3">
                             <Users className="w-5 h-5 text-yellow-500 mt-1" />
                             <div>
-                              <p className="font-semibold text-gray-700">Editor</p>
+                              <p className="font-semibold text-gray-700">
+                                Editor
+                              </p>
                               <p className="text-gray-600">{data.editor}</p>
                             </div>
                           </div>
@@ -323,8 +346,12 @@ const JournalAuthorInformation = () => {
                           <div className="flex items-start gap-3">
                             <Award className="w-5 h-5 text-yellow-500 mt-1" />
                             <div>
-                              <p className="font-semibold text-gray-700">Editorial Board</p>
-                              <p className="text-gray-600">{data.editorial_board}</p>
+                              <p className="font-semibold text-gray-700">
+                                Editorial Board
+                              </p>
+                              <p className="text-gray-600">
+                                {data.editorial_board}
+                              </p>
                             </div>
                           </div>
                         )}

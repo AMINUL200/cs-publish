@@ -40,6 +40,7 @@ const EditorInfo = () => {
       
       if (response.data.status) {
         setEditor(response.data.data);
+        console.log("EditorInfo ::", response.data.data)
       } else {
         throw new Error("Failed to fetch editor data");
       }
@@ -446,7 +447,7 @@ const EditorInfo = () => {
                   <div className="flex flex-wrap gap-4">
                     {editor.resume && editor.resume !== "null" && (
                       <a
-                        href={`${API_URL}${editor.resume}`}
+                        href={`${STORAGE_URL}${editor.resume}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="bg-yellow-50 hover:bg-yellow-100 text-yellow-700 px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 border border-yellow-200"

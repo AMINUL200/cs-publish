@@ -135,9 +135,13 @@ const DetailsOfCurrentIssue = () => {
   };
 
   const handleSubmit = () => {
-    toast.info("Please Register To Author");
-    // navigate("/signup");
+    toast.warning("Please sign in as an author to access this feature.");
   };
+
+  // const handleSubmit = () => {
+  //   toast.info("Please Register To Author");
+  //   // navigate("/signup");
+  // };
 
   if (loading) {
     return (
@@ -240,9 +244,10 @@ const DetailsOfCurrentIssue = () => {
                 <Bell className="w-5 h-5" />
                 Get Alerts
               </button>
-              <button 
-              onClick={handleSubmit}
-              className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2">
+              <button
+                onClick={handleSubmit}
+                className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2"
+              >
                 <Send className="w-5 h-5" />
                 Submit Manuscript
               </button>

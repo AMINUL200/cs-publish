@@ -19,6 +19,7 @@ import {
 import Loader from "../../../components/common/Loader";
 import { ArrowLeft } from "lucide-react";
 import { ArrowRight } from "lucide-react";
+import { toast } from "react-toastify";
 // import Loader from "../../components/common/Loader";
 
 const AboutJournal = () => {
@@ -41,7 +42,7 @@ const AboutJournal = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -49,7 +50,7 @@ const AboutJournal = () => {
       }
     } catch (err) {
       setError(
-        err.response?.data?.message || "Failed to fetch journal information"
+        err.response?.data?.message || "Failed to fetch journal information",
       );
       console.error("Error fetching journal details:", err);
     } finally {
@@ -98,6 +99,10 @@ const AboutJournal = () => {
       month: "long",
       day: "numeric",
     });
+  };
+
+  const handleSubmitButton = () => {
+    toast.warning("Please sign in as an author to access this feature.");
   };
 
   if (loading) {
@@ -219,13 +224,14 @@ const AboutJournal = () => {
 
                 {/* Action Buttons - Matching UserSideViewJournal style */}
                 <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-                  <Link
-                    to="/signin"
+                  <button
+                    // to="/signin"
+                    onClick={handleSubmitButton}
                     className="bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 flex items-center gap-2 shadow-lg"
                   >
                     <Send className="w-5 h-5" />
                     Submit Manuscript
-                  </Link>
+                  </button>
                   <button className="bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 flex items-center gap-2 shadow-lg">
                     <Bell className="w-5 h-5" />
                     Get Alerts

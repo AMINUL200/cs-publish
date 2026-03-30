@@ -240,6 +240,7 @@ function App() {
             }
           > */}
           <Route element={<AppLayout2 />}>
+          
             <Route index path="/" element={<HomePage />} />
             <Route path="/my-profile" element={<SubscriberProfile />} />
             <Route path="/subscription" element={<Subscription />} />

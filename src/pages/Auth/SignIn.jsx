@@ -56,6 +56,7 @@ export default function SignIn() {
       });
 
       if (response.data.flag === 1 || response.data) {
+        console.log(response.data)
         dispatch(
           login({ userData: response.data.user, token: response.data.token }),
         );

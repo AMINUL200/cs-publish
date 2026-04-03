@@ -50,7 +50,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
 
   const renderRoute = (route, level = 0, parentIndex = 0) => {
     // Safety checks
-    if (!route || !route.allowedRoles?.includes(userData?.user_type)) return null;
+    if (!route || !route.allowedRoles?.includes(Number(userData?.user_type))) return null;
     // Create a unique key for each route
   const routeKey = `${route.path || route.title}-${level}-${parentIndex}`;
 

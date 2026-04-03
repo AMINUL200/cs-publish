@@ -177,9 +177,9 @@ function App() {
       );
     }
 
-    // Role check
+    // FIX: ensure same type
     if (allowTypes.length > 0) {
-      if (!allowTypes.includes(userData?.user_type)) {
+      if (!allowTypes.includes(Number(userData?.user_type))) {
         return <Navigate to="/" replace />;
       }
     }
@@ -240,11 +240,10 @@ function App() {
             }
           > */}
           <Route element={<AppLayout2 />}>
-          
             <Route index path="/" element={<HomePage />} />
             <Route path="/my-profile" element={<SubscriberProfile />} />
             <Route path="/subscription" element={<Subscription />} />
-            <Route path="/team" element={<TeamPage/>}/>
+            <Route path="/team" element={<TeamPage />} />
 
             <Route path="/journal" element={<ViewJournalList />} />
             <Route path="/journal/:id" element={<UserSideViewJournal />} />
@@ -374,7 +373,7 @@ function App() {
               <ProtectedRoute
                 isAuthenticated={isAuthenticated}
                 userData={userData}
-                allowTypes={["0", "1", "2", "3", "5", "6", "7"]} // 👈 ONLY admin/editor/reviewer types
+                allowTypes={[0, 1, 2, 3, 5, 6, 7]} // 👈 ONLY admin/editor/reviewer types
               />
             }
           >
@@ -535,10 +534,22 @@ function App() {
                 element={<ConferenceForm />}
               />
 
-              <Route path="/handle-research-and-services" element={<HandleResearchAndServices/>}/>
-              <Route path="/handle-research-and-services-details" element={<HandleResearchAndServicesDetails/>}/>
-              <Route path="/handle-manuscript-process" element={<HandleManuscriptProcess/>}/>
-              <Route path="/handle-research-and-services-feature" element={<HandleResearchAndServicesFeature/>}/>
+              <Route
+                path="/handle-research-and-services"
+                element={<HandleResearchAndServices />}
+              />
+              <Route
+                path="/handle-research-and-services-details"
+                element={<HandleResearchAndServicesDetails />}
+              />
+              <Route
+                path="/handle-manuscript-process"
+                element={<HandleManuscriptProcess />}
+              />
+              <Route
+                path="/handle-research-and-services-feature"
+                element={<HandleResearchAndServicesFeature />}
+              />
 
               {/* ------------------------------------------ Admin Route End--------------------- */}
 

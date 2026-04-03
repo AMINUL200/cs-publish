@@ -104,7 +104,7 @@ const LandingFooter = ({
                 href={settingsData?.twitter}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-600 hover:text-yellow-500 transition-colors duration-300 mr-2"
+                className="text-white hover:text-yellow-500 transition-colors duration-300 mr-2"
               >
                 <FontAwesomeIcon icon={faTwitter} className="w-5 h-5" />
               </a>
@@ -113,7 +113,7 @@ const LandingFooter = ({
                 href={settingsData?.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-600 hover:text-yellow-500 transition-colors duration-300 mr-2"
+                className="text-white hover:text-yellow-500 transition-colors duration-300 mr-2"
               >
                 <FontAwesomeIcon icon={faInstagram} className="w-5 h-5" />
               </a>
@@ -122,7 +122,7 @@ const LandingFooter = ({
                 href={settingsData?.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-600 hover:text-yellow-500 transition-colors duration-300 mr-2"
+                className="text-white hover:text-yellow-500 transition-colors duration-300 mr-2"
               >
                 <FontAwesomeIcon icon={faLinkedin} className="w-5 h-5" />
               </a>
@@ -131,7 +131,7 @@ const LandingFooter = ({
                 href={settingsData?.whatsapp}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-600 hover:text-yellow-500 transition-colors duration-300 mr-2"
+                className="text-white hover:text-yellow-500 transition-colors duration-300 mr-2"
               >
                 <FontAwesomeIcon icon={faWhatsapp} className="w-5 h-5" />
               </a>

@@ -22,224 +22,225 @@ export const sidebarRoutes = [
   {
     title: "Navigation",
     type: "header",
-    allowedRoles: ["0", "1", "2", "3", "4", "5"],
+    // allowedRoles: ["0", "1", "2", "3", "4", "5"],
+    allowedRoles: [0, 1, 2, 3, 4, 5],
   },
   {
     path: "/dashboard",
     title: "Dashboard",
     icon: <FontAwesomeIcon icon={faTachometerAlt} />,
-    allowedRoles: ["0", "1", "2", "3", "4", "5"],
+    allowedRoles: [0, 1, 2, 3, 4, 5],
   },
   {
     path: "/profile",
     title: "Profile",
     icon: <FontAwesomeIcon icon={faUser} />,
-    allowedRoles: ["1", "2", "3", "4", "5"],
+    allowedRoles: [1, 2, 3, 4, 5],
   },
   // Admin only routes
   {
     title: "User Management",
     icon: <FontAwesomeIcon icon={faUsers} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/users/add-user",
         title: "Add User",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/view-users",
         title: "View Users",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/users/subscription-users",
         title: "Subscription Users",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
   {
     title: "Permission",
     icon: <FontAwesomeIcon icon={faLock} />,
-    allowedRoles: ["1"],
+    allowedRoles: [1],
     subRoutes: [
       {
         path: "/permission/editor",
         title: "Editor",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/permission/assigned-manuscript-reviewer",
         title: "Manuscript Assigned to Reviewer",
-        allowedRoles: ["1"],
+        allowedRoles: [1],
       },
       {
         path: "/permission/check-list",
         title: "Check List",
-        allowedRoles: ["1"],
+        allowedRoles: [1],
       },
       {
         path: "/permission/add-reviewer",
         title: "Add Reviewer",
-        allowedRoles: ["1"],
+        allowedRoles: [1],
       },
       {
         path: "/permission/manage-reviewer",
         title: "Manage Reviewer",
-        allowedRoles: ["1"],
+        allowedRoles: [1],
       },
     ],
   },
   {
     title: "Groups",
     icon: <FontAwesomeIcon icon={faFolder} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/groups/add-groups",
         title: "Add Group",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/groups/view-groups",
         title: "View Group",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
   {
     title: "Categories",
     icon: <FontAwesomeIcon icon={faFolder} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/categories/add-categories",
         title: "Add Categories",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/categories/view-categories",
         title: "View Categories",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
   {
     title: "Journal Manager",
     icon: <FontAwesomeIcon icon={faBook} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/article-manger/journal/add-journal",
         title: "Add Journal",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/article-manger/journal",
         title: "Journal",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/handle-volume",
         title: "Handle Volume",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
   {
     title: "Article Management",
     icon: <FontAwesomeIcon icon={faNewspaper} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/articlemanager/checklist",
         title: "Checklist",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/articlemanager/view-manuscript",
         title: "View Manuscript",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
   {
     title: "Blog",
     icon: <FontAwesomeIcon icon={faComments} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/blog/add",
         title: "Add Blog",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/blog/view",
         title: "View Blog",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/blog/categories",
         title: "Blog Categories",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
   {
     title: "Setting",
     icon: <FontAwesomeIcon icon={faCog} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/setting/setting",
         title: "Setting",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       // {
       //   path: "/setting/news",
       //   title: "Latest News",
-      //   allowedRoles: ["0"],
+      //   allowedRoles: [0],
       // },
       // {
       //   path: "/setting/add-news",
       //   title: "Add News",
-      //   allowedRoles: ["0"],
+      //   allowedRoles: [0],
       // },
       {
         path: "/setting/terms",
         title: "Terms & Condition",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/setting/policy",
         title: "Policy",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/setting/payment-policy",
         title: "Payment Policy",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/setting/research",
         title: "Handle Research ",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/setting/service",
         title: "Handle Service ",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/setting/teams",
         title: "Handle Teams",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/setting/handle-faqs",
         title: "Handle Faqs",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
@@ -247,37 +248,37 @@ export const sidebarRoutes = [
   //   path: "/contact",
   //   title: "Contact",
   //   icon: <FontAwesomeIcon icon={faEnvelope} />,
-  //   allowedRoles: ["0"],
+  //   allowedRoles: [0],
   // },
   {
     // path: "/payment",
     title: "Payment",
     icon: <FontAwesomeIcon icon={faCreditCard} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         // path: "/payment",
         title: "Featured Payment",
         icon: <FontAwesomeIcon icon={faCreditCard} />,
-        allowedRoles: ["0"],
+        allowedRoles: [0],
         path: "/payment/featured-payment",
       },
       {
         title: "Subscription Plans",
         icon: <FontAwesomeIcon icon={faCreditCard} />,
         path: "/payment/subscription-plans",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         title: "Subscription History",
         icon: <FontAwesomeIcon icon={faCreditCard} />,
-        allowedRoles: ["0"],
+        allowedRoles: [0],
         path: "/payment/subscription-history",
       },
       {
         title: "Author Paid",
         icon: <FontAwesomeIcon icon={faCreditCard} />,
-        allowedRoles: ["0"],
+        allowedRoles: [0],
         path: "/payment/author-paid",
       },
     ],
@@ -286,190 +287,190 @@ export const sidebarRoutes = [
   //   path: "/email-setting",
   //   title: "Email Setting",
   //   icon: <FontAwesomeIcon icon={faCog} />,
-  //   allowedRoles: ["0"],
+  //   allowedRoles: [0],
   // },
   {
     title: "Handle Landing Page",
     icon: <FontAwesomeIcon icon={faCog} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/landing-page/banner",
         title: "Manage Banners",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/landing-page/about-us",
         title: "Manage About Us",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/landing-page/partners",
         title: "Manage Partners",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
   {
     title: "Handle CMS Page",
     icon: <FontAwesomeIcon icon={faCog} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/add-cms-page",
         title: "Add CMS Page",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/list-cms-page",
         title: "CMS Page",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
   {
     title: "Handle Innovation",
     icon: <FontAwesomeIcon icon={faCog} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "add-innovation",
         title: "Add Innovation",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/handle-innovation",
         title: "List of Innovation",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
   {
     title: "Handle Who We Are",
     icon: <FontAwesomeIcon icon={faCog} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/add-who-we-are",
         title: "Add Who We Are",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/handle-who-we-are",
         title: "Who We Are",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
   {
     title: "Handle Mentor Hub",
     icon: <FontAwesomeIcon icon={faCog} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/add-mentor",
         title: "Add Mentor",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/handle-mentor-hub",
         title: "Mentor Hub",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
   {
     title: "Handle Publication Charge",
     icon: <FontAwesomeIcon icon={faCog} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/add-publication-charge",
         title: "Add Publication Charge",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/handle-publication-charge",
         title: "Publication Charge",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
   {
     title: "Handle Open Access Policy",
     icon: <FontAwesomeIcon icon={faCog} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/add-open-access-policy",
         title: "Add Open Policy",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/handle-open-access-policy",
         title: "Open Access Policy",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
   {
     title: "Handle Award",
     icon: <FontAwesomeIcon icon={faCog} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/add-award",
         title: "Add Award",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/handle-award",
         title: "Awards",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
   {
     title: "Handle Event & Conference",
     icon: <FontAwesomeIcon icon={faCog} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/add-event-conference",
         title: "Add Event ",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/handle-event-conference",
         title: "Event & Conference",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
     ],
   },
   {
     title: "Research And Services",
     icon: <FontAwesomeIcon icon={faCog} />,
-    allowedRoles: ["0"],
+    allowedRoles: [0],
     subRoutes: [
       {
         path: "/handle-research-and-services",
         title: "Research and Services Page",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/handle-research-and-services-details",
         title: "Details Page",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path: "/handle-manuscript-process",
         title: "Manuscript Process",
-        allowedRoles: ["0"],
+        allowedRoles: [0],
       },
       {
         path:"/handle-research-and-services-feature",
         title:"Service Feature",
-        allowedRoles: ["0"]
+        allowedRoles: [0]
       }
     ],
   },
@@ -479,7 +480,7 @@ export const sidebarRoutes = [
     path: "/list-journals",
     title: "Journals List",
     icon: <FontAwesomeIcon icon={faList} />,
-    allowedRoles: ["3"],
+    allowedRoles: [3],
   },
 
   // Editor route
@@ -487,7 +488,7 @@ export const sidebarRoutes = [
     path: "/assigned-manuscript",
     title: "View Assigned Manuscript",
     icon: <FontAwesomeIcon icon={faCheckCircle} />,
-    allowedRoles: ["1"],
+    allowedRoles: [1],
   },
 
   // Author route
@@ -496,13 +497,13 @@ export const sidebarRoutes = [
   //   path: "/confirmation/view-details-manuscript",
   //   title: "View Details Manuscript",
   //   icon: <FontAwesomeIcon icon={faCheckCircle} />,
-  //   allowedRoles: ["2"],
+  //   allowedRoles: [2],
   // },
   // {
   //   path: "/confirmation/view-details-manuscript2",
   //   title: "View Details Manuscript",
   //   icon: <FontAwesomeIcon icon={faCheckCircle} />,
-  //   allowedRoles: ["2"],
+  //   allowedRoles: [2],
   // },
 
   // Publisher route
@@ -510,36 +511,36 @@ export const sidebarRoutes = [
   //   path: "/publisher/manuscripts/pending",
   //   title: "Pending Manuscripts",
   //   icon: <FontAwesomeIcon icon={faList} />,
-  //   allowedRoles: ["5"],
+  //   allowedRoles: [5],
   // },
   // {
   //   path: "/publisher/payments",
   //   title: "Payments",
   //   icon: <FontAwesomeIcon icon={faCreditCard} />,
-  //   allowedRoles: ["5"],
+  //   allowedRoles: [5],
   // },
   {
     path: "/publisher/published-manuscripts-list",
     title: "Published Manuscripts",
     icon: <FontAwesomeIcon icon={faList} />,
-    allowedRoles: ["5"],
+    allowedRoles: [5],
   },
   // {
   //   path: "/publisher/reports",
   //   title: "Reports",
   //   icon: <FontAwesomeIcon icon={faList} />,
-  //   allowedRoles: ["5"],
+  //   allowedRoles: [5],
   // },
   // {
   //   path: "/publisher/manuscripts/design/:id",
   //   title: "Design Manuscript",
   //   icon: <FontAwesomeIcon icon={faList} />,
-  //   allowedRoles: ["5"],
+  //   allowedRoles: [5],
   // },
   // {
   //   path: "/publisher/manuscripts/view/:id",
   //   title: "View Design Manuscript",
   //   icon: <FontAwesomeIcon icon={faList} />,
-  //   allowedRoles: ["5"],
+  //   allowedRoles: [5],
   // },
 ];

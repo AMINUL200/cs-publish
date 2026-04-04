@@ -27,7 +27,7 @@ const LandingFooter = ({
         { name: "Author Services", path: "/author-services" },
         { name: "Research Snapshot", path: "/blog" },
         { name: "Events & Conference", path: "/event-conference" },
-        // { name: "Conference", path: "#" },
+        // { name: "Blogs", path: "/blog" },
       ],
     },
     {

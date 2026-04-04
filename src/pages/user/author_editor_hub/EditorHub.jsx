@@ -202,7 +202,7 @@ const EditorHub = () => {
                 >
                   <div className="flex flex-col lg:flex-row">
                     {/* Left Side - Editor Image and Basic Info */}
-                    <div className="lg:w-1/3 bg-gradient-to-b from-yellow-500 to-red-700 p-8 text-white">
+                    <div className="lg:w-1/3 bg-[#ffba00]/80 p-8 text-white">
                       <div className="flex flex-col items-center text-center h-full justify-center">
                         <div className={`w-32 h-32 rounded-full flex items-center justify-center text-white font-bold text-2xl mb-4 ${getAvatarColor(editor.id)}`}>
                           {/* {getInitials(editor.email)} */}

@@ -308,7 +308,7 @@ const BlogDetails = () => {
                         whileInView={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5 }}
                         viewport={{ once: true }}
-                        className="blog-sidebar-content-block bg-gradient-to-br from-red-500 to-red-600 text-white p-5 rounded-lg shadow-lg"
+                        className="blog-sidebar-content-block bg-gradient-to-br from-[#ffba00] to-red-600 text-white p-5 rounded-lg shadow-lg"
                       >
                         <div className="flex items-center gap-3 mb-4">
                           <div className="bg-white p-2 rounded-lg"></div>

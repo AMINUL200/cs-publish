@@ -280,7 +280,7 @@ const InnoVationDetailsPage = () => {
                         href={`${STORAGE_URL}${innovation.pdf}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-5 py-2 rounded-lg bg-red-500 text-white font-medium shadow-md hover:bg-red-600 transition cursor-pointer flex items-center gap-2"
+                        className="px-5 py-2 rounded-lg bg-[#ffba00] text-white font-medium shadow-md hover:bg-[#c6940c] transition cursor-pointer flex items-center gap-2"
                       >
                         <FontAwesomeIcon icon={faDownload} />
                         PDF Download
@@ -291,7 +291,7 @@ const InnoVationDetailsPage = () => {
                         href={`${STORAGE_URL}${innovation.ppt}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-5 py-2 rounded-lg bg-indigo-500 text-white font-medium shadow-md hover:bg-indigo-600 transition cursor-pointer flex items-center gap-2"
+                        className="px-5 py-2 rounded-lg bg-[#ffba00] text-white font-medium shadow-md hover:bg-[#c6940c] transition cursor-pointer flex items-center gap-2"
                       >
                         <FontAwesomeIcon icon={faDownload} />
                         PPT Download

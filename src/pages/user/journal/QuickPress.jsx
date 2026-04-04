@@ -117,8 +117,13 @@ const QuickPress = () => {
       toast.error(error.message);
     }
   };
-  const handleSubmitButton = () => {
-    toast.warning("Please sign in as an author to access this feature.");
+ const handleSubmitButton = () => {
+    if(token){
+      toast.warning("Please sign in as an author to access this feature.");
+
+    }else{
+      navigate("/signin");
+    }
   };
 
   const handleViewEditor = (edId) => {

@@ -85,8 +85,13 @@ const JournalAuthorInformation = () => {
     }
   };
   const handleSubmitButton = () => {
-    toast.warning("Please sign in as an author to access this feature.");
-  };
+     if(token){
+       toast.warning("Please sign in as an author to access this feature.");
+ 
+     }else{
+       navigate("/signin");
+     }
+   };
 
   useEffect(() => {
     fetchData();

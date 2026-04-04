@@ -20,6 +20,7 @@ import Loader from "../../../components/common/Loader";
 import { ArrowLeft } from "lucide-react";
 import { ArrowRight } from "lucide-react";
 import { toast } from "react-toastify";
+import { el } from "date-fns/locale/el";
 // import Loader from "../../components/common/Loader";
 
 const AboutJournal = () => {
@@ -102,7 +103,12 @@ const AboutJournal = () => {
   };
 
   const handleSubmitButton = () => {
-    toast.warning("Please sign in as an author to access this feature.");
+    if(token){
+      toast.warning("Please sign in as an author to access this feature.");
+
+    }else{
+      navigate("/signin");
+    }
   };
 
   if (loading) {

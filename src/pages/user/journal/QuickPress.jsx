@@ -245,12 +245,48 @@ const QuickPress = () => {
                       </div>
                     </div>
                   )}
-                  <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                    <div className="font-semibold text-yellow-300 text-sm">
-                      Quick Press
+                  {journalData.impact_factor && (
+                    <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
+                      <div className="font-semibold text-yellow-300 text-sm">
+                        Impact Factor
+                      </div>
+                      <div className="text-yellow-200 text-sm">
+                        {journalData?.impact_factor || "456"}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                      Total Articles
                     </div>
                     <div className="text-yellow-200 text-sm">
-                      {manuscripts.length} Articles
+                      {journalData.total_articles || "0"}
+                    </div>
+                  </div>
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                      Total Citations
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {journalData.total_citations || "0"}
+                    </div>
+                  </div>
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                      H-Index
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {journalData.h_index || "0"}
+                    </div>
+                  </div>
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                      Acceptance Rate
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {journalData.acceptance_rate || "0"}%
                     </div>
                   </div>
                 </div>
@@ -261,9 +297,10 @@ const QuickPress = () => {
                     <Bell className="w-5 h-5" />
                     Get Alerts
                   </button>
-                  <button 
-                  onClick={handleSubmitButton}
-                  className="bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 flex items-center gap-2 shadow-lg">
+                  <button
+                    onClick={handleSubmitButton}
+                    className="bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 flex items-center gap-2 shadow-lg"
+                  >
                     <Send className="w-5 h-5" />
                     Submit Manuscript
                   </button>

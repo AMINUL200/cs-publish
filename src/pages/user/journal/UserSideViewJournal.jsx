@@ -276,7 +276,7 @@ const UserSideViewJournal = () => {
                       </div>
                     </div>
                   )}
-
+                  {journal.impact_factor && (
                   <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                     <div className="font-semibold text-yellow-300 text-sm">
                       Impact Factor
@@ -285,6 +285,7 @@ const UserSideViewJournal = () => {
                       {journal?.impact_factor || "456"}
                     </div>
                   </div>
+                  )}
                 </div>
               </div>
             </div>

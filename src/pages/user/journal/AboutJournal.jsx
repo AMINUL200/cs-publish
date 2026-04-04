@@ -44,7 +44,7 @@ const AboutJournal = () => {
           },
         },
       );
-
+      console.log("Journal details response:", response.data.data);
       if (response.data.success) {
         setData(response.data.data);
       }
@@ -168,14 +168,14 @@ const AboutJournal = () => {
                 {/* Journal Metadata Grid - Matching UserSideViewJournal */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
                   {/* Editor */}
-                  <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
+                  {/* <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                     <div className="font-semibold text-yellow-300 text-sm">
                       Editor
                     </div>
                     <div className="text-yellow-200 text-sm truncate">
                       {data.editor}
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* ISSN Print */}
                   {data.issn_print && (
@@ -214,11 +214,49 @@ const AboutJournal = () => {
                   )}
 
                   {/* Impact Factor - Placeholder */}
-                  <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                    <div className="font-semibold text-yellow-300 text-sm">
-                      Impact Factor
+                  {data.impact_factor && (
+                    <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
+                      <div className="font-semibold text-yellow-300 text-sm">
+                        Impact Factor
+                      </div>
+                      <div className="text-yellow-200 text-sm">
+                        {data.impact_factor || "N/A"}
+                      </div>
                     </div>
-                    <div className="text-yellow-200 text-sm">4.56</div>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                      Total Articles
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {data.total_articles || "0"}
+                    </div>
+                  </div>
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                      Total Citations
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {data.total_citations || "0"}
+                    </div>
+                  </div>
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                      H-Index
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {data.h_index || "0"}
+                    </div>
+                  </div>
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                      Acceptance Rate
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {data.acceptance_rate || "0"}%
+                    </div>
                   </div>
                 </div>
 

@@ -258,7 +258,7 @@ const JournalAuthorInformation = () => {
                     {item.label}
                   </button>
                 ))}
-                {data.editor && (
+                {/* {data.editor && (
                   <button
                     onClick={() => handleViewEditor(data.editor)}
                     className="w-full bg-yellow-500 text-black px-4 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg text-center flex items-center justify-center gap-2"
@@ -266,7 +266,7 @@ const JournalAuthorInformation = () => {
                     <Users className="w-4 h-4" />
                     Editor Information
                   </button>
-                )}
+                )} */}
               </div>
             </div>
           </div>

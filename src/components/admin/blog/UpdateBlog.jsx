@@ -36,6 +36,8 @@ const UpdateBlog = () => {
       const response = await axios.get(`${API_URL}api/admin/blog-categories`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
       if (response.data.flag === 1) {
@@ -65,6 +67,8 @@ const UpdateBlog = () => {
       const response = await axios.get(`${API_URL}api/admin/blogs/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 

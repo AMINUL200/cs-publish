@@ -48,6 +48,8 @@ const ReviewerManuscriptView = () => {
       const res = await axios.get(`${API_URL}api/review/manuscript-dtl/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 

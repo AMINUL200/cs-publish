@@ -75,8 +75,10 @@ const StepperForm = () => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
           },
-        }
+        },
       );
 
       if (response.data.flag === 1) {
@@ -126,7 +128,7 @@ const StepperForm = () => {
               email: aut.email || "",
               university: aut.university || "",
               affiliation: aut.affiliation || "",
-            }))
+            })),
           );
         }
 
@@ -150,7 +152,7 @@ const StepperForm = () => {
 
       // Check if at least one author has name and email
       const hasValidAuthor = authors.some(
-        (author) => author.name && author.email
+        (author) => author.name && author.email,
       );
       if (!hasValidAuthor) {
         toast.error("Please add at least one author with name and email");
@@ -194,7 +196,7 @@ const StepperForm = () => {
     // Validate authors
     const validAuthors = authors.filter(
       (author) =>
-        author.name && author.email && author.university && author.affiliation
+        author.name && author.email && author.university && author.affiliation,
     );
 
     if (validAuthors.length === 0) {
@@ -209,13 +211,13 @@ const StepperForm = () => {
     // Basic validation for PDF generation
     if (!formData.title || !formData.journal_id) {
       toast.error(
-        "Please fill in at least the title and select a journal to generate PDF"
+        "Please fill in at least the title and select a journal to generate PDF",
       );
       return;
     }
 
     const validAuthors = authors.filter(
-      (author) => author.name && author.email
+      (author) => author.name && author.email,
     );
     if (validAuthors.length === 0) {
       toast.error("Please add at least one author to generate PDF");
@@ -227,7 +229,7 @@ const StepperForm = () => {
       const filename = await generateManuscriptPDF(
         formData,
         authors,
-        journalData
+        journalData,
       );
       toast.success(`PDF generated successfully: ${filename}`);
     } catch (error) {
@@ -246,7 +248,10 @@ const StepperForm = () => {
     try {
       const validAuthors = authors.filter(
         (author) =>
-          author.name && author.email && author.university && author.affiliation
+          author.name &&
+          author.email &&
+          author.university &&
+          author.affiliation,
       );
 
       if (isUpdateMode) {
@@ -267,18 +272,18 @@ const StepperForm = () => {
         formDataToSend.append("introduction", formData.introduction);
         formDataToSend.append(
           "materials_and_methods",
-          formData.materials_and_methods
+          formData.materials_and_methods,
         );
         formDataToSend.append("results", formData.results);
         formDataToSend.append("discussion", formData.discussion);
         formDataToSend.append("conclusion", formData.conclusion);
         formDataToSend.append(
           "author_contributions",
-          formData.author_contributions
+          formData.author_contributions,
         );
         formDataToSend.append(
           "conflict_of_interest_statement",
-          formData.conflict_of_interest_statement
+          formData.conflict_of_interest_statement,
         );
         formDataToSend.append("references", formData.references);
 
@@ -288,11 +293,11 @@ const StepperForm = () => {
           formDataToSend.append(`author[${index}][email]`, author.email || "");
           formDataToSend.append(
             `author[${index}][university]`,
-            author.university || ""
+            author.university || "",
           );
           formDataToSend.append(
             `author[${index}][affiliation]`,
-            author.affiliation || ""
+            author.affiliation || "",
           );
         });
 
@@ -326,7 +331,7 @@ const StepperForm = () => {
         if (formData.supplementary_files instanceof File) {
           formDataToSend.append(
             "supplementary_files",
-            formData.supplementary_files
+            formData.supplementary_files,
           );
         }
 
@@ -341,13 +346,13 @@ const StepperForm = () => {
               Authorization: `Bearer ${token}`,
               "Content-Type": "multipart/form-data",
             },
-          }
+          },
         );
 
         console.log("Update successful:", response.data);
         if (response.data.flag === 1) {
           toast.success(
-            response.data.message || "Manuscript updated successfully"
+            response.data.message || "Manuscript updated successfully",
           );
 
           // Generate PDF after successful update
@@ -355,17 +360,16 @@ const StepperForm = () => {
             const filename = await generateManuscriptPDF(
               formData,
               authors,
-              journalData
+              journalData,
             );
             toast.success(`PDF generated successfully: ${filename}`);
-            
           } catch (error) {
             console.error("PDF generation error:", error);
             toast.error(
-              "PDF generation failed, but manuscript was submitted successfully"
+              "PDF generation failed, but manuscript was submitted successfully",
             );
           }
-          navigate("/dashboard"); 
+          navigate("/dashboard");
         } else {
           toast.error(response.data.message || "Update failed");
         }
@@ -395,11 +399,11 @@ const StepperForm = () => {
           formDataToSend.append(`author[${index}][email]`, author.email || "");
           formDataToSend.append(
             `author[${index}][university]`,
-            author.university || ""
+            author.university || "",
           );
           formDataToSend.append(
             `author[${index}][affiliation]`,
-            author.affiliation || ""
+            author.affiliation || "",
           );
         });
 
@@ -442,13 +446,13 @@ const StepperForm = () => {
               Authorization: `Bearer ${token}`,
               "Content-Type": "multipart/form-data",
             },
-          }
+          },
         );
 
         console.log("Submission successful:", response.data);
         if (response.data.flag === 1) {
           toast.success(
-            response.data.message || "Manuscript submitted successfully"
+            response.data.message || "Manuscript submitted successfully",
           );
 
           // Generate PDF after successful submission
@@ -456,13 +460,13 @@ const StepperForm = () => {
             const filename = await generateManuscriptPDF(
               formData,
               authors,
-              journalData
+              journalData,
             );
             toast.success(`PDF generated successfully: ${filename}`);
           } catch (error) {
             console.error("PDF generation error:", error);
             toast.error(
-              "PDF generation failed, but manuscript was submitted successfully"
+              "PDF generation failed, but manuscript was submitted successfully",
             );
           }
         } else {
@@ -474,7 +478,7 @@ const StepperForm = () => {
       toast.error(
         isUpdateMode
           ? "Update failed. Check console for details."
-          : "Submission failed. Check console for details."
+          : "Submission failed. Check console for details.",
       );
       console.error("Submission error:", error.response?.data || error.message);
     } finally {
@@ -487,6 +491,8 @@ const StepperForm = () => {
       const response = await axios.get(`${API_URL}api/admin/journals`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 
@@ -495,7 +501,7 @@ const StepperForm = () => {
           response.data.data.map((journal) => ({
             id: journal.id,
             name: journal.j_title,
-          }))
+          })),
         );
       } else {
         toast.error(response.data.message || "Failed to fetch journals");
@@ -560,8 +566,8 @@ const StepperForm = () => {
                 step === idx + 1
                   ? "bg-blue-500"
                   : step > idx + 1
-                  ? "bg-green-500"
-                  : "bg-gray-300"
+                    ? "bg-green-500"
+                    : "bg-gray-300"
               }`}
             >
               {step > idx + 1 ? "✓" : idx + 1}
@@ -644,8 +650,8 @@ const StepperForm = () => {
               submitLoading
                 ? "bg-gray-500 cursor-not-allowed"
                 : isUpdateMode
-                ? "bg-orange-500 hover:bg-orange-600 cursor-pointer"
-                : "bg-green-500 hover:bg-green-600 cursor-pointer"
+                  ? "bg-orange-500 hover:bg-orange-600 cursor-pointer"
+                  : "bg-green-500 hover:bg-green-600 cursor-pointer"
             }`}
             disabled={submitLoading}
           >
@@ -654,8 +660,8 @@ const StepperForm = () => {
                 ? "Updating..."
                 : "Submitting..."
               : isUpdateMode
-              ? "Update Manuscript"
-              : "Submit Manuscript"}
+                ? "Update Manuscript"
+                : "Submit Manuscript"}
           </button>
         )}
       </div>

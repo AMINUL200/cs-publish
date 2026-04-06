@@ -35,7 +35,7 @@ const SignUp = () => {
     speciality: "",
     designation: "",
     journal_id: "",
-    resume: null
+    resume: null,
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +47,7 @@ const SignUp = () => {
   const userTypeOptions = [
     { value: "2", label: "Author" },
     { value: "3", label: "Reviewer" },
-    { value: "4", label: "User" }
+    { value: "4", label: "User" },
   ];
 
   const titleOptions = ["Mr", "Mrs", "Miss", "Dr", "Prof"];
@@ -60,16 +60,20 @@ const SignUp = () => {
   const fetchJournals = async () => {
     try {
       const response = await axios.get(`${API_URL}api/journal`, {
-
+        headers: {
+          // Authorization: `Bearer ${token}`,
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
       });
 
       if (response.status === 200 && response.data.success) {
-        setJournals(response.data.data.map(journal => ({
-          id: journal.id,
-          name: journal.j_title
-        })));
-
-
+        setJournals(
+          response.data.data.map((journal) => ({
+            id: journal.id,
+            name: journal.j_title,
+          })),
+        );
       } else {
         toast.error(response.data.message || "Failed to fetch journals");
       }
@@ -92,21 +96,29 @@ const SignUp = () => {
     console.log("Form Data:", formData);
 
     // Define reviewer-specific fields
-    const reviewerFields = ['qualification', 'university', 'affiliation', 'speciality', 'designation', 'journal_id', 'resume'];
+    const reviewerFields = [
+      "qualification",
+      "university",
+      "affiliation",
+      "speciality",
+      "designation",
+      "journal_id",
+      "resume",
+    ];
 
     // Create FormData for file upload
     const submitData = new FormData();
 
     // Add form fields to FormData based on user type
-    Object.keys(formData).forEach(key => {
+    Object.keys(formData).forEach((key) => {
       // Skip reviewer-specific fields if user is not a reviewer
       if (reviewerFields.includes(key) && formData.user_type !== "3") {
         return; // Skip this field
       }
 
-      if (key === 'resume' && formData[key]) {
-        submitData.append('resume', formData[key]);
-      } else if (key !== 'resume') {
+      if (key === "resume" && formData[key]) {
+        submitData.append("resume", formData[key]);
+      } else if (key !== "resume") {
         submitData.append(key, formData[key]);
       }
     });
@@ -123,7 +135,9 @@ const SignUp = () => {
         // Check if user is reviewer
         if (formData.user_type === "3") {
           // For reviewers, show success message but don't login
-          toast.success("Registration successful! Please wait for admin activation.");
+          toast.success(
+            "Registration successful! Please wait for admin activation.",
+          );
           // Reset form or redirect to login
           setFormData({
             name: "",
@@ -143,15 +157,17 @@ const SignUp = () => {
             speciality: "",
             designation: "",
             journal_id: "",
-            resume: null
+            resume: null,
           });
           setResumeFileName("");
-          navigate('/reviewer-activation');
+          navigate("/reviewer-activation");
         } else {
           // For non-reviewers, login immediately
-          dispatch(login({ userData: response.data.user, token: response.data.token }));
+          dispatch(
+            login({ userData: response.data.user, token: response.data.token }),
+          );
           toast.success(response.data.message);
-          navigate('/dashboard');
+          navigate("/dashboard");
         }
       } else {
         toast.error(response.data.message);
@@ -170,16 +186,20 @@ const SignUp = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       // Validate file type (optional)
-      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      const allowedTypes = [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ];
       if (allowedTypes.includes(file.type)) {
-        setFormData(prev => ({ ...prev, resume: file }));
+        setFormData((prev) => ({ ...prev, resume: file }));
         setResumeFileName(file.name);
       } else {
         toast.error("Please upload a PDF or Word document");
@@ -189,7 +209,7 @@ const SignUp = () => {
   };
 
   const handleRadioChange = (value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       user_type: String(value),
       // Clear reviewer-specific fields when changing from reviewer to other types
@@ -200,8 +220,8 @@ const SignUp = () => {
         speciality: "",
         designation: "",
         journal_id: "",
-        resume: null
-      })
+        resume: null,
+      }),
     }));
 
     // Clear file name when switching away from reviewer
@@ -209,8 +229,6 @@ const SignUp = () => {
       setResumeFileName("");
     }
   };
-
-
 
   const [showPassword, setShowPassword] = useState(false);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
@@ -221,9 +239,9 @@ const SignUp = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
+        delayChildren: 0.2,
+      },
+    },
   };
 
   const itemVariants = {
@@ -234,14 +252,13 @@ const SignUp = () => {
       transition: {
         type: "spring",
         stiffness: 100,
-        duration: 0.5
-      }
-    }
+        duration: 0.5,
+      },
+    },
   };
 
-
   if (loading) {
-    return <Loader />
+    return <Loader />;
   }
 
   return (
@@ -346,10 +363,11 @@ const SignUp = () => {
                   key={type.value}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`flex items-center justify-center p-2 rounded-lg border cursor-pointer transition-all ${formData.user_type === type.value
-                    ? "bg-yellow-100 border-yellow-500"
-                    : "border-gray-300 hover:border-yellow-300"
-                    }`}
+                  className={`flex items-center justify-center p-2 rounded-lg border cursor-pointer transition-all ${
+                    formData.user_type === type.value
+                      ? "bg-yellow-100 border-yellow-500"
+                      : "border-gray-300 hover:border-yellow-300"
+                  }`}
                 >
                   <input
                     type="radio"
@@ -448,7 +466,6 @@ const SignUp = () => {
           {/* Reviewer Specific Fields */}
           {isReviewer && (
             <>
-
               <motion.div variants={itemVariants}>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Select Journal *
@@ -560,7 +577,11 @@ const SignUp = () => {
                   />
                   <div className="flex items-center justify-center w-full px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-indigo-400 transition-all bg-gray-50">
                     <div className="text-center">
-                      <FontAwesomeIcon icon={faUpload} className="text-gray-400 mb-2" size="lg" />
+                      <FontAwesomeIcon
+                        icon={faUpload}
+                        className="text-gray-400 mb-2"
+                        size="lg"
+                      />
                       <p className="text-sm text-gray-600">
                         {resumeFileName || "Click to upload your resume/CV"}
                       </p>
@@ -577,9 +598,7 @@ const SignUp = () => {
                 )}
               </motion.div>
             </>
-
           )}
-
 
           <div className="grid grid-cols-1 gap-4">
             <motion.div variants={itemVariants} className="relative">
@@ -599,7 +618,7 @@ const SignUp = () => {
                   type="button"
                   onClick={togglePasswordVisibility}
                   className="absolute inset-y-8 right-0 pr-3 flex items-center text-gray-500 hover:text-yellow-600"
-                  style={{ top: '1.4rem' }}
+                  style={{ top: "1.4rem" }}
                 >
                   <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                 </button>
@@ -607,12 +626,9 @@ const SignUp = () => {
             </motion.div>
           </div>
 
-          <motion.div
-            variants={itemVariants}
-            className="text-center mt-4"
-          >
+          <motion.div variants={itemVariants} className="text-center mt-4">
             <p className="text-gray-600">
-              Already have an account?{' '}
+              Already have an account?{" "}
               <Link
                 to="/signin"
                 className="text-yellow-600 hover:text-yellow-800 font-medium"
@@ -624,12 +640,16 @@ const SignUp = () => {
 
           <motion.button
             variants={itemVariants}
-            whileHover={{ scale: 1.02, boxShadow: "0 4px 20px rgba(79, 70, 229, 0.3)" }}
+            whileHover={{
+              scale: 1.02,
+              boxShadow: "0 4px 20px rgba(79, 70, 229, 0.3)",
+            }}
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-6 rounded-xl font-semibold custom-btn shadow-lg transition-all ${isLoading ? "opacity-70 cursor-not-allowed" : "hover:shadow-xl"
-              }`}
+            className={`w-full py-3 px-6 rounded-xl font-semibold custom-btn shadow-lg transition-all ${
+              isLoading ? "opacity-70 cursor-not-allowed" : "hover:shadow-xl"
+            }`}
           >
             {isLoading ? (
               <div className="flex items-center justify-center space-x-2">

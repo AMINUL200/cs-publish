@@ -21,6 +21,8 @@ const Subscription = () => {
       const response = await axios.get(`${API_URL}api/plan`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
       if (response.status === 200 || response.status || response.data.status) {

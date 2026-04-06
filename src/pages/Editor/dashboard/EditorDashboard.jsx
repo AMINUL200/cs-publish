@@ -21,7 +21,9 @@ const EditorDashboard = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(`${API_URL}api/permission/editor`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`,
+       "Cache-Control": "no-cache",
+          Pragma: "no-cache", },
       });
 
       if (response.status === 200) {

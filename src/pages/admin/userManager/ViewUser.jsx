@@ -56,7 +56,9 @@ const ViewUser = () => {
             const response = await axios.get(`${API_URL}api/admin/all-user`,
                 {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`,
+                         "Cache-Control": "no-cache",
+          Pragma: "no-cache",
                     }
                 });
 

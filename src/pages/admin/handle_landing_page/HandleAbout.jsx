@@ -21,6 +21,8 @@ const HandleAbout = () => {
       const response = await axios.get(`${API_URL}api/abouts`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
       

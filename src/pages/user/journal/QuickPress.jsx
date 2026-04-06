@@ -36,6 +36,8 @@ const QuickPress = () => {
           {
             headers: {
               Authorization: `Bearer ${token}`,
+               "Cache-Control": "no-cache",
+          Pragma: "no-cache",
             },
           },
         );

@@ -26,6 +26,8 @@ const PaymentForAuthor = () => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+             "Cache-Control": "no-cache",
+          Pragma: "no-cache",
           },
         }
       );

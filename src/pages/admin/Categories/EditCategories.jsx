@@ -16,7 +16,7 @@ const EditCategories = () => {
     group_name: "",
     category_name: "",
     category_description: "",
-    status: "1",
+    status: 1,
   });
   const [loading, setLoading] = useState(true);
   const [handleLoading, setHandleLoading] = useState(false);
@@ -26,6 +26,8 @@ const EditCategories = () => {
     try {
       const response = await axios.get(`${API_URL}api/admin/categories/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
+         "Cache-Control": "no-cache",
+          Pragma: "no-cache",
       });
 
       if (response.status === 200 && response.data?.data) {
@@ -163,8 +165,8 @@ const EditCategories = () => {
                 type="radio"
                 name="status"
                 value="1"
-                checked={formData.status === "1"}
-                onChange={() => handleStatusChange("1")}
+                checked={formData.status === 1 || formData.status === "1"}
+                onChange={() => handleStatusChange(1)}
                 className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
               />
               <span className="ml-2 text-gray-700">Yes</span>
@@ -174,8 +176,8 @@ const EditCategories = () => {
                 type="radio"
                 name="status"
                 value="0"
-                checked={formData.status === "0"}
-                onChange={() => handleStatusChange("0")}
+                checked={formData.status === 0 || formData.status === "0"}
+                onChange={() => handleStatusChange(0)}
                 className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
               />
               <span className="ml-2 text-gray-700">No</span>

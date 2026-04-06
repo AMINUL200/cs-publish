@@ -8,7 +8,7 @@ const EventAndConferenceDetail = () => {
   const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const { slug } = useParams(); // Extract slug from URL
-  
+
   const [conference, setConference] = useState(null);
   const [latestConferences, setLatestConferences] = useState([]);
   const [popularConferences, setPopularConferences] = useState([]);
@@ -23,9 +23,20 @@ const EventAndConferenceDetail = () => {
   const fetchConferenceDetail = async () => {
     try {
       setLoading(true);
-      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      const response = await axios.get(`${API_URL}api/conference-details/${slug}`, config);
-      
+      const config = token
+        ? {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Cache-Control": "no-cache",
+              Pragma: "no-cache",
+            },
+          }
+        : {};
+      const response = await axios.get(
+        `${API_URL}api/conference-details/${slug}`,
+        config,
+      );
+
       if (response.data.status) {
         setConference(response.data.data);
         setLatestConferences(response.data.latest_5 || []);
@@ -45,8 +56,8 @@ const EventAndConferenceDetail = () => {
   const getCategoryColor = (category) => {
     const colors = {
       "Physics Confarences": "bg-yellow-500",
-      "Mathamatics": "bg-red-700",
-      "International Conference": "bg-black"
+      Mathamatics: "bg-red-700",
+      "International Conference": "bg-black",
     };
     return colors[category] || "bg-gray-500";
   };
@@ -54,24 +65,26 @@ const EventAndConferenceDetail = () => {
   const getCategoryTextColor = (category) => {
     const colors = {
       "Physics Confarences": "text-gray-800",
-      "Mathamatics": "text-white",
-      "International Conference": "text-white"
+      Mathamatics: "text-white",
+      "International Conference": "text-white",
     };
     return colors[category] || "text-white";
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-xl text-gray-600">Loading conference details...</div>
+        <div className="text-xl text-gray-600">
+          Loading conference details...
+        </div>
       </div>
     );
   }
@@ -80,9 +93,11 @@ const EventAndConferenceDetail = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-xl text-red-600 mb-4">{error || "Conference not found"}</div>
-          <Link 
-            to="/events" 
+          <div className="text-xl text-red-600 mb-4">
+            {error || "Conference not found"}
+          </div>
+          <Link
+            to="/events"
             className="bg-yellow-500 text-gray-900 px-6 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition-colors"
           >
             Back to Events
@@ -97,12 +112,22 @@ const EventAndConferenceDetail = () => {
       <div className="container mx-auto px-4">
         {/* Back Button */}
         <div className="mb-6">
-          <Link 
-            to="/events" 
+          <Link
+            to="/events"
             className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            <svg
+              className="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
             Back to Events
           </Link>
@@ -121,7 +146,9 @@ const EventAndConferenceDetail = () => {
                 />
               ) : (
                 <div className="w-full h-64 lg:h-80 bg-gray-200 flex items-center justify-center">
-                  <span className="text-gray-500 text-lg">No Image Available</span>
+                  <span className="text-gray-500 text-lg">
+                    No Image Available
+                  </span>
                 </div>
               )}
 
@@ -134,9 +161,24 @@ const EventAndConferenceDetail = () => {
                     {conference.catagory}
                   </span>
                   <span className="text-sm text-gray-500 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
                     </svg>
                     {conference.most_view} views
                   </span>
@@ -150,15 +192,40 @@ const EventAndConferenceDetail = () => {
                 {/* Location and Date */}
                 <div className="flex flex-wrap gap-4 mb-6">
                   <div className="flex items-center text-gray-600">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
                     </svg>
                     <span>{conference.location}</span>
                   </div>
                   <div className="flex items-center text-gray-600">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
                     </svg>
                     <span>{formatDate(conference.date)}</span>
                   </div>
@@ -166,7 +233,9 @@ const EventAndConferenceDetail = () => {
 
                 {/* Short Description */}
                 <div className="mb-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">About this Event</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-3">
+                    About this Event
+                  </h2>
                   <p className="text-gray-700 text-lg leading-relaxed">
                     {conference.description}
                   </p>
@@ -174,14 +243,16 @@ const EventAndConferenceDetail = () => {
 
                 {/* Long Description with HTML content */}
                 <div className="mb-8">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">Event Details</h2>
-                  <div 
+                  <h2 className="text-xl font-semibold text-gray-900 mb-3">
+                    Event Details
+                  </h2>
+                  <div
                     className="blog-rich-text max-w-none text-gray-700 leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: conference.long_description }}
+                    dangerouslySetInnerHTML={{
+                      __html: conference.long_description,
+                    }}
                   />
                 </div>
-
-                
               </div>
             </div>
           </div>
@@ -215,7 +286,9 @@ const EventAndConferenceDetail = () => {
                       <h4 className="font-semibold text-gray-900 group-hover:text-yellow-600 transition-colors line-clamp-2">
                         {conf.name}
                       </h4>
-                      <p className="text-sm text-gray-500 mt-1">{formatDate(conf.date)}</p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {formatDate(conf.date)}
+                      </p>
                     </div>
                   </Link>
                 ))}
@@ -250,9 +323,24 @@ const EventAndConferenceDetail = () => {
                         {conf.name}
                       </h4>
                       <div className="flex items-center text-sm text-gray-500 mt-1">
-                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        <svg
+                          className="w-3 h-3 mr-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
                         </svg>
                         {conf.most_view} views
                       </div>

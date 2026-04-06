@@ -40,7 +40,12 @@ const InnovationPage = () => {
   const fetchInnovations = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}api/innovations`);
+      const response = await axios.get(`${API_URL}api/innovations`, {
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
 
       if (response.data.status) {
         setInnovations({
@@ -59,7 +64,13 @@ const InnovationPage = () => {
   const handleRead = (innovation) => {
     if (!innovation) return;
     try {
-      axios.get(`${API_URL}api/innovations/${innovation.id}/view`);
+      axios.get(`${API_URL}api/innovations/${innovation.id}/view`, {
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
+
       navigation(`/innovation/${innovation.slug}`);
     } catch (error) {
       console.log(error);

@@ -23,7 +23,13 @@ const AuthorHub = () => {
   const fetchAuthors = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}api/author-hub`);
+      const response = await axios.get(`${API_URL}api/author-hub`, {
+        headers: {
+         
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
       
       if (response.data.status) {
         console.log("Authors data:", response.data.data);

@@ -22,6 +22,8 @@ const UserProfilePage = () => {
       const response = await axios.get(`${API_URL}api/about`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 

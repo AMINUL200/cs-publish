@@ -29,6 +29,8 @@ const HandleVolume = () => {
       const response = await axios.get(`${API_URL}api/volume/list`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
       
@@ -67,6 +69,8 @@ const HandleVolume = () => {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
+             "Cache-Control": "no-cache",
+          Pragma: "no-cache",
           },
         }
       );

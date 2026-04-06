@@ -19,6 +19,8 @@ const HandleSubScriptionHistory = () => {
       const response = await axios.get(`${API_URL}api/transactions`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 

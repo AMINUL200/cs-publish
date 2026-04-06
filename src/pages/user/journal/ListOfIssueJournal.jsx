@@ -10,8 +10,7 @@ const ListOfIssueJournal = () => {
   const { token } = useSelector((state) => state.auth);
   const { id } = useParams();
 
-  console.log("id::",id);
-  
+  console.log("id::", id);
 
   // State for data
   const [journalData, setJournalData] = useState(null);
@@ -23,14 +22,17 @@ const ListOfIssueJournal = () => {
   useEffect(() => {
     const fetchJournalIssues = async () => {
       console.log("fetch start::");
-      
+
       try {
         setLoading(true);
-        const response = await axios.get(
-          `${API_URL}api/all-volume/${id}`
-        );
+        const response = await axios.get(`${API_URL}api/all-volume/${id}`, {
+          headers: {
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
+        });
         console.log(response);
-        
+
         if (response.data.flag === 1 && response.data.data.length > 0) {
           const data = response.data.data;
           setIssues(data);
@@ -98,7 +100,7 @@ const ListOfIssueJournal = () => {
             {/* Left Side - Page Title */}
             <div className="flex-1 text-center lg:text-left">
               <h1 className="text-4xl lg:text-5xl font-bold text-yellow-500 mb-4">
-                 Library of issues
+                Library of issues
               </h1>
               <div className="flex items-center justify-center lg:justify-start text-yellow-500">
                 <BookOpen className="w-6 h-6 mr-2" />
@@ -115,7 +117,9 @@ const ListOfIssueJournal = () => {
                   className="w-20 h-28 object-cover rounded-lg shadow-lg border-2 border-white"
                 />
                 <div className="text-yellow-500 text-center sm:text-left">
-                  <h3 className="font-bold text-lg mb-1">{journalData.title}</h3>
+                  <h3 className="font-bold text-lg mb-1">
+                    {journalData.title}
+                  </h3>
                   {/* Add other journal information here if available in API response */}
                 </div>
               </div>
@@ -138,7 +142,11 @@ const ListOfIssueJournal = () => {
                 <div className="relative overflow-hidden bg-gradient-to-br from-red-900 to-red-700">
                   <img
                     // src={issue.image || journalData.journalImage}
-                    src={issue.image ? `${STORAGE_URL}${issue.image}` : `${STORAGE_URL}${journalData.journalImage}`}
+                    src={
+                      issue.image
+                        ? `${STORAGE_URL}${issue.image}`
+                        : `${STORAGE_URL}${journalData.journalImage}`
+                    }
                     alt={`Volume ${issue.volume} ${issue.issue_no}`}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                   />

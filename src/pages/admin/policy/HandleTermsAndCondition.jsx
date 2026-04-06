@@ -18,6 +18,8 @@ const HandleTermsAndCondition = () => {
       const response = await axios.get(`${API_URL}api/terms`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 

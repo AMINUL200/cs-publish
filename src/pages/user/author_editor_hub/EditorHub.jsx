@@ -26,7 +26,12 @@ const EditorHub = () => {
   const fetchEditors = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}api/editor-hub`);
+      const response = await axios.get(`${API_URL}api/editor-hub`,{
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
       
       if (response.data.status) {
         const editorsData = response.data.data;

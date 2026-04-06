@@ -27,7 +27,9 @@ const UpdateTerms = () => {
       setLoading(true);
       const response = await axios.get(`${API_URL}api/terms-edit/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         }
       });
 

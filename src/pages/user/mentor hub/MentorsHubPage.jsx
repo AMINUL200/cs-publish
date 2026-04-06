@@ -23,7 +23,12 @@ const MentorsHubPage = () => {
         const fetchMentorsData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`${API_URL}api/event/latest`);
+                const response = await axios.get(`${API_URL}api/event/latest`,{
+                    headers: {
+                        "Cache-Control": "no-cache",
+                        Pragma: "no-cache",
+                    },
+                });
                 
                 if (response.data.status) {
                     // Combine latest and most_view arrays, remove duplicates based on slug

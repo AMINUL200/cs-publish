@@ -29,6 +29,8 @@ const HandleBannerPage = () => {
       const response = await axios.get(`${API_URL}api/banners`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 

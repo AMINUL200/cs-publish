@@ -23,6 +23,8 @@ const ViewCategories = () => {
       const response = await axios.get(`${API_URL}api/admin/categories`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 
@@ -152,7 +154,7 @@ const ViewCategories = () => {
                     {cat.category_name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                    {cat.status === "1" ? "Yes" : "No"}
+                    {cat.status === 1 ? "Yes" : "No"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
                     {cat.created_at.split("T")[0]} 

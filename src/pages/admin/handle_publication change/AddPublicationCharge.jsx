@@ -40,7 +40,9 @@ const AddPublicationCharge = () => {
       const response = await axios.get(`${API_URL}api/admin/journals`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         }
       });
       
@@ -59,7 +61,9 @@ const AddPublicationCharge = () => {
       const response = await axios.get(`${API_URL}api/publication-charges/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         }
       });
       

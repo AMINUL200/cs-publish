@@ -54,7 +54,10 @@ const HandleResearchAndServicesFeature = () => {
   const fetchProducts = async () => {
     try {
       const response = await axios.get(`${API_URL}api/admin/rs-products`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`,
+       "Cache-Control": "no-cache",
+          Pragma: "no-cache", },
+        
       });
 
       if (response.data.status) {
@@ -71,7 +74,9 @@ const HandleResearchAndServicesFeature = () => {
     try {
       setFeaturesLoading(true);
       const response = await axios.get(`${API_URL}api/admin/rs-features`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`,
+       "Cache-Control": "no-cache",
+          Pragma: "no-cache", },
       });
 
       if (response.data.success) {

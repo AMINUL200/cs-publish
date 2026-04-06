@@ -84,6 +84,8 @@ const AssignedManuscript = () => {
       const response = await axios.get(`${API_URL}api/editor/show-manuscript`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
       if (response.data.flag === 1) {
@@ -109,6 +111,8 @@ const AssignedManuscript = () => {
       const response = await axios.get(`${API_URL}api/permission/publisher`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 

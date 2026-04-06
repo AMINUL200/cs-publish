@@ -20,6 +20,8 @@ const PublisherViewDesignManuscript = () => {
       const response = await axios.get(`${API_URL}api/published-manuscripts/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 

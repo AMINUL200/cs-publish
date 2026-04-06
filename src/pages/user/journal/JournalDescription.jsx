@@ -45,7 +45,12 @@ const JournalDescription = () => {
     const fetchJournalData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${API_URL}api/about_the_journal/${id}`);
+        const response = await axios.get(`${API_URL}api/about_the_journal/${id}`,{
+          headers: {
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
+        });
         console.log(response);
         
         setJournalData(response.data.data);

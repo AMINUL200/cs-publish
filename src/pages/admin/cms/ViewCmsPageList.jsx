@@ -3,23 +3,23 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Loader from "../../../components/common/Loader";
-import { 
-  Edit, 
-  Trash2, 
-  Plus, 
-  Eye, 
-  Search, 
+import {
+  Edit,
+  Trash2,
+  Plus,
+  Eye,
+  Search,
   Filter,
   FileText,
   Calendar,
-  RefreshCw
+  RefreshCw,
 } from "lucide-react";
 
 const ViewCmsPageList = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
-  
+
   const [cmsPages, setCmsPages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
@@ -30,15 +30,14 @@ const ViewCmsPageList = () => {
   const fetchCmsPages = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `${API_URL}api/cms-pages`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      
+      const response = await axios.get(`${API_URL}api/cms-pages`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
+
       setCmsPages(response.data.data || []);
       console.log("Fetched CMS pages:", response.data.data);
     } catch (error) {
@@ -61,15 +60,12 @@ const ViewCmsPageList = () => {
 
     try {
       setDeletingId(id);
-      await axios.delete(
-        `${API_URL}api/cms-pages/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      
+      await axios.delete(`${API_URL}api/cms-pages/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       alert("CMS page deleted successfully!");
       fetchCmsPages(); // Refresh the list
     } catch (error) {
@@ -96,21 +92,22 @@ const ViewCmsPageList = () => {
   };
 
   // Filter and search CMS pages
-  const filteredPages = cmsPages.filter(page => {
-    const matchesSearch = page.page_title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         page.heading?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+  const filteredPages = cmsPages.filter((page) => {
+    const matchesSearch =
+      page.page_title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      page.heading?.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesType = filterType === "all" || page.type === filterType;
-    
+
     return matchesSearch && matchesType;
   });
 
   // Format date
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -172,7 +169,10 @@ const ViewCmsPageList = () => {
                 Search Pages
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={18}
+                />
                 <input
                   type="text"
                   value={searchTerm}
@@ -225,12 +225,11 @@ const ViewCmsPageList = () => {
                 No CMS Pages Found
               </h3>
               <p className="text-gray-500 mb-4">
-                {searchTerm || filterType !== "all" 
+                {searchTerm || filterType !== "all"
                   ? "Try adjusting your search or filter criteria"
-                  : "Get started by creating your first CMS page"
-                }
+                  : "Get started by creating your first CMS page"}
               </p>
-              {(searchTerm || filterType !== "all") ? (
+              {searchTerm || filterType !== "all" ? (
                 <button
                   onClick={() => {
                     setSearchTerm("");
@@ -301,7 +300,9 @@ const ViewCmsPageList = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeBadge(page.type)}`}>
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeBadge(page.type)}`}
+                        >
                           {getTypeDisplayName(page.type)}
                         </span>
                       </td>
@@ -354,8 +355,12 @@ const ViewCmsPageList = () => {
               <div className="flex items-center gap-3">
                 <FileText className="text-blue-600" size={24} />
                 <div>
-                  <p className="text-sm text-blue-600 font-medium">Total Pages</p>
-                  <p className="text-2xl font-bold text-blue-900">{cmsPages.length}</p>
+                  <p className="text-sm text-blue-600 font-medium">
+                    Total Pages
+                  </p>
+                  <p className="text-2xl font-bold text-blue-900">
+                    {cmsPages.length}
+                  </p>
                 </div>
               </div>
             </div>
@@ -363,9 +368,15 @@ const ViewCmsPageList = () => {
               <div className="flex items-center gap-3">
                 <FileText className="text-green-600" size={24} />
                 <div>
-                  <p className="text-sm text-green-600 font-medium">Support & Contact</p>
+                  <p className="text-sm text-green-600 font-medium">
+                    Support & Contact
+                  </p>
                   <p className="text-2xl font-bold text-green-900">
-                    {cmsPages.filter(page => page.type === 'support_and_contact').length}
+                    {
+                      cmsPages.filter(
+                        (page) => page.type === "support_and_contact",
+                      ).length
+                    }
                   </p>
                 </div>
               </div>
@@ -374,9 +385,15 @@ const ViewCmsPageList = () => {
               <div className="flex items-center gap-3">
                 <FileText className="text-purple-600" size={24} />
                 <div>
-                  <p className="text-sm text-purple-600 font-medium">Policies & Access</p>
+                  <p className="text-sm text-purple-600 font-medium">
+                    Policies & Access
+                  </p>
                   <p className="text-2xl font-bold text-purple-900">
-                    {cmsPages.filter(page => page.type === 'policies_and_access').length}
+                    {
+                      cmsPages.filter(
+                        (page) => page.type === "policies_and_access",
+                      ).length
+                    }
                   </p>
                 </div>
               </div>

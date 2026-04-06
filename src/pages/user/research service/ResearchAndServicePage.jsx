@@ -66,7 +66,9 @@ const ResearchAndServicePage = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(`${API_URL}api/research-services`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`,
+       "Cache-Control": "no-cache",
+          Pragma: "no-cache",},
       });
 
       if (response.data.status) {

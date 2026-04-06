@@ -28,7 +28,12 @@ const UserSideWhoWeAre = () => {
   const fetchPageData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}api/who-we-are/${slug}`);
+      const response = await axios.get(`${API_URL}api/who-we-are/${slug}`, {
+        headers: {
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        }
+      });
       
       if (response.data.status) {
         setPageData(response.data.data);

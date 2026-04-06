@@ -32,7 +32,9 @@ const AwardPage = () => {
       const response = await axios.get(`${API_URL}api/awards`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         }
       });
       

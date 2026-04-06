@@ -23,6 +23,8 @@ const AddCategories = () => {
       const response = await axios.get(`${API_URL}api/admin/groups`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 

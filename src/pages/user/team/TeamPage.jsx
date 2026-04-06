@@ -24,7 +24,12 @@ const TeamPage = () => {
   const fetchTeamMembers = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}api/team`); // Adjust endpoint as needed
+      const response = await axios.get(`${API_URL}api/team`, {
+        headers: {
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        }
+      }); // Adjust endpoint as needed
 
       if (response.data && response.data.data) {
         setTeamMembers(response.data.data);

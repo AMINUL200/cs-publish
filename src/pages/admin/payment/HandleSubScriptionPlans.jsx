@@ -34,7 +34,9 @@ const HandleSubScriptionPlans = () => {
       const res = await axios.get(`${API_URL}api/plans`, {
         headers: { 
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
       

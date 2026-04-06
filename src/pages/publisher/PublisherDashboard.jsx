@@ -23,6 +23,8 @@ const PublisherDashboard = () => {
       const response = await axios.get(`${API_URL}api/publisher/list-manuscript`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
           
         },
 

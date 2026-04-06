@@ -79,7 +79,12 @@ const ResearchServiceDetail = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${API_URL}api/research-services-details/${serviceId}`);
+      const response = await axios.get(`${API_URL}api/research-services-details/${serviceId}`,{
+        headers: {
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        }
+      });
 
       if (response.data.status) {
         console.log(response.data);

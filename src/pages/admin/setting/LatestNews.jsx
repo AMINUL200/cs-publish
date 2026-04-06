@@ -26,6 +26,8 @@ const LatestNews = () => {
             const response = await axios.get(`${API_URL}api/admin/news`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
+                     "Cache-Control": "no-cache",
+          Pragma: "no-cache",
                 }
             });
 

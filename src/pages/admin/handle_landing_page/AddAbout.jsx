@@ -48,6 +48,8 @@ const AddAbout = () => {
       const response = await axios.get(`${API_URL}api/abouts/${updateId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 

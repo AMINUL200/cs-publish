@@ -7,7 +7,7 @@ const EventAndConference = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
-  
+
   const [conferences, setConferences] = useState([]);
   const [filteredConferences, setFilteredConferences] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -24,7 +24,10 @@ const EventAndConference = () => {
   // Extract categories and filter conferences when data changes
   useEffect(() => {
     if (conferences.length > 0) {
-      const uniqueCategories = ["all", ...new Set(conferences.map(conf => conf.catagory))];
+      const uniqueCategories = [
+        "all",
+        ...new Set(conferences.map((conf) => conf.catagory)),
+      ];
       setCategories(uniqueCategories);
       filterConferences(selectedCategory);
     }
@@ -33,9 +36,17 @@ const EventAndConference = () => {
   const fetchConferences = async () => {
     try {
       setLoading(true);
-      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      const config = token
+        ? {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Cache-Control": "no-cache",
+              Pragma: "no-cache",
+            },
+          }
+        : {};
       const response = await axios.get(`${API_URL}api/conference`, config);
-      
+
       if (response.data.status) {
         setConferences(response.data.data);
       } else {
@@ -53,17 +64,17 @@ const EventAndConference = () => {
     if (category === "all") {
       setFilteredConferences(conferences);
     } else {
-      const filtered = conferences.filter(conf => conf.catagory === category);
+      const filtered = conferences.filter((conf) => conf.catagory === category);
       setFilteredConferences(filtered);
     }
     setSelectedCategory(category);
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -71,8 +82,8 @@ const EventAndConference = () => {
   const getCategoryColor = (category) => {
     const colors = {
       "Physics Confarences": "bg-yellow-500",
-      "Mathamatics": "bg-red-700",
-      "International Conference": "bg-black"
+      Mathamatics: "bg-red-700",
+      "International Conference": "bg-black",
     };
     return colors[category] || "bg-gray-500";
   };
@@ -80,8 +91,8 @@ const EventAndConference = () => {
   const getCategoryTextColor = (category) => {
     const colors = {
       "Physics Confarences": "text-gray-800",
-      "Mathamatics": "text-white",
-      "International Conference": "text-white"
+      Mathamatics: "text-white",
+      "International Conference": "text-white",
     };
     return colors[category] || "text-white";
   };
@@ -89,8 +100,8 @@ const EventAndConference = () => {
   const getCardBorderColor = (category) => {
     const colors = {
       "Physics Confarences": "border-yellow-400",
-      "Mathamatics": "border-red-600",
-      "International Conference": "border-gray-800"
+      Mathamatics: "border-red-600",
+      "International Conference": "border-gray-800",
     };
     return colors[category] || "border-gray-400";
   };
@@ -128,7 +139,9 @@ const EventAndConference = () => {
           {/* Left Side - Filters */}
           <div className="lg:w-1/4">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Categories</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
+                Categories
+              </h2>
               <div className="space-y-2">
                 {categories.map((category) => (
                   <button
@@ -151,7 +164,9 @@ const EventAndConference = () => {
           <div className="lg:w-3/4">
             {filteredConferences.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-500 text-lg">No conferences found for the selected category.</p>
+                <p className="text-gray-500 text-lg">
+                  No conferences found for the selected category.
+                </p>
               </div>
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
@@ -169,7 +184,9 @@ const EventAndConference = () => {
                       />
                     ) : (
                       <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-500">No Image Available</span>
+                        <span className="text-gray-500">
+                          No Image Available
+                        </span>
                       </div>
                     )}
 
@@ -193,18 +210,45 @@ const EventAndConference = () => {
 
                       {/* Location and Date */}
                       <div className="flex items-center text-gray-600 mb-3">
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
                         </svg>
                         <span className="text-sm">{conference.location}</span>
                       </div>
 
                       <div className="flex items-center text-gray-600 mb-4">
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
                         </svg>
-                        <span className="text-sm">{formatDate(conference.date)}</span>
+                        <span className="text-sm">
+                          {formatDate(conference.date)}
+                        </span>
                       </div>
 
                       {/* Description */}
@@ -214,12 +258,14 @@ const EventAndConference = () => {
 
                       {/* Action Buttons */}
                       <div className="flex space-x-3">
-                        <button 
-                        onClick={()=> navigate(`/conference-detail/${conference.slug}`)}
-                        className="flex-1 bg-yellow-500 text-gray-900 py-2 px-4 rounded-lg font-semibold hover:bg-yellow-600 transition-colors duration-200">
+                        <button
+                          onClick={() =>
+                            navigate(`/conference-detail/${conference.slug}`)
+                          }
+                          className="flex-1 bg-yellow-500 text-gray-900 py-2 px-4 rounded-lg font-semibold hover:bg-yellow-600 transition-colors duration-200"
+                        >
                           View Details
                         </button>
-                        
                       </div>
                     </div>
                   </div>

@@ -26,7 +26,12 @@ const AuthorServices = () => {
   const fetchServices = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}api/services`);
+      const response = await axios.get(`${API_URL}api/services`,{
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
       
       if (response.data.status) {
         setServices(response.data.data);

@@ -22,7 +22,12 @@ const ViewJournalList = () => {
     const fetchJournals = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${API_URL}api/all-journals`);
+        const response = await axios.get(`${API_URL}api/all-journals`, {
+          headers: {
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
+        });
 
         if (response.data.success) {
           setJournals(response.data.data);
@@ -60,7 +65,7 @@ const ViewJournalList = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentJournals = filteredJournals.slice(
     indexOfFirstItem,
-    indexOfLastItem
+    indexOfLastItem,
   );
 
   const handleViewClick = (journalId) => {
@@ -253,7 +258,6 @@ const ViewJournalList = () => {
                   <div className="relative h-48 overflow-hidden">
                     <img
                       src={`${STORAGE_URL}${journal.image}`}
-                      
                       alt={journal.j_title}
                       className="w-full h-full object-cover"
                       onError={(e) => {

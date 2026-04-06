@@ -21,7 +21,9 @@ const UserSideOpenAccessPolicy = () => {
       const response = await axios.get(`${API_URL}api/open-access-policy`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         }
       });
       

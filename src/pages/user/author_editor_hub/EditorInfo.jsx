@@ -36,7 +36,12 @@ const EditorInfo = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`${API_URL}api/editor-detals/${editorId}`);
+      const response = await axios.get(`${API_URL}api/editor-detals/${editorId}`,{
+          headers: {
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
+      });
       
       if (response.data.status) {
         setEditor(response.data.data);

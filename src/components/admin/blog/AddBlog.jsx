@@ -35,8 +35,10 @@ const AddBlog = () => {
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              "Cache-Control": "no-cache",
+              Pragma: "no-cache",
             },
-          }
+          },
         );
         if (response.data.flag === 1) {
           setCategories(response.data.data);
@@ -111,7 +113,7 @@ const AddBlog = () => {
         ...prev,
         blog_pdf: file,
       }));
-      
+
       setPdfFileName(file.name);
     }
   };
@@ -124,7 +126,9 @@ const AddBlog = () => {
     }));
     setImagePreview(null);
 
-    const fileInput = document.querySelector('input[type="file"][accept="image/*"]');
+    const fileInput = document.querySelector(
+      'input[type="file"][accept="image/*"]',
+    );
     if (fileInput) {
       fileInput.value = "";
     }
@@ -137,7 +141,9 @@ const AddBlog = () => {
     }));
     setPdfFileName("");
 
-    const fileInput = document.querySelector('input[type="file"][accept=".pdf"]');
+    const fileInput = document.querySelector(
+      'input[type="file"][accept=".pdf"]',
+    );
     if (fileInput) {
       fileInput.value = "";
     }
@@ -175,7 +181,7 @@ const AddBlog = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       if (response.status === 201) {
@@ -450,7 +456,9 @@ const AddBlog = () => {
           {/* PDF Preview */}
           {pdfFileName && (
             <div className="mb-4">
-              <p className="text-sm font-medium text-gray-700 mb-2">PDF File:</p>
+              <p className="text-sm font-medium text-gray-700 mb-2">
+                PDF File:
+              </p>
               <div className="flex items-center justify-between bg-white border border-gray-300 rounded-lg p-4">
                 <div className="flex items-center space-x-3">
                   <svg

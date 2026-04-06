@@ -20,7 +20,12 @@ const CompanyPolicyCmsPage = () => {
       setLoading(true);
       setError(null);
       
-      const response = await axios.get(`${API_URL}api/terms-shows/${slug}`);
+      const response = await axios.get(`${API_URL}api/terms-shows/${slug}`,{
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
       
       if (response.data.status) {
         setPageData(response.data.data);

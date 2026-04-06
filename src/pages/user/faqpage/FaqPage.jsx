@@ -16,7 +16,12 @@ const FaqPage = () => {
   const fetchFaqs = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}api/faqs`);
+      const response = await axios.get(`${API_URL}api/faqs`,{
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
 
       if (response.data.status) {
         setFaqs(response.data.data);

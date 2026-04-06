@@ -40,7 +40,9 @@ const ReviewerDashboard = () => {
     try {
       const response = await axios.get(`${API_URL}api/review/view-manuscript`, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         }
       });
       if (response.data.flag === 1) {

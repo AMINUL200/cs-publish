@@ -13,7 +13,12 @@ const PaymentPolicy = () => {
   const fetchPaymentPolicy = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}api/payment-policy`);
+      const response = await axios.get(`${API_URL}api/payment-policy`,{
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
 
       if (response.data.status) {
         setPolicy(response.data.data);

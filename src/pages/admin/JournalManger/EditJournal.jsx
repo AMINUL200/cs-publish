@@ -56,7 +56,9 @@ const EditJournal = () => {
     const fetchJournal = async () => {
         try {
             const res = await axios.get(`${API_URL}api/admin/journals/${id}`, {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { Authorization: `Bearer ${token}`,
+             "Cache-Control": "no-cache",
+          Pragma: "no-cache", },
             });
             if (res.status === 200 && res.data.success) {
                 const j = res.data.data;

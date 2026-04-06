@@ -27,6 +27,8 @@ const AuthorViewSubmitManuscriptDetail = () => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+             "Cache-Control": "no-cache",
+          Pragma: "no-cache",
           },
         }
       );
@@ -53,6 +55,8 @@ const AuthorViewSubmitManuscriptDetail = () => {
       const response = await axios.get(`${API_URL}api/author-feature-option`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 
@@ -73,6 +77,8 @@ const AuthorViewSubmitManuscriptDetail = () => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+             "Cache-Control": "no-cache",
+          Pragma: "no-cache",
           },
         }
       );

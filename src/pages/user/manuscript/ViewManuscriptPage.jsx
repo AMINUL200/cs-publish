@@ -34,7 +34,9 @@ const ViewManuscriptPage = () => {
     try {
       setLoading(true);
       const res = await axios.get(`${API_URL}api/view-published-manuscript`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`,
+       "Cache-Control": "no-cache",
+          Pragma: "no-cache", },
       });
 
       if (res.data.status) {

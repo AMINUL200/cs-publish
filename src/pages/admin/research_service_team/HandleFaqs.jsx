@@ -45,6 +45,8 @@ const HandleFaqs = () => {
       const response = await axios.get(`${API_URL}api/faqs`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 

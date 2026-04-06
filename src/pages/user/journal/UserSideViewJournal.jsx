@@ -33,6 +33,8 @@ const UserSideViewJournal = () => {
       const response = await axios.get(`${API_URL}api/journal-article/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 

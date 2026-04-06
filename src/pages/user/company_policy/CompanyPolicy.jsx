@@ -18,7 +18,12 @@ const CompanyPolicy = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${API_URL}api/policy`);
+      const response = await axios.get(`${API_URL}api/policy`,{
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
 
       if (response.data.status && response.data.data) {
         setPolicyData({

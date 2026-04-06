@@ -30,7 +30,9 @@ const ChecklistPage = () => {
             const response = await axios.get(`${API_URL}api/admin/checklist-settings`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                     "Cache-Control": "no-cache",
+          Pragma: "no-cache",
                 }
             });
 
@@ -120,7 +122,9 @@ const ChecklistPage = () => {
             {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                     "Cache-Control": "no-cache",
+          Pragma: "no-cache",
                 }
             }
         );

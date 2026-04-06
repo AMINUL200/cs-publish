@@ -61,6 +61,8 @@ const HandleResearchAndServicesDetails = () => {
       const response = await axios.get(`${API_URL}api/admin/rs-products`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 
@@ -82,6 +84,8 @@ const HandleResearchAndServicesDetails = () => {
       const response = await axios.get(`${API_URL}api/admin/rs-product-images/${serviceId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 

@@ -39,7 +39,12 @@ const MentorHubDetails = () => {
         const fetchEventDetails = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`${API_URL}api/events/detail/${id}`);
+                const response = await axios.get(`${API_URL}api/events/detail/${id}`,{
+                    headers: {
+                        "Cache-Control": "no-cache",
+                        Pragma: "no-cache",
+                    },
+                });
                 
                 if (response.data.status) {
                     // console.log("Fetched event details:", response.data);

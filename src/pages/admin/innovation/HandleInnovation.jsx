@@ -38,6 +38,8 @@ const HandleInnovation = () => {
       const response = await axios.get(`${API_URL}api/innovations`, {
         headers: {
           Authorization: `Bearer ${token}`,
+           "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
       });
 

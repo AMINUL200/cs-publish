@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Editor } from "@tinymce/tinymce-react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 const AddWhoWeAre = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -43,7 +44,9 @@ const AddWhoWeAre = () => {
       const response = await fetch(`${API_URL}api/who-we-are/${slug}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+            "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         }
       });
       
@@ -161,76 +164,71 @@ const AddWhoWeAre = () => {
   };
 
   // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+
+// Handle form submission
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  // Validate required fields
+  if (!formData.category || !formData.title || !formData.long_desc) {
+    toast.error("Please fill in all required fields");
+    return;
+  }
+
+  if (!isEdit && !formData.image) {
+    toast.error("Please select an image");
+    return;
+  }
+  
+  try {
+    setLoading(true);
     
-    // Validate required fields
-    if (!formData.category || !formData.title || !formData.long_desc) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
-    if (!isEdit && !formData.image) {
-      toast.error("Please select an image");
-      return;
-    }
+    const submitData = new FormData();
+    submitData.append('category', formData.category);
+    submitData.append('title', formData.title);
+    submitData.append('long_desc', formData.long_desc);
     
-    try {
-      setLoading(true);
-      
-      const submitData = new FormData();
-      submitData.append('category', formData.category);
-      submitData.append('title', formData.title);
-      submitData.append('long_desc', formData.long_desc);
-      
-      // In edit mode, if no new image is selected but we want to remove current image
-      if (isEdit) {
-        if (formData.image) {
-          // New image selected
-          submitData.append('image', formData.image);
-        } else if (!currentImage && !formData.image) {
-          // No image exists and no new image selected
-          submitData.append('remove_image', 'true');
-        }
-      } else {
-        // Create mode - image is required
-        if (formData.image) {
-          submitData.append('image', formData.image);
-        }
+    // In edit mode, if no new image is selected but we want to remove current image
+    if (isEdit) {
+      if (formData.image) {
+        // New image selected
+        submitData.append('image', formData.image);
+      } else if (!currentImage && !formData.image) {
+        // No image exists and no new image selected
+        submitData.append('remove_image', 'true');
       }
-
-      const url = isEdit 
-        ? `${API_URL}api/who-we-are/update/${id}`
-        : `${API_URL}api/who-we-are/store`;
-      
-      const method = 'POST';
-
-      const response = await fetch(url, {
-        method: method,
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: submitData
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to ${isEdit ? 'update' : 'create'} item`);
+    } else {
+      // Create mode - image is required
+      if (formData.image) {
+        submitData.append('image', formData.image);
       }
-
-      const result = await response.json();
-      
-      if (result.status) {
-        toast.success(`Item ${isEdit ? 'updated' : 'created'} successfully!`);
-        navigate('/handle-who-we-are');
-      } else {
-        throw new Error(result.message || 'Operation failed');
-      }
-    } catch (err) {
-      toast.error(`Error: ${err.message}`);
-    } finally {
-      setLoading(false);
     }
-  };
+
+    const url = isEdit 
+      ? `${API_URL}api/who-we-are/update/${id}`
+      : `${API_URL}api/who-we-are/store`;
+    
+    const response = await axios.post(url, submitData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      }
+    });
+    
+    console.log("Add Response:: ", response);
+    
+    if (response.data.status) {
+      toast.success(`Item ${isEdit ? 'updated' : 'created'} successfully!`);
+      navigate('/handle-who-we-are');
+    } else {
+      throw new Error(response.data.message || 'Operation failed');
+    }
+  } catch (err) {
+    toast.error(`Error: ${err.response?.data?.message || err.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loading && isEdit) {
     return (
@@ -377,7 +375,7 @@ const AddWhoWeAre = () => {
                     {isEdit ? 'Upload new image' : 'Click to upload image'}
                   </span>
                   <span className="text-xs text-gray-400">
-                    PNG, JPG, JPEG up to 5MB
+                    PNG, JPG, JPEG up to 2MB
                   </span>
                 </label>
               </div>

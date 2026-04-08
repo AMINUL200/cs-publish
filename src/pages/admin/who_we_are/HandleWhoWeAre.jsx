@@ -19,7 +19,9 @@ const HandleWhoWeAre = () => {
       const response = await fetch(`${API_URL}api/who-we-are`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+            "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         }
       });
       

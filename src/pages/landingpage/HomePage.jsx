@@ -71,18 +71,25 @@ const HomePage = () => {
     team: null,
   });
 
+  const config = {
+    headers: {
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
+    },
+  };
+
   const fetchAll = async () => {
     const requests = {
-      banner: axios.get(`${API_URL}api/banners`),
-      partner: axios.get(`${API_URL}api/partners`),
-      blog: axios.get(`${API_URL}api/blog-user`),
-      about: axios.get(`${API_URL}api/about`),
-      pricing: axios.get(`${API_URL}api/plan`),
-      // publishedJournal: axios.get(`${API_URL}api/published-manuscripts-list`),
-      browsJournal: axios.get(`${API_URL}api/show-journals`),
-      research: axios.get(`${API_URL}api/innovations`),
-      service: axios.get(`${API_URL}api/services`),
-      team: axios.get(`${API_URL}api/team`),
+      banner: axios.get(`${API_URL}api/banners`, config),
+      partner: axios.get(`${API_URL}api/partners`, config),
+      blog: axios.get(`${API_URL}api/blog-user`, config),
+      about: axios.get(`${API_URL}api/about`, config),
+      pricing: axios.get(`${API_URL}api/plan`, config),
+      // publishedJournal: axios.get(`${API_URL}api/published-manuscripts-list`, config),
+      browsJournal: axios.get(`${API_URL}api/show-journals`, config),
+      research: axios.get(`${API_URL}api/innovations`, config),
+      service: axios.get(`${API_URL}api/services`, config),
+      team: axios.get(`${API_URL}api/team`, config),
     };
 
     Object.entries(requests).forEach(async ([key, request]) => {
@@ -171,7 +178,7 @@ const HomePage = () => {
         loading={loading.team}
         error={error.team}
       />
-      <FloatingSubmitButton/>
+      <FloatingSubmitButton />
     </>
   );
 };

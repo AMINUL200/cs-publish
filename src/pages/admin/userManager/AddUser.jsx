@@ -93,7 +93,7 @@ const AddUser = () => {
 
     } catch (error) {
       console.error(error);
-      toast.error(error.response.data.error || "Something went wrong while creating user");
+      toast.error(error.response.data.message || "Something went wrong while creating user");
     } finally {
       setIsLoading(false);
     }

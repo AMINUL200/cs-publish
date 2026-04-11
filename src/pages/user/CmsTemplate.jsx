@@ -144,7 +144,7 @@ const CmsTemplate = () => {
    
       <div className="min-h-screen bg-gray-50 pt-30">
         {/* Hero Section */}
-        <div className={`bg-gradient-to-br ${typeConfig.gradient} py-16`}>
+        <div className={`bg-gradient-to-br ${typeConfig.gradient} pt-16`}>
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="flex flex-col lg:flex-row items-center gap-8">
@@ -181,12 +181,12 @@ const CmsTemplate = () => {
                     </span>
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        content.status === "1"
+                        content.status == 1
                           ? "bg-green-100 text-green-800"
                           : "bg-red-100 text-red-800"
                       }`}
                     >
-                      {content.status === "1" ? "Active" : "Inactive"}
+                      {content.status == 1 ? "Active" : "Inactive"}
                     </span>
                   </div>
 
@@ -289,7 +289,7 @@ const CmsTemplate = () => {
 
         {/* Long Description Section */}
         {content.long_description && (
-          <div className="py-16">
+          <div className="pb-16 pt-4">
             <div className="container mx-auto px-4">
               <div className="max-w-6xl mx-auto">
                 <div className="bg-white rounded-2xl shadow-lg p-8 lg:p-12">

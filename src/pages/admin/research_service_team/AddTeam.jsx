@@ -23,6 +23,7 @@ const AddTeam = () => {
   const [formData, setFormData] = useState({
     type: "team",
     title: "",
+    category: "",
     image: null,
     short_description: "",
     long_description: "",
@@ -57,6 +58,7 @@ const AddTeam = () => {
         setFormData({
           type: team.type || "team",
           title: team.title || "",
+          category: team.category || "",
           image: team.image || null,
           short_description: team.short_description || "",
           long_description: team.long_description || "",
@@ -265,6 +267,24 @@ const AddTeam = () => {
                     placeholder="Enter team title"
                     required
                   />
+                </div>
+
+                {/* Category */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Category
+                  </label>
+                  <input
+                    type="text"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleInputChange}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                    placeholder="Enter category (e.g., Management, Development, Design)"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Specify the team category or department
+                  </p>
                 </div>
 
                 {/* Status */}

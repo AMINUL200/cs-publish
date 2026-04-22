@@ -26,7 +26,7 @@ const CmsTemplate = () => {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-           "Cache-Control": "no-cache",
+          "Cache-Control": "no-cache",
           Pragma: "no-cache",
         },
       });
@@ -34,7 +34,6 @@ const CmsTemplate = () => {
       if (res.data.status) {
         setContent(res.data.data);
         console.log(res.data.data);
-        
       } else {
         setError("Content not found");
         toast.error("Content not found");
@@ -141,7 +140,6 @@ const CmsTemplate = () => {
 
   return (
     <>
-   
       <div className="min-h-screen bg-gray-50 pt-30">
         {/* Hero Section */}
         <div className={`bg-gradient-to-br ${typeConfig.gradient} pt-16`}>
@@ -149,25 +147,26 @@ const CmsTemplate = () => {
             <div className="max-w-6xl mx-auto">
               <div className="flex flex-col lg:flex-row items-center gap-8">
                 {/* Image */}
+                {/* Profile Image */}
                 <div className="lg:w-2/5">
-                  {content.image ? (
-                    <div className="relative">
-                      <img
-                        src={`${STORAGE_URL}${content.image}`}
-                        alt={teamInfo ? teamInfo.name : content.title}
-                        className="w-full h-80 lg:h-96 object-fill rounded-2xl shadow-xl"
-                      />
-                      <div className="absolute -bottom-4 -right-4 bg-white rounded-full p-4 shadow-lg">
-                        <span className="text-3xl">{typeConfig.icon}</span>
+                  <div className="relative group">
+                    {content.image ? (
+                      <div className="rounded-2xl overflow-hidden shadow-lg">
+                        <img
+                          src={`${STORAGE_URL}${content.image}`}
+                          alt={teamInfo ? teamInfo.name : content.title}
+                          className="w-full h-auto object-cover"
+                        />
                       </div>
-                    </div>
-                  ) : (
-                    <div className="w-full h-80 lg:h-96 bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl shadow-xl flex items-center justify-center">
-                      <span className="text-6xl text-gray-400">
-                        {typeConfig.icon}
-                      </span>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="w-full aspect-square bg-gray-100 rounded-2xl shadow-lg flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="text-6xl mb-2">👤</div>
+                          <p className="text-gray-400">No Image Available</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Content */}
@@ -192,10 +191,10 @@ const CmsTemplate = () => {
 
                   {teamInfo ? (
                     <>
-                      <h1 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-3">
+                      <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-3">
                         {teamInfo.name}
                       </h1>
-                      <p className="text-xl lg:text-2xl text-blue-600 font-semibold mb-6">
+                      <p className="text-xl lg:text-xl text-blue-600 font-semibold mb-6">
                         {teamInfo.position}
                       </p>
                     </>
@@ -311,7 +310,6 @@ const CmsTemplate = () => {
         )}
 
         {/* Metadata Section */}
-        
       </div>
     </>
   );

@@ -11,6 +11,8 @@ const TeamPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("ALL");
+  const [categories, setCategories] = useState([]);
 
   const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
@@ -26,14 +28,24 @@ const TeamPage = () => {
       setLoading(true);
       const response = await axios.get(`${API_URL}api/team`, {
         headers: {
-           "Cache-Control": "no-cache",
+          "Cache-Control": "no-cache",
           Pragma: "no-cache",
-        }
-      }); // Adjust endpoint as needed
+        },
+      });
 
       if (response.data && response.data.data) {
         setTeamMembers(response.data.data);
         setFilteredMembers(response.data.data);
+
+        // Extract unique categories from team members
+        const uniqueCategories = [
+          ...new Set(
+            response.data.data
+              .map((member) => member.category)
+              .filter((cat) => cat),
+          ),
+        ];
+        setCategories(uniqueCategories);
       }
     } catch (err) {
       console.error("Error fetching team members:", err);
@@ -43,24 +55,38 @@ const TeamPage = () => {
     }
   };
 
-  // Handle search
+  // Handle category filter
   useEffect(() => {
-    if (searchTerm.trim() === "") {
-      setFilteredMembers(teamMembers);
-    } else {
-      const filtered = teamMembers.filter((member) => {
+    filterMembers();
+  }, [searchTerm, selectedCategory, teamMembers]);
+
+  const filterMembers = () => {
+    let filtered = [...teamMembers];
+
+    // Filter by category
+    if (selectedCategory !== "ALL") {
+      filtered = filtered.filter(
+        (member) => member.category === selectedCategory,
+      );
+    }
+
+    // Filter by search term
+    if (searchTerm.trim() !== "") {
+      filtered = filtered.filter((member) => {
         const { name, position } = getTeamMemberInfo(member.title);
         return (
           name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           position.toLowerCase().includes(searchTerm.toLowerCase()) ||
           member.short_description
             ?.toLowerCase()
-            .includes(searchTerm.toLowerCase())
+            .includes(searchTerm.toLowerCase()) ||
+          member.category?.toLowerCase().includes(searchTerm.toLowerCase())
         );
       });
-      setFilteredMembers(filtered);
     }
-  }, [searchTerm, teamMembers]);
+
+    setFilteredMembers(filtered);
+  };
 
   // Extract name and position from title
   const getTeamMemberInfo = (title) => {
@@ -79,6 +105,10 @@ const TeamPage = () => {
 
   const clearSearch = () => {
     setSearchTerm("");
+  };
+
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
   };
 
   // Loading state
@@ -164,7 +194,7 @@ const TeamPage = () => {
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search by name, position, or description..."
+                placeholder="Search by name, position, category, or description..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-xl shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-lg"
@@ -178,17 +208,87 @@ const TeamPage = () => {
                 </button>
               )}
             </div>
-
-            {/* Search Stats */}
-            {searchTerm && (
-              <div className="mt-3 text-left text-gray-600">
-                Found{" "}
-                <span className="font-semibold">{filteredMembers.length}</span>{" "}
-                team member{filteredMembers.length !== 1 ? "s" : ""}
-              </div>
-            )}
           </div>
         </div>
+
+        {/* Category Filters */}
+        {categories.length > 0 && (
+          <div className="max-w-5xl mx-auto mb-10">
+            <div className="flex flex-wrap justify-center gap-3">
+              {/* ALL Button */}
+              <button
+                onClick={() => handleCategoryChange("ALL")}
+                className={`px-6 py-2 rounded-full font-medium transition-all duration-300 transform hover:scale-105 ${
+                  selectedCategory === "ALL"
+                    ? "bg-yellow-500 text-white shadow-lg ring-2 ring-yellow-300"
+                    : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+                }`}
+              >
+                ALL
+                <span className="ml-2 text-sm">({teamMembers.length})</span>
+              </button>
+
+              {/* Dynamic Category Buttons */}
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => handleCategoryChange(category)}
+                  className={`px-6 py-2 rounded-full font-medium transition-all duration-300 transform hover:scale-105 ${
+                    selectedCategory === category
+                      ? "bg-yellow-500 text-white shadow-lg ring-2 ring-yellow-300"
+                      : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+                  }`}
+                >
+                  {category}
+                  <span className="ml-2 text-sm">
+                    ({teamMembers.filter((m) => m.category === category).length}
+                    )
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Search and Filter Stats */}
+        {(searchTerm || selectedCategory !== "ALL") && (
+          <div className="max-w-5xl mx-auto mb-6">
+            <div className="bg-white rounded-lg p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+              <div className="text-gray-600">
+                Found{" "}
+                <span className="font-semibold text-yellow-600">
+                  {filteredMembers.length}
+                </span>{" "}
+                team member{filteredMembers.length !== 1 ? "s" : ""}
+                {selectedCategory !== "ALL" && (
+                  <span className="ml-1">
+                    in <span className="font-semibold">{selectedCategory}</span>{" "}
+                    category
+                  </span>
+                )}
+              </div>
+
+              <div className="flex gap-2">
+                {selectedCategory !== "ALL" && (
+                  <button
+                    onClick={() => handleCategoryChange("ALL")}
+                    className="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors"
+                  >
+                    Clear Filter
+                  </button>
+                )}
+                {searchTerm && (
+                  <button
+                    onClick={clearSearch}
+                    className="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors"
+                  >
+                    Clear Search
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Team Members Grid */}
         {filteredMembers.length === 0 ? (
@@ -198,39 +298,71 @@ const TeamPage = () => {
               No team members found
             </h3>
             <p className="text-gray-500 text-lg mb-6">
-              {searchTerm
-                ? `No results match "${searchTerm}". Try adjusting your search.`
+              {searchTerm || selectedCategory !== "ALL"
+                ? `No results match your ${
+                    searchTerm ? `search "${searchTerm}"` : ""
+                  } ${searchTerm && selectedCategory !== "ALL" ? "and " : ""}
+                  ${selectedCategory !== "ALL" ? `${selectedCategory} category` : ""}. 
+                  Try adjusting your filters.`
                 : "Team members will appear here once added."}
             </p>
-            {searchTerm && (
-              <button
-                onClick={clearSearch}
-                className="px-6 py-3 bg-yellow-400 text-gray-900 rounded-lg hover:bg-yellow-500 transition-colors font-semibold"
-              >
-                Clear Search
-              </button>
+            {(searchTerm || selectedCategory !== "ALL") && (
+              <div className="flex gap-3 justify-center">
+                {selectedCategory !== "ALL" && (
+                  <button
+                    onClick={() => handleCategoryChange("ALL")}
+                    className="px-6 py-3 bg-yellow-400 text-gray-900 rounded-lg hover:bg-yellow-500 transition-colors font-semibold"
+                  >
+                    Clear Category Filter
+                  </button>
+                )}
+                {searchTerm && (
+                  <button
+                    onClick={clearSearch}
+                    className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+                  >
+                    Clear Search
+                  </button>
+                )}
+              </div>
             )}
           </div>
         ) : (
           <>
             {/* Results Count */}
-            <div className="mb-8 text-right text-gray-600">
+            <div className="mb-8 text-right text-gray-600 max-w-5xl mx-auto">
               Showing{" "}
-              <span className="font-semibold">{filteredMembers.length}</span> of{" "}
-              <span className="font-semibold">{teamMembers.length}</span> team
-              members
+              <span className="font-semibold text-yellow-600">
+                {filteredMembers.length}
+              </span>{" "}
+              of <span className="font-semibold">{teamMembers.length}</span>{" "}
+              team members
             </div>
 
-            {/* Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mx-6">
+            {/* Grid - Updated with auto-fit and centering */}
+            <div
+              className="grid gap-8 mx-6 justify-center"
+              style={{
+                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 320px))",
+              }}
+            >
               {filteredMembers.map((member) => {
                 const { name, position } = getTeamMemberInfo(member.title);
 
                 return (
                   <div
                     key={member.id}
-                    className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden group"
+                    className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden group w-full max-w-sm"
                   >
+                    {/* Category Badge */}
+                    {member.category && (
+                      <div className="absolute top-3 right-3 z-10">
+                        <span className="bg-yellow-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                          {member.category}
+                        </span>
+                      </div>
+                    )}
+
                     {/* Image Container */}
                     <div className="relative overflow-hidden">
                       <img
@@ -251,7 +383,7 @@ const TeamPage = () => {
                               href={member.facebook_link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="bg-yellow-600 text-white p-3 rounded-full hover:bg-yellow-700 transition-colors"
+                              className="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition-colors"
                             >
                               <svg
                                 className="w-5 h-5"
@@ -267,7 +399,7 @@ const TeamPage = () => {
                               href={member.twitter_link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="bg-yellow-400 text-white p-3 rounded-full hover:bg-yellow-500 transition-colors"
+                              className="bg-sky-500 text-white p-3 rounded-full hover:bg-sky-600 transition-colors"
                             >
                               <svg
                                 className="w-5 h-5"
@@ -283,7 +415,7 @@ const TeamPage = () => {
                               href={member.linkedin_link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="bg-yellow-700 text-white p-3 rounded-full hover:bg-yellow-800 transition-colors"
+                              className="bg-blue-800 text-white p-3 rounded-full hover:bg-blue-900 transition-colors"
                             >
                               <svg
                                 className="w-5 h-5"

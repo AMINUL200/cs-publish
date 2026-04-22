@@ -315,6 +315,17 @@ const HandleTeams = () => {
                         </div>
                       </div>
                     )}
+                    {/* Category */}
+                    {member.category && (
+                      <div className="mb-4 flex flex-wrap gap-2">
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">
+                          Category:
+                        </h4>
+                        <span className="inline-flex items-center text-indigo-600 text-xs bg-indigo-50 px-2 py-1 rounded">
+                          🏷️ {member.category}
+                        </span>
+                      </div>
+                    )}
 
                     {/* Metadata */}
                     <div className="border-t border-gray-200 pt-4">

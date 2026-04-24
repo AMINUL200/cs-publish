@@ -33,6 +33,31 @@ const DetailsOfCurrentIssue = () => {
   const [sortBy, setSortBy] = useState("date");
   const navigate = useNavigate();
 
+  // Navigation items (matching QuickPress component)
+  const navItems = [
+    {
+      label: "About Journal",
+      path: `/about-journal/${id}`,
+    },
+    {
+      label: "Scholarly domain",
+      path: `/author-overview/${id}`,
+    },
+    {
+      label: "Library of issues",
+      path: `/list-of-archive/${id}`,
+    },
+    {
+      label: "Present issue",
+      path: `/view-current-issue/${id}`,
+    },
+    { label: "Quick Press", path: `/quick-press/${id}` },
+    {
+      label: "Quick Insight (A-Z)",
+      path: `/journal-description/${id}`,
+    },
+  ];
+
   // Fetch current issue details and manuscripts
   useEffect(() => {
     const fetchCurrentIssueDetails = async () => {
@@ -41,16 +66,16 @@ const DetailsOfCurrentIssue = () => {
         const response = await axios.get(`${API_URL}api/current-issue/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
-             "Cache-Control": "no-cache",
-          Pragma: "no-cache",
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
           },
         });
 
-        if (response.data.flag === 1 && response.data.data) {
-          console.log("Current Issue Response:", response.data);
+        console.log("Current Issue Response:", response.data.data);
+        if (response.data.flag === 1 || response.data.flag === 0) {
           const data = response.data.data;
-          setJournalData(data.journal);
-          setVolumeData(data.volume);
+          setJournalData(data);
+          setVolumeData(data?.volume);
           setManuscripts(data.manuscripts || []);
         } else {
           setError("No data found for this current issue");
@@ -140,10 +165,17 @@ const DetailsOfCurrentIssue = () => {
     toast.warning("Please sign in as an author to access this feature.");
   };
 
-  // const handleSubmit = () => {
-  //   toast.info("Please Register To Author");
-  //   // navigate("/signup");
-  // };
+  const handleSubmitButton = () => {
+    if (token) {
+      toast.warning("Please sign in as an author to access this feature.");
+    } else {
+      navigate("/signin");
+    }
+  };
+
+  const handleNavClick = (path) => {
+    navigate(path);
+  };
 
   if (loading) {
     return (
@@ -168,7 +200,7 @@ const DetailsOfCurrentIssue = () => {
     );
   }
 
-  if (!journalData || !volumeData) {
+  if (!journalData ) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-10 sm:pt-24 flex items-center justify-center">
         <div className="text-center">
@@ -187,72 +219,148 @@ const DetailsOfCurrentIssue = () => {
       {/* Header Section */}
       <div className="bg-black text-yellow-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col lg:flex-row gap-8 items-center">
-            {/* Left Side - Cover Image */}
-            <div className="flex-shrink-0">
-              <div className="relative group">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Right Column - Journal Image */}
+            <div className="lg:col-span-3 flex justify-center lg:justify-end order-2 lg:order-3">
+              <div className="relative">
                 <img
-                  // src={volumeData.image || journalData.image}
-                  src={`${STORAGE_URL}${volumeData.image || journalData.image}`}
-                  alt={`Volume ${volumeData.volume} ${volumeData.issue_no}`}
-                  className="w-48 h-64 object-cover rounded-xl shadow-2xl border-4 border-white group-hover:scale-105 transition-transform duration-300"
+                  src={`${STORAGE_URL}${journalData.image}`}
+                  alt={journalData.j_title}
+                  className="w-48 h-60 lg:w-56 lg:h-86 object-cover rounded-lg shadow-2xl border-4 border-yellow-500"
                 />
-                <div className="absolute -bottom-2 -right-2 bg-yellow-500 text-white  px-3 py-1 rounded-lg font-bold text-sm">
-                  Vol {volumeData.volume}
+                <div className="absolute -bottom-3 -right-3 bg-yellow-500 text-black px-3 py-1 rounded-lg font-bold text-xs shadow-lg rotate-3">
+                  Journal Cover
                 </div>
               </div>
             </div>
 
-            {/* Center - Issue Details */}
-            <div className="flex-1 text-center lg:text-left">
-              <h1 className="text-3xl lg:text-4xl font-bold text-yellow-500 mb-4">
-                {journalData.j_title}
-              </h1>
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-4">
-                {/* <p className="text-white text-lg leading-relaxed">
-                  {journalData.j_description || "No description available"}
-                </p> */}
-              </div>
-              <div className="flex flex-wrap gap-4 justify-center lg:justify-start text-yellow-500">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
-                  <span>From: {formatDate(volumeData.from_date)}</span>
+            {/* Middle Column - Journal Information */}
+            <div className="lg:col-span-6 order-1 lg:order-2">
+              <div className="text-center lg:text-left">
+                <h1 className="text-3xl lg:text-4xl font-bold mb-4 text-yellow-400">
+                  {journalData.j_title}
+                </h1>
+                <p className="text-lg mb-6 text-yellow-300">
+                  Author Overview - Guidelines for Authors
+                </p>
+
+                {/* Journal Details Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
+                  {journalData.issn_print && (
+                    <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
+                      <div className="font-semibold text-yellow-300 text-sm">
+                        ISSN Print
+                      </div>
+                      <div className="text-yellow-200 text-sm">
+                        {journalData.issn_print_no}
+                      </div>
+                    </div>
+                  )}
+                  {journalData.issn_online && (
+                    <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
+                      <div className="font-semibold text-yellow-300 text-sm">
+                        ISSN Online
+                      </div>
+                      <div className="text-yellow-200 text-sm">
+                        {journalData.issn_online_no}
+                      </div>
+                    </div>
+                  )}
+                  {journalData.ugc_approved && (
+                    <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
+                      <div className="font-semibold text-yellow-300 text-sm">
+                        UGC Approved
+                      </div>
+                      <div className="text-yellow-200 text-sm">
+                        {journalData.ugc_no}
+                      </div>
+                    </div>
+                  )}
+                  <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-sm">
+                      Impact Factor
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {journalData.impact_factor || "N/A"}
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
-                  <span>To: {formatDate(volumeData.to_date)}</span>
+
+                {/* Journal Metrics Row */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                      Total Articles
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {journalData.total_articles || "0"}
+                    </div>
+                  </div>
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                      Total Citations
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {journalData.total_citations || "0"}
+                    </div>
+                  </div>
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                      H-Index
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {journalData.h_index || "0"}
+                    </div>
+                  </div>
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                      Acceptance Rate
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {journalData.acceptance_rate || "0"}%
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
-                  <span>{volumeData.page_no}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
-                  <span>Issue No: {volumeData.issue_no || "N/A"}</span>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
+                  <button className="bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 flex items-center gap-2 shadow-lg">
+                    <Bell className="w-5 h-5" />
+                    Get Alerts
+                  </button>
+                  <button
+                    onClick={handleSubmitButton}
+                    className="bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 flex items-center gap-2 shadow-lg"
+                  >
+                    <Send className="w-5 h-5" />
+                    Submit Manuscript
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* Right Side - Action Buttons */}
-            <div className="flex flex-col gap-4">
-              <button
-                onClick={handleDownloadCover}
-                className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2"
-              >
-                <Download className="w-5 h-5" />
-                Download Cover
-              </button>
-              <button className="bg-red-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2">
-                <Bell className="w-5 h-5" />
-                Get Alerts
-              </button>
-              <button
-                onClick={handleSubmit}
-                className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-yellow-500 hover:text-black transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2"
-              >
-                <Send className="w-5 h-5" />
-                Submit Manuscript
-              </button>
+            {/* Left Column - Navigation Links */}
+            <div className="lg:col-span-3 order-3 lg:order-1">
+              <div className="space-y-3">
+                {navItems.map((item, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleNavClick(item.path)}
+                    className="w-full bg-yellow-500 text-black px-4 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg text-center"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+                {/* {data.editor && (
+                       <button
+                         onClick={() => handleViewEditor(data.editor)}
+                         className="w-full bg-yellow-500 text-black px-4 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg text-center flex items-center justify-center gap-2"
+                       >
+                         <Users className="w-4 h-4" />
+                         Editor Information
+                       </button>
+                     )} */}
+              </div>
             </div>
           </div>
         </div>

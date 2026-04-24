@@ -24,6 +24,7 @@ const AddTeam = () => {
     type: "team",
     title: "",
     category: "",
+    is_order: "",
     image: null,
     short_description: "",
     long_description: "",
@@ -59,6 +60,7 @@ const AddTeam = () => {
           type: team.type || "team",
           title: team.title || "",
           category: team.category || "",
+          is_order: team.is_order || "",
           image: team.image || null,
           short_description: team.short_description || "",
           long_description: team.long_description || "",
@@ -103,7 +105,13 @@ const AddTeam = () => {
         setImagePreview(null);
       }
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      // For number input, ensure we store as number
+      if (name === "is_order") {
+        const numValue = value === "" ? "" : Number(value);
+        setFormData((prev) => ({ ...prev, [name]: numValue }));
+      } else {
+        setFormData((prev) => ({ ...prev, [name]: value }));
+      }
     }
   };
 
@@ -154,7 +162,7 @@ const AddTeam = () => {
             submitData.append(key, formData.image);
           }
         } else {
-          if (formData[key] !== null && formData[key] !== undefined) {
+          if (formData[key] !== null && formData[key] !== undefined && formData[key] !== "") {
             submitData.append(key, formData[key]);
           }
         }
@@ -270,7 +278,7 @@ const AddTeam = () => {
                 </div>
 
                 {/* Category */}
-                <div className="md:col-span-2">
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Category
                   </label>
@@ -284,6 +292,26 @@ const AddTeam = () => {
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     Specify the team category or department
+                  </p>
+                </div>
+
+                {/* Order */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Display Order
+                  </label>
+                  <input
+                    type="number"
+                    name="is_order"
+                    value={formData.is_order}
+                    onChange={handleInputChange}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                    placeholder="Enter display order (e.g., 1, 2, 3)"
+                    min="0"
+                    step="1"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Set the display order (lower numbers appear first)
                   </p>
                 </div>
 

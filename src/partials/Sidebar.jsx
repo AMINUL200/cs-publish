@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { sidebarRoutes } from "./sidebarRoutes";
 import { CloseIcon, ExpandIcon, ChevronDown } from "../utils/icons";
 
-function Sidebar({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
+function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
   const location = useLocation();
   const { pathname } = location;
   const { userData } = useSelector((state) => state.auth);
@@ -15,14 +15,19 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
   const sidebar = useRef(null);
   const storedSidebarExpanded = localStorage.getItem("sidebar-expanded");
   const [sidebarExpanded, setSidebarExpanded] = useState(
-    storedSidebarExpanded === null ? false : storedSidebarExpanded === "true"
+    storedSidebarExpanded === null ? false : storedSidebarExpanded === "true",
   );
 
   // Close on click outside
   useEffect(() => {
     const clickHandler = ({ target }) => {
       if (!sidebar.current || !trigger.current) return;
-      if (!sidebarOpen || sidebar.current.contains(target) || trigger.current.contains(target)) return;
+      if (
+        !sidebarOpen ||
+        sidebar.current.contains(target) ||
+        trigger.current.contains(target)
+      )
+        return;
       setSidebarOpen(false);
     };
     document.addEventListener("click", clickHandler);
@@ -50,13 +55,14 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
 
   const renderRoute = (route, level = 0, parentIndex = 0) => {
     // Safety checks
-    if (!route || !route.allowedRoles?.includes(Number(userData?.user_type))) return null;
+    if (!route || !route.allowedRoles?.includes(Number(userData?.user_type)))
+      return null;
     // Create a unique key for each route
-  const routeKey = `${route.path || route.title}-${level}-${parentIndex}`;
+    const routeKey = `${route.path || route.title}-${level}-${parentIndex}`;
 
     if (route.type === "header") {
       return (
-        <h3 className="text-xs uppercase text-gray-400 dark:text-gray-500 font-semibold pl-3">
+        <h3 className="text-xs uppercase text-gray-400 font-semibold pl-3">
           <span className="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6">
             •••
           </span>
@@ -68,22 +74,22 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
     }
 
     if (route.subRoutes) {
-      const isActive = route.subRoutes.some(sub =>
-        pathname.includes(sub.path) ||
-        (sub.subRoutes && sub.subRoutes.some(subSub => pathname.includes(subSub.path)))
+      const isActive = route.subRoutes.some(
+        (sub) =>
+          pathname.includes(sub.path) ||
+          (sub.subRoutes &&
+            sub.subRoutes.some((subSub) => pathname.includes(subSub.path))),
       );
 
       return (
-        <SidebarLinkGroup
-          key={routeKey}
-          activecondition={isActive}
-        >
+        <SidebarLinkGroup key={routeKey} activecondition={isActive}>
           {(handleClick, open) => (
             <>
               <a
                 href="#0"
-                className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${isActive ? "" : "hover:text-gray-900 dark:hover:text-white"
-                  }`}
+                className={`block text-gray-800 truncate transition duration-150 ${
+                  isActive ? "" : "hover:text-gray-900"
+                }`}
                 onClick={(e) => {
                   e.preventDefault();
                   handleClick();
@@ -93,21 +99,28 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     {route.icon && (
-                      <div className={`shrink-0 ${isActive ? 'text-violet-500' : 'text-gray-400 dark:text-gray-500'
-                        }`}>
+                      <div
+                        className={`shrink-0 ${
+                          isActive ? "text-violet-500" : "text-gray-400"
+                        }`}
+                      >
                         {route.icon}
                       </div>
                     )}
-                    <span className={`text-sm font-medium ${route.icon ? 'ml-4' : ''} lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200`}>
+                    <span
+                      className={`text-sm font-medium ${route.icon ? "ml-4" : ""} ${!sidebarExpanded ? "lg:hidden" : "lg:block"} duration-200`}
+                    >
                       {route.title}
                     </span>
                   </div>
                   {route.subRoutes && <ChevronDown open={open} />}
                 </div>
               </a>
-              <div className="lg:hidden lg:sidebar-expanded:block 2xl:block">
-                <ul className={`pl-${4 + (level * 4)} mt-1 ${!open && "hidden"}`}>
-                  {route.subRoutes.map((subRoute, index) => renderRoute(subRoute, level + 1, index))}
+              <div className={`${!sidebarExpanded ? "lg:hidden" : "lg:block"}`}>
+                <ul className={`pl-${4 + level * 4} mt-1 ${!open && "hidden"}`}>
+                  {route.subRoutes.map((subRoute, index) =>
+                    renderRoute(subRoute, level + 1, index),
+                  )}
                 </ul>
               </div>
             </>
@@ -119,26 +132,36 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
     return (
       <li
         key={routeKey}
-        className={`pl-${4 + (level * 4)} pr-3 py-2 rounded-lg mb-0.5 last:mb-0 ${pathname === route.path ? "bg-linear-to-r from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]" : ""
-          }`}
+        className={`pl-${4 + level * 4} pr-3 py-2 rounded-lg mb-0.5 last:mb-0 ${
+          pathname === route.path
+            ? "bg-linear-to-r from-violet-500/[0.12] to-violet-500/[0.04]"
+            : ""
+        }`}
       >
-        
         <NavLink
           end
           to={route.path}
           className={({ isActive }) =>
-            `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${isActive ? "" : "hover:text-gray-900 dark:hover:text-white"
+            `block truncate transition duration-150 ${
+              isActive
+                ? "text-violet-600 font-semibold"
+                : "text-gray-800 hover:text-gray-900"
             }`
           }
         >
           <div className="flex items-center">
             {route.icon && (
-              <div className={`shrink-0 ${pathname === route.path ? 'text-violet-500' : 'text-gray-400 dark:text-gray-500'
-                }`}>
+              <div
+                className={`shrink-0 ${
+                  pathname === route.path ? "text-violet-500" : "text-gray-400"
+                }`}
+              >
                 {route.icon}
               </div>
             )}
-            <span className={`text-sm font-medium ${route.icon ? 'ml-4' : ''} lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200`}>
+            <span
+              className={`text-sm font-medium ${route.icon ? "ml-4" : ""} ${!sidebarExpanded ? "lg:hidden" : "lg:block"} duration-200`}
+            >
               {route.title}
             </span>
           </div>
@@ -151,8 +174,9 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
     <div className="min-w-fit">
       {/* Sidebar backdrop (mobile only) */}
       <div
-        className={`fixed inset-0 bg-gray-900/30 z-40 lg:hidden lg:z-auto transition-opacity duration-200 ${sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
+        className={`fixed inset-0 bg-gray-900/30 z-40 lg:hidden lg:z-auto transition-opacity duration-200 ${
+          sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
         aria-hidden="true"
       ></div>
 
@@ -160,9 +184,11 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
       <div
         id="sidebar"
         ref={sidebar}
-        className={`flex lg:flex! flex-col absolute z-40 left-0 top-0 lg:static lg:left-auto lg:top-auto lg:translate-x-0 h-[100dvh] overflow-y-scroll lg:overflow-y-auto no-scrollbar w-64 lg:w-20 lg:sidebar-expanded:!w-64 2xl:w-64! shrink-0 bg-white dark:bg-gray-800 p-4 transition-all duration-200 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-64"
-          } ${variant === 'v2' ? 'border-r border-gray-200 dark:border-gray-700/60' : 'rounded-r-2xl shadow-xs'
-          }`}
+        className={`flex lg:flex! flex-col absolute z-40 left-0 top-0 lg:static lg:left-auto lg:top-auto lg:translate-x-0 h-[100dvh] overflow-y-scroll lg:overflow-y-auto no-scrollbar shrink-0 bg-white p-4 transition-all duration-200 ease-in-out 
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-64"}
+          ${sidebarExpanded ? "w-64" : "lg:w-20 w-64"}
+          ${variant === "v2" ? "border-r border-gray-200" : "rounded-r-2xl shadow-xs"}
+        `}
       >
         {/* Sidebar header */}
         <div className="flex justify-between mb-10 pr-3 sm:px-2">
@@ -179,7 +205,11 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
           </button>
           {/* Logo */}
           <NavLink end to="/" className="block">
-            <img src={landingLog} alt="Company Logo" />
+            <img
+              src={landingLog}
+              alt="Company Logo"
+              className={!sidebarExpanded ? "lg:w-8 lg:h-8" : ""}
+            />
           </NavLink>
         </div>
 
@@ -191,10 +221,10 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = 'default' }) {
         </div>
 
         {/* Expand / collapse button */}
-        <div className="pt-3 hidden lg:inline-flex 2xl:hidden justify-end mt-auto ">
+        <div className="pt-3 hidden lg:inline-flex  justify-end mt-auto">
           <div className="w-12 pl-4 pr-3 py-2">
             <button
-              className="text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-400 cursor-pointer"
+              className="text-gray-400 hover:text-gray-700 cursor-pointer"
               onClick={() => setSidebarExpanded(!sidebarExpanded)}
             >
               <span className="sr-only">Expand / collapse sidebar</span>

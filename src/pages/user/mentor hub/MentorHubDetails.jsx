@@ -92,7 +92,6 @@ const MentorHubDetails = () => {
     // Transform popular mentors data
     const transformedPopularMentors = popularMentors.map(mentor => ({
         id: mentor.id,
-        id: mentor.id,
         title: mentor.title,
         slug: mentor.slug,
         media: {

@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Loader from "../../components/common/Loader";
+import { BookOpen } from "lucide-react";
 // import Loader from '../../../components/common/Loader';
 
 const CmsTemplate = () => {
@@ -287,26 +288,34 @@ const CmsTemplate = () => {
         </div>
 
         {/* Long Description Section */}
+
         {content.long_description && (
-          <div className="pb-16 pt-4">
-            <div className="container mx-auto px-4">
-              <div className="max-w-6xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-lg p-8 lg:p-12">
-                  <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-                    {content.type === "team"
-                      ? "About Me"
-                      : "Detailed Description"}
-                  </h2>
-                  <div
-                    className="prose prose-lg max-w-none blog-rich-text"
-                    dangerouslySetInnerHTML={{
-                      __html: content.long_description,
-                    }}
-                  />
+          <section className="py-8 bg-white border-b border-gray-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="bg-amber-50 rounded-xl p-6 border-l-4 border-yellow-500">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="bg-yellow-500 p-3 rounded-lg">
+                      <BookOpen className="h-6 w-6 text-black" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {content.type === "team"
+                        ? "Biography"
+                        : "Detailed Description"}
+                    </h3>
+                    <p
+                      className="text-gray-700 leading-relaxed whitespace-pre-line blog-rich-text"
+                      dangerouslySetInnerHTML={{
+                        __html: content.long_description,
+                      }}
+                    ></p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
         )}
 
         {/* Metadata Section */}

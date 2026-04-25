@@ -4,7 +4,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Loader from "../../../components/common/Loader";
-import { Editor } from "@tinymce/tinymce-react";
+// import { Editor } from "@tinymce/tinymce-react";
+import TextEditor from "../../../components/common/TextEditor";
 
 const AddTeam = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -49,7 +50,7 @@ const AddTeam = () => {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-           "Cache-Control": "no-cache",
+          "Cache-Control": "no-cache",
           Pragma: "no-cache",
         },
       });
@@ -78,9 +79,7 @@ const AddTeam = () => {
       }
     } catch (err) {
       console.error("Error fetching team data:", err);
-      toast.error(
-        err.response?.data?.message || "Error fetching team data"
-      );
+      toast.error(err.response?.data?.message || "Error fetching team data");
     } finally {
       setFetchLoading(false);
     }
@@ -157,12 +156,16 @@ const AddTeam = () => {
 
       // Append all form data except image if it's null
       Object.keys(formData).forEach((key) => {
-        if (key === 'image') {
+        if (key === "image") {
           if (formData.image instanceof File) {
             submitData.append(key, formData.image);
           }
         } else {
-          if (formData[key] !== null && formData[key] !== undefined && formData[key] !== "") {
+          if (
+            formData[key] !== null &&
+            formData[key] !== undefined &&
+            formData[key] !== ""
+          ) {
             submitData.append(key, formData[key]);
           }
         }
@@ -179,7 +182,7 @@ const AddTeam = () => {
               Authorization: `Bearer ${token}`,
               "Content-Type": "multipart/form-data",
             },
-          }
+          },
         );
       } else {
         // Create new team
@@ -196,7 +199,7 @@ const AddTeam = () => {
           res.data.message ||
             (isEditMode
               ? "Team updated successfully"
-              : "Team created successfully")
+              : "Team created successfully"),
         );
         navigate("/setting/teams");
       }
@@ -204,7 +207,7 @@ const AddTeam = () => {
       console.error("Error saving team:", err);
       toast.error(
         err.response?.data?.message ||
-          (isEditMode ? "Error updating team" : "Error creating team")
+          (isEditMode ? "Error updating team" : "Error creating team"),
       );
     } finally {
       setLoading(false);
@@ -215,11 +218,11 @@ const AddTeam = () => {
   const handleRemoveImage = () => {
     setFormData((prev) => ({ ...prev, image: null }));
     setImagePreview(null);
-    
+
     // Also clear the file input
     const fileInput = document.querySelector('input[type="file"]');
     if (fileInput) {
-      fileInput.value = '';
+      fileInput.value = "";
     }
   };
 
@@ -341,9 +344,7 @@ const AddTeam = () => {
                 {/* Image Preview */}
                 {imagePreview && (
                   <div className="mb-4">
-                    <p className="text-sm text-gray-600 mb-2">
-                      Image Preview:
-                    </p>
+                    <p className="text-sm text-gray-600 mb-2">Image Preview:</p>
                     <div className="relative inline-block">
                       <img
                         src={imagePreview}
@@ -394,51 +395,19 @@ const AddTeam = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Long Description
                 </label>
-                <Editor
-                  apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
-                  value={formData.long_description}
-                  init={{
-                    height: 400,
-                    menubar: false,
-                    plugins: [
-                      "advlist",
-                      "autolink",
-                      "link",
-                      "lists",
-                      "charmap",
-                      "preview",
-                      "searchreplace",
-                      "visualblocks",
-                      "code",
-                      "fullscreen",
-                      "help",
-                      "wordcount",
-                    ],
-                    toolbar:
-                      "undo redo | blocks | " +
-                      "bold italic underline | link | " +
-                      "alignleft aligncenter alignright alignjustify | " +
-                      "bullist numlist outdent indent | " +
-                      "removeformat | help | code",
-                    content_style:
-                      "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-                    link_context_toolbar: true,
-                    link_assume_external_targets: true,
-                    link_title: false,
-                    default_link_target: "_blank",
-                    link_list: [
-                      { title: "Home Page", value: "/" },
-                      { title: "About Page", value: "/about" },
-                      { title: "Contact Page", value: "/contact" },
-                    ],
-                  }}
-                  onEditorChange={(content) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      long_description: content,
-                    }))
-                  }
-                />
+                
+                <div className="border border-gray-300 rounded-lg h-[600px] overflow-y-auto">
+                  <TextEditor
+                    apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
+                    value={formData.long_description}
+                    onChange={(content) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        long_description: content,
+                      }))
+                    }
+                  />
+                </div>
               </div>
 
               {/* Social Media Links */}
@@ -511,8 +480,8 @@ const AddTeam = () => {
                     loading
                       ? "bg-gray-400 cursor-not-allowed"
                       : isEditMode
-                      ? "bg-yellow-500 hover:bg-yellow-600"
-                      : "bg-green-500 hover:bg-green-600"
+                        ? "bg-yellow-500 hover:bg-yellow-600"
+                        : "bg-green-500 hover:bg-green-600"
                   } transition-colors`}
                 >
                   {loading ? (

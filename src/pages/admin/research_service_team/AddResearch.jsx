@@ -5,7 +5,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Loader from "../../../components/common/Loader";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-import { Editor } from "@tinymce/tinymce-react";
+// import { Editor } from "@tinymce/tinymce-react";
+import TextEditor from "../../../components/common/TextEditor";
 
 const AddResearch = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -352,51 +353,15 @@ const AddResearch = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Long Description
                   </label>
-                  <Editor
-                    apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
+                  <div className="border border-gray-300 rounded-lg h-[600px] overflow-y-auto">
+                   <TextEditor apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
                     value={formData.long_description}
-                    init={{
-                      height: 400,
-                      menubar: false,
-                      plugins: [
-                        "advlist",
-                        "autolink",
-                        "link",
-                        "lists",
-                        "charmap",
-                        "preview",
-                        "searchreplace",
-                        "visualblocks",
-                        "code",
-                        "fullscreen",
-                        "help",
-                        "wordcount",
-                      ],
-                      toolbar:
-                        "undo redo | blocks | " +
-                        "bold italic underline | link | " +
-                        "alignleft aligncenter alignright alignjustify | " +
-                        "bullist numlist outdent indent | " +
-                        "removeformat | help | code",
-                      content_style:
-                        "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-                      link_context_toolbar: true,
-                      link_assume_external_targets: true,
-                      link_title: false,
-                      default_link_target: "_blank",
-                      link_list: [
-                        { title: "Home Page", value: "/" },
-                        { title: "About Page", value: "/about" },
-                        { title: "Contact Page", value: "/contact" },
-                      ],
-                    }}
-                    onEditorChange={(content) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        long_description: content,
-                      }))
-                    }
+                    onChange={(content) => setFormData((prev) => ({
+                      ...prev,
+                      long_description: content,
+                    }))}
                   />
+                  </div>
                 </div>
 
                 {/* Social Media Links */}

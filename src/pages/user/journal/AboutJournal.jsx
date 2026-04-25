@@ -306,7 +306,7 @@ const AboutJournal = () => {
 
       {/* Journal Description Section */}
       {data.j_description && (
-        <section className="py-8 bg-white border-b border-gray-200">
+        <section className="py-4 bg-white  border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-amber-50 rounded-xl p-6 border-l-4 border-yellow-500">
               <div className="flex items-start gap-4">
@@ -329,39 +329,33 @@ const AboutJournal = () => {
         </section>
       )}
 
-      {/* About Journal Content Section */}
-      <section className="py-10 bg-white">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-3">
-              <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-                {/* Header */}
-                <div className="bg-gradient-to-r from-black to-yellow-300 text-white p-6">
-                  <div className="flex items-center space-x-3">
-                    <Globe className="h-8 w-8 text-yellow-300" />
-                    <div>
-                      <h2 className="text-2xl font-bold">About the Journal</h2>
-                    </div>
-                  </div>
+       {data.about_the_journal && (
+        <section className="pb-8 bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-amber-50 rounded-xl p-6 border-l-4 border-yellow-500">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                 
                 </div>
-
-                {/* About Content */}
-                <div className="p-8">
-                  <div className="blog-rich-text max-w-none">
-                    <div
-                      dangerouslySetInnerHTML={{
+                <div>
+                  {/* <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    About the Journal
+                  </h3> */}
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-line"
+                   dangerouslySetInnerHTML={{
                         __html: data.about_the_journal,
                       }}
-                      className="text-gray-700 leading-relaxed"
-                    />
-                  </div>
+                  >
+                  
+                  </p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+    
     </div>
   );
 };

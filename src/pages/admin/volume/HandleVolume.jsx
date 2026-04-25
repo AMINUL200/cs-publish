@@ -8,11 +8,14 @@ const HandleVolume = () => {
   const { token } = useSelector((state) => state.auth);
   
   const [volumes, setVolumes] = useState([]);
+  const [journals, setJournals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [journalsLoading, setJournalsLoading] = useState(true);
   const [error, setError] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [editingVolume, setEditingVolume] = useState(null);
   const [formData, setFormData] = useState({
+    journal_id: "",
     volume: "",
     issue_no: "",
     from_date: "",
@@ -22,6 +25,30 @@ const HandleVolume = () => {
   });
   const [formLoading, setFormLoading] = useState(false);
 
+  // Fetch journals list
+  const fetchJournals = async () => {
+    try {
+      setJournalsLoading(true);
+      const response = await axios.get(`${API_URL}api/admin/journals`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
+      
+      if (response.data.success) {
+        setJournals(response.data.data);
+      } else {
+        console.error("Failed to fetch journals");
+      }
+    } catch (err) {
+      console.error("Error fetching journals:", err);
+    } finally {
+      setJournalsLoading(false);
+    }
+  };
+
   // Fetch volumes from API
   const fetchVolumes = async () => {
     try {
@@ -29,7 +56,7 @@ const HandleVolume = () => {
       const response = await axios.get(`${API_URL}api/volume/list`, {
         headers: {
           Authorization: `Bearer ${token}`,
-           "Cache-Control": "no-cache",
+          "Cache-Control": "no-cache",
           Pragma: "no-cache",
         },
       });
@@ -37,7 +64,6 @@ const HandleVolume = () => {
       if (response.data.status) {
         setVolumes(response.data.data);
         console.log(response.data.data);
-        
       } else {
         setError("Failed to fetch volumes");
       }
@@ -51,6 +77,7 @@ const HandleVolume = () => {
 
   useEffect(() => {
     fetchVolumes();
+    fetchJournals();
   }, []);
 
   // Handle status toggle - only close open volumes
@@ -69,8 +96,8 @@ const HandleVolume = () => {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
-             "Cache-Control": "no-cache",
-          Pragma: "no-cache",
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
           },
         }
       );
@@ -98,6 +125,7 @@ const HandleVolume = () => {
   const handleAddVolume = () => {
     setEditingVolume(null);
     setFormData({
+      journal_id: "",
       volume: "",
       issue_no: "",
       from_date: "",
@@ -112,6 +140,7 @@ const HandleVolume = () => {
   const handleEditVolume = (volume) => {
     setEditingVolume(volume);
     setFormData({
+      journal_id: volume.journal_id || "",
       volume: volume.volume || "",
       issue_no: volume.issue_no || "",
       from_date: volume.from_date || "",
@@ -141,10 +170,18 @@ const HandleVolume = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validation
+    if (!formData.journal_id) {
+      alert("Please select a journal");
+      return;
+    }
+    
     setFormLoading(true);
 
     try {
       const submitData = new FormData();
+      submitData.append("journal_id", formData.journal_id);
       submitData.append("volume", formData.volume);
       submitData.append("issue_no", formData.issue_no);
       submitData.append("from_date", formData.from_date);
@@ -225,8 +262,15 @@ const HandleVolume = () => {
     }
   };
 
+  // Get journal title by ID
+  const getJournalTitle = (journalId) => {
+    const journal = journals.find(j => j.id === journalId);
+    return journal ? journal.j_title : "Unknown Journal";
+  };
+
   // Format date for display
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString();
   };
 
@@ -290,7 +334,6 @@ const HandleVolume = () => {
               <div className="h-48 overflow-hidden">
                 <img 
                   src={`${STORAGE_URL}${volume.image}`} 
-                  
                   alt={`Volume ${volume.volume}`}
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -325,6 +368,14 @@ const HandleVolume = () => {
                     </span>
                   </div>
                 </div>
+
+                {/* Journal Name */}
+                <div className="mb-3 pb-2 border-b border-gray-200">
+                  <p className="text-sm text-gray-600">
+                    {/* <span className="font-medium">Journal:</span> {getJournalTitle(volume.journal_id)} */}
+                    <span className="font-medium">Journal:</span> {volume?.journal?.j_title || getJournalTitle(volume.journal_id)}
+                  </p>
+                </div>
                 
                 <div className="space-y-2 text-sm text-gray-600">
                   {volume.page_no && (
@@ -344,15 +395,7 @@ const HandleVolume = () => {
                     <span>{formatDate(volume.to_date)}</span>
                   </div>
                   
-                  <div className="flex justify-between">
-                    <span className="font-medium">Created:</span>
-                    <span>{formatDate(volume.created_at)}</span>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="font-medium">Updated:</span>
-                    <span>{formatDate(volume.updated_at)}</span>
-                  </div>
+                 
                 </div>
                 
                 {/* Action Buttons */}
@@ -388,8 +431,8 @@ const HandleVolume = () => {
       {/* Popup Modal */}
       {showPopup && (
         <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-            <div className="flex justify-between items-center p-6 border-b">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-6 border-b sticky top-0 bg-white">
               <h2 className="text-xl font-semibold text-gray-800">
                 {editingVolume ? "Edit Volume" : "Add New Volume"}
               </h2>
@@ -403,6 +446,31 @@ const HandleVolume = () => {
 
             <form onSubmit={handleSubmit} className="p-6">
               <div className="space-y-4">
+                {/* Journal Dropdown */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Select Journal *
+                  </label>
+                  <select
+                    name="journal_id"
+                    value={formData.journal_id}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={journalsLoading}
+                  >
+                    <option value="">Select a journal</option>
+                    {journals.map((journal) => (
+                      <option key={journal.id} value={journal.id}>
+                        {journal.j_title}
+                      </option>
+                    ))}
+                  </select>
+                  {journalsLoading && (
+                    <p className="text-xs text-gray-500 mt-1">Loading journals...</p>
+                  )}
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Volume Number *

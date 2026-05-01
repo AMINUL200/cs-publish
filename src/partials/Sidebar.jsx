@@ -226,6 +226,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
             <button
               className="text-gray-400 hover:text-gray-700 cursor-pointer"
               onClick={() => setSidebarExpanded(!sidebarExpanded)}
+              title=""
             >
               <span className="sr-only">Expand / collapse sidebar</span>
               <ExpandIcon expanded={sidebarExpanded} />

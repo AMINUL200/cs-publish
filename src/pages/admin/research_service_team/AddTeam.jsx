@@ -171,6 +171,11 @@ const AddTeam = () => {
         }
       });
 
+      // Debugging: Log form data before submission
+      // for (let pair of submitData.entries()) {
+      //   console.log(`${pair[0]}: ${pair[1]}`);
+      // }
+
       let res;
       if (isEditMode) {
         // Update existing team

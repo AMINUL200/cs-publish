@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { data, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import {
   Calendar,
@@ -21,7 +21,7 @@ const DetailsOfArchiveList = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const { token } = useSelector((state) => state.auth);
   const { j_id, v_id } = useParams();
-
+    const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   // State management
   const [journalData, setJournalData] = useState(null);
   const [volumeData, setVolumeData] = useState(null);
@@ -47,7 +47,7 @@ const DetailsOfArchiveList = () => {
             },
           }
         );
-
+        console.log(response.data.data.journal);
         if (response.data.flag === 1 && response.data.data) {
           const data = response.data.data;
           setJournalData(data.journal);
@@ -172,7 +172,7 @@ const DetailsOfArchiveList = () => {
             <div className="flex-shrink-0">
               <div className="relative group">
                 <img
-                  src={volumeData.image || journalData.image}
+                  src={STORAGE_URL + (volumeData.image || journalData.image)}
                   alt={`Volume ${volumeData.volume} ${volumeData.issue_no}`}
                   className="w-48 h-64 object-cover rounded-xl shadow-2xl border-4 border-white group-hover:scale-105 transition-transform duration-300"
                 />
@@ -187,11 +187,11 @@ const DetailsOfArchiveList = () => {
               <h1 className="text-3xl lg:text-4xl font-bold text-white mb-4">
                 {journalData.j_title}
               </h1>
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-4">
+              {/* <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-4">
                 <p className="text-white text-lg leading-relaxed">
                   {journalData.j_description || "No description available"}
                 </p>
-              </div>
+              </div> */}
               <div className="flex flex-wrap gap-4 justify-center lg:justify-start text-white">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-5 h-5" />
@@ -214,10 +214,10 @@ const DetailsOfArchiveList = () => {
 
             {/* Right Side - Action Buttons */}
             <div className="flex flex-col gap-4">
-              <button className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black hover:text-yellow-500 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2">
+              {/* <button className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black hover:text-yellow-500 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2">
                 <Download className="w-5 h-5" />
                 Download Cover
-              </button>
+              </button> */}
               <button className="bg-red-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black hover:text-red-500 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2">
                 <Bell className="w-5 h-5" />
                 Get Alerts

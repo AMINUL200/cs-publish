@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Loader from "../../../components/common/Loader";
@@ -10,8 +10,10 @@ import { User } from "lucide-react";
 import { ChevronUp } from "lucide-react";
 import { ChevronDown } from "lucide-react";
 import { FileText } from "lucide-react";
-import { Users, Award, Globe, BookOpen } from "lucide-react";
+import { BookOpen, Layers } from "lucide-react";
 import { toast } from "react-toastify";
+import { ChevronLeft } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 const QuickPress = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -24,7 +26,46 @@ const QuickPress = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedAbstract, setExpandedAbstract] = useState(null);
+  const [volumes, setVolumes] = useState([]);
+  const [selectedVolume, setSelectedVolume] = useState(null);
+  const [currentIssueData, setCurrentIssueData] = useState(null);
+  const [activeTab, setActiveTab] = useState("current"); // 'current' or 'archive'
   const navigate = useNavigate();
+
+  const [showLeftScroll, setShowLeftScroll] = useState(false);
+  const [showRightScroll, setShowRightScroll] = useState(false);
+  const scrollContainerRef = useRef(null);
+
+  // Check scroll position
+  const checkScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } =
+        scrollContainerRef.current;
+      setShowLeftScroll(scrollLeft > 0);
+      setShowRightScroll(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  // Scroll function
+  const scroll = (direction) => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = direction === "left" ? -300 : 300;
+      scrollContainerRef.current.scrollBy({
+        left: scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  // Add scroll event listener
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener("scroll", checkScroll);
+      checkScroll();
+      return () => container.removeEventListener("scroll", checkScroll);
+    }
+  }, [volumes]);
 
   // Fetch current issue details and manuscripts
   useEffect(() => {
@@ -36,8 +77,8 @@ const QuickPress = () => {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-               "Cache-Control": "no-cache",
-          Pragma: "no-cache",
+              "Cache-Control": "no-cache",
+              Pragma: "no-cache",
             },
           },
         );
@@ -47,7 +88,19 @@ const QuickPress = () => {
           console.log(data);
 
           setJournalData(data.journal);
-          setManuscripts(data.quick_press || []);
+
+          // Set current issue data
+          if (data.current_issue) {
+            setCurrentIssueData(data.current_issue);
+            setManuscripts(data.current_issue.manuscripts || []);
+          }
+
+          // Set volumes data
+          if (data.volumes && data.volumes.length > 0) {
+            setVolumes(data.volumes);
+            // Set default selected volume to first volume
+            setSelectedVolume(data.volumes[0]);
+          }
         } else {
           setError("No data found for this Quick Press");
         }
@@ -63,6 +116,21 @@ const QuickPress = () => {
       fetchData();
     }
   }, [id, token, API_URL]);
+
+  // Handle volume change
+  const handleVolumeClick = (volume) => {
+    setSelectedVolume(volume);
+    setActiveTab("archive");
+    setManuscripts(volume.manuscripts || []);
+    setExpandedAbstract(null); // Close any open abstract
+  };
+
+  // Handle current issue tab click
+  const handleCurrentIssueClick = () => {
+    setActiveTab("current");
+    setManuscripts(currentIssueData?.manuscripts || []);
+    setExpandedAbstract(null);
+  };
 
   // Toggle abstract visibility
   const toggleAbstract = (id) => {
@@ -119,17 +187,13 @@ const QuickPress = () => {
       toast.error(error.message);
     }
   };
- const handleSubmitButton = () => {
-    if(token){
-      toast.warning("Please sign in as an author to access this feature.");
 
-    }else{
+  const handleSubmitButton = () => {
+    if (token) {
+      toast.warning("Please sign in as an author to access this feature.");
+    } else {
       navigate("/signin");
     }
-  };
-
-  const handleViewEditor = (edId) => {
-    navigate(`/editor-info/${edId}`);
   };
 
   // Navigation items (matching UserSideViewJournal)
@@ -333,10 +397,152 @@ const QuickPress = () => {
         </div>
       </div>
 
+      {/* Volume Filter Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="border-b border-gray-200">
+            <div className="flex flex-wrap">
+              {/* Current Issue Tab */}
+              <button
+                onClick={handleCurrentIssueClick}
+                className={`px-6 py-4 text-lg font-semibold transition-all duration-300 flex items-center gap-2 ${
+                  activeTab === "current"
+                    ? "bg-yellow-500 text-black border-b-2 border-yellow-600"
+                    : "text-gray-600 hover:text-yellow-500 hover:bg-gray-50"
+                }`}
+              >
+                <BookOpen className="w-5 h-5" />
+                Current Issue
+                {currentIssueData?.total_manuscripts > 0 && (
+                  <span className="ml-2 bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-0.5 rounded-full">
+                    {currentIssueData.total_manuscripts}
+                  </span>
+                )}
+              </button>
+
+              {/* Archive Volumes Section with Horizontal Scroll and Navigation Buttons */}
+              <div className="px-4 py-2">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Layers className="w-5 h-5 text-gray-500" />
+                    <span className="text-gray-600 font-medium">
+                      Archive Volumes:
+                    </span>
+                  </div>
+
+                  {/* Scroll Navigation Buttons */}
+                  <div className="flex gap-2">
+                    {showLeftScroll && (
+                      <button
+                        onClick={() => scroll("left")}
+                        className="p-1 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors"
+                        aria-label="Scroll left"
+                      >
+                        <ChevronLeft className="w-4 h-4 text-gray-600" />
+                      </button>
+                    )}
+                    {showRightScroll && (
+                      <button
+                        onClick={() => scroll("right")}
+                        className="p-1 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors"
+                        aria-label="Scroll right"
+                      >
+                        <ChevronRight className="w-4 h-4 text-gray-600" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Horizontal Scroll Container */}
+                <div
+                  ref={scrollContainerRef}
+                  className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+                  style={{ scrollbarWidth: "thin" }}
+                >
+                  <div className="flex gap-3 pb-2 min-w-max">
+                    {volumes.map((volume) => (
+                      <button
+                        key={volume.volume.id}
+                        onClick={() => handleVolumeClick(volume)}
+                        className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 whitespace-nowrap ${
+                          activeTab === "archive" &&
+                          selectedVolume?.volume.id === volume.volume.id
+                            ? "bg-yellow-500 text-black shadow-md"
+                            : "bg-gray-100 text-gray-700 hover:bg-yellow-100 hover:text-yellow-700"
+                        }`}
+                      >
+                        Vol. {volume.volume.volume}, {volume.volume.issue_no}
+                        {volume.total_manuscripts > 0 && (
+                          <span className="ml-2 text-xs font-normal">
+                            ({volume.total_manuscripts})
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Active Volume Info Bar */}
+          {activeTab === "archive" && selectedVolume && (
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-3 border-b border-gray-200">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-yellow-600" />
+                    <span className="text-sm font-medium text-gray-700">
+                      Volume {selectedVolume.volume.volume}
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Issue: {selectedVolume.volume.issue_no}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Pages: {selectedVolume.volume.page_no}
+                  </div>
+                </div>
+                <div className="text-sm text-gray-500">
+                  Published: {formatDate(selectedVolume.volume.from_date)} -{" "}
+                  {formatDate(selectedVolume.volume.to_date)}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Current Issue Info Bar */}
+          {activeTab === "current" && currentIssueData && (
+            <div className="bg-gradient-to-r from-yellow-50 to-amber-50 px-6 py-3 border-b border-yellow-200">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-yellow-600" />
+                    <span className="text-sm font-medium text-gray-700">
+                      Volume {currentIssueData.volume.volume}
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Issue: {currentIssueData.volume.issue_no}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Pages: {currentIssueData.volume.page_no}
+                  </div>
+                </div>
+                <div className="text-sm text-gray-500">
+                  Current Issue Open:{" "}
+                  {formatDate(currentIssueData.volume.from_date)} -{" "}
+                  {formatDate(currentIssueData.volume.to_date)}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Manuscripts List */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
-          {/* Manuscripts List */}
           <div className="space-y-12">
             {manuscripts.length > 0 ? (
               manuscripts.map((manuscript) => (
@@ -355,7 +561,7 @@ const QuickPress = () => {
                           {getCleanTitle(manuscript.title)}
                         </h3>
 
-                        <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
                           <div className="flex items-center gap-1">
                             <User className="w-4 h-4" />
                             <span>
@@ -450,13 +656,15 @@ const QuickPress = () => {
                 </div>
               ))
             ) : (
-              <div className="text-center py-16">
+              <div className="text-center py-16 bg-white rounded-xl shadow-md">
                 <div className="text-gray-400 text-6xl mb-4">📝</div>
                 <h3 className="text-2xl font-bold text-gray-600 mb-2">
                   No Manuscripts Found
                 </h3>
                 <p className="text-gray-500">
-                  No manuscripts available for this Quick Press.
+                  {activeTab === "current"
+                    ? "No manuscripts available for the current issue."
+                    : "No manuscripts available for this volume."}
                 </p>
               </div>
             )}

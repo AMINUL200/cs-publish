@@ -63,7 +63,7 @@ const ListOfIssueJournal = () => {
             Pragma: "no-cache",
           },
         });
-        console.log(response.data.journal);
+        console.log(response.data);
 
         if (response.data.flag === 1) {
           const data = response.data.data;
@@ -292,17 +292,18 @@ const ListOfIssueJournal = () => {
             {issues.map((issue, index) => (
               <Link
                 key={index}
-                to={`/view-archive/${issue.journal_id}/${issue.volume_id}`}
+                to={`/view-archive/${issue.journal_id}/${issue.id}`}
                 className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-2xl transition-all duration-300 group"
               >
                 {/* Issue Cover */}
                 <div className="relative overflow-hidden bg-gradient-to-br from-red-900 to-red-700">
+                  {console.log("Image URL:", issue.volume_image ? `${STORAGE_URL}${issue.volume_image}` : `${STORAGE_URL}${journalData.volume_image}`  )}
                   <img
                     // src={issue.image || journalData.journalImage}
                     src={
                       issue.image
                         ? `${STORAGE_URL}${issue.image}`
-                        : `${STORAGE_URL}${journalData.journalImage}`
+                        : `${STORAGE_URL}${journalData.volume_image}`
                     }
                     alt={`Volume ${issue.volume} ${issue.issue_no}`}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"

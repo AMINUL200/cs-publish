@@ -266,7 +266,7 @@ const QuickPress = () => {
                 <img
                   src={`${STORAGE_URL}${journalData.image}`}
                   alt={journalData.j_title}
-                  className="w-48 h-60 lg:w-56 lg:h-86 object-cover rounded-lg shadow-2xl border-4 border-yellow-500"
+                  className="w-48 h-60 lg:w-56 lg:h-80 object-cover rounded-lg shadow-2xl border-4 border-yellow-500"
                 />
                 <div className="absolute -bottom-3 -right-3 bg-yellow-500 text-black px-3 py-1 rounded-lg font-bold text-xs shadow-lg rotate-3">
                   Journal Cover

@@ -29,7 +29,7 @@ const HandleTeams = () => {
           Pragma: "no-cache",
         },
         params: {
-          t: new Date() // 👈 dynamic timestamp
+          t: new Date(), // 👈 dynamic timestamp
         },
       });
 
@@ -106,6 +106,7 @@ const HandleTeams = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         {/* Page Header with Add Button */}
+        {/* Page Header with Add Button */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
           <div className="text-center sm:text-left mb-4 sm:mb-0">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
@@ -116,13 +117,24 @@ const HandleTeams = () => {
             </p>
           </div>
 
-          <button
-            onClick={handleAddTeam}
-            className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors font-medium flex items-center gap-2"
-          >
-            <span>+</span>
-            Add New Team Member
-          </button>
+          {/* Buttons */}
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => navigate("/setting/add-team-category")}
+              className="bg-indigo-500 text-white px-6 py-3 rounded-lg hover:bg-indigo-600 transition-colors font-medium flex items-center gap-2 shadow-sm"
+            >
+              <span>📂</span>
+              Create Team Category
+            </button>
+
+            <button
+              onClick={handleAddTeam}
+              className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors font-medium flex items-center gap-2 shadow-sm"
+            >
+              <span>+</span>
+              Add New Team Member
+            </button>
+          </div>
         </div>
 
         {/* Teams Grid */}
@@ -209,12 +221,12 @@ const HandleTeams = () => {
                     <div className="absolute top-3 right-3">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          member.status === 1
+                          member.status == 1
                             ? "bg-green-100 text-green-800"
                             : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {member.status === 1 ? "Active" : "Inactive"}
+                        {member.status == 1 ? "Active" : "Inactive"}
                       </span>
                     </div>
                   </div>
@@ -322,7 +334,7 @@ const HandleTeams = () => {
                           Category:
                         </h4>
                         <span className="inline-flex items-center text-indigo-600 text-xs bg-indigo-50 px-2 py-1 rounded">
-                          🏷️ {member.category}
+                          🏷️ {member?.team_category?.name}
                         </span>
                       </div>
                     )}

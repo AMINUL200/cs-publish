@@ -160,6 +160,7 @@ import HandleResearchAndServicesDetails from "./pages/admin/research_services/Ha
 import HandleManuscriptProcess from "./pages/admin/research_services/HandleManuscriptProcess";
 import HandleResearchAndServicesFeature from "./pages/admin/research_services/HandleResearchAndServicesFeature";
 import TeamPage from "./pages/user/team/TeamPage";
+import MangeTeamCategory from "./pages/admin/research_service_team/MangeTeamCategory";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -428,6 +429,7 @@ function App() {
 
               <Route path="/setting/teams" element={<HandleTeams />} />
               <Route path="/setting/add-team" element={<AddTeam />} />
+              <Route path="/setting/add-team-category" element={<MangeTeamCategory />} />
 
               <Route path="/setting/handle-faqs" element={<HandleFaqs />} />
 

@@ -37,15 +37,38 @@ const TeamPage = () => {
         setTeamMembers(response.data.data);
         setFilteredMembers(response.data.data);
 
-        // Extract unique categories from team members
-        const uniqueCategories = [
-          ...new Set(
-            response.data.data
-              .map((member) => member.category)
-              .filter((cat) => cat),
-          ),
-        ];
+        // Extract unique categories from team members with their order
+        const categoryMap = new Map();
+        
+        response.data.data.forEach((member) => {
+          if (member.team_category && member.category) {
+            if (!categoryMap.has(member.category)) {
+              categoryMap.set(member.category, {
+                id: member.category,
+                name: member.team_category.name,
+                order: parseInt(member.team_category.is_order) || 999,
+                count: 1
+              });
+            } else {
+              const existing = categoryMap.get(member.category);
+              existing.count++;
+              categoryMap.set(member.category, existing);
+            }
+          }
+        });
+
+        // Convert map to array and sort by order
+        const uniqueCategories = Array.from(categoryMap.values())
+          .sort((a, b) => a.order - b.order)
+          .map(cat => ({
+            id: cat.id,
+            name: cat.name,
+            count: cat.count,
+            order: cat.order
+          }));
+
         setCategories(uniqueCategories);
+        console.log("Ordered categories:", uniqueCategories);
       }
     } catch (err) {
       console.error("Error fetching team members:", err);
@@ -66,7 +89,7 @@ const TeamPage = () => {
     // Filter by category
     if (selectedCategory !== "ALL") {
       filtered = filtered.filter(
-        (member) => member.category === selectedCategory,
+        (member) => member.category === selectedCategory
       );
     }
 
@@ -80,7 +103,7 @@ const TeamPage = () => {
           member.short_description
             ?.toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
-          member.category?.toLowerCase().includes(searchTerm.toLowerCase())
+          member.team_category?.name?.toLowerCase().includes(searchTerm.toLowerCase())
         );
       });
     }
@@ -107,8 +130,25 @@ const TeamPage = () => {
     setSearchTerm("");
   };
 
-  const handleCategoryChange = (category) => {
-    setSelectedCategory(category);
+  const handleCategoryChange = (categoryId) => {
+    setSelectedCategory(categoryId);
+  };
+
+  // Get category name by ID
+  const getCategoryName = (categoryId) => {
+    const category = categories.find(cat => cat.id === categoryId);
+    return category ? category.name : "Unknown";
+  };
+
+  // Get category count by ID
+  const getCategoryCount = (categoryId) => {
+    const category = categories.find(cat => cat.id === categoryId);
+    return category ? category.count : 0;
+  };
+
+  // Get total members count for ALL button
+  const getTotalMembersCount = () => {
+    return teamMembers.filter(member => member.status === "1").length;
   };
 
   // Loading state
@@ -211,7 +251,7 @@ const TeamPage = () => {
           </div>
         </div>
 
-        {/* Category Filters */}
+        {/* Category Filters - Ordered by is_order */}
         {categories.length > 0 && (
           <div className="max-w-5xl mx-auto mb-10">
             <div className="flex flex-wrap justify-center gap-3">
@@ -225,27 +265,31 @@ const TeamPage = () => {
                 }`}
               >
                 ALL
-                <span className="ml-2 text-sm">({teamMembers.length})</span>
+                <span className="ml-2 text-sm">({getTotalMembersCount()})</span>
               </button>
 
-              {/* Dynamic Category Buttons */}
+              {/* Dynamic Category Buttons - Sorted by order */}
               {categories.map((category) => (
                 <button
-                  key={category}
-                  onClick={() => handleCategoryChange(category)}
+                  key={category.id}
+                  onClick={() => handleCategoryChange(category.id.toString())}
                   className={`px-6 py-2 rounded-full font-medium transition-all duration-300 transform hover:scale-105 ${
-                    selectedCategory === category
+                    selectedCategory === category.id.toString()
                       ? "bg-yellow-500 text-white shadow-lg ring-2 ring-yellow-300"
                       : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
                   }`}
                 >
-                  {category}
-                  <span className="ml-2 text-sm">
-                    ({teamMembers.filter((m) => m.category === category).length}
-                    )
-                  </span>
+                  {category.name}
+                  <span className="ml-2 text-sm">({category.count})</span>
                 </button>
               ))}
+            </div>
+            
+            {/* Order indicator (optional - shows the priority order) */}
+            <div className="text-center mt-3">
+              <p className="text-xs text-gray-500">
+                Categories ordered by priority
+              </p>
             </div>
           </div>
         )}
@@ -262,7 +306,7 @@ const TeamPage = () => {
                 team member{filteredMembers.length !== 1 ? "s" : ""}
                 {selectedCategory !== "ALL" && (
                   <span className="ml-1">
-                    in <span className="font-semibold">{selectedCategory}</span>{" "}
+                    in <span className="font-semibold">{getCategoryName(selectedCategory)}</span>{" "}
                     category
                   </span>
                 )}
@@ -302,7 +346,7 @@ const TeamPage = () => {
                 ? `No results match your ${
                     searchTerm ? `search "${searchTerm}"` : ""
                   } ${searchTerm && selectedCategory !== "ALL" ? "and " : ""}
-                  ${selectedCategory !== "ALL" ? `${selectedCategory} category` : ""}. 
+                  ${selectedCategory !== "ALL" ? `${getCategoryName(selectedCategory)} category` : ""}. 
                   Try adjusting your filters.`
                 : "Team members will appear here once added."}
             </p>
@@ -348,17 +392,18 @@ const TeamPage = () => {
             >
               {filteredMembers.map((member) => {
                 const { name, position } = getTeamMemberInfo(member.title);
-
+                const categoryName = member.team_category?.name || "Uncategorized";
+                
                 return (
                   <div
                     key={member.id}
                     className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden group w-full max-w-sm"
                   >
                     {/* Category Badge */}
-                    {member.category && (
+                    {categoryName && (
                       <div className="absolute top-3 right-3 z-10">
                         <span className="bg-yellow-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
-                          {member.category}
+                          {categoryName}
                         </span>
                       </div>
                     )}

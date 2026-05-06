@@ -4,7 +4,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Loader from "../../../components/common/Loader";
-// import { Editor } from "@tinymce/tinymce-react";
 import TextEditor from "../../../components/common/TextEditor";
 
 const AddTeam = () => {
@@ -20,6 +19,8 @@ const AddTeam = () => {
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(isEditMode);
   const [imagePreview, setImagePreview] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
 
   const [formData, setFormData] = useState({
     type: "team",
@@ -36,17 +37,46 @@ const AddTeam = () => {
     status: "1",
   });
 
+  // Fetch categories
+  const fetchCategories = async () => {
+    try {
+      setLoadingCategories(true);
+      const res = await axios.get(`${API_URL}api/team-category`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+        params: {
+          t: new Date(),
+        },
+      });
+
+      if (res.data.status) {
+        setCategories(res.data.data);
+        console.log("Fetched categories:", res.data.data);
+      }
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+      toast.error(err.response?.data?.message || "Error fetching categories");
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
   // Fetch team data for editing
   useEffect(() => {
     if (isEditMode) {
       fetchTeamForEdit();
     }
+    fetchCategories();
   }, [isEditMode, updateId]);
 
   const fetchTeamForEdit = async () => {
     try {
       setFetchLoading(true);
-      const res = await axios.get(`${API_URL}api/contents/${updateId}`, {
+      const res = await axios.get(`${API_URL}api/team-edit/${updateId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -149,6 +179,11 @@ const AddTeam = () => {
       return;
     }
 
+    if (!formData.category) {
+      toast.error("Please select a category");
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -171,16 +206,11 @@ const AddTeam = () => {
         }
       });
 
-      // Debugging: Log form data before submission
-      // for (let pair of submitData.entries()) {
-      //   console.log(`${pair[0]}: ${pair[1]}`);
-      // }
-
       let res;
       if (isEditMode) {
         // Update existing team
         res = await axios.post(
-          `${API_URL}api/contents/${updateId}`,
+          `${API_URL}api/team-update/${updateId}`,
           submitData,
           {
             headers: {
@@ -285,21 +315,34 @@ const AddTeam = () => {
                   />
                 </div>
 
-                {/* Category */}
+                {/* Category - Changed to Dropdown */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category
+                    Category *
                   </label>
-                  <input
-                    type="text"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                    placeholder="Enter category (e.g., Management, Development, Design)"
-                  />
+                  {loadingCategories ? (
+                    <div className="flex items-center gap-2 text-gray-500">
+                      <span className="animate-spin">⏳</span>
+                      Loading categories...
+                    </div>
+                  ) : (
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleInputChange}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                      required
+                    >
+                      <option value="">Select a category</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id.toString()}>
+                          {category.name} (Order: {category.is_order})
+                        </option>
+                      ))}
+                    </select>
+                  )}
                   <p className="text-xs text-gray-500 mt-1">
-                    Specify the team category or department
+                    Select the team category (e.g., Advisor, Communicator, Organizer)
                   </p>
                 </div>
 
@@ -339,6 +382,18 @@ const AddTeam = () => {
                   </select>
                 </div>
               </div>
+
+              {/* Display Selected Category Info when editing */}
+              {isEditMode && formData.category && (
+                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                  <p className="text-sm text-blue-800">
+                    <span className="font-medium">Selected Category:</span>{" "}
+                    {categories.find(c => c.id.toString() === formData.category)?.name || "Unknown"} 
+                    <span className="mx-2">•</span>
+                    <span className="font-medium">Category ID:</span> {formData.category}
+                  </p>
+                </div>
+              )}
 
               {/* Image Upload */}
               <div>

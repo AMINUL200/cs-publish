@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 
@@ -21,9 +21,26 @@ const HandleVolume = () => {
     from_date: "",
     to_date: "",
     page_no: "",
-    image: null
+    image: null,
+    issue_type: "",
+    issue_theme: "",
+    keywords: "",
+    editor_name: "",
+    issn_number: "",
+    doi: "",
+    copyright_type: "",
+    copyright_value: null,
+    web_url: ""
   });
   const [formLoading, setFormLoading] = useState(false);
+  
+  // State for image previews
+  const [imagePreview, setImagePreview] = useState(null);
+  const [copyrightImagePreview, setCopyrightImagePreview] = useState(null);
+  
+  // Refs for file inputs
+  const imageInputRef = useRef(null);
+  const copyrightImageInputRef = useRef(null);
 
   // Fetch journals list
   const fetchJournals = async () => {
@@ -121,6 +138,45 @@ const HandleVolume = () => {
     }
   };
 
+  // Handle image file selection and preview
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData(prev => ({
+        ...prev,
+        image: file
+      }));
+      
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
+  // Handle copyright image file selection and preview
+  const handleCopyrightImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData(prev => ({
+        ...prev,
+        copyright_value: file
+      }));
+      
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setCopyrightImagePreview(previewUrl);
+    }
+  };
+
+  // Handle copyright URL input change
+  const handleCopyrightUrlChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      copyright_value: value
+    }));
+  };
+
   // Open popup for adding new volume
   const handleAddVolume = () => {
     setEditingVolume(null);
@@ -131,8 +187,19 @@ const HandleVolume = () => {
       from_date: "",
       to_date: "",
       page_no: "",
-      image: null
+      image: null,
+      issue_type: "",
+      issue_theme: "",
+      keywords: "",
+      editor_name: "",
+      issn_number: "",
+      doi: "",
+      copyright_type: "",
+      copyright_value: null,
+      web_url: ""
     });
+    setImagePreview(null);
+    setCopyrightImagePreview(null);
     setShowPopup(true);
   };
 
@@ -146,8 +213,32 @@ const HandleVolume = () => {
       from_date: volume.from_date || "",
       to_date: volume.to_date || "",
       page_no: volume.page_no || "",
-      image: null
+      image: null,
+      issue_type: volume.issue_type || "",
+      issue_theme: volume.issue_theme || "",
+      keywords: volume.keywords || "",
+      editor_name: volume.editor_name || "",
+      issn_number: volume.issn_number || "",
+      doi: volume.doi || "",
+      copyright_type: volume.copyright_type || "",
+      copyright_value: volume.copyright_value || null,
+      web_url: volume.web_url || ""
     });
+    
+    // Set image previews for existing images
+    if (volume.image) {
+      setImagePreview(`${STORAGE_URL}${volume.image}`);
+    } else {
+      setImagePreview(null);
+    }
+    
+    // Set copyright preview based on type
+    if (volume.copyright_type === "image" && volume.copyright_value) {
+      setCopyrightImagePreview(`${STORAGE_URL}${volume.copyright_value}`);
+    } else {
+      setCopyrightImagePreview(null);
+    }
+    
     setShowPopup(true);
   };
 
@@ -155,16 +246,26 @@ const HandleVolume = () => {
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "image") {
-      setFormData(prev => ({
-        ...prev,
-        image: files[0]
-      }));
+      handleImageChange(e);
+    } else if (name === "copyright_value" && formData.copyright_type === "image") {
+      handleCopyrightImageChange(e);
     } else {
       setFormData(prev => ({
         ...prev,
         [name]: value
       }));
     }
+  };
+
+  // Handle copyright type change
+  const handleCopyrightTypeChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      copyright_type: value,
+      copyright_value: null
+    }));
+    setCopyrightImagePreview(null);
   };
 
   // Handle form submission
@@ -187,9 +288,33 @@ const HandleVolume = () => {
       submitData.append("from_date", formData.from_date);
       submitData.append("to_date", formData.to_date);
       submitData.append("page_no", formData.page_no);
+      submitData.append("issue_type", formData.issue_type);
+      submitData.append("issue_theme", formData.issue_theme);
+      submitData.append("keywords", formData.keywords);
+      submitData.append("editor_name", formData.editor_name);
+      submitData.append("issn_number", formData.issn_number);
+      submitData.append("doi", formData.doi);
+      submitData.append("copyright_type", formData.copyright_type);
+      submitData.append("web_url", formData.web_url);
+      
+      // Handle copyright value based on type
+      if (formData.copyright_type === "image") {
+        if (formData.copyright_value && typeof formData.copyright_value !== 'string') {
+          submitData.append("copyright_image", formData.copyright_value);
+        }
+      } else if (formData.copyright_type === "url") {
+        if (formData.copyright_value) {
+          submitData.append("copyright_image", formData.copyright_value);
+        }
+      }
       
       if (formData.image) {
         submitData.append("image", formData.image);
+      }
+
+      // Debugging: Log form data before submission
+      for (let pair of submitData.entries()) {
+        console.log(`${pair[0]}:`, pair[1]);
       }
 
       let response;
@@ -225,6 +350,7 @@ const HandleVolume = () => {
         alert(editingVolume ? "Volume updated successfully!" : "Volume added successfully!");
       } else {
         alert(response.data.message || "Something went wrong!");
+        console.error("Error response from server:", response.data);
       }
     } catch (err) {
       alert(err.response?.data?.message || "An error occurred!");
@@ -274,10 +400,19 @@ const HandleVolume = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
-  // Close popup
+  // Close popup and cleanup preview URLs
   const closePopup = () => {
     setShowPopup(false);
     setEditingVolume(null);
+    // Cleanup preview URLs
+    if (imagePreview && !imagePreview.startsWith(STORAGE_URL)) {
+      URL.revokeObjectURL(imagePreview);
+    }
+    if (copyrightImagePreview && !copyrightImagePreview.startsWith(STORAGE_URL)) {
+      URL.revokeObjectURL(copyrightImagePreview);
+    }
+    setImagePreview(null);
+    setCopyrightImagePreview(null);
   };
 
   if (loading) {
@@ -372,12 +507,54 @@ const HandleVolume = () => {
                 {/* Journal Name */}
                 <div className="mb-3 pb-2 border-b border-gray-200">
                   <p className="text-sm text-gray-600">
-                    {/* <span className="font-medium">Journal:</span> {getJournalTitle(volume.journal_id)} */}
                     <span className="font-medium">Journal:</span> {volume?.journal?.j_title || getJournalTitle(volume.journal_id)}
                   </p>
                 </div>
                 
                 <div className="space-y-2 text-sm text-gray-600">
+                  {/* Issue Type & Theme */}
+                  {volume.issue_type && (
+                    <div className="flex justify-between">
+                      <span className="font-medium">Issue Type:</span>
+                      <span>{volume.issue_type}</span>
+                    </div>
+                  )}
+                  
+                  {volume.issue_theme && (
+                    <div className="flex justify-between">
+                      <span className="font-medium">Theme:</span>
+                      <span className="truncate max-w-[150px]">{volume.issue_theme}</span>
+                    </div>
+                  )}
+                  
+                  {volume.keywords && (
+                    <div className="flex justify-between">
+                      <span className="font-medium">Keywords:</span>
+                      <span className="truncate max-w-[150px]">{volume.keywords}</span>
+                    </div>
+                  )}
+                  
+                  {volume.editor_name && (
+                    <div className="flex justify-between">
+                      <span className="font-medium">Editor:</span>
+                      <span>{volume.editor_name}</span>
+                    </div>
+                  )}
+                  
+                  {volume.issn_number && (
+                    <div className="flex justify-between">
+                      <span className="font-medium">ISSN:</span>
+                      <span>{volume.issn_number}</span>
+                    </div>
+                  )}
+                  
+                  {volume.doi && (
+                    <div className="flex justify-between">
+                      <span className="font-medium">DOI:</span>
+                      <span className="truncate max-w-[150px]">{volume.doi}</span>
+                    </div>
+                  )}
+                  
                   {volume.page_no && (
                     <div className="flex justify-between">
                       <span className="font-medium">Pages:</span>
@@ -395,7 +572,28 @@ const HandleVolume = () => {
                     <span>{formatDate(volume.to_date)}</span>
                   </div>
                   
-                 
+                  {volume.web_url && (
+                    <div className="flex justify-between">
+                      <span className="font-medium">Web URL:</span>
+                      <a href={volume.web_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline truncate max-w-[150px]">
+                        Link
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Display Copyright Info */}
+                  {volume.copyright_type && volume.copyright_value && (
+                    <div className="flex justify-between">
+                      <span className="font-medium">Copyright:</span>
+                      {volume.copyright_type === "image" ? (
+                        <span className="text-blue-500">Image</span>
+                      ) : (
+                        <a href={volume.copyright_value} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline truncate max-w-[150px]">
+                          URL
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
                 
                 {/* Action Buttons */}
@@ -412,7 +610,6 @@ const HandleVolume = () => {
                   >
                     Delete
                   </button>
-                  {/* Only show Close button for open volumes */}
                   {volume.status === "open" && (
                     <button 
                       onClick={() => handleToggleStatus(volume.id, volume.status)}
@@ -431,7 +628,7 @@ const HandleVolume = () => {
       {/* Popup Modal */}
       {showPopup && (
         <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-6 border-b sticky top-0 bg-white">
               <h2 className="text-xl font-semibold text-gray-800">
                 {editingVolume ? "Edit Volume" : "Add New Volume"}
@@ -471,77 +668,186 @@ const HandleVolume = () => {
                   )}
                 </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Volume Number *
+                    </label>
+                    <input
+                      type="text"
+                      name="volume"
+                      value={formData.volume}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter volume number"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Issue Number
+                    </label>
+                    <input
+                      type="text"
+                      name="issue_no"
+                      value={formData.issue_no}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., Issue 01, Spring 2024"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Issue Type
+                    </label>
+                    <input
+                      type="text"
+                      name="issue_type"
+                      value={formData.issue_type}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., Regular, Special"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Issue Theme
+                    </label>
+                    <input
+                      type="text"
+                      name="issue_theme"
+                      value={formData.issue_theme}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Issue theme"
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Volume Number *
+                    Keywords
                   </label>
                   <input
                     type="text"
-                    name="volume"
-                    value={formData.volume}
+                    name="keywords"
+                    value={formData.keywords}
                     onChange={handleInputChange}
-                    required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter volume number"
+                    placeholder="Comma separated keywords"
                   />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Editor Name
+                    </label>
+                    <input
+                      type="text"
+                      name="editor_name"
+                      value={formData.editor_name}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Editor name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      ISSN Number
+                    </label>
+                    <input
+                      type="text"
+                      name="issn_number"
+                      value={formData.issn_number}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="ISSN number"
+                    />
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Issue Number
+                    DOI
                   </label>
                   <input
                     type="text"
-                    name="issue_no"
-                    value={formData.issue_no}
+                    name="doi"
+                    value={formData.doi}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., Issue 01, Spring 2024"
+                    placeholder="Digital Object Identifier"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Page Numbers
+                    Web URL
                   </label>
                   <input
-                    type="text"
-                    name="page_no"
-                    value={formData.page_no}
+                    type="url"
+                    name="web_url"
+                    value={formData.web_url}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., 1-150, 50-200"
+                    placeholder="https://example.com"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    From Date *
-                  </label>
-                  <input
-                    type="date"
-                    name="from_date"
-                    value={formData.from_date}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Page Numbers
+                    </label>
+                    <input
+                      type="text"
+                      name="page_no"
+                      value={formData.page_no}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., 1-150, 50-200"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    To Date *
-                  </label>
-                  <input
-                    type="date"
-                    name="to_date"
-                    value={formData.to_date}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      From Date *
+                    </label>
+                    <input
+                      type="date"
+                      name="from_date"
+                      value={formData.from_date}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      To Date *
+                    </label>
+                    <input
+                      type="date"
+                      name="to_date"
+                      value={formData.to_date}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
                 </div>
 
+                {/* Volume Image Section with Preview */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Volume Image {!editingVolume && "*"}
@@ -551,13 +857,126 @@ const HandleVolume = () => {
                     name="image"
                     onChange={handleInputChange}
                     accept="image/*"
-                    required={!editingVolume}
+                    ref={imageInputRef}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  {editingVolume && (
+                  {imagePreview && (
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-600 mb-1">Image Preview:</p>
+                      <div className="relative w-32 h-32 border rounded-md overflow-hidden">
+                        <img 
+                          src={imagePreview} 
+                          alt="Volume preview" 
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setImagePreview(null);
+                            setFormData(prev => ({ ...prev, image: null }));
+                            if (imageInputRef.current) {
+                              imageInputRef.current.value = "";
+                            }
+                          }}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  {editingVolume && !imagePreview && volume?.image && (
                     <p className="text-xs text-gray-500 mt-1">
-                      Leave empty to keep current image
+                      Current image will be kept unless you upload a new one
                     </p>
+                  )}
+                </div>
+
+                {/* Copyright Section */}
+                <div className="border-t pt-4 mt-4">
+                  <h3 className="text-md font-semibold text-gray-800 mb-3">Copyright Information</h3>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Copyright Type
+                    </label>
+                    <select
+                      name="copyright_type"
+                      value={formData.copyright_type}
+                      onChange={handleCopyrightTypeChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Select copyright type</option>
+                      <option value="url">URL</option>
+                      <option value="image">Image</option>
+                    </select>
+                  </div>
+
+                  {formData.copyright_type === "image" && (
+                    <div className="mt-3">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Copyright Image {!editingVolume && "*"}
+                      </label>
+                      <input
+                        type="file"
+                        name="copyright_value"
+                        onChange={handleInputChange}
+                        accept="image/*"
+                        ref={copyrightImageInputRef}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      {copyrightImagePreview && (
+                        <div className="mt-2">
+                          <p className="text-sm text-gray-600 mb-1">Copyright Image Preview:</p>
+                          <div className="relative w-32 h-32 border rounded-md overflow-hidden">
+                            <img 
+                              src={copyrightImagePreview} 
+                              alt="Copyright preview" 
+                              className="w-full h-full object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCopyrightImagePreview(null);
+                                setFormData(prev => ({ ...prev, copyright_value: null }));
+                                if (copyrightImageInputRef.current) {
+                                  copyrightImageInputRef.current.value = "";
+                                }
+                              }}
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                      {editingVolume && !copyrightImagePreview && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          Current copyright image will be kept unless you upload a new one
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {formData.copyright_type === "url" && (
+                    <div className="mt-3">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Copyright URL
+                      </label>
+                      <input
+                        type="url"
+                        name="copyright_value"
+                        value={typeof formData.copyright_value === 'string' ? formData.copyright_value : ''}
+                        onChange={handleCopyrightUrlChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="https://example.com/copyright"
+                      />
+                      {editingVolume && formData.copyright_value && typeof formData.copyright_value === 'string' && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          Current copyright URL will be updated
+                        </p>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

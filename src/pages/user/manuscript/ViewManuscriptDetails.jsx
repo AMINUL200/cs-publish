@@ -73,8 +73,8 @@ const ViewManuscriptDetails = () => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-             "Cache-Control": "no-cache",
-          Pragma: "no-cache",
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
           },
         },
       );
@@ -288,11 +288,9 @@ const ViewManuscriptDetails = () => {
     const text = "Check out this research article";
 
     try {
-      // ✅ Copy link automatically
       await navigator.clipboard.writeText(url);
       toast.success("Link copied! Choose where to share.");
 
-      // ✅ Open native share popup (mobile + supported browsers)
       if (navigator.share) {
         await navigator.share({
           title: title,
@@ -300,7 +298,6 @@ const ViewManuscriptDetails = () => {
           url: url,
         });
       } else {
-        // ✅ Fallback popup if browser doesn't support Web Share API
         setShareDropdownOpen(true);
       }
     } catch (error) {
@@ -313,7 +310,7 @@ const ViewManuscriptDetails = () => {
     toast.info("Expand functionality to be implemented");
   };
 
-  // Simple handlers for mobile view (without dropdowns for now)
+  // Simple handlers for mobile view
   const handleMobileCite = () => {
     if (manuscriptData?.cites?.length > 0) {
       handleCitePopup(manuscriptData.cites[0]);
@@ -432,7 +429,7 @@ const ViewManuscriptDetails = () => {
   return (
     <div className="min-h-screen bg-gray-50 relative">
       {/* Fixed Header with Navigation */}
-      <div className="bg-white shadow-md border-b fixed mb-10 top-0 left-0 right-0 z-50">
+      <div className="bg-white shadow-md border-b fixed top-0 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-4">
             {/* Top Row: Breadcrumb */}
@@ -479,7 +476,7 @@ const ViewManuscriptDetails = () => {
             {/* Bottom Row: Title and Actions */}
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
               {/* Title - Hidden on medium screens */}
-              <h1 className="text-2xl font-bold text-gray-900 flex-1 ">
+              <h1 className="text-2xl font-bold text-gray-900 flex-1">
                 {getCleanTitle()}
               </h1>
 
@@ -647,7 +644,7 @@ const ViewManuscriptDetails = () => {
             </div>
 
             {/* Author info with hover popup */}
-            <div className="relative">
+            <div className="relative mt-2">
               <ul className="flex flex-wrap gap-3">
                 {authorInfo.map((author, index) => (
                   <li
@@ -874,7 +871,7 @@ const ViewManuscriptDetails = () => {
             <button
               onClick={() => handleDownloadPDF(manuscriptData.pdf)}
               disabled={downloadLoading}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer w-full ${
                 downloadLoading
                   ? "bg-yellow-400 cursor-not-allowed"
                   : "bg-yellow-600 hover:bg-yellow-700 text-white"
@@ -916,219 +913,181 @@ const ViewManuscriptDetails = () => {
       )}
 
       {/* Main Content Area */}
-      <div className="pt-60 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="pt-60 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-8 relative">
-          {/* Left Sidebar - Journal Info (Scrollable) + Figures & References (Fixed) */}
-          <div className="lg:w-90 flex-shrink-0">
-            {/* Journal Information Card - Scrollable */}
-            <div className="bg-white rounded-lg shadow-sm border mb-4 hidden lg:block">
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                  <BookOpen className="w-5 h-5 mr-2 text-yellow-600" />
-                  Journal Information
-                </h3>
-                {journalInfo && (
-                  <div className="space-y-3">
-                    {journalInfo.image && (
-                      <div className="flex justify-center mb-3">
-                        <img
-                          src={`${STORAGE_URL}${journalInfo.image}`}
-                          // srcSet={`${STORAGE_URL}${journalInfo.image} 1x, ${STORAGE_URL}${journalInfo.image} 2x`}
-                          alt={journalInfo.j_title}
-                          className="h-20 w-auto object-cover rounded-lg"
-                        />
-                      </div>
-                    )}
-                    <div>
-                      <h4 className="font-semibold text-gray-900 text-sm mb-1">
-                        Journal
-                      </h4>
-                      <p className="text-sm text-gray-700">
-                        {journalInfo.j_title}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">
-                        {journalInfo.j_description}
-                      </p>
-                    </div>
-                    {volumeInfo && (
+          {/* Left Sidebar - Fixed on large screens */}
+          <div className="hidden lg:block lg:w-96 flex-shrink-0">
+            <div className="sticky top-60 space-y-4">
+              {/* Journal Information Card */}
+              <div className="bg-white rounded-lg shadow-sm border">
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                    <BookOpen className="w-5 h-5 mr-2 text-yellow-600" />
+                    Journal Information
+                  </h3>
+                  {journalInfo && (
+                    <div className="space-y-3">
+                      {journalInfo.image && (
+                        <div className="flex justify-center mb-3">
+                          <img
+                            src={`${STORAGE_URL}${journalInfo.image}`}
+                            alt={journalInfo.j_title}
+                            className="h-20 w-auto object-cover rounded-lg"
+                          />
+                        </div>
+                      )}
                       <div>
                         <h4 className="font-semibold text-gray-900 text-sm mb-1">
-                          Issue
+                          Journal
                         </h4>
                         <p className="text-sm text-gray-700">
-                          Volume {volumeInfo.volume}, {volumeInfo.issue_no}
+                          {journalInfo.j_title}
                         </p>
-                        {volumeInfo.page_no && (
-                          <p className="text-xs text-gray-500 mt-1">
-                            Pages: {volumeInfo.page_no}
-                          </p>
-                        )}
                       </div>
-                    )}
+                      <div>
+                        <p className="text-sm text-gray-600 line-clamp-3">
+                          {journalInfo.j_description}
+                        </p>
+                      </div>
+                      {volumeInfo && (
+                        <div>
+                          <h4 className="font-semibold text-gray-900 text-sm mb-1">
+                            Issue
+                          </h4>
+                          <p className="text-sm text-gray-700">
+                            Volume {volumeInfo.volume}, {volumeInfo.issue_no}
+                          </p>
+                          {volumeInfo.page_no && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              Pages: {volumeInfo.page_no}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Altmetric and Citations Card */}
+              <div className="bg-white rounded-lg shadow-sm border">
+                <div className="flex gap-2 justify-center">
+                  <div className="flex flex-col text-center p-6 flex-1">
+                    <span className="text-sm text-gray-600">Altmetric</span>
+                    <span className="text-xl font-bold text-gray-900">-</span>
                   </div>
-                )}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border mb-4 hidden lg:block">
-              <div className="flex gap-2 justify-center ">
-                <div className="flex flex-col text-center p-6">
-                  <span> Altmetric</span>
-                  <span> -</span>
-                </div>
-                <div className="flex flex-col text-center p-6">
-                  <span> Citations</span>
-                  <span> -</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Keywords Section */}
-            {manuscriptData.keywords && manuscriptData.keywords.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm border mb-4 hidden lg:block">
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                    Keywords
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {manuscriptData.keywords.map((keyword, index) => (
-                      <span
-                        key={index}
-                        className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full"
-                      >
-                        {keyword}
-                      </span>
-                    ))}
+                  <div className="flex flex-col text-center p-6 flex-1">
+                    <span className="text-sm text-gray-600">Citations</span>
+                    <span className="text-xl font-bold text-gray-900">-</span>
                   </div>
                 </div>
               </div>
-            )}
 
-            {/* Figures & References Section - Fixed */}
-            <div
-              className={`lg:w-90 flex-shrink-0 fixed lg:sticky top-0 lg:top-60 left-0 lg:left-auto h-screen lg:h-auto bg-white lg:bg-transparent shadow-2xl lg:shadow-none z-999 lg:z-auto transform transition-transform duration-300 ease-in-out ${
-                showLeftSidebar
-                  ? "translate-x-0"
-                  : "-translate-x-full lg:translate-x-0"
-              } ${showLeftSidebar ? "block" : "hidden lg:block"}`}
-            >
-              <div className="h-[calc(100vh-176px)] lg:max-h-100vh overflow-y-auto custom-scrollbar">
-                <div className="lg:hidden flex justify-between items-center p-4 border-b bg-white sticky top-0 z-10">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {leftPanelView === "figures" ? "Figures" : "References"}
-                  </h3>
+              {/* Keywords Section */}
+              {manuscriptData.keywords && manuscriptData.keywords.length > 0 && (
+                <div className="bg-white rounded-lg shadow-sm border">
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                      Keywords
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {manuscriptData.keywords.map((keyword, index) => (
+                        <span
+                          key={index}
+                          className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full"
+                        >
+                          {keyword}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Figures & References Toggle */}
+              <div className="bg-white rounded-lg shadow-sm border">
+                <div className="flex border-b">
                   <button
-                    onClick={toggleLeftSidebar}
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                    onClick={() => setLeftPanelView("figures")}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                      leftPanelView === "figures"
+                        ? "bg-yellow-50 text-yellow-700 border-b-2 border-yellow-700"
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
                   >
-                    <X className="w-5 h-5" />
-                    <span>Close</span>
+                    <Image className="w-4 h-4" />
+                    Figures
+                  </button>
+                  <button
+                    onClick={() => setLeftPanelView("references")}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                      leftPanelView === "references"
+                        ? "bg-yellow-50 text-yellow-700 border-b-2 border-yellow-700"
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    References
                   </button>
                 </div>
 
-                <div className="p-4 lg:p-0">
-                  <div className="bg-white rounded-lg shadow-sm border mb-4">
-                    <div className="flex border-b">
-                      <button
-                        onClick={() => setLeftPanelView("figures")}
-                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
-                          leftPanelView === "figures"
-                            ? "bg-yellow-50 text-yellow-700 border-b-2 border-yellow-700"
-                            : "text-gray-600 hover:bg-gray-50"
-                        }`}
-                      >
-                        <Image className="w-4 h-4" />
-                        Figures
-                      </button>
-                      <button
-                        onClick={() => setLeftPanelView("references")}
-                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
-                          leftPanelView === "references"
-                            ? "bg-yellow-50 text-yellow-700 border-b-2 border-yellow-700"
-                            : "text-gray-600 hover:bg-gray-50"
-                        }`}
-                      >
-                        <BookOpen className="w-4 h-4" />
-                        References
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="bg-white rounded-lg shadow-sm border overflow-hidden max-h-[calc(100vh-320px)] lg:max-h-[calc(100vh-260px)] overflow-y-auto custom-scrollbar">
-                    {leftPanelView === "figures" ? (
-                      <div className="p-4">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 lg:block hidden">
-                          Figures
-                        </h3>
-                        <div className="space-y-6">
-                          {figures && figures.length > 0 ? (
-                            figures.map((figure) => (
-                              <div
-                                key={figure.id}
-                                className="border-b pb-4 last:border-b-0 group"
+                <div className="p-4 max-h-[500px] overflow-y-auto custom-scrollbar">
+                  {leftPanelView === "figures" ? (
+                    <div className="space-y-6">
+                      {figures && figures.length > 0 ? (
+                        figures.map((figure) => (
+                          <div
+                            key={figure.id}
+                            className="border-b pb-4 last:border-b-0 group"
+                          >
+                            <div className="relative overflow-hidden rounded-lg">
+                              <img
+                                src={figure.image}
+                                alt={figure.title}
+                                className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                              />
+                              <button
+                                onClick={() =>
+                                  handleFigurePreview(figure.image)
+                                }
+                                className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-2 hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
+                                title="Preview Figure"
                               >
-                                <div className="relative overflow-hidden rounded-lg">
-                                  <img
-                                    src={figure.image}
-                                    alt={figure.title}
-                                    className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-                                  />
-                                  <button
-                                    onClick={() =>
-                                      handleFigurePreview(figure.image)
-                                    }
-                                    className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-2 hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
-                                    title="Preview Figure"
-                                  >
-                                    <ExternalLink className="w-4 h-4" />
-                                  </button>
-                                </div>
-                                <h4 className="font-semibold text-sm text-gray-900 mb-1 mt-2">
-                                  {figure.title}
-                                </h4>
-                                <p className="text-xs text-gray-600">
-                                  {figure.description}
-                                </p>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="text-center py-8">
-                              <Image className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                              <p className="text-sm text-gray-500">
-                                No figures available
-                              </p>
+                                <ExternalLink className="w-4 h-4" />
+                              </button>
                             </div>
-                          )}
+                            <h4 className="font-semibold text-sm text-gray-900 mb-1 mt-2">
+                              {figure.title}
+                            </h4>
+                            <p className="text-xs text-gray-600">
+                              {figure.description}
+                            </p>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-8">
+                          <Image className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                          <p className="text-sm text-gray-500">
+                            No figures available
+                          </p>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="p-4">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 lg:block hidden">
-                          References
-                        </h3>
-                        <div
-                          className="blog-rich-text max-w-none text-gray-700"
-                          dangerouslySetInnerHTML={{
-                            __html: manuscriptData.references,
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div
+                      className="blog-rich-text max-w-none text-gray-700 text-sm"
+                      dangerouslySetInnerHTML={{
+                        __html: manuscriptData.references,
+                      }}
+                    />
+                  )}
                 </div>
               </div>
             </div>
           </div>
 
           {/* Main Content - Right Side */}
-          <div
-            className={`flex-1 min-w-0 transition-all duration-300 ${
-              showLeftSidebar ? "lg:block" : ""
-            }`}
-          >
-            {/* Your main content sections remain the same */}
+          <div className="flex-1 min-w-0">
             <div className="bg-white rounded-lg shadow-sm border">
               <div className="p-6 lg:p-8">
                 <section id="abstract" className="mb-12 scroll-mt-44">
@@ -1268,7 +1227,7 @@ const ViewManuscriptDetails = () => {
                           research.
                         </p>
                       </div>
-                      {/* 👇 PDF Preview Section */}
+                      {/* PDF Preview Section */}
                       <div className="mt-6">
                         <h4 className="text-md font-semibold text-gray-900 mb-2">
                           Preview Supplementary PDF:
@@ -1362,22 +1321,21 @@ const ViewManuscriptDetails = () => {
                 </Link>
               </div>
             )}
+            
+            {/* Subscription Required Message */}
             {isLoggedIn && !hasActiveSubscription && (
               <div className="my-12">
                 <div className="bg-gradient-to-br from-yellow-50 to-white border border-yellow-300 rounded-2xl p-8 shadow-lg">
-                  {/* ⬇ Force center here */}
                   <div className="text-center">
                     <h3 className="text-2xl font-bold text-gray-900 mb-3">
                       🚀 Unlock Full Access
                     </h3>
-
                     <h5 className="text-gray-700 max-w-2xl mx-auto mb-6 leading-relaxed">
-                      You’re logged in, but your account does not have an active
+                      You're logged in, but your account does not have an active
                       subscription. Subscribe now to access the complete
                       manuscript, PDF downloads, references, figures, and
                       supplementary materials.
                     </h5>
-
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       <Link
                         to="/subscription"
@@ -1391,16 +1349,141 @@ const ViewManuscriptDetails = () => {
               </div>
             )}
           </div>
-
-          {/* Overlay for mobile when sidebar is open */}
-          {showLeftSidebar && (
-            <div
-              className="fixed inset-0 bg-black/50 bg-opacity-50 z-30 lg:hidden"
-              onClick={toggleLeftSidebar}
-            />
-          )}
         </div>
       </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {showLeftSidebar && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            onClick={toggleLeftSidebar}
+          />
+          <div className="fixed top-0 left-0 bottom-0 w-80 bg-white z-50 shadow-2xl overflow-y-auto transform transition-transform duration-300 md:hidden">
+            <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center z-10">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {leftPanelView === "figures" ? "Figures & Info" : "References"}
+              </h3>
+              <button
+                onClick={toggleLeftSidebar}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4">
+              {/* Journal Info for Mobile */}
+              <div className="bg-white rounded-lg shadow-sm border mb-4">
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                    <BookOpen className="w-5 h-5 mr-2 text-yellow-600" />
+                    Journal Information
+                  </h3>
+                  {journalInfo && (
+                    <div className="space-y-3">
+                      {journalInfo.image && (
+                        <div className="flex justify-center mb-3">
+                          <img
+                            src={`${STORAGE_URL}${journalInfo.image}`}
+                            alt={journalInfo.j_title}
+                            className="h-20 w-auto object-cover rounded-lg"
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <h4 className="font-semibold text-gray-900 text-sm mb-1">
+                          Journal
+                        </h4>
+                        <p className="text-sm text-gray-700">
+                          {journalInfo.j_title}
+                        </p>
+                      </div>
+                      {volumeInfo && (
+                        <div>
+                          <h4 className="font-semibold text-gray-900 text-sm mb-1">
+                            Issue
+                          </h4>
+                          <p className="text-sm text-gray-700">
+                            Volume {volumeInfo.volume}, {volumeInfo.issue_no}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Figures/References for Mobile */}
+              <div className="bg-white rounded-lg shadow-sm border">
+                <div className="flex border-b">
+                  <button
+                    onClick={() => setLeftPanelView("figures")}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                      leftPanelView === "figures"
+                        ? "bg-yellow-50 text-yellow-700 border-b-2 border-yellow-700"
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    <Image className="w-4 h-4" />
+                    Figures
+                  </button>
+                  <button
+                    onClick={() => setLeftPanelView("references")}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                      leftPanelView === "references"
+                        ? "bg-yellow-50 text-yellow-700 border-b-2 border-yellow-700"
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    References
+                  </button>
+                </div>
+
+                <div className="p-4 max-h-[500px] overflow-y-auto">
+                  {leftPanelView === "figures" ? (
+                    <div className="space-y-6">
+                      {figures && figures.length > 0 ? (
+                        figures.map((figure) => (
+                          <div key={figure.id} className="border-b pb-4 last:border-b-0">
+                            <div className="relative overflow-hidden rounded-lg">
+                              <img
+                                src={figure.image}
+                                alt={figure.title}
+                                className="w-full h-48 object-cover"
+                              />
+                            </div>
+                            <h4 className="font-semibold text-sm text-gray-900 mb-1 mt-2">
+                              {figure.title}
+                            </h4>
+                            <p className="text-xs text-gray-600">
+                              {figure.description}
+                            </p>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-8">
+                          <Image className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                          <p className="text-sm text-gray-500">
+                            No figures available
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div
+                      className="blog-rich-text max-w-none text-gray-700 text-sm"
+                      dangerouslySetInnerHTML={{
+                        __html: manuscriptData.references,
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Click outside to close dropdowns */}
       {(dropdownOpen ||

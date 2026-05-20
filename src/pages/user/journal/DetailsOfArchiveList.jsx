@@ -47,7 +47,7 @@ const DetailsOfArchiveList = () => {
             },
           }
         );
-        console.log(response.data.data.journal);
+        console.log(response.data);
         if (response.data.flag === 1 && response.data.data) {
           const data = response.data.data;
           setJournalData(data.journal);
@@ -359,7 +359,7 @@ const DetailsOfArchiveList = () => {
                       {manuscript.image && (
                         <div className="flex-shrink-0">
                           <img
-                            src={manuscript.image}
+                            src={`${STORAGE_URL}/${manuscript.image}`}
                             alt={getCleanTitle(manuscript.title)}
                             className="w-40 h-28 object-cover rounded-lg shadow-md"
                           />

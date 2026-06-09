@@ -257,7 +257,7 @@ const LandingOurTeam = ({
                       <p className="text-yellow-600 font-semibold mb-3">
                         {position}
                       </p>
-                      <p className="text-gray-600 text-sm leading-relaxed">
+                      <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
                         {member.short_description}
                       </p>
                     </div>

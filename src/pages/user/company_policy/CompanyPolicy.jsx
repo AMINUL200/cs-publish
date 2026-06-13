@@ -26,6 +26,7 @@ const CompanyPolicy = () => {
       });
 
       if (response.data.status && response.data.data) {
+        console.log("Company policy data fetched successfully:", response.data.data);
         setPolicyData({
           title: response.data.data.title || "Company Policy",
           description: response.data.data.description || "",
@@ -66,7 +67,7 @@ const CompanyPolicy = () => {
         <Breadcrumb
           items={[
             { label: "Home", path: "/", icon: "home" },
-            { label: "Policy" },
+            { label: " Company Policy" },
           ]}
         />
 
@@ -92,7 +93,7 @@ const CompanyPolicy = () => {
         <Breadcrumb
           items={[
             { label: "Home", path: "/", icon: "home" },
-            { label: "Policy" },
+            { label: " Company Policy" },
           ]}
         />
 
@@ -122,7 +123,7 @@ const CompanyPolicy = () => {
       <Breadcrumb
         items={[
           { label: "Home", path: "/", icon: "home" },
-          { label: "Policy" },
+          { label: " Company Policy" },
         ]}
       />
 

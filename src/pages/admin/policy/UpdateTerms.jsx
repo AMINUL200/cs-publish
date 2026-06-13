@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { ArrowLeft, Save, Loader } from "lucide-react";
-import { Editor } from "@tinymce/tinymce-react";
+import TextEditor from "../../../components/common/TextEditor";
 
 const UpdateTerms = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -18,7 +18,7 @@ const UpdateTerms = () => {
   const [formData, setFormData] = useState({
     page_title: "",
     title: "",
-    description: ""
+    description: "",
   });
 
   // Fetch page data
@@ -28,9 +28,9 @@ const UpdateTerms = () => {
       const response = await axios.get(`${API_URL}api/terms-edit/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
-           "Cache-Control": "no-cache",
+          "Cache-Control": "no-cache",
           Pragma: "no-cache",
-        }
+        },
       });
 
       if (response.data.status) {
@@ -48,24 +48,24 @@ const UpdateTerms = () => {
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   // Handle editor changes
   const handleEditorChange = (content, fieldName) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [fieldName]: content
+      [fieldName]: content,
     }));
   };
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       setUpdating(true);
       const response = await axios.post(
@@ -74,9 +74,9 @@ const UpdateTerms = () => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
+            "Content-Type": "application/json",
+          },
+        },
       );
 
       if (response.data.status) {
@@ -118,7 +118,7 @@ const UpdateTerms = () => {
           <ArrowLeft className="w-5 h-5" />
           <span>Back to Pages</span>
         </button>
-        
+
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
@@ -132,11 +132,17 @@ const UpdateTerms = () => {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md border border-gray-200">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white rounded-lg shadow-md border border-gray-200"
+      >
         <div className="p-6 space-y-6">
           {/* Page Title */}
           <div>
-            <label htmlFor="page_title" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="page_title"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Page Title *
             </label>
             <input
@@ -154,7 +160,10 @@ const UpdateTerms = () => {
 
           {/* Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Content Title *
             </label>
             <input
@@ -171,64 +180,29 @@ const UpdateTerms = () => {
 
           {/* Description with TinyMCE Editor */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Description *
             </label>
-            <Editor
-              apiKey={apikey}
-              value={formData.description}
-              init={{
-                height: 500,
-                menubar: false,
-                plugins: [
-                  "advlist",
-                  "autolink",
-                  "link",
-                  "lists",
-                  "charmap",
-                  "preview",
-                  "searchreplace",
-                  "visualblocks",
-                  "code",
-                  "fullscreen",
-                  "help",
-                  "wordcount",
-                ],
-                toolbar:
-                  "undo redo | blocks | " +
-                  "bold italic underline | link | " +
-                  "alignleft aligncenter alignright alignjustify | " +
-                  "bullist numlist outdent indent | " +
-                  "removeformat | help | code",
-                content_style:
-                  "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-                link_context_toolbar: true,
-                link_assume_external_targets: true,
-                link_title: false,
-                default_link_target: "_blank",
-                link_list: [
-                  { title: "Home Page", value: "/" },
-                  { title: "About Page", value: "/about" },
-                  { title: "Contact Page", value: "/contact" },
-                ],
-                // Additional styling options
-                branding: false,
-                statusbar: true,
-                elementpath: true,
-                paste_data_images: false,
-                images_upload_handler: undefined,
-                // Responsive setup
-                mobile: {
-                  theme: 'mobile',
-                  toolbar: [
-                    'undo', 'redo', 'bold', 'italic', 'underline', 'link'
-                  ]
+           
+            <div
+              className="border border-gray-300 rounded-md overflow-hidden"
+              style={{ height: "500px" }}
+            >
+              <TextEditor
+                apiKey={apikey}
+                value={formData.description}
+                onChange={(content) =>
+                  handleEditorChange(content, "description")
                 }
-              }}
-              onEditorChange={(content) => handleEditorChange(content, "description")}
-            />
+              />
+            </div>
+
             <p className="text-xs text-gray-500 mt-2">
-              Use the rich text editor to format your content. You can add links, lists, and apply formatting as needed.
+              Use the rich text editor to format your content. You can add
+              links, lists, and apply formatting as needed.
             </p>
           </div>
 
@@ -237,7 +211,8 @@ const UpdateTerms = () => {
             <div className="flex justify-between items-center text-sm text-gray-600">
               <span>Content Length:</span>
               <span className="font-medium">
-                {formData.description ? formData.description.length : 0} characters
+                {formData.description ? formData.description.length : 0}{" "}
+                characters
               </span>
             </div>
           </div>
@@ -253,7 +228,7 @@ const UpdateTerms = () => {
             >
               Cancel
             </button>
-            
+
             <button
               type="submit"
               disabled={updating || !formData.description.trim()}
@@ -279,30 +254,22 @@ const UpdateTerms = () => {
       <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <h3 className="text-sm font-medium text-blue-800 mb-2">Editor Tips</h3>
         <ul className="text-sm text-blue-700 space-y-1">
-          <li>• Use the toolbar to format your text with bold, italic, and underline</li>
-          <li>• Create lists and organize your content with proper alignment</li>
+          <li>
+            • Use the toolbar to format your text with bold, italic, and
+            underline
+          </li>
+          <li>
+            • Create lists and organize your content with proper alignment
+          </li>
           <li>• Add links to relevant pages using the link button</li>
           <li>• Use the code view for advanced HTML editing</li>
-          <li>• Make sure your content is comprehensive but easy to understand</li>
+          <li>
+            • Make sure your content is comprehensive but easy to understand
+          </li>
         </ul>
       </div>
 
-      {/* Preview Section (Optional) */}
-      <div className="mt-8 bg-white rounded-lg shadow-md border border-gray-200">
-        <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Content Preview</h3>
-          <div className="prose max-w-none p-4 border border-gray-200 rounded-lg min-h-32 bg-gray-50">
-            {formData.description ? (
-              <div 
-                dangerouslySetInnerHTML={{ __html: formData.description }} 
-                className="text-gray-700"
-              />
-            ) : (
-              <p className="text-gray-500 italic">Your content will appear here as you type...</p>
-            )}
-          </div>
-        </div>
-      </div>
+      
     </div>
   );
 };

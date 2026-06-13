@@ -28,6 +28,7 @@ const CompanyPolicyCmsPage = () => {
       });
       
       if (response.data.status) {
+        console.log("Page data fetched successfully:", response.data.data);
         setPageData(response.data.data);
       } else {
         setError("Page not found");
@@ -128,7 +129,7 @@ const CompanyPolicyCmsPage = () => {
             
             <div className="text-center">
               <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                {pageData.page_title}
+                {pageData.title}
               </h1>
               
              

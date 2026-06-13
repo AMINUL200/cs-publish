@@ -85,7 +85,7 @@ const PaymentPolicy = () => {
       <Breadcrumb
         items={[
           { label: "Home", path: "/", icon: "home" },
-          { label: "Payment Policy" },
+          { label: "Refund Policy" },
         ]}
       />
 

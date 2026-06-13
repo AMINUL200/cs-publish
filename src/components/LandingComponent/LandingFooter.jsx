@@ -76,11 +76,11 @@ const LandingFooter = ({
 
   const legalLinks = [
     ...policyData.map((policy) => ({
-      name: policy.page_title,
+      name: policy.title,
       path: `/policy-page/${policy.slug}`,
     })),
-    { name: "Policy", path: "/policy" },
-    { name: "Payment Policy", path: "/payment-policy" },
+    { name: "Company Policy", path: "/policy" },
+    { name: "Refund Policy", path: "/payment-policy" },
   ];
 
   return (

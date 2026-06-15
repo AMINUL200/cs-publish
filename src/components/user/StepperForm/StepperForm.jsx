@@ -28,6 +28,7 @@ const StepperForm = () => {
 
   const [formData, setFormData] = useState({
     journal_id: "",
+    article_type: "",
     username: "",
     contact_number: "",
     email: "",
@@ -88,6 +89,7 @@ const StepperForm = () => {
         setFormData({
           ...formData,
           journal_id: manuscript.journal_id || "",
+          article_type: manuscript.article_type || "",
           username: manuscript.username || "",
           contact_number: manuscript.contact_number || "",
           email: manuscript.email || "",
@@ -145,7 +147,7 @@ const StepperForm = () => {
   const nextStep = () => {
     // ✅ Basic validation before moving to next step
     if (step === 1) {
-      if (!formData.journal_id || !formData.username || !formData.email) {
+      if (!formData.journal_id ||  !formData.article_type || !formData.username || !formData.email) {
         toast.error("Please fill all required fields in Step 1");
         return;
       }
@@ -177,6 +179,7 @@ const StepperForm = () => {
   const validateForm = () => {
     const requiredFields = [
       "journal_id",
+      "article_type",
       "username",
       "contact_number",
       "email",
@@ -260,6 +263,7 @@ const StepperForm = () => {
 
         // Add all text fields
         formDataToSend.append("journal_id", formData.journal_id);
+        formDataToSend.append("article_type", formData.article_type);
         formDataToSend.append("username", formData.username);
         formDataToSend.append("contact_number", formData.contact_number);
         formDataToSend.append("email", formData.email);

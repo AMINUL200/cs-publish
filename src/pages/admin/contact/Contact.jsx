@@ -18,6 +18,7 @@ const Contact = () => {
     landline: "",
     fax: "",
     web: "",
+    facebook: "",
     twitter: "",
     instagram: "",
     linkedin: "",
@@ -52,6 +53,7 @@ const Contact = () => {
           landline: contactData.landline || "",
           fax: contactData.fax || "",
           web: contactData.web || "",
+          facebook: contactData.facebook || "",
           twitter: contactData.twitter || "",
           instagram: contactData.instagram || "",
           linkedin: contactData.linkedin || "",
@@ -487,6 +489,23 @@ const Contact = () => {
                 name="twitter"
                 type="text"
                 value={formData.twitter || ""}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="facebook"
+              >
+                Facebook
+              </label>
+              <input
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500"
+                id="facebook"
+                name="facebook"
+                type="url"
+                placeholder="https://facebook.com/yourpage"
+                value={formData.facebook || ""}
                 onChange={handleChange}
               />
             </div>

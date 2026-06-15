@@ -1,9 +1,19 @@
 import { useEffect } from "react";
 
-const StepOne = ({ formData, setFormData, handleChange, journalData, authors, setAuthors, isUpdateMode = false }) => {
-
+const StepOne = ({
+  formData,
+  setFormData,
+  handleChange,
+  journalData,
+  authors,
+  setAuthors,
+  isUpdateMode = false,
+}) => {
   const handleAddAuthor = () => {
-    setAuthors([...authors, { name: "", email: "", university: "", affiliation: "" }]);
+    setAuthors([
+      ...authors,
+      { name: "", email: "", university: "", affiliation: "" },
+    ]);
   };
 
   const handleAuthorChange = (index, field, value) => {
@@ -25,13 +35,15 @@ const StepOne = ({ formData, setFormData, handleChange, journalData, authors, se
     const value = e.target.value;
     setFormData({
       ...formData,
-      add_myself: value === "true" || value === true ? true : false
+      add_myself: value === "true" || value === true ? true : false,
     });
   };
 
   return (
     <>
-      <h2 className="text-xl mb-4 font-bold">Step 1: Article Submission Info</h2>
+      <h2 className="text-xl mb-4 font-bold">
+        Step 1: Article Submission Info
+      </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -40,7 +52,7 @@ const StepOne = ({ formData, setFormData, handleChange, journalData, authors, se
             name="journal_id"
             value={formData.journal_id}
             onChange={handleChange}
-            className={`w-full p-2 border rounded ${isUpdateMode ? 'bg-gray-200 cursor-not-allowed' : ''}`}
+            className={`w-full p-2 border rounded ${isUpdateMode ? "bg-gray-200 cursor-not-allowed" : ""}`}
             required
             disabled={isUpdateMode} // Disable in update mode
           >
@@ -50,6 +62,28 @@ const StepOne = ({ formData, setFormData, handleChange, journalData, authors, se
                 {journal.name}
               </option>
             ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block mb-1 font-medium">Article Type *</label>
+
+          <select
+            name="article_type"
+            value={formData.article_type}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+            required
+          >
+            <option value="">Select Article Type</option>
+
+            <option value="RA">Research Articles</option>
+            <option value="RV">Review</option>
+            <option value="EO">Expert Opinion</option>
+            <option value="SI">Special Issues</option>
+            <option value="QP">Quick Press</option>
+            <option value="SC">Short Communication</option>
+            <option value="ER">Editorial Report</option>
           </select>
         </div>
 
@@ -177,7 +211,9 @@ const StepOne = ({ formData, setFormData, handleChange, journalData, authors, se
                 <input
                   type="text"
                   value={author.name}
-                  onChange={(e) => handleAuthorChange(index, 'name', e.target.value)}
+                  onChange={(e) =>
+                    handleAuthorChange(index, "name", e.target.value)
+                  }
                   placeholder="Enter author name"
                   className="w-full p-2 border rounded"
                   required
@@ -189,7 +225,9 @@ const StepOne = ({ formData, setFormData, handleChange, journalData, authors, se
                 <input
                   type="email"
                   value={author.email}
-                  onChange={(e) => handleAuthorChange(index, 'email', e.target.value)}
+                  onChange={(e) =>
+                    handleAuthorChange(index, "email", e.target.value)
+                  }
                   placeholder="author@example.com"
                   className="w-full p-2 border rounded"
                   required
@@ -201,7 +239,9 @@ const StepOne = ({ formData, setFormData, handleChange, journalData, authors, se
                 <input
                   type="text"
                   value={author.university}
-                  onChange={(e) => handleAuthorChange(index, 'university', e.target.value)}
+                  onChange={(e) =>
+                    handleAuthorChange(index, "university", e.target.value)
+                  }
                   placeholder="University name"
                   className="w-full p-2 border rounded"
                   required
@@ -213,7 +253,9 @@ const StepOne = ({ formData, setFormData, handleChange, journalData, authors, se
                 <input
                   type="text"
                   value={author.affiliation}
-                  onChange={(e) => handleAuthorChange(index, 'affiliation', e.target.value)}
+                  onChange={(e) =>
+                    handleAuthorChange(index, "affiliation", e.target.value)
+                  }
                   placeholder="Department/Institution"
                   className="w-full p-2 border rounded"
                   required

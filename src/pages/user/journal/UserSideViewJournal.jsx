@@ -251,7 +251,7 @@ const UserSideViewJournal = () => {
                   {journal.issn_print && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
-                        ISSN Print
+                        Publication Model
                       </div>
                       <div className="text-yellow-200 text-sm">
                         {journal.issn_print_no}
@@ -261,7 +261,7 @@ const UserSideViewJournal = () => {
                   {journal.issn_online && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
-                        ISSN Online
+                       Peer Review
                       </div>
                       <div className="text-yellow-200 text-sm">
                         {journal.issn_online_no}
@@ -271,20 +271,20 @@ const UserSideViewJournal = () => {
                   {journal.ugc_approved && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
-                        UGC Approved
+                        DOI 
                       </div>
                       <div className="text-yellow-200 text-sm">
                         {journal.ugc_no}
                       </div>
                     </div>
                   )}
-                  {journal.impact_factor && (
+                  {journal.h_index && (
                   <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                     <div className="font-semibold text-yellow-300 text-sm">
-                      Impact Factor
+                      First Decision
                     </div>
                     <div className="text-yellow-200 text-sm">
-                      {journal?.impact_factor || "456"}
+                      {journal?.h_index || "456"}
                     </div>
                   </div>
                   )}

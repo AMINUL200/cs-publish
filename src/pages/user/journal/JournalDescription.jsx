@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { IndianRupee } from 'lucide-react';
 
 const JournalDescription = () => {
   const { id } = useParams();
@@ -185,19 +186,19 @@ const JournalDescription = () => {
                     {journalData.issn_print && journalData.issn_print_no && (
                       <div className="flex items-center gap-2">
                         <Book className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-700">Print ISSN: {journalData.issn_print_no}</span>
+                        <span className="text-sm text-gray-700">Publication Model: {journalData.issn_print_no}</span>
                       </div>
                     )}
                     {journalData.issn_online && journalData.issn_online_no && (
                       <div className="flex items-center gap-2">
                         <Globe className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-700">eISSN: {journalData.issn_online_no}</span>
+                        <span className="text-sm text-gray-700">Peer Review: {journalData.issn_online_no}</span>
                       </div>
                     )}
                     {journalData.amount && (
                       <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-700">APC: ${journalData.amount}</span>
+                        <IndianRupee className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm text-gray-700">APC: {journalData.amount}</span>
                       </div>
                     )}
                   </div>
@@ -237,7 +238,7 @@ const JournalDescription = () => {
               {journalData.ugc_approved && (
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg">
                   <CheckCircle className="w-4 h-4" />
-                  <span className="font-medium">UGC Approved</span>
+                  <span className="font-medium">DOI</span>
                   {journalData.ugc_no && (
                     <span className="text-sm">({journalData.ugc_no})</span>
                   )}
@@ -263,18 +264,18 @@ const JournalDescription = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 mt-6 border-t border-b border-gray-200">
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-900">{journalData?.total_articles}+</div>
-              <div className="text-sm text-gray-600">Total Articles</div>
+              <div className="text-sm text-gray-600">Quick Press</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-900">{journalData?.total_citations}</div>
-              <div className="text-sm text-gray-600">Total Citations</div>
+              <div className="text-sm text-gray-600">Indexing</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-900">{journalData?.h_index}</div>
-              <div className="text-sm text-gray-600">h-Index</div>
+              <div className="text-sm text-gray-600">First Decision</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">{journalData?.acceptance_rate}%</div>
+              <div className="text-2xl font-bold text-gray-900">{journalData?.acceptance_rate}</div>
               <div className="text-sm text-gray-600">Acceptance Rate</div>
             </div>
           </div>
@@ -346,16 +347,16 @@ const JournalDescription = () => {
                     {/* ISSN Information */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t">
                       <div>
-                        <h3 className="font-medium text-gray-900 mb-2">ISSN Information</h3>
+                        <h3 className="font-medium text-gray-900 mb-2">Publication Model</h3>
                         <div className="space-y-2">
                           {journalData.issn_print && (
                             <p className="text-gray-700">
-                              <span className="font-medium">Print ISSN:</span> {journalData.issn_print_no}
+                              <span className="font-medium">Publication Model:</span> {journalData.issn_print_no}
                             </p>
                           )}
                           {journalData.issn_online && (
                             <p className="text-gray-700">
-                              <span className="font-medium">Online ISSN:</span> {journalData.issn_online_no}
+                              <span className="font-medium">Peer Review:</span> {journalData.issn_online_no}
                             </p>
                           )}
                         </div>
@@ -366,9 +367,9 @@ const JournalDescription = () => {
                           <div className="flex items-center gap-2">
                             <CheckCircle className="w-5 h-5 text-green-500" />
                             <div>
-                              <p className="text-gray-700 font-medium">UGC Approved Journal</p>
+                              <p className="text-gray-700 font-medium">DOI</p>
                               {journalData.ugc_no && (
-                                <p className="text-sm text-gray-600">Approval No: {journalData.ugc_no}</p>
+                                <p className="text-sm text-gray-600">DOI No: {journalData.ugc_no}</p>
                               )}
                             </div>
                           </div>
@@ -409,10 +410,10 @@ const JournalDescription = () => {
                   {journalData.amount && (
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <h3 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
-                        <DollarSign className="w-4 h-4" />
+                        <IndianRupee className="w-4 h-4" />
                         Article Processing Charge (APC)
                       </h3>
-                      <p className="text-2xl font-bold text-[#ffba00]">${journalData.amount}</p>
+                      <p className="text-2xl font-bold text-[#ffba00]">{journalData.amount}</p>
                       <p className="text-sm text-gray-600 mt-1">One-time publication fee</p>
                     </div>
                   )}
@@ -448,8 +449,8 @@ const JournalDescription = () => {
                   <div>
                     <h2 className="text-xl font-semibold mb-2">Publication Fees</h2>
                     <div className="flex items-center gap-2 mb-1">
-                      <DollarSign className="w-5 h-5" />
-                      <span className="text-3xl font-bold">${journalData.amount}</span>
+                      <IndianRupee className="w-5 h-5" />
+                      <span className="text-3xl font-bold">{journalData.amount}</span>
                     </div>
                     <p className="text-sm opacity-90">Article Processing Charge</p>
                   </div>
@@ -493,19 +494,19 @@ const JournalDescription = () => {
                 )}
                 {journalData.issn_print && journalData.issn_print_no && (
                   <div className="flex justify-between py-2 border-b">
-                    <span className="text-gray-600">Print ISSN</span>
+                    <span className="text-gray-600">Publication Model</span>
                     <span className="font-medium text-gray-900">{journalData.issn_print_no}</span>
                   </div>
                 )}
                 {journalData.issn_online && journalData.issn_online_no && (
                   <div className="flex justify-between py-2 border-b">
-                    <span className="text-gray-600">Online ISSN</span>
+                    <span className="text-gray-600">Peer Review</span>
                     <span className="font-medium text-gray-900">{journalData.issn_online_no}</span>
                   </div>
                 )}
                 {journalData.ugc_approved && (
                   <div className="flex justify-between py-2 border-b">
-                    <span className="text-gray-600">UGC Approved</span>
+                    <span className="text-gray-600">DOI</span>
                     <span className="text-green-600 font-medium">Yes</span>
                   </div>
                 )}

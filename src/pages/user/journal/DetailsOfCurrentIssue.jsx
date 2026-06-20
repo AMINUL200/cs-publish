@@ -246,42 +246,42 @@ const DetailsOfCurrentIssue = () => {
 
                 {/* Journal Details Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-                  {journalData.issn_print && (
+                  {journalData?.issn_print && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
-                        ISSN Print
+                        Publication Model
                       </div>
                       <div className="text-yellow-200 text-sm">
-                        {journalData.issn_print_no}
+                        {journalData?.issn_print_no}
                       </div>
                     </div>
                   )}
-                  {journalData.issn_online && (
+                  {journalData?.issn_online && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
-                        ISSN Online
+                        Peer Review
                       </div>
                       <div className="text-yellow-200 text-sm">
-                        {journalData.issn_online_no}
+                        {journalData?.issn_online_no}
                       </div>
                     </div>
                   )}
-                  {journalData.ugc_approved && (
+                  {journalData?.ugc_approved && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
-                        UGC Approved
+                       DOI
                       </div>
                       <div className="text-yellow-200 text-sm">
-                        {journalData.ugc_no}
+                        {journalData?.ugc_no}
                       </div>
                     </div>
                   )}
                   <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                     <div className="font-semibold text-yellow-300 text-sm">
-                      Impact Factor
+                      First Decision
                     </div>
                     <div className="text-yellow-200 text-sm">
-                      {journalData.impact_factor || "N/A"}
+                      {journalData?.h_index || "N/A"}
                     </div>
                   </div>
                 </div>
@@ -290,34 +290,34 @@ const DetailsOfCurrentIssue = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                   <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
                     <div className="font-semibold text-yellow-300 text-xs">
-                      Total Articles
+                     Quick Press
                     </div>
                     <div className="text-yellow-200 text-sm">
-                      {journalData.total_articles || "0"}
+                      {journalData?.total_articles || "0"}
                     </div>
                   </div>
                   <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
                     <div className="font-semibold text-yellow-300 text-xs">
-                      Total Citations
+                      Acceptance  Rate
                     </div>
                     <div className="text-yellow-200 text-sm">
-                      {journalData.total_citations || "0"}
+                      {journalData?.acceptance_rate || "0"}
                     </div>
                   </div>
                   <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
                     <div className="font-semibold text-yellow-300 text-xs">
-                      H-Index
+                      Impact Factor
                     </div>
                     <div className="text-yellow-200 text-sm">
-                      {journalData.h_index || "0"}
+                      {journalData?.impact_factor || "0"}
                     </div>
                   </div>
                   <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
                     <div className="font-semibold text-yellow-300 text-xs">
-                      Acceptance Rate
+                      Indexing
                     </div>
                     <div className="text-yellow-200 text-sm">
-                      {journalData.acceptance_rate || "0"}%
+                      {journalData?.total_citations || "0"}%
                     </div>
                   </div>
                 </div>

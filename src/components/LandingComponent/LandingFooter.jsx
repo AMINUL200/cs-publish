@@ -6,6 +6,7 @@ import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { faInstagram } from "@fortawesome/free-brands-svg-icons";
 import { faLinkedin } from "@fortawesome/free-brands-svg-icons";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
+import { faFacebook } from "@fortawesome/free-brands-svg-icons";
 
 const LandingFooter = ({
   settingsData = {},
@@ -13,7 +14,7 @@ const LandingFooter = ({
   policyData = [],
   loading = false,
 }) => {
-  // console.log(policyData);
+  console.log(settingsData, "settingsData");
   const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
   const sections = [
@@ -99,6 +100,16 @@ const LandingFooter = ({
               <p className="text-[0.7rem]">{settingsData?.address_line2}</p>
             </div>
             <div className="space-y-1 mt-4 ml-4">
+              {/* facebook icon */}
+              <a
+                href={settingsData?.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-yellow-500 transition-colors duration-300 mr-2"
+              >
+                <FontAwesomeIcon icon={faFacebook} className="w-5 h-5" />
+              </a>
+
               {/* Twitter Icon */}
               <a
                 href={settingsData?.twitter}

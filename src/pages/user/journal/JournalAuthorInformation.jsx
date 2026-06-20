@@ -67,8 +67,8 @@ const JournalAuthorInformation = () => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-             "Cache-Control": "no-cache",
-          Pragma: "no-cache",
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
           },
         },
       );
@@ -87,13 +87,12 @@ const JournalAuthorInformation = () => {
     }
   };
   const handleSubmitButton = () => {
-     if(token){
-       toast.warning("Please sign in as an author to access this feature.");
- 
-     }else{
-       navigate("/signin");
-     }
-   };
+    if (token) {
+      toast.warning("Please sign in as an author to access this feature.");
+    } else {
+      navigate("/signin");
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -164,48 +163,56 @@ const JournalAuthorInformation = () => {
                   {data.issn_print && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
-                        ISSN Print
+                        Publication Model
                       </div>
                       <div className="text-yellow-200 text-sm">
                         {data.issn_print_no}
                       </div>
                     </div>
                   )}
+
+                  {/* ISSN Online */}
                   {data.issn_online && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
-                        ISSN Online
+                        Peer Review
                       </div>
                       <div className="text-yellow-200 text-sm">
                         {data.issn_online_no}
                       </div>
                     </div>
                   )}
+
+                  {/* UGC Approval */}
                   {data.ugc_approved && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
-                        UGC Approved
+                        DOI
                       </div>
                       <div className="text-yellow-200 text-sm">
                         {data.ugc_no}
                       </div>
                     </div>
                   )}
-                  <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                    <div className="font-semibold text-yellow-300 text-sm">
-                      Impact Factor
+
+                  {/* Impact Factor - Placeholder */}
+                  {data.h_index && (
+                    <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
+                      <div className="font-semibold text-yellow-300 text-sm">
+                        First Decision
+                      </div>
+                      <div className="text-yellow-200 text-sm">
+                        {data.h_index || "N/A"}
+                      </div>
                     </div>
-                    <div className="text-yellow-200 text-sm">
-                      {data.impact_factor || "N/A"}
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Journal Metrics Row */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                   <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
                     <div className="font-semibold text-yellow-300 text-xs">
-                      Total Articles
+                      Quick Press
                     </div>
                     <div className="text-yellow-200 text-sm">
                       {data.total_articles || "0"}
@@ -213,26 +220,26 @@ const JournalAuthorInformation = () => {
                   </div>
                   <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
                     <div className="font-semibold text-yellow-300 text-xs">
-                      Total Citations
+                      Acceptance  Rate
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {data.acceptance_rate || "0"}
+                    </div>
+                  </div>
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                       Impact Factor
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {data.impact_factor || "0"}
+                    </div>
+                  </div>
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                      Indexing
                     </div>
                     <div className="text-yellow-200 text-sm">
                       {data.total_citations || "0"}
-                    </div>
-                  </div>
-                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
-                    <div className="font-semibold text-yellow-300 text-xs">
-                      H-Index
-                    </div>
-                    <div className="text-yellow-200 text-sm">
-                      {data.h_index || "0"}
-                    </div>
-                  </div>
-                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
-                    <div className="font-semibold text-yellow-300 text-xs">
-                      Acceptance Rate
-                    </div>
-                    <div className="text-yellow-200 text-sm">
-                      {data.acceptance_rate || "0"}%
                     </div>
                   </div>
                 </div>
@@ -243,9 +250,10 @@ const JournalAuthorInformation = () => {
                     <Bell className="w-5 h-5" />
                     Get Alerts
                   </button>
-                  <button 
-                  onClick={handleSubmitButton}
-                  className="bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 flex items-center gap-2 shadow-lg">
+                  <button
+                    onClick={handleSubmitButton}
+                    className="bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all duration-300 flex items-center gap-2 shadow-lg"
+                  >
                     <Send className="w-5 h-5" />
                     Submit Manuscript
                   </button>

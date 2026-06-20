@@ -189,7 +189,7 @@ const AboutJournal = () => {
                   {data.issn_print && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
-                        ISSN Print
+                        Publication Model
                       </div>
                       <div className="text-yellow-200 text-sm">
                         {data.issn_print_no}
@@ -201,7 +201,7 @@ const AboutJournal = () => {
                   {data.issn_online && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
-                        ISSN Online
+                        Peer Review
                       </div>
                       <div className="text-yellow-200 text-sm">
                         {data.issn_online_no}
@@ -213,7 +213,7 @@ const AboutJournal = () => {
                   {data.ugc_approved && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
-                        UGC Approved
+                        DOI
                       </div>
                       <div className="text-yellow-200 text-sm">
                         {data.ugc_no}
@@ -222,13 +222,13 @@ const AboutJournal = () => {
                   )}
 
                   {/* Impact Factor - Placeholder */}
-                  {data.impact_factor && (
+                  {data.h_index && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
-                        Impact Factor
+                        First Decision
                       </div>
                       <div className="text-yellow-200 text-sm">
-                        {data.impact_factor || "N/A"}
+                        {data.h_index || "N/A"}
                       </div>
                     </div>
                   )}
@@ -236,7 +236,7 @@ const AboutJournal = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                   <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
                     <div className="font-semibold text-yellow-300 text-xs">
-                      Total Articles
+                      Quick Press
                     </div>
                     <div className="text-yellow-200 text-sm">
                       {data.total_articles || "0"}
@@ -244,26 +244,26 @@ const AboutJournal = () => {
                   </div>
                   <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
                     <div className="font-semibold text-yellow-300 text-xs">
-                      Total Citations
+                      Acceptance  Rate
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {data.acceptance_rate || "0"}
+                    </div>
+                  </div>
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                       Impact Factor
+                    </div>
+                    <div className="text-yellow-200 text-sm">
+                      {data.impact_factor || "0"}
+                    </div>
+                  </div>
+                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
+                    <div className="font-semibold text-yellow-300 text-xs">
+                      Indexing
                     </div>
                     <div className="text-yellow-200 text-sm">
                       {data.total_citations || "0"}
-                    </div>
-                  </div>
-                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
-                    <div className="font-semibold text-yellow-300 text-xs">
-                      H-Index
-                    </div>
-                    <div className="text-yellow-200 text-sm">
-                      {data.h_index || "0"}
-                    </div>
-                  </div>
-                  <div className="bg-black bg-opacity-20 rounded-lg p-2 border border-yellow-500 border-opacity-30">
-                    <div className="font-semibold text-yellow-300 text-xs">
-                      Acceptance Rate
-                    </div>
-                    <div className="text-yellow-200 text-sm">
-                      {data.acceptance_rate || "0"}%
                     </div>
                   </div>
                 </div>

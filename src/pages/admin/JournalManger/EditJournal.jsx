@@ -278,7 +278,7 @@ const EditJournal = () => {
                         {/* Total Articles */}
                         <div>
                             <label className="block mb-1 font-medium">
-                                Total Articles
+                               Quick Press
                                 <span className="text-xs text-gray-500 ml-1">(Optional)</span>
                             </label>
                             <input
@@ -294,7 +294,7 @@ const EditJournal = () => {
                         {/* Total Citations */}
                         <div>
                             <label className="block mb-1 font-medium">
-                                Total Citations
+                                Indexing
                                 <span className="text-xs text-gray-500 ml-1">(Optional)</span>
                             </label>
                             <input
@@ -310,7 +310,7 @@ const EditJournal = () => {
                         {/* H-Index */}
                         <div>
                             <label className="block mb-1 font-medium">
-                                H-Index
+                                First Decision
                                 <span className="text-xs text-gray-500 ml-1">(Optional)</span>
                             </label>
                             <input
@@ -475,9 +475,9 @@ const EditJournal = () => {
                     />
                 </div>
 
-                {/* ISSN Print */}
+                {/* Publication Model */}
                 <div>
-                    <label className="block mb-1 font-medium">ISSN Print</label>
+                    <label className="block mb-1 font-medium">Publication Model</label>
                     <div className="flex items-center gap-4">
                         <label>
                             <input
@@ -503,7 +503,7 @@ const EditJournal = () => {
                 </div>
 
                 <div>
-                    <label className="block mb-1 font-medium">ISSN Print No</label>
+                    <label className="block mb-1 font-medium">Publication Model No</label>
                     <input
                         type="text"
                         name="issn_print_no"
@@ -516,7 +516,7 @@ const EditJournal = () => {
 
                 {/* ISSN Online */}
                 <div>
-                    <label className="block mb-1 font-medium">ISSN Online</label>
+                    <label className="block mb-1 font-medium">Peer Review</label>
                     <div className="flex items-center gap-4">
                         <label>
                             <input
@@ -542,7 +542,7 @@ const EditJournal = () => {
                 </div>
 
                 <div>
-                    <label className="block mb-1 font-medium">ISSN Online No</label>
+                    <label className="block mb-1 font-medium">Peer Review No</label>
                     <input
                         type="text"
                         name="issn_online_no"
@@ -555,7 +555,7 @@ const EditJournal = () => {
 
                 {/* UGC Approved */}
                 <div>
-                    <label className="block mb-1 font-medium">UGC Approved</label>
+                    <label className="block mb-1 font-medium">DOI</label>
                     <div className="flex items-center gap-4">
                         <label>
                             <input
@@ -581,7 +581,7 @@ const EditJournal = () => {
                 </div>
 
                 <div>
-                    <label className="block mb-1 font-medium">UGC No</label>
+                    <label className="block mb-1 font-medium">DOI No</label>
                     <input
                         type="text"
                         name="ugc_no"

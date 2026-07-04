@@ -33,7 +33,7 @@ const UserSideViewJournal = () => {
       const response = await axios.get(`${API_URL}api/journal-article/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
-           "Cache-Control": "no-cache",
+          "Cache-Control": "no-cache",
           Pragma: "no-cache",
         },
       });
@@ -107,7 +107,6 @@ const UserSideViewJournal = () => {
     navigate(path);
   };
 
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -159,8 +158,8 @@ const UserSideViewJournal = () => {
     all_manuscripts,
     quick_press,
   } = journalData;
-  if( all_manuscripts.length === 0 ){
-      console.log("Latest Published:", latest_published);
+  if (all_manuscripts.length === 0) {
+    console.log("Latest Published:", latest_published);
   }
 
   console.log("Most Viewed:", all_manuscripts.length > 0);
@@ -203,28 +202,52 @@ const UserSideViewJournal = () => {
                       </h3>
 
                       {/* 👉 NEW VIEW LINK */}
-                      <button
-                        onClick={() => handleViewEditor(editor[0].user_id)}
-                        className="inline-flex items-center px-3 py-1.5 bg-yellow-500 hover:bg-yellow-400 
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleViewEditor(editor[0].user_id)}
+                          className="inline-flex items-center px-3 py-1.5 bg-yellow-500 hover:bg-yellow-400 
                      text-black font-semibold text-xs rounded-md transition-all duration-200 
                      transform hover:scale-105 focus:outline-none focus:ring-2 
                      focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-black"
-                      >
-                        <span>Editor Info</span>
-                        <svg
-                          className="w-3.5 h-3.5 ml-1"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </button>
+                          <span>Editor Info</span>
+                          <svg
+                            className="w-3.5 h-3.5 ml-1"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => navigate(`/editorial-board/${journal.id}`)}
+                          className="inline-flex items-center px-3 py-1.5 bg-yellow-500 hover:bg-yellow-400 
+                     text-black font-semibold text-xs rounded-md transition-all duration-200 
+                     transform hover:scale-105 focus:outline-none focus:ring-2 
+                     focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-black"
+                        >
+                          <span>Editor Board</span>
+                          <svg
+                            className="w-3.5 h-3.5 ml-1"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
 
                     <p className="text-yellow-200 text-sm">
@@ -261,7 +284,7 @@ const UserSideViewJournal = () => {
                   {journal.issn_online && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
-                       Peer Review
+                        Peer Review
                       </div>
                       <div className="text-yellow-200 text-sm">
                         {journal.issn_online_no}
@@ -271,7 +294,7 @@ const UserSideViewJournal = () => {
                   {journal.ugc_approved && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
                       <div className="font-semibold text-yellow-300 text-sm">
-                        DOI 
+                        DOI
                       </div>
                       <div className="text-yellow-200 text-sm">
                         {journal.ugc_no}
@@ -279,14 +302,14 @@ const UserSideViewJournal = () => {
                     </div>
                   )}
                   {journal.h_index && (
-                  <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                    <div className="font-semibold text-yellow-300 text-sm">
-                      First Decision
+                    <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
+                      <div className="font-semibold text-yellow-300 text-sm">
+                        First Decision
+                      </div>
+                      <div className="text-yellow-200 text-sm">
+                        {journal?.h_index || "456"}
+                      </div>
                     </div>
-                    <div className="text-yellow-200 text-sm">
-                      {journal?.h_index || "456"}
-                    </div>
-                  </div>
                   )}
                 </div>
               </div>
@@ -312,13 +335,14 @@ const UserSideViewJournal = () => {
       {/* Slider Sections */}
       <div className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-          { all_manuscripts.length === 0 && (
+          {all_manuscripts.length === 0 && (
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-gray-900 border-l-4 border-yellow-500 pl-4 inline-block">
                 Explore Our Journal
               </h2>
-              <p className="mt-4 text-gray-600">Discover the latest articles and research in our journal.</p>
+              <p className="mt-4 text-gray-600">
+                Discover the latest articles and research in our journal.
+              </p>
             </div>
           )}
 

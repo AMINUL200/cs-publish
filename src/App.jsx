@@ -161,6 +161,8 @@ import HandleManuscriptProcess from "./pages/admin/research_services/HandleManus
 import HandleResearchAndServicesFeature from "./pages/admin/research_services/HandleResearchAndServicesFeature";
 import TeamPage from "./pages/user/team/TeamPage";
 import MangeTeamCategory from "./pages/admin/research_service_team/MangeTeamCategory";
+import JournalEditorial from "./pages/user/journal/JournalEditorial";
+import JournalEditorialDetails from "./pages/user/journal/JournalEditorialDetails";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -275,6 +277,8 @@ function App() {
             />
             <Route path="/about-journal/:id" element={<AboutJournal />} />
             <Route path="/quick-press/:id" element={<QuickPress />} />
+            <Route path="/editorial-board/:id" element={<JournalEditorial />} />
+            <Route path="/editorial-board/:id/:slug" element={<JournalEditorialDetails />} />
 
             <Route path="/my-subscription" element={<MySubscription />} />
 

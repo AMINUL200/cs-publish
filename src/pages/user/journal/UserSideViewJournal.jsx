@@ -232,7 +232,7 @@ const UserSideViewJournal = () => {
                      transform hover:scale-105 focus:outline-none focus:ring-2 
                      focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-black"
                         >
-                          <span>Editor Board</span>
+                          <span>Editorial Board</span>
                           <svg
                             className="w-3.5 h-3.5 ml-1"
                             fill="none"

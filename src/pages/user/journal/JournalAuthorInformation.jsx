@@ -162,7 +162,7 @@ const JournalAuthorInformation = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
                   {data.issn_print && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                      <div className="font-semibold text-yellow-300 text-sm">
+                      <div className="font-semibold text-yellow-300 text-xs">
                         Publication Model
                       </div>
                       <div className="text-yellow-200 text-sm">
@@ -174,7 +174,7 @@ const JournalAuthorInformation = () => {
                   {/* ISSN Online */}
                   {data.issn_online && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                      <div className="font-semibold text-yellow-300 text-sm">
+                      <div className="font-semibold text-yellow-300 text-xs">
                         Peer Review
                       </div>
                       <div className="text-yellow-200 text-sm">
@@ -186,7 +186,7 @@ const JournalAuthorInformation = () => {
                   {/* UGC Approval */}
                   {data.ugc_approved && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                      <div className="font-semibold text-yellow-300 text-sm">
+                      <div className="font-semibold text-yellow-300 text-xs">
                         DOI
                       </div>
                       <div className="text-yellow-200 text-sm">
@@ -198,7 +198,7 @@ const JournalAuthorInformation = () => {
                   {/* Impact Factor - Placeholder */}
                   {data.h_index && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                      <div className="font-semibold text-yellow-300 text-sm">
+                      <div className="font-semibold text-yellow-300 text-xs">
                         First Decision
                       </div>
                       <div className="text-yellow-200 text-sm">

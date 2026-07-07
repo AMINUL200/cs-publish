@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom"; // Add this import
+import { useNavigate, useSearchParams } from "react-router-dom";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepThree from "./StepThree";
@@ -9,10 +9,12 @@ import { useSelector } from "react-redux";
 import Loader from "../../common/Loader";
 import { generateManuscriptPDF } from "../../../utils/pdfGenerator";
 
+const STORAGE_KEY = "manuscript_draft";
+
 const StepperForm = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const { token, userData } = useSelector((state) => state.auth);
-  const [searchParams] = useSearchParams(); // Add this hook
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [journalData, setJournalData] = useState([]);
   const navigate = useNavigate();
@@ -56,19 +58,127 @@ const StepperForm = () => {
     manuscript_file: null,
     copyright_form: null,
     supplementary_files: null,
-    figures: [], // ✅ New figures field for multiple images
+    figures: [],
 
     // For storing existing file paths when updating
     existing_manuscript_file: null,
     existing_copyright_form: null,
     existing_supplementary_files: null,
-    existing_figures: [], // ✅ For existing figures in update mode
+    existing_figures: [],
   });
 
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [isDraftRestored, setIsDraftRestored] = useState(false);
 
-  // ✅ Updated function to fetch manuscript data for update mode
+  // ✅ Helper function to save draft to localStorage
+  const saveDraft = (data, authorsData, currentStep) => {
+    if (isUpdateMode) return; // Don't save drafts in update mode
+
+    try {
+      // Create a clean copy without File objects
+      const draftData = {
+        formData: {
+          ...data,
+          // Exclude File objects
+          manuscript_file: null,
+          copyright_form: null,
+          supplementary_files: null,
+          figures: Array.isArray(data.figures) 
+            ? data.figures.filter(f => !(f instanceof File))
+            : [],
+        },
+        authors: authorsData,
+        step: currentStep,
+        timestamp: new Date().toISOString(),
+      };
+      
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(draftData));
+    } catch (error) {
+      console.error("Error saving draft:", error);
+    }
+  };
+
+  // ✅ Helper function to load draft from localStorage
+  const loadDraft = () => {
+    if (isUpdateMode) return null;
+    
+    try {
+      const draft = localStorage.getItem(STORAGE_KEY);
+      if (!draft) return null;
+      
+      const parsedDraft = JSON.parse(draft);
+      return parsedDraft;
+    } catch (error) {
+      console.error("Error loading draft:", error);
+      return null;
+    }
+  };
+
+  // ✅ Helper function to clear draft
+  const clearDraft = () => {
+    if (isUpdateMode) return;
+    localStorage.removeItem(STORAGE_KEY);
+  };
+
+  // ✅ Function to restore draft on load
+  const restoreDraft = () => {
+    if (isUpdateMode) return false;
+    
+    const draft = loadDraft();
+    if (!draft) return false;
+
+    try {
+      // Restore form data (excluding files)
+      setFormData(prev => ({
+        ...prev,
+        journal_id: draft.formData.journal_id || "",
+        article_type: draft.formData.article_type || "",
+        username: draft.formData.username || "",
+        contact_number: draft.formData.contact_number || "",
+        email: draft.formData.email || "",
+        affiliation: draft.formData.affiliation || "",
+        address: draft.formData.address || "",
+        country: draft.formData.country || "",
+        add_myself: draft.formData.add_myself ?? true,
+        title: draft.formData.title || "",
+        abstract: draft.formData.abstract || "",
+        introduction: draft.formData.introduction || "",
+        materials_and_methods: draft.formData.materials_and_methods || "",
+        results: draft.formData.results || "",
+        discussion: draft.formData.discussion || "",
+        conclusion: draft.formData.conclusion || "",
+        author_contributions: draft.formData.author_contributions || "",
+        conflict_of_interest_statement: draft.formData.conflict_of_interest_statement || "",
+        references: draft.formData.references || "",
+        keywords: Array.isArray(draft.formData.keywords) ? draft.formData.keywords : [],
+        figures: Array.isArray(draft.formData.figures) ? draft.formData.figures : [],
+        // Files should be null (user needs to reselect)
+        manuscript_file: null,
+        copyright_form: null,
+        supplementary_files: null,
+      }));
+
+      // Restore authors
+      if (Array.isArray(draft.authors) && draft.authors.length > 0) {
+        setAuthors(draft.authors);
+      }
+
+      // Restore step
+      if (draft.step && draft.step >= 1 && draft.step <= 3) {
+        setStep(draft.step);
+      }
+
+      setIsDraftRestored(true);
+      toast.success("Draft restored successfully.");
+      return true;
+    } catch (error) {
+      console.error("Error restoring draft:", error);
+      return false;
+    }
+  };
+
+  // ✅ Function to fetch manuscript data for update mode
   const fetchManuscriptForUpdate = async (manuscriptId) => {
     try {
       const response = await axios.get(
@@ -114,12 +224,10 @@ const StepperForm = () => {
           keywords: Array.isArray(manuscript.keywords)
             ? manuscript.keywords
             : [],
-
-          // ✅ Store existing file paths directly (not with existing_ prefix)
           manuscript_file: manuscript.manuscript_file || null,
           copyright_form: manuscript.copyright_form || null,
           supplementary_files: manuscript.supplementary_files || null,
-          figures: Array.isArray(manuscript.figures) ? manuscript.figures : [], // ✅ Handle existing figures
+          figures: Array.isArray(manuscript.figures) ? manuscript.figures : [],
         });
 
         // Update authors if they exist
@@ -147,7 +255,7 @@ const StepperForm = () => {
   const nextStep = () => {
     // ✅ Basic validation before moving to next step
     if (step === 1) {
-      if (!formData.journal_id ||  !formData.article_type || !formData.username || !formData.email) {
+      if (!formData.journal_id || !formData.article_type || !formData.username || !formData.email) {
         toast.error("Please fill all required fields in Step 1");
         return;
       }
@@ -162,17 +270,34 @@ const StepperForm = () => {
       }
     }
 
+    // Save draft when moving to next step
+    if (!isUpdateMode) {
+      saveDraft(formData, authors, step + 1);
+    }
+    
     setStep((prev) => prev + 1);
   };
 
-  const prevStep = () => setStep((prev) => prev - 1);
+  const prevStep = () => {
+    // Save draft when going back
+    if (!isUpdateMode) {
+      saveDraft(formData, authors, step - 1);
+    }
+    setStep((prev) => prev - 1);
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
+    const newFormData = {
       ...formData,
       [name]: type === "checkbox" ? checked : value,
-    });
+    };
+    setFormData(newFormData);
+
+    // ✅ Auto-save on any change (only for new submission)
+    if (!isUpdateMode) {
+      saveDraft(newFormData, authors, step);
+    }
   };
 
   // ✅ Form validation before submission
@@ -242,6 +367,7 @@ const StepperForm = () => {
       setSubmitLoading(false);
     }
   };
+
   const handleSubmit = async () => {
     if (!validateForm()) {
       return;
@@ -305,7 +431,7 @@ const StepperForm = () => {
           );
         });
 
-        // Add keywords as array (supports either array or comma-separated string)
+        // Add keywords as array
         const keywordsArray = Array.isArray(formData.keywords)
           ? formData.keywords
           : String(formData.keywords || "")
@@ -316,7 +442,7 @@ const StepperForm = () => {
           formDataToSend.append(`keywords[${index}]`, kw);
         });
 
-        // ✅ Handle figures - only append new File objects
+        // Handle figures - only append new File objects
         if (Array.isArray(formData.figures)) {
           formData.figures.forEach((figure, index) => {
             if (figure instanceof File) {
@@ -384,7 +510,6 @@ const StepperForm = () => {
         // Add all fields to FormData
         Object.keys(formData).forEach((key) => {
           if (key === "keywords" || key === "figures") {
-            // handled separately below as array fields
             return;
           } else if (key === "add_myself") {
             formDataToSend.append(key, formData[key] ? 1 : 0);
@@ -411,7 +536,7 @@ const StepperForm = () => {
           );
         });
 
-        // Add keywords as array (supports either array or comma-separated string)
+        // Add keywords as array
         const createKeywordsArray = Array.isArray(formData.keywords)
           ? formData.keywords
           : String(formData.keywords || "")
@@ -422,24 +547,13 @@ const StepperForm = () => {
           formDataToSend.append(`keywords[${index}]`, kw);
         });
 
-        // ✅ Add figures as array for create mode
+        // Add figures as array for create mode
         if (Array.isArray(formData.figures)) {
           formData.figures.forEach((figure, index) => {
             if (figure instanceof File) {
               formDataToSend.append(`figures[${index}]`, figure);
             }
           });
-        }
-
-        // Debug formDataToSend
-        // 🔹 DEBUG: Print all FormData entries
-        console.log("=== Debug: FormData to send ===");
-        for (let pair of formDataToSend.entries()) {
-          if (pair[1] instanceof File) {
-            console.log(pair[0], ":", pair[1].name); // show file name instead of object
-          } else {
-            console.log(pair[0], ":", pair[1]);
-          }
         }
 
         const response = await axios.post(
@@ -459,6 +573,9 @@ const StepperForm = () => {
             response.data.message || "Manuscript submitted successfully",
           );
 
+          // ✅ Clear draft after successful submission
+          clearDraft();
+
           // Generate PDF after successful submission
           try {
             const filename = await generateManuscriptPDF(
@@ -475,6 +592,7 @@ const StepperForm = () => {
           }
         } else {
           toast.error(response.data.message || "Submission failed");
+          // ✅ Keep draft if submission fails
         }
         navigate("/dashboard");
       }
@@ -485,6 +603,7 @@ const StepperForm = () => {
           : "Submission failed. Check console for details.",
       );
       console.error("Submission error:", error.response?.data || error.message);
+      // ✅ Keep draft if submission fails
     } finally {
       setSubmitLoading(false);
     }
@@ -526,11 +645,31 @@ const StepperForm = () => {
       // If in update mode, fetch manuscript data
       if (isUpdateMode && updateId) {
         await fetchManuscriptForUpdate(updateId);
+        // Clear draft if it exists in update mode
+        clearDraft();
+      } else {
+        // ✅ Restore draft for new submission
+        restoreDraft();
       }
     };
 
     initializeForm();
   }, [updateId, isUpdateMode]);
+
+  // ✅ Auto-save effect for any changes
+  useEffect(() => {
+    // Don't save if in update mode or if no data yet
+    if (isUpdateMode || loading) return;
+    
+    // Save draft whenever formData or authors change
+    saveDraft(formData, authors, step);
+  }, [formData, authors, step, isUpdateMode, loading]);
+
+  // ✅ Save draft when authors change
+  useEffect(() => {
+    if (isUpdateMode || loading) return;
+    saveDraft(formData, authors, step);
+  }, [authors]);
 
   if (loading) {
     return <Loader />;
@@ -549,6 +688,11 @@ const StepperForm = () => {
           <p className="text-sm text-blue-600 mt-1">
             You are editing an existing manuscript. All changes will be saved as
             an update.
+          </p>
+        )}
+        {!isUpdateMode && isDraftRestored && (
+          <p className="text-sm text-green-600 mt-1">
+            ✓ Draft restored - continue where you left off
           </p>
         )}
       </div>
@@ -645,7 +789,7 @@ const StepperForm = () => {
             disabled={submitLoading}
             className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 cursor-pointer"
           >
-            Next →
+            Save & Next →
           </button>
         ) : (
           <button

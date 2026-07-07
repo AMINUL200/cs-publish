@@ -188,7 +188,7 @@ const AboutJournal = () => {
                   {/* ISSN Print */}
                   {data.issn_print && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                      <div className="font-semibold text-yellow-300 text-sm">
+                      <div className="font-semibold text-yellow-300 text-[13px]">
                         Publication Model
                       </div>
                       <div className="text-yellow-200 text-sm">
@@ -200,7 +200,7 @@ const AboutJournal = () => {
                   {/* ISSN Online */}
                   {data.issn_online && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                      <div className="font-semibold text-yellow-300 text-sm">
+                      <div className="font-semibold text-yellow-300 text-[13px]">
                         Peer Review
                       </div>
                       <div className="text-yellow-200 text-sm">
@@ -212,7 +212,7 @@ const AboutJournal = () => {
                   {/* UGC Approval */}
                   {data.ugc_approved && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                      <div className="font-semibold text-yellow-300 text-sm">
+                      <div className="font-semibold text-yellow-300 text-[13px]">
                         DOI
                       </div>
                       <div className="text-yellow-200 text-sm">
@@ -224,7 +224,7 @@ const AboutJournal = () => {
                   {/* Impact Factor - Placeholder */}
                   {data.h_index && (
                     <div className="bg-black bg-opacity-20 rounded-lg p-3 border border-yellow-500 border-opacity-30">
-                      <div className="font-semibold text-yellow-300 text-sm">
+                      <div className="font-semibold text-yellow-300 text-[13px]">
                         First Decision
                       </div>
                       <div className="text-yellow-200 text-sm">

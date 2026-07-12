@@ -1,153 +1,75 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Search, Users, X, ArrowLeft } from 'lucide-react'
+import { useSelector } from 'react-redux'
+import axios from 'axios'
 
 const JournalEditorial = () => {
-  const {id} = useParams()
+  const { id } = useParams()
+  const { token } = useSelector((state) => state.auth)
+  const API_URL = import.meta.env.VITE_API_URL
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL
+
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('ALL')
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [editorialMembers, setEditorialMembers] = useState([])
+  const [categories, setCategories] = useState([])
   const [filteredMembers, setFilteredMembers] = useState([])
 
-  // Dummy data for editorial board members
-  const [editorialMembers] = useState([
-    {
-      id: 1,
-      name: 'Dr. Sarah Johnson',
-      position: 'Editor-in-Chief',
-      category: 'editorial',
-      categoryName: 'Editorial Board',
-      image: 'https://randomuser.me/api/portraits/women/1.jpg',
-      short_description: 'Leading expert in biomedical sciences with over 20 years of experience in academic publishing.',
-      facebook_link: 'https://facebook.com',
-      twitter_link: 'https://twitter.com',
-      linkedin_link: 'https://linkedin.com',
-      instagram_link: null,
-      slug: 'sarah-johnson'
-    },
-    {
-      id: 2,
-      name: 'Dr. Michael Chen',
-      position: 'Managing Editor',
-      category: 'editorial',
-      categoryName: 'Editorial Board',
-      image: 'https://randomuser.me/api/portraits/men/2.jpg',
-      short_description: 'Specializes in scientific communication and research integrity with a focus on peer review excellence.',
-      facebook_link: null,
-      twitter_link: 'https://twitter.com',
-      linkedin_link: 'https://linkedin.com',
-      instagram_link: null,
-      slug: 'michael-chen'
-    },
-    {
-      id: 3,
-      name: 'Prof. Emily Williams',
-      position: 'Associate Editor',
-      category: 'editorial',
-      categoryName: 'Editorial Board',
-      image: 'https://randomuser.me/api/portraits/women/3.jpg',
-      short_description: 'Professor of Chemistry with expertise in materials science and nanotechnology research.',
-      facebook_link: 'https://facebook.com',
-      twitter_link: null,
-      linkedin_link: 'https://linkedin.com',
-      instagram_link: 'https://instagram.com',
-      slug: 'emily-williams'
-    },
-    {
-      id: 4,
-      name: 'Dr. James Rodriguez',
-      position: 'Section Editor - Physics',
-      category: 'section',
-      categoryName: 'Section Editors',
-      image: 'https://randomuser.me/api/portraits/men/4.jpg',
-      short_description: 'Physicist specializing in quantum mechanics and condensed matter physics.',
-      facebook_link: null,
-      twitter_link: 'https://twitter.com',
-      linkedin_link: null,
-      instagram_link: null,
-      slug: 'james-rodriguez'
-    },
-    {
-      id: 5,
-      name: 'Dr. Amara Singh',
-      position: 'Section Editor - Biology',
-      category: 'section',
-      categoryName: 'Section Editors',
-      image: 'https://randomuser.me/api/portraits/women/5.jpg',
-      short_description: 'Molecular biologist with research interests in genetics and cellular biology.',
-      facebook_link: 'https://facebook.com',
-      twitter_link: 'https://twitter.com',
-      linkedin_link: 'https://linkedin.com',
-      instagram_link: 'https://instagram.com',
-      slug: 'amara-singh'
-    },
-    {
-      id: 6,
-      name: 'Prof. David Kim',
-      position: 'Statistical Editor',
-      category: 'statistical',
-      categoryName: 'Statistical Editors',
-      image: 'https://randomuser.me/api/portraits/men/6.jpg',
-      short_description: 'Biostatistician specializing in research methodology and data analysis for clinical trials.',
-      facebook_link: null,
-      twitter_link: null,
-      linkedin_link: 'https://linkedin.com',
-      instagram_link: null,
-      slug: 'david-kim'
-    },
-    {
-      id: 7,
-      name: 'Dr. Maria Garcia',
-      position: 'Language Editor',
-      category: 'language',
-      categoryName: 'Language Editors',
-      image: 'https://randomuser.me/api/portraits/women/7.jpg',
-      short_description: 'Expert in scientific writing and editing with a focus on clarity and precision in academic texts.',
-      facebook_link: 'https://facebook.com',
-      twitter_link: 'https://twitter.com',
-      linkedin_link: 'https://linkedin.com',
-      instagram_link: 'https://instagram.com',
-      slug: 'maria-garcia'
-    },
-    {
-      id: 8,
-      name: 'Dr. Robert Taylor',
-      position: 'Ethics Editor',
-      category: 'ethics',
-      categoryName: 'Ethics Editors',
-      image: 'https://randomuser.me/api/portraits/men/8.jpg',
-      short_description: 'Philosophy professor specializing in research ethics and publication integrity.',
-      facebook_link: null,
-      twitter_link: 'https://twitter.com',
-      linkedin_link: null,
-      instagram_link: null,
-      slug: 'robert-taylor'
-    },
-    {
-      id: 9,
-      name: 'Dr. Lisa Park',
-      position: 'Technical Editor',
-      category: 'technical',
-      categoryName: 'Technical Editors',
-      image: 'https://randomuser.me/api/portraits/women/9.jpg',
-      short_description: 'Computer scientist with expertise in scientific computing and software development for research.',
-      facebook_link: 'https://facebook.com',
-      twitter_link: null,
-      linkedin_link: 'https://linkedin.com',
-      instagram_link: 'https://instagram.com',
-      slug: 'lisa-park'
-    }
-  ])
+  // Fetch editorial members
+  const fetchEditorialMembers = async () => {
+    try {
+      const response = await axios.get(`${API_URL}api/journal/${id}/editorial-details`, {
+          
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
+      })
 
-  // Define categories with order
-  const categories = [
-    { id: 'editorial', name: 'Editorial Board', order: 1 },
-    { id: 'section', name: 'Section Editors', order: 2 },
-    { id: 'statistical', name: 'Statistical Editors', order: 3 },
-    { id: 'language', name: 'Language Editors', order: 4 },
-    { id: 'ethics', name: 'Ethics Editors', order: 5 },
-    { id: 'technical', name: 'Technical Editors', order: 6 }
-  ]
+      if (response.status === 200 && response.data.status) {
+        const members = response.data.data
+        
+        // Group members by category
+        const categoryMap = new Map()
+        members.forEach(member => {
+          if (member.editorial_category) {
+            const categoryId = member.editorial_category.id
+            if (!categoryMap.has(categoryId)) {
+              categoryMap.set(categoryId, {
+                id: categoryId,
+                name: member.editorial_category.name,
+                order: parseInt(member.editorial_category.is_order) || 999,
+                members: []
+              })
+            }
+            categoryMap.get(categoryId).members.push(member)
+          }
+        })
+
+        // Convert to array and sort by order
+        const sortedCategories = Array.from(categoryMap.values())
+          .sort((a, b) => a.order - b.order)
+
+        setCategories(sortedCategories)
+        setEditorialMembers(members)
+        setFilteredMembers(members)
+      } else {
+        toast.error(response.data.message || "Failed to fetch editorial members")
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error("Something went wrong while fetching editorial members")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchEditorialMembers()
+  }, [token, id])
 
   // Filter members based on search and category
   useEffect(() => {
@@ -156,18 +78,19 @@ const JournalEditorial = () => {
     // Filter by category
     if (selectedCategory !== 'ALL') {
       filtered = filtered.filter(
-        (member) => member.category === selectedCategory
+        (member) => member.editorial_category_id === selectedCategory
       )
     }
 
     // Filter by search term
     if (searchTerm.trim() !== '') {
       filtered = filtered.filter((member) => {
+        const searchLower = searchTerm.toLowerCase()
         return (
-          member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          member.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          member.short_description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          member.categoryName.toLowerCase().includes(searchTerm.toLowerCase())
+          member.title.toLowerCase().includes(searchLower) ||
+          member.short_description?.toLowerCase().includes(searchLower) ||
+          member.editorial_category?.name?.toLowerCase().includes(searchLower) ||
+          member.long_description?.toLowerCase().includes(searchLower)
         )
       })
     }
@@ -177,7 +100,9 @@ const JournalEditorial = () => {
 
   // Get category count
   const getCategoryCount = (categoryId) => {
-    return editorialMembers.filter(member => member.category === categoryId).length
+    return editorialMembers.filter(member => 
+      member.editorial_category_id === categoryId
+    ).length
   }
 
   // Get total members count
@@ -187,7 +112,7 @@ const JournalEditorial = () => {
 
   // Get category name by ID
   const getCategoryName = (categoryId) => {
-    const category = categories.find(cat => cat.id === categoryId)
+    const category = categories.find(cat => cat.id === parseInt(categoryId))
     return category ? category.name : 'Unknown'
   }
 
@@ -199,7 +124,6 @@ const JournalEditorial = () => {
     setSelectedCategory(categoryId)
   }
 
-  // Loading state (keep for consistency)
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-16 pt-20">
@@ -290,15 +214,15 @@ const JournalEditorial = () => {
               {categories.map((category) => (
                 <button
                   key={category.id}
-                  onClick={() => handleCategoryChange(category.id)}
+                  onClick={() => handleCategoryChange(category.id.toString())}
                   className={`px-6 py-2 rounded-full font-medium transition-all duration-300 transform hover:scale-105 ${
-                    selectedCategory === category.id
+                    selectedCategory === category.id.toString()
                       ? 'bg-yellow-500 text-white shadow-lg ring-2 ring-yellow-300'
                       : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
                   }`}
                 >
                   {category.name}
-                  <span className="ml-2 text-sm">({getCategoryCount(category.id)})</span>
+                  <span className="ml-2 text-sm">({getCategoryCount(category.id.toString())})</span>
                 </button>
               ))}
             </div>
@@ -411,25 +335,25 @@ const JournalEditorial = () => {
               {filteredMembers.map((member) => (
                 <div
                   key={member.id}
-                  className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden group w-full max-w-sm"
+                  className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden group w-full max-w-sm relative"
                 >
                   {/* Category Badge */}
                   <div className="absolute top-3 right-3 z-10">
                     <span className="bg-yellow-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
-                      {member.categoryName}
+                      {member.editorial_category?.name || 'Uncategorized'}
                     </span>
                   </div>
 
                   {/* Image Container */}
                   <div className="relative overflow-hidden">
                     <img
-                      src={member.image}
-                      alt={member.name}
+                      src={member.image ? `${STORAGE_URL}${member.image}` : '/placeholder-avatar.jpg'}
+                      alt={member.title}
                       className="w-full h-80 object-cover group-hover:scale-110 transition-transform duration-500"
                       onError={(e) => {
-                        e.target.src = `https://via.placeholder.com/400x400/4F46E5/FFFFFF?text=${encodeURIComponent(
-                          member.name.charAt(0)
-                        )}`
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                          member.title
+                        )}&size=400&background=4F46E5&color=FFFFFF&bold=true`
                       }}
                     />
                     {/* Overlay with social links */}
@@ -517,14 +441,17 @@ const JournalEditorial = () => {
                       to={`/editorial-board/${id}/${member.slug}`}
                       className="text-xl font-bold text-gray-800 mb-2 hover:text-yellow-600 transition-colors block"
                     >
-                      {member.name}
+                      {member.title}
                     </Link>
                     <p className="text-yellow-600 font-semibold mb-3">
-                      {member.position}
-                    </p>
-                    <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
                       {member.short_description}
                     </p>
+                    <div 
+                      className="text-gray-600 text-sm leading-relaxed line-clamp-3"
+                      dangerouslySetInnerHTML={{ 
+                        __html: member.long_description 
+                      }}
+                    />
 
                     {/* Read More Link */}
                     <Link

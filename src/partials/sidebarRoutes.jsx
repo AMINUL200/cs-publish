@@ -149,6 +149,23 @@ export const sidebarRoutes = [
     ],
   },
   {
+    title: "Editorial Info",
+    icon: <FontAwesomeIcon icon={faBook} />,
+    allowedRoles: [0],
+    subRoutes: [
+      {
+        path: "/manage-editorial-category",
+        title: "Manage Editorial Category",
+        allowedRoles: [0],
+      },
+      {
+        path: "/manage-editorial",
+        title: "Manage Editorial",
+        allowedRoles: [0],
+      },
+    ],
+  },
+  {
     title: "Article Management",
     icon: <FontAwesomeIcon icon={faNewspaper} />,
     allowedRoles: [0],
@@ -468,10 +485,10 @@ export const sidebarRoutes = [
         allowedRoles: [0],
       },
       {
-        path:"/handle-research-and-services-feature",
-        title:"Service Feature",
-        allowedRoles: [0]
-      }
+        path: "/handle-research-and-services-feature",
+        title: "Service Feature",
+        allowedRoles: [0],
+      },
     ],
   },
 

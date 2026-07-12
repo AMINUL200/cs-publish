@@ -163,6 +163,8 @@ import TeamPage from "./pages/user/team/TeamPage";
 import MangeTeamCategory from "./pages/admin/research_service_team/MangeTeamCategory";
 import JournalEditorial from "./pages/user/journal/JournalEditorial";
 import JournalEditorialDetails from "./pages/user/journal/JournalEditorialDetails";
+import MangeEDitorialCategory from "./pages/admin/editorail_info/MangeEDitorialCategory";
+import ManageEditorial from "./pages/admin/editorail_info/ManageEditorial";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -468,6 +470,9 @@ function App() {
                 element={<EditJournal />}
               />
               <Route path="/handle-volume" element={<HandleVolume />} />
+              {/* Journal ways editorial */}
+              <Route path="/manage-editorial" element={<ManageEditorial />} />
+              <Route path="/manage-editorial-category" element={<MangeEDitorialCategory />} />
 
               {/* Payment */}
               <Route

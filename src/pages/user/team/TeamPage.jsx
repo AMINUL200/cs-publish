@@ -216,7 +216,7 @@ const TeamPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-16 pt-30">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-16 pt-32">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">

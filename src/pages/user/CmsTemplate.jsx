@@ -141,7 +141,7 @@ const CmsTemplate = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 pt-30">
+      <div className="min-h-screen bg-gray-50 pt-24">
         {/* Hero Section */}
         <div className={`bg-gradient-to-br ${typeConfig.gradient} pt-16`}>
           <div className="container mx-auto px-4">

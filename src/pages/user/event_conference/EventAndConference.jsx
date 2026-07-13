@@ -123,7 +123,7 @@ const EventAndConference = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 sm:py-25">
+    <div className="min-h-screen bg-gray-50 py-10 py-24">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">

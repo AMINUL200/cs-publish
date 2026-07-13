@@ -108,7 +108,7 @@ const EventAndConferenceDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 sm:py-25">
+    <div className="min-h-screen bg-gray-50  py-24">
       <div className="container mx-auto px-4">
         {/* Back Button */}
         <div className="mb-6">

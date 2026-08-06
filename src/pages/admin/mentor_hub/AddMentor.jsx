@@ -76,7 +76,7 @@ const AddMentor = () => {
 
       if (response.data.status && response.data.data) {
         const mentor = response.data.data;
-        
+        console.log("Fetched mentor data:", mentor);
         // Set current image for preview
         if (mentor.image_video) {
           setCurrentImage(`${STORAGE_URL}${mentor.image_video}`);

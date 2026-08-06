@@ -246,7 +246,7 @@ export const sidebarRoutes = [
       },
       {
         path: "/setting/service",
-        title: "Handle Service ",
+        title: "Handle Author Service ",
         allowedRoles: [0],
       },
       {

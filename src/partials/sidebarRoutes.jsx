@@ -346,7 +346,7 @@ export const sidebarRoutes = [
     ],
   },
   {
-    title: "Handle Innovation",
+    title: "Research & Innovation ",
     icon: <FontAwesomeIcon icon={faCog} />,
     allowedRoles: [0],
     subRoutes: [

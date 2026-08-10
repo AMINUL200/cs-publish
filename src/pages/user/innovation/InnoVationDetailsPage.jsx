@@ -12,6 +12,7 @@ import {
   faEye,
   faTag,
   faDownload,
+  faPlay,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faFacebook,
@@ -36,7 +37,8 @@ const InnoVationDetailsPage = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${API_URL}api/innovations-details/${slug}`,{
+        `${API_URL}api/innovations-details/${slug}`,
+        {
           headers: {
             "Cache-Control": "no-cache",
             Pragma: "no-cache",
@@ -67,28 +69,49 @@ const InnoVationDetailsPage = () => {
     return { __html: htmlContent };
   };
 
-  // Extract YouTube video ID or get image URL
-  const getMediaInfo = (url) => {
-    if (!url) return { type: "none", src: null };
+  // Extract YouTube video ID from various YouTube URL formats
+  const extractYouTubeId = (url) => {
+    if (!url) return null;
 
-    // ✅ YouTube check
+    // Handle youtu.be format
+    const youtuBeMatch = url.match(/youtu\.be\/([^?&]+)/);
+    if (youtuBeMatch) return youtuBeMatch[1];
+
+    // Handle youtube.com formats
     const youtubeMatch = url.match(
-      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/,
+      /youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=)([^&?]+)/
     );
+    if (youtubeMatch) return youtubeMatch[1];
 
-    if (youtubeMatch) {
+    // Handle shorts format
+    const shortsMatch = url.match(/youtube\.com\/shorts\/([^?&]+)/);
+    if (shortsMatch) return shortsMatch[1];
+
+    return null;
+  };
+
+  // Get media info from image_video field
+  const getMediaInfo = (url) => {
+    if (!url) return { type: "none", src: null, videoId: null };
+
+    // Check if it's a YouTube URL
+    const videoId = extractYouTubeId(url);
+    if (videoId) {
       return {
         type: "youtube",
-        src: `https://img.youtube.com/vi/${youtubeMatch[1]}/hqdefault.jpg`,
+        src: `https://www.youtube.com/embed/${videoId}`,
+        thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+        videoId: videoId,
       };
     }
 
-    // ✅ Image check
+    // Check if it's an image URL
     const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"];
-
     const isImageUrl =
       imageExtensions.some((ext) => url.toLowerCase().includes(ext)) ||
-      url.includes("innovations");
+      url.includes("innovations") ||
+      url.includes("uploads") ||
+      url.includes("storage");
 
     if (isImageUrl) {
       const fullImageUrl = url.startsWith("http")
@@ -98,10 +121,88 @@ const InnoVationDetailsPage = () => {
       return {
         type: "image",
         src: fullImageUrl,
+        videoId: null,
       };
     }
 
-    return { type: "none", src: null };
+    // If it's a URL but not YouTube or image, try to handle it
+    if (url.startsWith("http")) {
+      return {
+        type: "url",
+        src: url,
+        videoId: null,
+      };
+    }
+
+    return { type: "none", src: null, videoId: null };
+  };
+
+  // Render YouTube video with responsive container
+  const renderYouTubeVideo = (videoId) => {
+    return (
+      <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+        <iframe
+          src={`https://www.youtube.com/embed/${videoId}`}
+          title="YouTube video player"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="absolute top-0 left-0 w-full h-full rounded-lg"
+        ></iframe>
+      </div>
+    );
+  };
+
+  // Render media content
+  const renderMediaContent = () => {
+    if (!innovation || !innovation.image_video) {
+      return (
+        <div className="bg-gray-100 rounded-lg p-12 text-center">
+          <p className="text-gray-500">No media available</p>
+        </div>
+      );
+    }
+
+    const mediaInfo = getMediaInfo(innovation.image_video);
+
+    switch (mediaInfo.type) {
+      case "youtube":
+        return renderYouTubeVideo(mediaInfo.videoId);
+
+      case "image":
+        return (
+          <img
+            src={mediaInfo.src}
+            alt={innovation.page_title || "Innovation Image"}
+            className="w-full h-auto rounded-lg object-cover max-h-[500px]"
+            onError={(e) => {
+              e.target.src = "https://via.placeholder.com/800x400/4F46E5/FFFFFF?text=Image+Not+Available";
+            }}
+          />
+        );
+
+      case "url":
+        return (
+          <div className="bg-gray-100 rounded-lg p-12 text-center">
+            <p className="text-gray-600 mb-4">Media preview not available</p>
+            <a
+              href={mediaInfo.src}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700 transition"
+            >
+              View Media
+            </a>
+          </div>
+        );
+
+      default:
+        return (
+          <div className="bg-gray-100 rounded-lg p-12 text-center">
+            <p className="text-gray-500">No media available</p>
+          </div>
+        );
+    }
   };
 
   // Team Members Data (keeping this as it's for testimonials)
@@ -176,8 +277,6 @@ const InnoVationDetailsPage = () => {
     );
   }
 
-  const mediaInfo = getMediaInfo(innovation.image_video);
-
   return (
     <>
       <Breadcrumb
@@ -223,14 +322,9 @@ const InnoVationDetailsPage = () => {
                 </p>
               </div>
 
-              {/* Featured Media */}
+              {/* Featured Media - Updated to handle both images and YouTube */}
               <div className="w-full p-4">
-                <MediaRenderer
-                  media={{
-                    type: mediaInfo.type,
-                    url: mediaInfo.src,
-                  }}
-                />
+                {renderMediaContent()}
               </div>
 
               {/* Content */}
@@ -363,13 +457,36 @@ const InnoVationDetailsPage = () => {
                         className="flex items-start hover:bg-gray-50 p-2 rounded-md transition-colors"
                       >
                         <div className="flex-shrink-0 mr-4 w-28">
-                          <MediaRenderer
-                            media={{
-                              type: itemMediaInfo.type,
-                              url: itemMediaInfo.src,
-                            }}
-                            className="h-20"
-                          />
+                          {itemMediaInfo.type === "youtube" ? (
+                            <div className="relative">
+                              <img
+                                src={itemMediaInfo.thumbnail}
+                                alt={item.title}
+                                className="w-full h-20 object-cover rounded-md"
+                                onError={(e) => {
+                                  e.target.src = "https://via.placeholder.com/120x80/4F46E5/FFFFFF?text=Video";
+                                }}
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="bg-black/50 rounded-full p-2">
+                                  <FontAwesomeIcon icon={faPlay} className="text-white text-sm" />
+                                </div>
+                              </div>
+                            </div>
+                          ) : itemMediaInfo.type === "image" ? (
+                            <img
+                              src={itemMediaInfo.src}
+                              alt={item.title}
+                              className="w-full h-20 object-cover rounded-md"
+                              onError={(e) => {
+                                e.target.src = "https://via.placeholder.com/120x80/4F46E5/FFFFFF?text=Image";
+                              }}
+                            />
+                          ) : (
+                            <div className="w-full h-20 bg-gray-200 rounded-md flex items-center justify-center text-gray-400 text-xs">
+                              No Media
+                            </div>
+                          )}
                         </div>
                         <div>
                           <h3 className="font-semibold text-gray-800 hover:text-yellow-600 transition-colors">
@@ -391,22 +508,6 @@ const InnoVationDetailsPage = () => {
           </div>
         </div>
       </div>
-
-      {/* Innovators' Voices Section */}
-      {/* <section className="py-20 bg-white innovation-section ">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Voice Of   <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">Innovator</span>
-            </h2>
-            <h5 className="text-lg text-gray-600 max-w-2xl mx-auto text-center">
-              The visionaries and pioneers driving technological advancement
-            </h5>
-          </div>
-
-          <InnovationTestimonial innovatorVoices={innovatorVoices} />
-        </div>
-      </section> */}
     </>
   );
 };

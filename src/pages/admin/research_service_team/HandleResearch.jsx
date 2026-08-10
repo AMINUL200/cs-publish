@@ -31,6 +31,7 @@ const HandleResearch = () => {
 
       if (res.data.status) {
         setResearchData(res.data.data);
+        console.log('Fetched research data:', res.data.data);
         setSectionTitle(res.data.section || 'Research & Innovation');
         console.log(res.data.data);
         

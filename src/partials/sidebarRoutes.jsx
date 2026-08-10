@@ -239,11 +239,11 @@ export const sidebarRoutes = [
         title: "Payment Policy",
         allowedRoles: [0],
       },
-      {
-        path: "/setting/research",
-        title: "Handle Research ",
-        allowedRoles: [0],
-      },
+      // {
+      //   path: "/setting/research",
+      //   title: "Handle Research ",
+      //   allowedRoles: [0],
+      // },
       {
         path: "/setting/service",
         title: "Handle Author Service ",

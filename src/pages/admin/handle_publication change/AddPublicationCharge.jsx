@@ -103,7 +103,7 @@ const AddPublicationCharge = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    console.log('Form Data Submitted:', formData);
     // Validate required fields
     if (!formData.journal_id || !formData.title || !formData.long_description) {
       toast.error("Please fill in all required fields");
@@ -115,7 +115,7 @@ const AddPublicationCharge = () => {
 
       const url = isEdit 
         ? `${API_URL}api/publication-charges/${currentId}`
-        : `${API_URL}api/publication-charges/`;
+        : `${API_URL}api/publication-charges`;
       
       const method = isEdit ? 'POST' : 'POST';
 
@@ -128,7 +128,7 @@ const AddPublicationCharge = () => {
           'Content-Type': 'application/json'
         }
       });
-
+      console.log('API Response:', response);
       if (response.data.status) {
         toast.success(`Publication charge ${isEdit ? 'updated' : 'created'} successfully!`);
         navigate('/handle-publication-charge');
@@ -138,6 +138,7 @@ const AddPublicationCharge = () => {
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message || `Failed to ${isEdit ? 'update' : 'create'} publication charge`;
       toast.error(errorMessage);
+      console.error('Error during form submission:', err);
     } finally {
       setLoading(false);
     }

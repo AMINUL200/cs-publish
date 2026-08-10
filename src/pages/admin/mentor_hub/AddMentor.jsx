@@ -282,76 +282,175 @@ const AddMentor = () => {
   };
 
   // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Basic validation
-    if (!formData.catagory || !formData.title || !formData.event_name) {
-      toast.error("Please fill in required fields: Category, Title, and Event Name");
-      return;
-    }
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      setLoading(true);
+  // Basic validation
+  if (!formData.catagory || !formData.title || !formData.event_name) {
+    toast.error(
+      "Please fill in required fields: Category, Title, and Event Name"
+    );
+    return;
+  }
 
-      const submitData = new FormData();
-      
-      // Append form data
-      Object.keys(formData).forEach(key => {
-        if (formData[key] !== null && formData[key] !== undefined) {
-          if (key === 'image_video' || key === 'pdf' || key === 'ppt') {
-            if (formData[key] instanceof File) {
-              submitData.append(key, formData[key]);
-            } else if (formData[key] === null && isEdit) {
-              // In edit mode, if file is removed, send null to delete it
-              submitData.append(key, '');
-            }
-          } else {
-            submitData.append(key, formData[key]);
-          }
+  try {
+    setLoading(true);
+
+    const submitData = new FormData();
+
+    // ==========================================
+    // 1. NORMAL FORM DATA
+    // ==========================================
+    Object.keys(formData).forEach((key) => {
+      // Handle files separately
+      if (key === "image_video" || key === "pdf" || key === "ppt") {
+        if (formData[key] instanceof File) {
+          submitData.append(key, formData[key]);
         }
-      });
 
-      // Format and append links
-      const formattedShareLinks = formatLinksForSubmission(shareLinks);
-      const formattedEventLinks = formatLinksForSubmission(eventSocialLinks);
-
-      if (formattedShareLinks) {
-        submitData.append('share_links', JSON.stringify(formattedShareLinks));
-      } else if (isEdit) {
-        submitData.append('share_links', '');
+        return;
       }
 
-      if (formattedEventLinks) {
-        submitData.append('event_social_links', JSON.stringify(formattedEventLinks));
-      } else if (isEdit) {
-        submitData.append('event_social_links', '');
+      // Normal fields
+      if (
+        formData[key] !== null &&
+        formData[key] !== undefined &&
+        formData[key] !== ""
+      ) {
+        submitData.append(key, formData[key]);
       }
+    });
 
-      const url = isEdit 
-        ? `${API_URL}api/events/update/${mentorId}`
-        : `${API_URL}api/events/store`;
+    // ==========================================
+    // 2. SHARE LINKS
+    // ==========================================
+    const validShareLinks = shareLinks.filter(
+      (link) => link.key?.trim() && link.value?.trim()
+    );
 
-      const response = await axios.post(url, submitData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+    validShareLinks.forEach((link, index) => {
+      submitData.append(
+        `share_links[${index}][key]`,
+        link.key.trim()
+      );
 
-      if (response.data.status) {
-        toast.success(`Mentor event ${isEdit ? 'updated' : 'created'} successfully!`);
-        navigate('/handle-mentor-hub');
-      } else {
-        throw new Error(response.data.message || 'Operation failed');
-      }
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error(error.response?.data?.message || `Failed to ${isEdit ? 'update' : 'create'} mentor event`);
-    } finally {
-      setLoading(false);
+      submitData.append(
+        `share_links[${index}][value]`,
+        link.value.trim()
+      );
+    });
+
+    // If editing and all share links were removed
+    if (isEdit && validShareLinks.length === 0) {
+      submitData.append("share_links", "");
     }
-  };
+
+    // ==========================================
+    // 3. EVENT SOCIAL LINKS
+    // ==========================================
+    const validEventSocialLinks = eventSocialLinks.filter(
+      (link) => link.key?.trim() && link.value?.trim()
+    );
+
+    validEventSocialLinks.forEach((link, index) => {
+      submitData.append(
+        `event_social_links[${index}][key]`,
+        link.key.trim()
+      );
+
+      submitData.append(
+        `event_social_links[${index}][value]`,
+        link.value.trim()
+      );
+    });
+
+    // If editing and all event social links were removed
+    if (isEdit && validEventSocialLinks.length === 0) {
+      submitData.append("event_social_links", "");
+    }
+
+    // ==========================================
+    // 4. DEBUG - SEE WHAT IS BEING SENT
+    // ==========================================
+    console.log("========== FORM DATA ==========");
+
+    for (const [key, value] of submitData.entries()) {
+      console.log(
+        key,
+        value instanceof File
+          ? `FILE: ${value.name}`
+          : value
+      );
+    }
+
+    console.log("===============================");
+
+    // ==========================================
+    // 5. API URL
+    // ==========================================
+    const url = isEdit
+      ? `${API_URL}api/events/update/${mentorId}`
+      : `${API_URL}api/events/store`;
+
+    // ==========================================
+    // 6. API REQUEST
+    // ==========================================
+    const response = await axios.post(url, submitData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    // ==========================================
+    // 7. SUCCESS
+    // ==========================================
+    if (response.data.status) {
+      toast.success(
+        `Mentor event ${
+          isEdit ? "updated" : "created"
+        } successfully!`
+      );
+
+      navigate("/handle-mentor-hub");
+    } else {
+      throw new Error(
+        response.data.message || "Operation failed"
+      );
+    }
+
+  } catch (error) {
+    // ==========================================
+    // 8. ERROR
+    // ==========================================
+    console.error("Error submitting form:", error);
+
+    console.error(
+      "API Error Response:",
+      error.response?.data
+    );
+
+    // Laravel validation errors
+    if (error.response?.data?.errors) {
+      const errors = error.response.data.errors;
+
+      Object.entries(errors).forEach(([field, messages]) => {
+        messages.forEach((message) => {
+          toast.error(`${field}: ${message}`);
+        });
+      });
+    } else {
+      toast.error(
+        error.response?.data?.message ||
+        `Failed to ${
+          isEdit ? "update" : "create"
+        } mentor event`
+      );
+    }
+
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loading && isEdit) {
     return (

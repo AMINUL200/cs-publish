@@ -35,6 +35,7 @@ const AuthorServices = () => {
       
       if (response.data.status) {
         setServices(response.data.data);
+        console.log("Fetched services data:", response.data.data);
       } else {
         throw new Error("Failed to fetch services data");
       }

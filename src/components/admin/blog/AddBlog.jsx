@@ -23,6 +23,7 @@ const AddBlog = () => {
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [pdfFileName, setPdfFileName] = useState("");
+  const [errors, setErrors] = useState({});
   const API_URL = import.meta.env.VITE_API_URL;
 
   // Fetch categories on component mount
@@ -53,8 +54,37 @@ const AddBlog = () => {
     fetchCategories();
   }, [token, API_URL]);
 
+  // Validation function
+  const validateField = (name, value) => {
+    let error = "";
+    
+    // Required fields validation
+    const requiredFields = ['blog_category_id', 'title', 'author', 'description', 'long_description', 'date'];
+    
+    if (requiredFields.includes(name) && !value) {
+      error = `${name.replace('_', ' ')} is required`;
+    }
+    
+    // Validate image dimensions when image is selected
+    if (name === 'image' && value) {
+      // Image validation is handled in handleImageChange
+    }
+    
+    return error;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Clear previous error for this field
+    setErrors(prev => ({ ...prev, [name]: "" }));
+    
+    // Validate field
+    const error = validateField(name, value);
+    if (error) {
+      setErrors(prev => ({ ...prev, [name]: error }));
+    }
+    
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -62,6 +92,14 @@ const AddBlog = () => {
   };
 
   const handleEditorChange = (content, fieldName) => {
+    // Clear previous error for this field
+    setErrors(prev => ({ ...prev, [fieldName]: "" }));
+    
+    // Validate required editor fields
+    if (fieldName === 'long_description' && !content) {
+      setErrors(prev => ({ ...prev, [fieldName]: "Long description is required" }));
+    }
+    
     setFormData((prev) => ({
       ...prev,
       [fieldName]: content,
@@ -70,42 +108,98 @@ const AddBlog = () => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+    
+    // Clear previous error
+    setErrors(prev => ({ ...prev, image: "" }));
+    
     if (file) {
+      // Validate file type
       if (!file.type.startsWith("image/")) {
+        setErrors(prev => ({ ...prev, image: "Please select a valid image file" }));
         toast.error("Please select a valid image file");
         return;
       }
 
+      // Validate file size (5MB)
       if (file.size > 5 * 1024 * 1024) {
+        setErrors(prev => ({ ...prev, image: "Image size should be less than 5MB" }));
         toast.error("Image size should be less than 5MB");
         return;
       }
 
-      setFormData((prev) => ({
-        ...prev,
-        image: file,
-      }));
+      // Validate image dimensions (recommended: 1200x800 or similar aspect ratio)
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      
+      img.onload = function() {
+        const width = this.width;
+        const height = this.height;
+        
+        // Recommended dimensions: minimum 800px width, 500px height
+        // You can adjust these values based on your requirements
+        if (width < 800 || height < 500) {
+          setErrors(prev => ({ 
+            ...prev, 
+            image: `Image dimensions should be at least 800x500px. Current: ${width}x${height}px` 
+          }));
+          toast.error(`Image dimensions should be at least 800x500px. Current: ${width}x${height}px`);
+          URL.revokeObjectURL(objectUrl);
+          return;
+        }
+        
+        // Check aspect ratio (between 1.3:1 and 2:1 is ideal for blog images)
+        const aspectRatio = width / height;
+        if (aspectRatio < 1.3 || aspectRatio > 2.0) {
+          setErrors(prev => ({ 
+            ...prev, 
+            image: `Recommended aspect ratio is between 1.3:1 and 2:1 (landscape). Current: ${(width/height).toFixed(2)}:1` 
+          }));
+          toast.error(`Recommended aspect ratio is between 1.3:1 and 2:1 (landscape)`);
+          URL.revokeObjectURL(objectUrl);
+          return;
+        }
+        
+        // If all validations pass
+        setFormData((prev) => ({
+          ...prev,
+          image: file,
+        }));
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+        URL.revokeObjectURL(objectUrl);
       };
-      reader.readAsDataURL(file);
+      
+      img.onerror = function() {
+        toast.error("Failed to load image");
+        URL.revokeObjectURL(objectUrl);
+      };
+      
+      img.src = objectUrl;
     }
   };
 
   const handlePdfChange = (e) => {
     const file = e.target.files[0];
+    
+    // Clear previous error
+    setErrors(prev => ({ ...prev, blog_pdf: "" }));
+    
     if (file) {
       // Validate file type
       if (file.type !== "application/pdf") {
+        setErrors(prev => ({ ...prev, blog_pdf: "Please select a valid PDF file" }));
         toast.error("Please select a valid PDF file");
         return;
       }
 
-      // Validate file size (2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error("PDF file size should be less than 2MB");
+      // Validate file size (10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setErrors(prev => ({ ...prev, blog_pdf: "PDF file size should be less than 10MB" }));
+        toast.error("PDF file size should be less than 10MB");
         return;
       }
 
@@ -125,6 +219,7 @@ const AddBlog = () => {
       image_alt: "",
     }));
     setImagePreview(null);
+    setErrors(prev => ({ ...prev, image: "" }));
 
     const fileInput = document.querySelector(
       'input[type="file"][accept="image/*"]',
@@ -140,6 +235,7 @@ const AddBlog = () => {
       blog_pdf: null,
     }));
     setPdfFileName("");
+    setErrors(prev => ({ ...prev, blog_pdf: "" }));
 
     const fileInput = document.querySelector(
       'input[type="file"][accept=".pdf"]',
@@ -151,6 +247,39 @@ const AddBlog = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate all required fields before submission
+    const newErrors = {};
+    let hasError = false;
+    
+    // Check required fields
+    const requiredFields = ['blog_category_id', 'title', 'author', 'description', 'long_description', 'date'];
+    requiredFields.forEach(field => {
+      if (!formData[field]) {
+        newErrors[field] = `${field.replace('_', ' ')} is required`;
+        hasError = true;
+      }
+    });
+    
+    // Validate image
+    if (!formData.image) {
+      newErrors.image = "Image is required";
+      hasError = true;
+    }
+    
+    if (hasError) {
+      setErrors(newErrors);
+      // Scroll to first error
+      const firstErrorField = Object.keys(newErrors)[0];
+      const element = document.querySelector(`[name="${firstErrorField}"]`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.focus();
+      }
+      toast.error("Please fix all validation errors before submitting");
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -202,6 +331,7 @@ const AddBlog = () => {
         });
         setImagePreview(null);
         setPdfFileName("");
+        setErrors({});
       }
     } catch (err) {
       const errorMessage = err.response?.data?.message || "Failed to add blog";
@@ -235,7 +365,9 @@ const AddBlog = () => {
             value={formData.blog_category_id}
             onChange={handleChange}
             required
-            className="mt-1 block w-full pl-3 pr-10 py-3 text-base border-gray-300 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className={`mt-1 block w-full pl-3 pr-10 py-3 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+              errors.blog_category_id ? 'border-red-500' : 'border-gray-300'
+            }`}
             disabled={loading}
           >
             <option value="">Select a category</option>
@@ -245,6 +377,9 @@ const AddBlog = () => {
               </option>
             ))}
           </select>
+          {errors.blog_category_id && (
+            <p className="text-red-500 text-sm mt-1">{errors.blog_category_id}</p>
+          )}
         </div>
 
         {/* Title */}
@@ -263,9 +398,14 @@ const AddBlog = () => {
             onChange={handleChange}
             required
             disabled={loading}
-            className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className={`mt-1 block w-full border rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+              errors.title ? 'border-red-500' : 'border-gray-300'
+            }`}
             placeholder="Enter blog title"
           />
+          {errors.title && (
+            <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+          )}
         </div>
 
         {/* Author */}
@@ -284,9 +424,14 @@ const AddBlog = () => {
             onChange={handleChange}
             required
             disabled={loading}
-            className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className={`mt-1 block w-full border rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+              errors.author ? 'border-red-500' : 'border-gray-300'
+            }`}
             placeholder="Enter author name"
           />
+          {errors.author && (
+            <p className="text-red-500 text-sm mt-1">{errors.author}</p>
+          )}
         </div>
 
         {/* Date */}
@@ -306,19 +451,26 @@ const AddBlog = () => {
             required
             disabled={loading}
             max={getTodayDate()}
-            className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className={`mt-1 block w-full border rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+              errors.date ? 'border-red-500' : 'border-gray-300'
+            }`}
           />
+          {errors.date && (
+            <p className="text-red-500 text-sm mt-1">{errors.date}</p>
+          )}
         </div>
 
         {/* Image Upload Section */}
         <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <label className="block text-sm font-medium text-gray-700 mb-4">
-            Blog Image
+            Blog Image *
           </label>
 
           {/* Upload Area */}
           {!imagePreview && (
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center transition-all duration-300 hover:border-blue-400 hover:bg-blue-50 mb-4">
+            <div className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 hover:border-blue-400 hover:bg-blue-50 mb-4 ${
+              errors.image ? 'border-red-500' : 'border-gray-300'
+            }`}>
               <input
                 type="file"
                 accept="image/*"
@@ -348,7 +500,7 @@ const AddBlog = () => {
                   Click to upload image
                 </span>
                 <span className="text-xs text-gray-400">
-                  PNG, JPG, JPEG up to 5MB
+                  PNG, JPG, JPEG up to 5MB (Recommended: 1200x800px, landscape)
                 </span>
               </label>
             </div>
@@ -388,8 +540,12 @@ const AddBlog = () => {
             </div>
           )}
 
+          {errors.image && (
+            <p className="text-red-500 text-sm mt-2">{errors.image}</p>
+          )}
+
           {/* Alt Text Input */}
-          <div>
+          <div className="mt-4">
             <label
               htmlFor="image_alt"
               className="block text-sm font-medium text-gray-700 mb-2"
@@ -412,12 +568,14 @@ const AddBlog = () => {
         {/* PDF Upload Section */}
         <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <label className="block text-sm font-medium text-gray-700 mb-4">
-            Blog PDF (Optional)
+            Blog PDF (Optional - Max 10MB)
           </label>
 
           {/* Upload Area */}
           {!pdfFileName && (
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center transition-all duration-300 hover:border-green-400 hover:bg-green-50 mb-4">
+            <div className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 hover:border-green-400 hover:bg-green-50 mb-4 ${
+              errors.blog_pdf ? 'border-red-500' : 'border-gray-300'
+            }`}>
               <input
                 type="file"
                 accept=".pdf"
@@ -447,7 +605,7 @@ const AddBlog = () => {
                   Click to upload PDF
                 </span>
                 <span className="text-xs text-gray-400">
-                  PDF file up to 2MB
+                  PDF file up to 10MB
                 </span>
               </label>
             </div>
@@ -505,8 +663,12 @@ const AddBlog = () => {
             </div>
           )}
 
+          {errors.blog_pdf && (
+            <p className="text-red-500 text-sm mt-2">{errors.blog_pdf}</p>
+          )}
+
           <p className="text-sm text-gray-500 mt-2">
-            Upload a PDF version of your blog (maximum size: 2MB)
+            Upload a PDF version of your blog (maximum size: 10MB)
           </p>
         </div>
 
@@ -526,9 +688,14 @@ const AddBlog = () => {
             required
             disabled={loading}
             rows="4"
-            className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className={`mt-1 block w-full border rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+              errors.description ? 'border-red-500' : 'border-gray-300'
+            }`}
             placeholder="Enter a brief description of the blog"
           />
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+          )}
         </div>
 
         {/* Long Description */}
@@ -539,48 +706,53 @@ const AddBlog = () => {
           >
             Long Description *
           </label>
-          <Editor
-            apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
-            value={formData.long_description}
-            init={{
-              height: 400,
-              menubar: false,
-              plugins: [
-                "advlist",
-                "autolink",
-                "link",
-                "lists",
-                "charmap",
-                "preview",
-                "searchreplace",
-                "visualblocks",
-                "code",
-                "fullscreen",
-                "help",
-                "wordcount",
-              ],
-              toolbar:
-                "undo redo | blocks | " +
-                "bold italic underline | link | " +
-                "alignleft aligncenter alignright alignjustify | " +
-                "bullist numlist outdent indent | " +
-                "removeformat | help | code",
-              content_style:
-                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-              link_context_toolbar: true,
-              link_assume_external_targets: true,
-              link_title: false,
-              default_link_target: "_blank",
-              link_list: [
-                { title: "Home Page", value: "/" },
-                { title: "About Page", value: "/about" },
-                { title: "Contact Page", value: "/contact" },
-              ],
-            }}
-            onEditorChange={(content) =>
-              handleEditorChange(content, "long_description")
-            }
-          />
+          <div className={`border rounded-lg ${errors.long_description ? 'border-red-500' : 'border-gray-300'}`}>
+            <Editor
+              apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
+              value={formData.long_description}
+              init={{
+                height: 400,
+                menubar: false,
+                plugins: [
+                  "advlist",
+                  "autolink",
+                  "link",
+                  "lists",
+                  "charmap",
+                  "preview",
+                  "searchreplace",
+                  "visualblocks",
+                  "code",
+                  "fullscreen",
+                  "help",
+                  "wordcount",
+                ],
+                toolbar:
+                  "undo redo | blocks | " +
+                  "bold italic underline | link | " +
+                  "alignleft aligncenter alignright alignjustify | " +
+                  "bullist numlist outdent indent | " +
+                  "removeformat | help | code",
+                content_style:
+                  "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                link_context_toolbar: true,
+                link_assume_external_targets: true,
+                link_title: false,
+                default_link_target: "_blank",
+                link_list: [
+                  { title: "Home Page", value: "/" },
+                  { title: "About Page", value: "/about" },
+                  { title: "Contact Page", value: "/contact" },
+                ],
+              }}
+              onEditorChange={(content) =>
+                handleEditorChange(content, "long_description")
+              }
+            />
+          </div>
+          {errors.long_description && (
+            <p className="text-red-500 text-sm mt-1">{errors.long_description}</p>
+          )}
         </div>
 
         {/* Submit Button */}

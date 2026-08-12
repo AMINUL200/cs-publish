@@ -15,6 +15,7 @@ const AddJournal = () => {
 
   const [loading, setLoading] = useState(true);
   const [handleLoading, setHandleLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   // formData state
   const [formData, setFormData] = useState({
@@ -97,15 +98,93 @@ const AddJournal = () => {
     fetchGroupData();
   }, []);
 
+  // Validation function
+ // Validation function - Updated to support decimal values with 2 decimal places
+// Validation function - Updated to support decimals with any decimal places
+const validateField = (name, value) => {
+  let error = "";
+  
+  // Number fields that should accept decimals with any number of decimal places
+  const decimalFields = [
+    "impact_factor", 
+    "acceptance_rate",
+    "issn_print_no",    // Added - can have any decimal places
+    "issn_online_no"    // Added - can have any decimal places
+  ];
+  
+  // Integer fields (whole numbers only)
+  const integerFields = [
+    "total_articles",
+    "total_citations", 
+    "h_index",
+    "amount"
+  ];
+  
+  // Text fields (can contain alphanumeric and special characters)
+  const textFields = [
+    "ugc_no"
+  ];
+
+  if (decimalFields.includes(name)) {
+    // Allow empty or numbers with any number of decimal places
+    if (value && !/^\d*\.?\d*$/.test(value)) {
+      error = "Please enter a valid decimal number (e.g., 22.05, 12.005, 5.234445345)";
+    }
+    // Check if it's a valid number format (no multiple dots)
+    if (value && (value.match(/\./g) || []).length > 1) {
+      error = "Please enter a valid number with only one decimal point";
+    }
+  } else if (integerFields.includes(name)) {
+    if (value && !/^\d*$/.test(value)) {
+      error = "Please enter a valid number (digits only)";
+    }
+    // For amount field, check if it's not negative
+    if (name === "amount" && value && parseFloat(value) < 0) {
+      error = "Amount cannot be negative";
+    }
+  } else if (textFields.includes(name)) {
+    // UGC No can contain alphanumeric characters
+    if (value && !/^[a-zA-Z0-9\-_\s]*$/.test(value)) {
+      error = "Please enter valid characters (alphanumeric, spaces, hyphens, underscores)";
+    }
+  }
+  
+  return error;
+};
+
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
+    
+    // Clear previous error for this field
+    setErrors(prev => ({ ...prev, [name]: "" }));
+    
     if (type === "file") {
-      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+      // Validate image file
+      const file = files[0];
+      if (file) {
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        
+        if (!validTypes.includes(file.type)) {
+          setErrors(prev => ({ ...prev, image: "Please upload a valid image file (JPEG, PNG, GIF, WEBP)" }));
+          return;
+        }
+        if (file.size > maxSize) {
+          setErrors(prev => ({ ...prev, image: "Image size should be less than 5MB" }));
+          return;
+        }
+      }
+      setFormData((prev) => ({ ...prev, [name]: file }));
     } else if (
       ["issn_print", "issn_online", "ugc_approved", "status"].includes(name)
     ) {
       setFormData((prev) => ({ ...prev, [name]: value }));
     } else {
+      // Validate the field
+      const error = validateField(name, value);
+      if (error) {
+        setErrors(prev => ({ ...prev, [name]: error }));
+      }
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
 
@@ -125,6 +204,65 @@ const AddJournal = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate all fields before submission
+    const newErrors = {};
+    let hasError = false;
+    
+    // Check required fields
+    const requiredFields = ['group_id', 'category_id', 'j_title', 'amount'];
+    requiredFields.forEach(field => {
+      if (!formData[field]) {
+        newErrors[field] = `${field.replace('_', ' ')} is required`;
+        hasError = true;
+      }
+    });
+    
+    // Validate all numeric fields
+    const numericFields = [
+      'impact_factor', 'acceptance_rate', 'total_articles', 
+      'total_citations', 'h_index', 'issn_print_no', 
+      'issn_online_no', 'amount'
+    ];
+    
+    numericFields.forEach(field => {
+      if (formData[field]) {
+        const error = validateField(field, formData[field]);
+        if (error) {
+          newErrors[field] = error;
+          hasError = true;
+        }
+      }
+    });
+    
+    // Validate UGC No
+    if (formData.ugc_no) {
+      const error = validateField('ugc_no', formData.ugc_no);
+      if (error) {
+        newErrors.ugc_no = error;
+        hasError = true;
+      }
+    }
+    
+    // Validate image
+    if (!formData.image) {
+      newErrors.image = "Please upload an image";
+      hasError = true;
+    }
+    
+    if (hasError) {
+      setErrors(newErrors);
+      // Scroll to first error
+      const firstErrorField = Object.keys(newErrors)[0];
+      const element = document.querySelector(`[name="${firstErrorField}"]`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.focus();
+      }
+      toast.error("Please fix all validation errors before submitting");
+      return;
+    }
+    
     setHandleLoading(true);
     try {
       const submitData = new FormData();
@@ -171,6 +309,7 @@ const AddJournal = () => {
           acceptance_rate: "",
           total_articles: "",
         });
+        setErrors({});
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
@@ -199,7 +338,7 @@ const AddJournal = () => {
               name="group_id"
               value={formData.group_id}
               onChange={handleChange}
-              className="w-full border px-3 py-2 rounded"
+              className={`w-full border px-3 py-2 rounded ${errors.group_id ? 'border-red-500' : ''}`}
               required
             >
               <option value="">Select Group</option>
@@ -209,6 +348,7 @@ const AddJournal = () => {
                 </option>
               ))}
             </select>
+            {errors.group_id && <p className="text-red-500 text-sm mt-1">{errors.group_id}</p>}
           </div>
 
           {/* Category ID */}
@@ -218,7 +358,7 @@ const AddJournal = () => {
               name="category_id"
               value={formData.category_id}
               onChange={handleChange}
-              className="w-full border px-3 py-2 rounded"
+              className={`w-full border px-3 py-2 rounded ${errors.category_id ? 'border-red-500' : ''}`}
               required
             >
               <option value="">Select Category</option>
@@ -228,6 +368,7 @@ const AddJournal = () => {
                 </option>
               ))}
             </select>
+            {errors.category_id && <p className="text-red-500 text-sm mt-1">{errors.category_id}</p>}
           </div>
         </div>
 
@@ -239,9 +380,10 @@ const AddJournal = () => {
             name="j_title"
             value={formData.j_title}
             onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
+            className={`w-full border px-3 py-2 rounded ${errors.j_title ? 'border-red-500' : ''}`}
             required
           />
+          {errors.j_title && <p className="text-red-500 text-sm mt-1">{errors.j_title}</p>}
         </div>
 
         {/* Categories */}
@@ -274,7 +416,7 @@ const AddJournal = () => {
             Journal Metrics
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            {/* Impact Factor - New Field */}
+            {/* Impact Factor - Decimal */}
             <div>
               <label className="block mb-1 font-medium">
                 Impact Factor
@@ -286,11 +428,12 @@ const AddJournal = () => {
                 value={formData.impact_factor}
                 onChange={handleChange}
                 placeholder="e.g., 2.5"
-                className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.impact_factor ? 'border-red-500' : ''}`}
               />
+              {errors.impact_factor && <p className="text-red-500 text-sm mt-1">{errors.impact_factor}</p>}
             </div>
 
-            {/* Total Articles */}
+            {/* Total Articles - Integer */}
             <div>
               <label className="block mb-1 font-medium">
                 Quick Press
@@ -302,11 +445,12 @@ const AddJournal = () => {
                 value={formData.total_articles}
                 onChange={handleChange}
                 placeholder="e.g., 500"
-                className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.total_articles ? 'border-red-500' : ''}`}
               />
+              {errors.total_articles && <p className="text-red-500 text-sm mt-1">{errors.total_articles}</p>}
             </div>
 
-            {/* Total Citations */}
+            {/* Total Citations - Integer */}
             <div>
               <label className="block mb-1 font-medium">
                 Indexing
@@ -318,11 +462,12 @@ const AddJournal = () => {
                 value={formData.total_citations}
                 onChange={handleChange}
                 placeholder="e.g., 1250"
-                className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.total_citations ? 'border-red-500' : ''}`}
               />
+              {errors.total_citations && <p className="text-red-500 text-sm mt-1">{errors.total_citations}</p>}
             </div>
 
-            {/* H-Index */}
+            {/* H-Index - Integer */}
             <div>
               <label className="block mb-1 font-medium">
                 First Decision
@@ -334,11 +479,12 @@ const AddJournal = () => {
                 value={formData.h_index}
                 onChange={handleChange}
                 placeholder="e.g., 45"
-                className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.h_index ? 'border-red-500' : ''}`}
               />
+              {errors.h_index && <p className="text-red-500 text-sm mt-1">{errors.h_index}</p>}
             </div>
 
-            {/* Acceptance Rate */}
+            {/* Acceptance Rate - Decimal */}
             <div>
               <label className="block mb-1 font-medium">
                 Acceptance Rate (%)
@@ -350,8 +496,9 @@ const AddJournal = () => {
                 value={formData.acceptance_rate}
                 onChange={handleChange}
                 placeholder="e.g., 25.5"
-                className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.acceptance_rate ? 'border-red-500' : ''}`}
               />
+              {errors.acceptance_rate && <p className="text-red-500 text-sm mt-1">{errors.acceptance_rate}</p>}
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">
@@ -478,17 +625,19 @@ const AddJournal = () => {
           />
         </div>
 
-        {/* Amount */}
+        {/* Amount - Integer */}
         <div>
           <label className="block mb-1 font-medium">Amount</label>
           <input
-            type="number"
+            type="text"
             name="amount"
             value={formData.amount}
             onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
+            className={`w-full border px-3 py-2 rounded ${errors.amount ? 'border-red-500' : ''}`}
             placeholder="Enter amount"
+            required
           />
+          {errors.amount && <p className="text-red-500 text-sm mt-1">{errors.amount}</p>}
         </div>
 
         {/* Publication Model */}
@@ -525,9 +674,10 @@ const AddJournal = () => {
             name="issn_print_no"
             value={formData.issn_print_no}
             onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
+            className={`w-full border px-3 py-2 rounded ${errors.issn_print_no ? 'border-red-500' : ''}`}
             placeholder="Enter ISSN Print Number"
           />
+          {errors.issn_print_no && <p className="text-red-500 text-sm mt-1">{errors.issn_print_no}</p>}
         </div>
 
         {/* ISSN Online */}
@@ -564,9 +714,10 @@ const AddJournal = () => {
             name="issn_online_no"
             value={formData.issn_online_no}
             onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
+            className={`w-full border px-3 py-2 rounded ${errors.issn_online_no ? 'border-red-500' : ''}`}
             placeholder="Enter ISSN Online Number"
           />
+          {errors.issn_online_no && <p className="text-red-500 text-sm mt-1">{errors.issn_online_no}</p>}
         </div>
 
         {/* UGC Approved */}
@@ -603,9 +754,10 @@ const AddJournal = () => {
             name="ugc_no"
             value={formData.ugc_no}
             onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
+            className={`w-full border px-3 py-2 rounded ${errors.ugc_no ? 'border-red-500' : ''}`}
             placeholder="Enter UGC Number"
           />
+          {errors.ugc_no && <p className="text-red-500 text-sm mt-1">{errors.ugc_no}</p>}
         </div>
 
         {/* Image */}
@@ -617,8 +769,10 @@ const AddJournal = () => {
             ref={fileInputRef}
             onChange={handleChange}
             accept="image/*"
-            className="w-full border px-3 py-2 rounded"
+            className={`w-full border px-3 py-2 rounded ${errors.image ? 'border-red-500' : ''}`}
+            required
           />
+          {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
         </div>
 
         {/* Status */}

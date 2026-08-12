@@ -75,8 +75,8 @@ const UserBlogPage = () => {
   return (
     <>
       <Breadcrumb
-        items={[{ label: "Home", path: "/", icon: "home" }, { label: "Blogs" }]}
-        pageTitle="Blogs"
+        items={[{ label: "Home", path: "/", icon: "home" }, { label: "Research Snapshot" }]}
+        pageTitle="Research Snapshot"
       />
       
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8">
@@ -84,7 +84,7 @@ const UserBlogPage = () => {
           {/* Header Section */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Our <span className="text-yellow-600">Blog</span>
+              Research  <span className="text-yellow-600">Snapshot</span>
             </h1>
             <h5 className="text-xl text-gray-600 max-w-3xl mx-auto">
               Discover insightful articles, latest trends, and expert opinions from our team

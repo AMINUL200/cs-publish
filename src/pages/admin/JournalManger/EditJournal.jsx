@@ -53,35 +53,35 @@ const EditJournal = () => {
     const [imagePreview, setImagePreview] = useState(null);
     const [currentImageUrl, setCurrentImageUrl] = useState("");
 
-    // Validation function - Same as AddJournal
+    // Validation function - Updated for flexible string values
     const validateField = (name, value) => {
         let error = "";
         
-        // Number fields that should accept decimals with any number of decimal places
+        // Decimal fields (numbers with decimals)
         const decimalFields = [
             "impact_factor", 
-            "acceptance_rate",
-            "issn_print_no",
-            "issn_online_no"
+            "acceptance_rate"
         ];
         
         // Integer fields (whole numbers only)
         const integerFields = [
-            "total_articles",
-            "total_citations", 
             "h_index",
             "amount"
         ];
         
-        // Text fields (can contain alphanumeric and special characters)
-        const textFields = [
+        // String fields - allow almost any character, no strict validation
+        const stringFields = [
+            "issn_print_no",
+            "issn_online_no",
+            "total_articles",
+            "total_citations",
             "ugc_no"
         ];
 
         if (decimalFields.includes(name)) {
             // Allow empty or numbers with any number of decimal places
             if (value && !/^\d*\.?\d*$/.test(value)) {
-                error = "Please enter a valid decimal number (e.g., 22.05, 12.005, 5.234445345)";
+                error = "Please enter a valid decimal number (e.g., 22.05, 12.005, 5.234)";
             }
             // Check if it's a valid number format (no multiple dots)
             if (value && (value.match(/\./g) || []).length > 1) {
@@ -95,11 +95,14 @@ const EditJournal = () => {
             if (name === "amount" && value && parseFloat(value) < 0) {
                 error = "Amount cannot be negative";
             }
-        } else if (textFields.includes(name)) {
-            // UGC No can contain alphanumeric characters
-            if (value && !/^[a-zA-Z0-9\-_\s]*$/.test(value)) {
-                error = "Please enter valid characters (alphanumeric, spaces, hyphens, underscores)";
+        } else if (stringFields.includes(name)) {
+            // For string fields - allow any character, no strict validation
+            // Only check if it's not empty and not just spaces
+            if (value && value.trim() === "") {
+                error = "Please enter a valid value";
             }
+            // Optional: You can add specific validation for ISSN if needed
+            // But we'll keep it flexible
         }
         
         return error;
@@ -189,14 +192,54 @@ const EditJournal = () => {
                     return;
                 }
                 
-                setFormData((prev) => ({ ...prev, [name]: file }));
+                // Validate image dimensions
+                const img = new Image();
+                const objectUrl = URL.createObjectURL(file);
                 
-                // Create preview for new image
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    setImagePreview(reader.result);
+                img.onload = function() {
+                    const width = this.width;
+                    const height = this.height;
+                    
+                    // Recommended dimensions: minimum 800px width, 500px height
+                    if (width < 800 || height < 500) {
+                        setErrors(prev => ({ 
+                            ...prev, 
+                            image: `Image dimensions should be at least 800x500px. Current: ${width}x${height}px` 
+                        }));
+                        toast.error(`Image dimensions should be at least 800x500px. Current: ${width}x${height}px`);
+                        URL.revokeObjectURL(objectUrl);
+                        return;
+                    }
+                    
+                    // Check aspect ratio (between 1.3:1 and 2:1)
+                    const aspectRatio = width / height;
+                    if (aspectRatio < 1.3 || aspectRatio > 2.0) {
+                        setErrors(prev => ({ 
+                            ...prev, 
+                            image: `Recommended aspect ratio is between 1.3:1 and 2:1. Current: ${(width/height).toFixed(2)}:1` 
+                        }));
+                        toast.error(`Recommended aspect ratio is between 1.3:1 and 2:1`);
+                        URL.revokeObjectURL(objectUrl);
+                        return;
+                    }
+                    
+                    setFormData((prev) => ({ ...prev, [name]: file }));
+                    
+                    // Create preview for new image
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        setImagePreview(reader.result);
+                    };
+                    reader.readAsDataURL(file);
+                    URL.revokeObjectURL(objectUrl);
                 };
-                reader.readAsDataURL(file);
+                
+                img.onerror = function() {
+                    toast.error("Failed to load image");
+                    URL.revokeObjectURL(objectUrl);
+                };
+                
+                img.src = objectUrl;
             }
         } else if (
             ["issn_print", "issn_online", "ugc_approved", "status"].includes(name)
@@ -245,11 +288,9 @@ const EditJournal = () => {
             }
         });
         
-        // Validate all numeric fields
+        // Validate numeric fields (decimal and integer)
         const numericFields = [
-            'impact_factor', 'acceptance_rate', 'total_articles', 
-            'total_citations', 'h_index', 'issn_print_no', 
-            'issn_online_no', 'amount'
+            'impact_factor', 'acceptance_rate', 'h_index', 'amount'
         ];
         
         numericFields.forEach(field => {
@@ -262,14 +303,21 @@ const EditJournal = () => {
             }
         });
         
-        // Validate UGC No
-        if (formData.ugc_no) {
-            const error = validateField('ugc_no', formData.ugc_no);
-            if (error) {
-                newErrors.ugc_no = error;
-                hasError = true;
+        // Validate string fields - only check if they have value
+        const stringFields = [
+            'issn_print_no', 'issn_online_no', 'total_articles', 
+            'total_citations', 'ugc_no'
+        ];
+        
+        stringFields.forEach(field => {
+            if (formData[field]) {
+                const error = validateField(field, formData[field]);
+                if (error) {
+                    newErrors[field] = error;
+                    hasError = true;
+                }
             }
-        }
+        });
         
         if (hasError) {
             setErrors(newErrors);
@@ -406,7 +454,7 @@ const EditJournal = () => {
                             {errors.impact_factor && <p className="text-red-500 text-sm mt-1">{errors.impact_factor}</p>}
                         </div>
 
-                        {/* Total Articles - Integer */}
+                        {/* Total Articles - String */}
                         <div>
                             <label className="block mb-1 font-medium">
                                Quick Press
@@ -417,13 +465,13 @@ const EditJournal = () => {
                                 name="total_articles"
                                 value={formData.total_articles}
                                 onChange={handleChange}
-                                placeholder="e.g., 500"
+                                placeholder="e.g., 500 or 500+"
                                 className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.total_articles ? 'border-red-500' : ''}`}
                             />
                             {errors.total_articles && <p className="text-red-500 text-sm mt-1">{errors.total_articles}</p>}
                         </div>
 
-                        {/* Total Citations - Integer */}
+                        {/* Total Citations - String */}
                         <div>
                             <label className="block mb-1 font-medium">
                                 Indexing
@@ -434,7 +482,7 @@ const EditJournal = () => {
                                 name="total_citations"
                                 value={formData.total_citations}
                                 onChange={handleChange}
-                                placeholder="e.g., 1250"
+                                placeholder="e.g., 1250 or Scopus"
                                 className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.total_citations ? 'border-red-500' : ''}`}
                             />
                             {errors.total_citations && <p className="text-red-500 text-sm mt-1">{errors.total_citations}</p>}
@@ -647,7 +695,7 @@ const EditJournal = () => {
                         value={formData.issn_print_no}
                         onChange={handleChange}
                         className={`w-full border px-3 py-2 rounded ${errors.issn_print_no ? 'border-red-500' : ''}`}
-                        placeholder="Enter ISSN Print Number (e.g., 22.05, 12.005, 5.234445345)"
+                        placeholder="Enter ISSN Print Number"
                     />
                     {errors.issn_print_no && <p className="text-red-500 text-sm mt-1">{errors.issn_print_no}</p>}
                 </div>
@@ -687,7 +735,7 @@ const EditJournal = () => {
                         value={formData.issn_online_no}
                         onChange={handleChange}
                         className={`w-full border px-3 py-2 rounded ${errors.issn_online_no ? 'border-red-500' : ''}`}
-                        placeholder="Enter ISSN Online Number (e.g., 22.05, 12.005, 5.234445345)"
+                        placeholder="Enter ISSN Online Number"
                     />
                     {errors.issn_online_no && <p className="text-red-500 text-sm mt-1">{errors.issn_online_no}</p>}
                 </div>

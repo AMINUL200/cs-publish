@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 // Import Swiper styles
 import "swiper/css";
@@ -17,10 +18,15 @@ import {
   faStar,
   faEye,
   faUser,
+  faPlus,
+  faLightbulb,
+  faRocket,
+  faFileAlt,
+  faClock,
 } from "@fortawesome/free-solid-svg-icons";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import InnovationTestimonial from "../../../components/common/InnovationTestimonial";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Loader from "../../../components/common/Loader";
 import { toast } from "react-toastify";
 
@@ -76,6 +82,11 @@ const InnovationPage = () => {
       console.log(error);
       toast.error(error.message);
     }
+  };
+
+  // Handle submit innovation button click
+  const handleSubmitInnovation = () => {
+    navigation("/submit-innovation"); // Adjust the route path as needed
   };
 
   // Extract YouTube video ID or get image URL
@@ -240,7 +251,6 @@ const InnovationPage = () => {
           </div>
 
           <button
-            // to={`/innovation/${innovation.slug}`}
             onClick={() => handleRead(innovation)}
             className="w-full bg-gradient-to-r from-amber-600 to-red-800 text-white py-3 px-4 rounded-lg hover:from-amber-700 hover:to-red-900 transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer font-medium"
           >
@@ -254,46 +264,6 @@ const InnovationPage = () => {
       </div>
     );
   };
-
-  // Team Members Data (keeping this as it's for testimonials)
-  const innovatorVoices = [
-    {
-      id: 1,
-      name: "Sarah Mitchell",
-      role: "Editor-in-Chief",
-      image:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop",
-      bio: "Award-winning journalist with 15+ years in digital publishing",
-      social: "@sarahmitchell",
-    },
-    {
-      id: 2,
-      name: "Marcus Johnson",
-      role: "Senior Writer",
-      image:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop",
-      bio: "Bestselling author and writing coach specializing in fiction",
-      social: "@marcusjwrites",
-    },
-    {
-      id: 3,
-      name: "Lisa Chen",
-      role: "Content Strategist",
-      image:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop",
-      bio: "Digital marketing expert helping authors build their online presence",
-      social: "@lisachen_media",
-    },
-    {
-      id: 4,
-      name: "James Rivera",
-      role: "Community Manager",
-      image:
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop",
-      bio: "Passionate about connecting writers and fostering creative communities",
-      social: "@jamesrivera",
-    },
-  ];
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -311,43 +281,97 @@ const InnovationPage = () => {
           { label: "Home", path: "/", icon: "home" },
           { label: "Research And Innovation" },
         ]}
-        pageTitle=" Research And Innovation"
+        pageTitle="Research And Innovation"
       />
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-red-50">
-        {/* Search Section */}
-        {/* <div className="bg-gradient-to-r from-amber-600 via-red-800 to-black py-16">
+        {/* Hero Section with Submit Button */}
+        <div className="bg-gradient-to-r from-amber-600 via-red-800 to-black py-12">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-                Discover{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-200">
-                  Innovation
-                </span>
-              </h1>
-              <h5 className="text-xl text-amber-100 max-w-2xl mx-auto">
-                Explore cutting-edge technologies and breakthrough innovations
-                shaping our future
-              </h5>
-            </div>
-
-            <div className="max-w-2xl mx-auto relative">
-              <div className="relative">
-                <FontAwesomeIcon
-                  icon={faSearch}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-600 w-5 h-5 z-10"
-                />
-
-                <input
-                  type="text"
-                  placeholder="Search innovations, technologies, or innovators..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-6 py-4 text-lg rounded-2xl border-0 shadow-2xl focus:ring-4 focus:ring-amber-300/50 focus:outline-none backdrop-blur-sm bg-white/95 text-gray-900"
-                />
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+              <div className="text-center lg:text-left flex-1">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+                  Discover{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-200">
+                    Innovation
+                  </span>
+                </h1>
+                <h5 className="text-lg md:text-xl text-amber-100 max-w-2xl mx-auto lg:mx-0">
+                  Explore cutting-edge technologies and breakthrough innovations
+                  shaping our future
+                </h5>
+              </div>
+              
+              {/* Submit Innovation Button */}
+              <div className="flex-shrink-0">
+                <button
+                  onClick={handleSubmitInnovation}
+                  className="group relative bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-gray-900 font-bold py-4 px-8 rounded-2xl shadow-2xl hover:shadow-yellow-500/50 transition-all duration-300 flex items-center gap-3 transform hover:scale-105"
+                >
+                  <div className="absolute -inset-1 bg-gradient-to-r from-yellow-300 to-amber-600 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-300"></div>
+                  <div className="relative flex items-center gap-3">
+                    <FontAwesomeIcon icon={faPlus} className="w-5 h-5" />
+                    <span>Submit Innovation</span>
+                    <FontAwesomeIcon icon={faRocket} className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </button>
+                <p className="text-amber-200 text-sm text-center mt-2 flex items-center justify-center gap-1">
+                  <FontAwesomeIcon icon={faLightbulb} className="w-3 h-3" />
+                  Share your breakthrough ideas with the world
+                </p>
               </div>
             </div>
           </div>
-        </div> */}
+        </div>
+
+        {/* Info Cards Section */}
+        <div className="container mx-auto px-4 -mt-8 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white rounded-xl shadow-lg p-4 hover:shadow-xl transition-shadow">
+              <div className="flex items-center gap-3">
+                <div className="bg-amber-100 p-3 rounded-lg">
+                  <FontAwesomeIcon icon={faLightbulb} className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-gray-900">Share Ideas</h4>
+                  <p className="text-xs text-gray-500">Submit your innovations</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-4 hover:shadow-xl transition-shadow">
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-100 p-3 rounded-lg">
+                  <FontAwesomeIcon icon={faRocket} className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-gray-900">Get Noticed</h4>
+                  <p className="text-xs text-gray-500">Global recognition</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-4 hover:shadow-xl transition-shadow">
+              <div className="flex items-center gap-3">
+                <div className="bg-green-100 p-3 rounded-lg">
+                  <FontAwesomeIcon icon={faFileAlt} className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-gray-900">Easy Process</h4>
+                  <p className="text-xs text-gray-500">Simple submission</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-4 hover:shadow-xl transition-shadow">
+              <div className="flex items-center gap-3">
+                <div className="bg-purple-100 p-3 rounded-lg">
+                  <FontAwesomeIcon icon={faClock} className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-gray-900">Quick Review</h4>
+                  <p className="text-xs text-gray-500">Fast approval process</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Recent Innovations Section */}
         <section className="py-16 innovation-section">
@@ -508,25 +532,6 @@ const InnovationPage = () => {
             )}
           </div>
         </section>
-
-        {/* Innovators' Voices Section */}
-        {/* <section className="py-20 bg-white innovation-section ">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Meet Our{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-red-800">
-                  Innovators
-                </span>
-              </h2>
-              <h5 className="text-lg text-gray-600 max-w-2xl mx-auto text-center">
-                The visionaries and pioneers driving technological advancement
-              </h5>
-            </div>
-
-            <InnovationTestimonial innovatorVoices={innovatorVoices} />
-          </div>
-        </section> */}
       </div>
     </>
   );

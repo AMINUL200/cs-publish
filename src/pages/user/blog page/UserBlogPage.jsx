@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -10,6 +10,7 @@ const UserBlogPage = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   const [blogData, setBlogData] = useState([]);
   const [filteredBlogs, setFilteredBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +22,7 @@ const UserBlogPage = () => {
       const response = await axios.get(`${API_URL}api/blogs`, {
         headers: {
           Authorization: `Bearer ${token}`,
-           "Cache-Control": "no-cache",
+          "Cache-Control": "no-cache",
           Pragma: "no-cache",
         },
       });
@@ -30,11 +31,13 @@ const UserBlogPage = () => {
         const blogs = response.data.data;
         setBlogData(blogs);
         setFilteredBlogs(blogs);
-        
+
         // Extract unique categories
-        const uniqueCategories = [...new Map(blogs.map(blog => 
-          [blog.category.id, blog.category])
-        ).values()];
+        const uniqueCategories = [
+          ...new Map(
+            blogs.map((blog) => [blog.category.id, blog.category]),
+          ).values(),
+        ];
         setCategories(uniqueCategories);
       }
     } catch (error) {
@@ -54,12 +57,17 @@ const UserBlogPage = () => {
     if (selectedCategory === "all") {
       setFilteredBlogs(blogData);
     } else {
-      const filtered = blogData.filter(blog => 
-        blog.category.id.toString() === selectedCategory
+      const filtered = blogData.filter(
+        (blog) => blog.category.id.toString() === selectedCategory,
       );
       setFilteredBlogs(filtered);
     }
   }, [selectedCategory, blogData]);
+
+  // Handle submit blog button click
+  const handleSubmitBlog = () => {
+    navigate("/submit-blog"); // Adjust the route path as needed
+  };
 
   if (loading) {
     return (
@@ -75,78 +83,169 @@ const UserBlogPage = () => {
   return (
     <>
       <Breadcrumb
-        items={[{ label: "Home", path: "/", icon: "home" }, { label: "Research Snapshot" }]}
+        items={[
+          { label: "Home", path: "/", icon: "home" },
+          { label: "Research Snapshot" },
+        ]}
         pageTitle="Research Snapshot"
       />
-      
+
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8">
         <div className="container mx-auto px-4 max-w-8xl">
           {/* Header Section */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Research  <span className="text-yellow-600">Snapshot</span>
+              Research <span className="text-yellow-600">Snapshot</span>
             </h1>
             <h5 className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Discover insightful articles, latest trends, and expert opinions from our team
+              Discover insightful articles, latest trends, and expert opinions
+              from our team
             </h5>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* Sidebar - Filters */}
+            {/* Sidebar - Submit Blog & Filters */}
             <div className="lg:w-1/4">
               <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-20">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">Filter by Category</h3>
-                
-                {/* All Categories Button */}
-                <button
-                  onClick={() => setSelectedCategory("all")}
-                  className={`w-full text-left px-4 py-3 rounded-xl mb-3 transition-all duration-200 ${
-                    selectedCategory === "all" 
-                      ? "bg-yellow-600 text-white shadow-lg" 
-                      : "bg-gray-50 text-gray-700 hover:bg-gray-100"
-                  }`}
-                >
-                  <span className="font-medium">All Categories</span>
-                  <span className="ml-2 text-sm opacity-75">({blogData.length})</span>
-                </button>
-
-                {/* Category Filters */}
-                <div className="space-y-2">
-                  {categories.map((category) => (
-                    <button
-                      key={category.id}
-                      onClick={() => setSelectedCategory(category.id.toString())}
-                      className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 ${
-                        selectedCategory === category.id.toString()
-                          ? "bg-yellow-600 text-white shadow-lg"
-                          : "bg-gray-50 text-gray-700 hover:bg-gray-100"
-                      }`}
-                    >
-                      <span className="font-medium">{category.category_name}</span>
-                      <span className="ml-2 text-sm opacity-75">
-                        ({blogData.filter(blog => blog.category.id === category.id).length})
-                      </span>
-                    </button>
-                  ))}
-                </div>
-
-                {/* Active Filter Info */}
-                {selectedCategory !== "all" && (
-                  <div className="mt-6 p-4 bg-yellow-50 rounded-xl border border-yellow-200">
-                    <p className="text-sm text-yellow-800">
-                      Showing blogs from{" "}
-                      <strong>
-                        {categories.find(cat => cat.id.toString() === selectedCategory)?.category_name}
-                      </strong>
+                {/* Submit Blog Button - New Section */}
+                {token && (
+                  <div className="mb-8 pb-6 border-b border-gray-200">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">
+                      Share Your Knowledge
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Have insights to share? Submit your research blog and
+                      contribute to our community.
                     </p>
                     <button
-                      onClick={() => setSelectedCategory("all")}
-                      className="text-yellow-600 hover:text-yellow-800 text-sm font-medium mt-2"
+                      onClick={handleSubmitBlog}
+                      className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                     >
-                      Clear filter
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                      Submit Blog
                     </button>
+                    <div className="mt-3 flex items-center justify-center text-xs text-gray-500">
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span>Share your expertise with our community</span>
+                    </div>
                   </div>
                 )}
+
+                {/* Category Filter Section */}
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-6">
+                    Filter by Category
+                  </h3>
+
+                  {/* All Categories Button */}
+                  <button
+                    onClick={() => setSelectedCategory("all")}
+                    className={`w-full text-left px-4 py-3 rounded-xl mb-3 transition-all duration-200 ${
+                      selectedCategory === "all"
+                        ? "bg-yellow-600 text-white shadow-lg"
+                        : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                    }`}
+                  >
+                    <span className="font-medium">All Categories</span>
+                    <span className="ml-2 text-sm opacity-75">
+                      ({blogData.length})
+                    </span>
+                  </button>
+
+                  {/* Category Filters */}
+                  <div className="space-y-2">
+                    {categories.map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() =>
+                          setSelectedCategory(category.id.toString())
+                        }
+                        className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 ${
+                          selectedCategory === category.id.toString()
+                            ? "bg-yellow-600 text-white shadow-lg"
+                            : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
+                        <span className="font-medium">
+                          {category.category_name}
+                        </span>
+                        <span className="ml-2 text-sm opacity-75">
+                          (
+                          {
+                            blogData.filter(
+                              (blog) => blog.category.id === category.id,
+                            ).length
+                          }
+                          )
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Active Filter Info */}
+                  {selectedCategory !== "all" && (
+                    <div className="mt-6 p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+                      <p className="text-sm text-yellow-800">
+                        Showing blogs from{" "}
+                        <strong>
+                          {
+                            categories.find(
+                              (cat) => cat.id.toString() === selectedCategory,
+                            )?.category_name
+                          }
+                        </strong>
+                      </p>
+                      <button
+                        onClick={() => setSelectedCategory("all")}
+                        className="text-yellow-600 hover:text-yellow-800 text-sm font-medium mt-2"
+                      >
+                        Clear filter
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Quick Stats - Optional Info Section */}
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-blue-50 rounded-xl p-3 text-center">
+                      <p className="text-2xl font-bold text-blue-600">
+                        {blogData.length}
+                      </p>
+                      <p className="text-xs text-gray-600">Total Blogs</p>
+                    </div>
+                    <div className="bg-green-50 rounded-xl p-3 text-center">
+                      <p className="text-2xl font-bold text-green-600">
+                        {categories.length}
+                      </p>
+                      <p className="text-xs text-gray-600">Categories</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -155,12 +254,21 @@ const UserBlogPage = () => {
               {/* Results Count */}
               <div className="flex justify-between items-center mb-6">
                 <p className="text-gray-600">
-                  Showing <span className="font-semibold">{filteredBlogs.length}</span> 
+                  Showing{" "}
+                  <span className="font-semibold">{filteredBlogs.length}</span>
                   {filteredBlogs.length === 1 ? " blog" : " blogs"}
                   {selectedCategory !== "all" && (
-                    <> in <span className="font-semibold text-yellow-600">
-                      {categories.find(cat => cat.id.toString() === selectedCategory)?.category_name}
-                    </span></>
+                    <>
+                      {" "}
+                      in{" "}
+                      <span className="font-semibold text-yellow-600">
+                        {
+                          categories.find(
+                            (cat) => cat.id.toString() === selectedCategory,
+                          )?.category_name
+                        }
+                      </span>
+                    </>
                   )}
                 </p>
               </div>
@@ -198,8 +306,18 @@ const UserBlogPage = () => {
                       <div className="p-6">
                         {/* Date */}
                         <div className="flex items-center text-gray-500 text-sm mb-3">
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          <svg
+                            className="w-4 h-4 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
                           </svg>
                           {formatDate(blog.date)}
                         </div>
@@ -209,15 +327,20 @@ const UserBlogPage = () => {
                           {blog.title}
                         </h3>
 
-                        {/* Description */}
-                        {/* <p className="text-gray-600 mb-4 line-clamp-3 leading-relaxed">
-                          {blog.description}
-                        </p> */}
-
                         {/* Author */}
                         <div className="flex items-center text-gray-500 text-sm mb-4">
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          <svg
+                            className="w-4 h-4 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            />
                           </svg>
                           By {blog.author}
                         </div>
@@ -228,8 +351,18 @@ const UserBlogPage = () => {
                           className="inline-flex items-center justify-center w-full custom-btn text-white py-3 px-6 rounded-xl font-semibold hover:bg-blue-700 transition-all duration-200 hover:shadow-lg group/btn"
                         >
                           Read More
-                          <svg className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          <svg
+                            className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M14 5l7 7m0 0l-7 7m7-7H3"
+                            />
                           </svg>
                         </Link>
                       </div>
@@ -240,15 +373,26 @@ const UserBlogPage = () => {
                 // No Results State
                 <div className="text-center py-16">
                   <div className="max-w-md mx-auto">
-                    <svg className="w-24 h-24 text-gray-300 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    <svg
+                      className="w-24 h-24 text-gray-300 mx-auto mb-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1}
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                      />
                     </svg>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">No blogs found</h3>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      No blogs found
+                    </h3>
                     <p className="text-gray-600 mb-6">
-                      {selectedCategory !== "all" 
+                      {selectedCategory !== "all"
                         ? `No blogs found in the selected category. Try selecting a different category.`
-                        : `No blogs available at the moment. Please check back later.`
-                      }
+                        : `No blogs available at the moment. Please check back later.`}
                     </p>
                     {selectedCategory !== "all" && (
                       <button

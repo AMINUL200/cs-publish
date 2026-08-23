@@ -165,6 +165,10 @@ import JournalEditorial from "./pages/user/journal/JournalEditorial";
 import JournalEditorialDetails from "./pages/user/journal/JournalEditorialDetails";
 import MangeEDitorialCategory from "./pages/admin/editorail_info/MangeEDitorialCategory";
 import ManageEditorial from "./pages/admin/editorail_info/ManageEditorial";
+import UserSubmitBlogPage from "./pages/user/blog page/UserSubmitBlogPage";
+import UserSubmittedBlogVew from "./components/admin/blog/UserSubmittedBlogVew";
+import UserAddInnovationPage from "./pages/user/innovation/UserAddInnovationPage";
+import UserSubmitInnovation from "./pages/admin/innovation/UserSubmitInnovation";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -294,11 +298,14 @@ function App() {
             />
             <Route path="/about" element={<UserProfilePage />} />
             <Route path="/blog" element={<UserBlogPage />} />
+            <Route path="/submit-blog" element={<UserSubmitBlogPage />} />
+
             <Route path="/blog/:id" element={<BlogDetails />} />
             <Route path="/cms/:slug" element={<CmsTemplate />} />
             <Route path="/cms-page/:slug" element={<CmsPage />} />
 
             <Route path="/innovation" element={<InnovationPage />} />
+            <Route path="/submit-innovation" element={<UserAddInnovationPage />} />
             <Route
               path="/innovation/:slug"
               element={<InnoVationDetailsPage />}
@@ -406,6 +413,7 @@ function App() {
               {/* blog */}
               <Route path="/blog/add" element={<AddBlog />} />
               <Route path="/blog/view" element={<ViewBlog />} />
+              <Route path="/user-submitted-blog" element={<UserSubmittedBlogVew />} />
               <Route path="/blog/view/:id" element={<UpdateBlog />} />
               <Route path="/blog/categories" element={<BlogCategories />} />
               <Route
@@ -510,6 +518,7 @@ function App() {
               <Route path="/add-cms-page" element={<AddNewCmsPage />} />
               <Route path="/list-cms-page" element={<ViewCmsPageList />} />
               <Route path="/handle-innovation" element={<HandleInnovation />} />
+              <Route path="/user-submit-innovation" element={<UserSubmitInnovation />} />
               <Route path="/add-innovation" element={<AddInnovation />} />
 
               <Route path="/handle-mentor-hub" element={<HandleMentorHub />} />

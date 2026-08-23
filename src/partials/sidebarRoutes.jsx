@@ -198,6 +198,11 @@ export const sidebarRoutes = [
         allowedRoles: [0],
       },
       {
+        path: "/user-submitted-blog",
+        title: " User Submitted Blog",
+        allowedRoles: [0],
+      },
+      {
         path: "/blog/categories",
         title: "Blog Categories",
         allowedRoles: [0],
@@ -358,6 +363,11 @@ export const sidebarRoutes = [
       {
         path: "/handle-innovation",
         title: "List of Innovation",
+        allowedRoles: [0],
+      },
+      {
+        path: "/user-submit-innovation",
+        title: "User Submit ",
         allowedRoles: [0],
       },
     ],

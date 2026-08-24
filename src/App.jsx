@@ -169,6 +169,8 @@ import UserSubmitBlogPage from "./pages/user/blog page/UserSubmitBlogPage";
 import UserSubmittedBlogVew from "./components/admin/blog/UserSubmittedBlogVew";
 import UserAddInnovationPage from "./pages/user/innovation/UserAddInnovationPage";
 import UserSubmitInnovation from "./pages/admin/innovation/UserSubmitInnovation";
+import BlogGuidLinePage from "./components/admin/blog/BlogGuidLinePage";
+import UserViewSubmittedBlog from "./pages/user/blog page/UserViewSubmittedBlog";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -299,6 +301,7 @@ function App() {
             <Route path="/about" element={<UserProfilePage />} />
             <Route path="/blog" element={<UserBlogPage />} />
             <Route path="/submit-blog" element={<UserSubmitBlogPage />} />
+            <Route path="/view-submit-blog" element={<UserViewSubmittedBlog />} />
 
             <Route path="/blog/:id" element={<BlogDetails />} />
             <Route path="/cms/:slug" element={<CmsTemplate />} />
@@ -414,6 +417,7 @@ function App() {
               <Route path="/blog/add" element={<AddBlog />} />
               <Route path="/blog/view" element={<ViewBlog />} />
               <Route path="/user-submitted-blog" element={<UserSubmittedBlogVew />} />
+              <Route path="/blog/guid-line" element={<BlogGuidLinePage />} />
               <Route path="/blog/view/:id" element={<UpdateBlog />} />
               <Route path="/blog/categories" element={<BlogCategories />} />
               <Route

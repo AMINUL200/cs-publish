@@ -203,6 +203,11 @@ export const sidebarRoutes = [
         allowedRoles: [0],
       },
       {
+        path: "/blog/guid-line",
+        title: "Guid Line",
+        allowedRoles: [0],
+      },
+      {
         path: "/blog/categories",
         title: "Blog Categories",
         allowedRoles: [0],

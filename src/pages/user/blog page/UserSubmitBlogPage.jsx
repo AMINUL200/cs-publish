@@ -4,12 +4,15 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import { Editor } from "@tinymce/tinymce-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
 const UserSubmitBlogPage = () => {
-  const { token } = useSelector((state) => state.auth);
+  const { token, userData } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const updateId = searchParams.get("update");
+
   const [formData, setFormData] = useState({
     blog_category_id: "",
     title: "",
@@ -24,11 +27,18 @@ const UserSubmitBlogPage = () => {
   });
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [pdfFileName, setPdfFileName] = useState("");
   const [errors, setErrors] = useState({});
   const [submissionSuccess, setSubmissionSuccess] = useState(false);
+  const [examplePdf, setExamplePdf] = useState(null);
+  const [examplePdfLoading, setExamplePdfLoading] = useState(false);
+  const [existingImage, setExistingImage] = useState(null);
+  const [existingPdf, setExistingPdf] = useState(null);
+  
   const API_URL = import.meta.env.VITE_API_URL;
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -36,7 +46,7 @@ const UserSubmitBlogPage = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `${API_URL}api/admin/blog-categories`,
+          `${API_URL}api/user/blogs/categories`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -57,6 +67,98 @@ const UserSubmitBlogPage = () => {
 
     fetchCategories();
   }, [token, API_URL]);
+
+  // Fetch example PDF on component mount
+  useEffect(() => {
+    const fetchExamplePdf = async () => {
+      try {
+        setExamplePdfLoading(true);
+        const response = await axios.get(
+          `${API_URL}api/blog-pdf`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Cache-Control": "no-cache",
+              Pragma: "no-cache",
+            },
+          }
+        );
+
+        if (response.data.status) {
+          setExamplePdf(response.data.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch example PDF:", err);
+      } finally {
+        setExamplePdfLoading(false);
+      }
+    };
+
+    fetchExamplePdf();
+  }, [token, API_URL]);
+
+  // Fetch blog data for update
+  useEffect(() => {
+    if (updateId) {
+      fetchBlogData(updateId);
+    }
+  }, [updateId]);
+
+  const fetchBlogData = async (id) => {
+    try {
+      setFetchLoading(true);
+      const response = await axios.get(
+        `${API_URL}api/user/blogs/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
+        }
+      );
+
+      if (response.data.flag === 1) {
+        const data = response.data.data;
+        
+        // Set form data with existing values
+        setFormData({
+          blog_category_id: data.blog_category_id || "",
+          title: data.title || "",
+          author: data.author || "",
+          description: data.description || "",
+          long_description: data.long_description || "",
+          image: null,
+          image_alt: data.image_alt || "",
+          blog_pdf: null,
+          date: data.date ? data.date.split('T')[0] : "",
+          most_view: data.most_view || 0,
+        });
+
+        // Set existing image preview
+        if (data.image) {
+          setExistingImage(data.image);
+          setImagePreview(`${STORAGE_URL}${data.image}`);
+        }
+
+        // Set existing PDF name
+        if (data.blog_pdf) {
+          setExistingPdf(data.blog_pdf);
+          const pdfName = data.blog_pdf.split('/').pop();
+          setPdfFileName(pdfName);
+        }
+
+        toast.info("Blog data loaded for editing");
+      } else {
+        toast.error(response.data.message || "Failed to load blog data");
+      }
+    } catch (error) {
+      console.error("Error fetching blog data:", error);
+      toast.error(error.response?.data?.message || "Failed to load blog data");
+    } finally {
+      setFetchLoading(false);
+    }
+  };
 
   // Validation function
   const validateField = (name, value) => {
@@ -104,6 +206,7 @@ const UserSubmitBlogPage = () => {
     const file = e.target.files[0];
     
     setErrors(prev => ({ ...prev, image: "" }));
+    setExistingImage(null);
     
     if (file) {
       if (!file.type.startsWith("image/")) {
@@ -172,6 +275,7 @@ const UserSubmitBlogPage = () => {
     const file = e.target.files[0];
     
     setErrors(prev => ({ ...prev, blog_pdf: "" }));
+    setExistingPdf(null);
     
     if (file) {
       if (file.type !== "application/pdf") {
@@ -202,6 +306,7 @@ const UserSubmitBlogPage = () => {
       image_alt: "",
     }));
     setImagePreview(null);
+    setExistingImage(null);
     setErrors(prev => ({ ...prev, image: "" }));
 
     const fileInput = document.querySelector(
@@ -218,6 +323,7 @@ const UserSubmitBlogPage = () => {
       blog_pdf: null,
     }));
     setPdfFileName("");
+    setExistingPdf(null);
     setErrors(prev => ({ ...prev, blog_pdf: "" }));
 
     const fileInput = document.querySelector(
@@ -242,7 +348,8 @@ const UserSubmitBlogPage = () => {
       }
     });
     
-    if (!formData.image) {
+    // Check if image exists (either new upload or existing)
+    if (!formData.image && !existingImage) {
       newErrors.image = "Image is required";
       hasError = true;
     }
@@ -271,28 +378,58 @@ const UserSubmitBlogPage = () => {
       submitData.append("image_alt", formData.image_alt);
       submitData.append("date", formData.date);
       submitData.append("most_view", formData.most_view);
+      submitData.append("created_by", userData?.id);
 
+      // For update, keep status as is
+      if (updateId) {
+        submitData.append("is_update", 0);
+      } else {
+        submitData.append("status", 0);
+      }
+
+      // Handle image - only append if new file is selected
       if (formData.image) {
         submitData.append("image", formData.image);
       }
 
+      // Handle PDF - only append if new file is selected
       if (formData.blog_pdf) {
         submitData.append("blog_pdf", formData.blog_pdf);
       }
 
-      const response = await axios.post(
-        `${API_URL}api/admin/blogs`,
-        submitData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        },
-      );
+      let response;
+      if (updateId) {
+        // Update existing blog
+        response = await axios.post(
+          `${API_URL}api/user/blogs/${updateId}`,
+          submitData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      } else {
+        // Create new blog
+        response = await axios.post(
+          `${API_URL}api/user/blogs`,
+          submitData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      }
 
-      if (response.status === 201) {
-        toast.success("Your blog has been submitted successfully!");
+      if (response.status === 200 || response.status === 201) {
+        toast.success(
+          updateId 
+            ? "Your blog has been updated successfully!" 
+            : "Your blog has been submitted successfully!"
+        );
         setSubmissionSuccess(true);
         
         // Reset form after successful submission
@@ -310,16 +447,20 @@ const UserSubmitBlogPage = () => {
         });
         setImagePreview(null);
         setPdfFileName("");
+        setExistingImage(null);
+        setExistingPdf(null);
         setErrors({});
         
-        // Redirect after 3 seconds
+        // Redirect after short delay
         setTimeout(() => {
-          navigate("/blogs");
-        }, 3000);
+          navigate(updateId ? "/view-submit-blog" : "/blog");
+        }, 1500);
       }
     } catch (err) {
-      const errorMessage = err.response?.data?.message || "Failed to submit blog. Please try again.";
+      const errorMessage = err.response?.data?.message || 
+        (updateId ? "Failed to update blog. Please try again." : "Failed to submit blog. Please try again.");
       toast.error(errorMessage);
+      console.error("Error submitting blog:", err);
     } finally {
       setLoading(false);
     }
@@ -329,15 +470,33 @@ const UserSubmitBlogPage = () => {
     return new Date().toISOString().split("T")[0];
   };
 
+  // Get full PDF URL
+  const getPdfUrl = (pdfPath) => {
+    if (!pdfPath) return null;
+    if (pdfPath.startsWith('http')) return pdfPath;
+    return `${STORAGE_URL}${pdfPath}`;
+  };
+
+  if (fetchLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading blog data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <Breadcrumb
         items={[
           { label: "Home", path: "/", icon: "home" },
           { label: "Research Snapshot", path: "/blog" },
-          { label: "Submit Blog" }
+          { label: updateId ? "Update Blog" : "Submit Blog" }
         ]}
-        pageTitle="Submit Your Research Blog"
+        pageTitle={updateId ? "Update Your Research Blog" : "Submit Your Research Blog"}
       />
       
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8">
@@ -354,7 +513,10 @@ const UserSubmitBlogPage = () => {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-green-800 font-medium">
-                    Your blog has been submitted successfully! You will be redirected shortly.
+                    {updateId 
+                      ? "Your blog has been updated successfully! You will be redirected shortly."
+                      : "Your blog has been submitted successfully! You will be redirected shortly."
+                    }
                   </p>
                 </div>
               </div>
@@ -364,11 +526,22 @@ const UserSubmitBlogPage = () => {
           {/* Header Section */}
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Share Your <span className="text-yellow-600">Research</span>
+              {updateId ? "Update Your" : "Share Your"} <span className="text-yellow-600">Research</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Contribute your research findings, insights, and expertise to our community
+              {updateId 
+                ? "Update your research blog with new findings and insights"
+                : "Contribute your research findings, insights, and expertise to our community"
+              }
             </p>
+            {updateId && (
+              <div className="mt-3 inline-flex items-center px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Editing existing blog
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -430,15 +603,45 @@ const UserSubmitBlogPage = () => {
                     <p>• Image: High-quality infographic or research image</p>
                     <p>• PDF: Full research paper with methodology</p>
                   </div>
-                  <button 
-                    onClick={() => window.open('https://example.com/sample-blog-pdf.pdf', '_blank')}
-                    className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center"
-                  >
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                    </svg>
-                    View Example PDF
-                  </button>
+                  
+                  {examplePdfLoading ? (
+                    <div className="mt-2 flex items-center text-xs text-blue-600">
+                      <svg className="animate-spin w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Loading example PDF...
+                    </div>
+                  ) : examplePdf && examplePdf.pdf ? (
+                    <a
+                      href={getPdfUrl(examplePdf.pdf)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center group"
+                    >
+                      <svg className="w-4 h-4 mr-1 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                      </svg>
+                      View Example PDF
+                      <span className="ml-1 text-xs text-blue-400">(opens in new tab)</span>
+                    </a>
+                  ) : (
+                    <p className="mt-2 text-xs text-gray-500">Example PDF not available</p>
+                  )}
+                </div>
+
+                {/* Quick Stats */}
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-yellow-50 rounded-lg p-2 text-center">
+                      <p className="text-lg font-bold text-yellow-600">50+</p>
+                      <p className="text-xs text-gray-600">Blogs Published</p>
+                    </div>
+                    <div className="bg-blue-50 rounded-lg p-2 text-center">
+                      <p className="text-lg font-bold text-blue-600">30+</p>
+                      <p className="text-xs text-gray-600">Active Authors</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -446,8 +649,15 @@ const UserSubmitBlogPage = () => {
             {/* Main Form */}
             <div className="lg:col-span-3">
               <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Submit Your Blog</h2>
-                <p className="text-gray-600 mb-6">Fill in the details below to submit your research blog</p>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  {updateId ? "Update Your Blog" : "Submit Your Blog"}
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  {updateId 
+                    ? "Make changes to your blog and submit for review again"
+                    : "Fill in the details below to submit your research blog"
+                  }
+                </p>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Category Selection */}
@@ -464,7 +674,7 @@ const UserSubmitBlogPage = () => {
                       className={`mt-1 block w-full pl-3 pr-10 py-3 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm ${
                         errors.blog_category_id ? 'border-red-500' : 'border-gray-300'
                       }`}
-                      disabled={loading}
+                      disabled={loading || fetchLoading}
                     >
                       <option value="">Select a category</option>
                       {categories.map((category) => (
@@ -490,7 +700,7 @@ const UserSubmitBlogPage = () => {
                       value={formData.title}
                       onChange={handleChange}
                       required
-                      disabled={loading}
+                      disabled={loading || fetchLoading}
                       className={`mt-1 block w-full border rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm ${
                         errors.title ? 'border-red-500' : 'border-gray-300'
                       }`}
@@ -513,7 +723,7 @@ const UserSubmitBlogPage = () => {
                       value={formData.author}
                       onChange={handleChange}
                       required
-                      disabled={loading}
+                      disabled={loading || fetchLoading}
                       className={`mt-1 block w-full border rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm ${
                         errors.author ? 'border-red-500' : 'border-gray-300'
                       }`}
@@ -536,7 +746,7 @@ const UserSubmitBlogPage = () => {
                       value={formData.date}
                       onChange={handleChange}
                       required
-                      disabled={loading}
+                      disabled={loading || fetchLoading}
                       max={getTodayDate()}
                       className={`mt-1 block w-full border rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm ${
                         errors.date ? 'border-red-500' : 'border-gray-300'
@@ -553,7 +763,7 @@ const UserSubmitBlogPage = () => {
                       Blog Image <span className="text-red-500">*</span>
                     </label>
 
-                    {!imagePreview && (
+                    {!imagePreview && !existingImage && (
                       <div className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 hover:border-yellow-400 hover:bg-yellow-50 mb-4 ${
                         errors.image ? 'border-red-500' : 'border-gray-300'
                       }`}>
@@ -563,7 +773,7 @@ const UserSubmitBlogPage = () => {
                           onChange={handleImageChange}
                           className="hidden"
                           id="image-upload"
-                          disabled={loading}
+                          disabled={loading || fetchLoading}
                         />
                         <label htmlFor="image-upload" className="cursor-pointer flex flex-col items-center justify-center">
                           <svg className="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -579,19 +789,21 @@ const UserSubmitBlogPage = () => {
                       </div>
                     )}
 
-                    {imagePreview && (
+                    {(imagePreview || existingImage) && (
                       <div className="mb-4">
-                        <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
+                        <p className="text-sm font-medium text-gray-700 mb-2">
+                          {existingImage && !imagePreview ? "Current Image:" : "Preview:"}
+                        </p>
                         <div className="relative inline-block group">
                           <img
-                            src={imagePreview}
+                            src={imagePreview || `${STORAGE_URL}${existingImage}`}
                             alt="Preview"
                             className="h-48 w-full object-cover rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105"
                           />
                           <button
                             type="button"
                             onClick={handleRemoveImage}
-                            disabled={loading}
+                            disabled={loading || fetchLoading}
                             className="absolute -top-2 -right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-all duration-200 shadow-lg disabled:opacity-50"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -599,6 +811,9 @@ const UserSubmitBlogPage = () => {
                             </svg>
                           </button>
                         </div>
+                        {existingImage && !imagePreview && (
+                          <p className="text-xs text-gray-500 mt-1">Remove to upload a new image</p>
+                        )}
                       </div>
                     )}
 
@@ -616,7 +831,7 @@ const UserSubmitBlogPage = () => {
                         name="image_alt"
                         value={formData.image_alt}
                         onChange={handleChange}
-                        disabled={loading}
+                        disabled={loading || fetchLoading}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200"
                         placeholder="Enter descriptive alt text for the image"
                       />
@@ -632,7 +847,7 @@ const UserSubmitBlogPage = () => {
                       Upload a PDF version of your research for detailed reference
                     </p>
 
-                    {!pdfFileName && (
+                    {!pdfFileName && !existingPdf && (
                       <div className={`border-2 border-dashed rounded-xl p-6 text-center transition-all duration-300 hover:border-green-400 hover:bg-green-50 ${
                         errors.blog_pdf ? 'border-red-500' : 'border-gray-300'
                       }`}>
@@ -642,7 +857,7 @@ const UserSubmitBlogPage = () => {
                           onChange={handlePdfChange}
                           className="hidden"
                           id="pdf-upload"
-                          disabled={loading}
+                          disabled={loading || fetchLoading}
                         />
                         <label htmlFor="pdf-upload" className="cursor-pointer flex flex-col items-center justify-center">
                           <svg className="w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -655,7 +870,7 @@ const UserSubmitBlogPage = () => {
                       </div>
                     )}
 
-                    {pdfFileName && (
+                    {(pdfFileName || existingPdf) && (
                       <div className="flex items-center justify-between bg-white border border-gray-300 rounded-lg p-4">
                         <div className="flex items-center space-x-3">
                           <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -663,16 +878,18 @@ const UserSubmitBlogPage = () => {
                           </svg>
                           <div>
                             <p className="text-sm font-medium text-gray-900 truncate max-w-xs">
-                              {pdfFileName}
+                              {pdfFileName || existingPdf?.split('/').pop()}
                             </p>
-                            <p className="text-xs text-gray-500">PDF file selected</p>
+                            <p className="text-xs text-gray-500">
+                              {existingPdf && !pdfFileName ? "Current PDF file" : "PDF file selected"}
+                            </p>
                           </div>
                         </div>
                         <button
                           type="button"
                           onClick={handleRemovePdf}
-                          disabled={loading}
-                          className="text-red-500 hover:text-red-700 transition-colors"
+                          disabled={loading || fetchLoading}
+                          className="text-red-500 hover:text-red-700 transition-colors disabled:opacity-50"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -697,7 +914,7 @@ const UserSubmitBlogPage = () => {
                       value={formData.description}
                       onChange={handleChange}
                       required
-                      disabled={loading}
+                      disabled={loading || fetchLoading}
                       rows="4"
                       className={`mt-1 block w-full border rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm ${
                         errors.description ? 'border-red-500' : 'border-gray-300'
@@ -754,14 +971,14 @@ const UserSubmitBlogPage = () => {
                   <div className="flex flex-col sm:flex-row justify-between items-center pt-6 border-t border-gray-200 gap-4">
                     <button
                       type="button"
-                      onClick={() => navigate("/blog")}
+                      onClick={() => navigate(updateId ? "/my-blogs" : "/blog")}
                       className="text-gray-600 hover:text-gray-800 font-medium transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      disabled={loading}
+                      disabled={loading || fetchLoading}
                       className="inline-flex justify-center items-center py-3 px-8 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
                     >
                       {loading ? (
@@ -770,14 +987,14 @@ const UserSubmitBlogPage = () => {
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
-                          Submitting...
+                          {updateId ? "Updating..." : "Submitting..."}
                         </>
                       ) : (
                         <>
                           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                           </svg>
-                          Submit Blog
+                          {updateId ? "Update Blog" : "Submit Blog"}
                         </>
                       )}
                     </button>

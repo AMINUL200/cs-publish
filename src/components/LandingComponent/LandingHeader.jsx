@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../features/auth/AuthSlice";
 import axios from "axios";
 import { ChevronDown, UserCircle, User, Package, LogOut, Settings, CreditCard } from "lucide-react";
+import { faBlog } from "@fortawesome/free-solid-svg-icons";
 
 const LandingHeader = ({
   toggleMenu,
@@ -96,6 +97,11 @@ const LandingHeader = ({
       icon: Package,
       label: "My Subscription",
       path: "/my-subscription",
+    },
+    {
+      icon: Package,
+      label: "My Blog",
+      path: "/view-submit-blog",
     },
    
   ];

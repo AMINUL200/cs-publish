@@ -13,6 +13,8 @@ import {
   faCheckCircle,
   faTimesCircle,
   faSpinner,
+  faEdit,
+  faTimes as faTimesIcon,
 } from "@fortawesome/free-solid-svg-icons";
 import Loader from "../../common/Loader";
 
@@ -24,9 +26,9 @@ const UserSubmittedBlogVew = () => {
   const [filteredBlogs, setFilteredBlogs] = useState([]);
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
-  const [useDummyData, setUseDummyData] = useState(true); // Toggle for dummy/real data
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -34,175 +36,22 @@ const UserSubmittedBlogVew = () => {
     rejected: 0,
   });
   
+  // Update form state
+  const [updateForm, setUpdateForm] = useState({
+    is_update: "0",
+    comment: "",
+    blogId: null,
+  });
+
   const API_URL = import.meta.env.VITE_API_URL;
   const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
-  // Dummy data for testing
-  const dummyBlogs = [
-    {
-      id: 1,
-      title: "The Future of Artificial Intelligence in Healthcare",
-      author: "Dr. Sarah Johnson",
-      description: "Exploring how AI is revolutionizing medical diagnosis and patient care",
-      long_description: "<p>Artificial Intelligence is transforming healthcare in unprecedented ways. From early disease detection to personalized treatment plans, AI-powered solutions are improving patient outcomes and reducing healthcare costs. This comprehensive study examines the latest developments in AI healthcare applications, including machine learning algorithms for medical imaging, natural language processing for clinical documentation, and predictive analytics for patient monitoring.</p><p>Key findings suggest that AI integration in healthcare could save billions in operational costs while significantly improving diagnostic accuracy. However, challenges remain in data privacy, regulatory compliance, and the need for human oversight in critical medical decisions.</p>",
-      image: "/dummy-images/ai-healthcare.jpg",
-      image_alt: "AI in Healthcare",
-      blog_pdf: "/dummy-pdfs/ai-healthcare.pdf",
-      category: {
-        id: 1,
-        category_name: "Technology"
-      },
-      user: {
-        id: 101,
-        name: "John Doe",
-        email: "john.doe@example.com"
-      },
-      status: "pending",
-      date: "2026-08-15",
-      created_at: "2026-08-10T14:30:00Z",
-      rejection_reason: null,
-      most_view: 0
-    },
-    {
-      id: 2,
-      title: "Sustainable Agriculture Practices for the 21st Century",
-      author: "Prof. Michael Green",
-      description: "Innovative farming techniques that promote environmental sustainability",
-      long_description: "<p>As global population continues to grow, sustainable agriculture has become more critical than ever. This research explores innovative farming techniques that balance productivity with environmental stewardship. Topics covered include precision agriculture, crop rotation strategies, organic farming methods, and the role of technology in sustainable food production.</p><p>The study demonstrates that sustainable practices can increase crop yields by up to 30% while reducing water usage by 40% and eliminating harmful pesticide use. These findings have significant implications for food security and environmental conservation worldwide.</p>",
-      image: "/dummy-images/sustainable-agriculture.jpg",
-      image_alt: "Sustainable Agriculture",
-      blog_pdf: "/dummy-pdfs/sustainable-agriculture.pdf",
-      category: {
-        id: 2,
-        category_name: "Agriculture"
-      },
-      user: {
-        id: 102,
-        name: "Jane Smith",
-        email: "jane.smith@example.com"
-      },
-      status: "approved",
-      date: "2026-08-12",
-      created_at: "2026-08-05T09:15:00Z",
-      rejection_reason: null,
-      most_view: 156
-    },
-    {
-      id: 3,
-      title: "Climate Change Impacts on Marine Ecosystems",
-      author: "Dr. Emily Watson",
-      description: "Understanding the effects of global warming on ocean life and biodiversity",
-      long_description: "<p>Climate change is profoundly affecting marine ecosystems worldwide. Rising ocean temperatures, ocean acidification, and changing currents are reshaping marine habitats and threatening biodiversity. This comprehensive study analyzes data from 50 marine research stations across five continents to document these changes and predict future trends.</p><p>The research reveals alarming rates of coral bleaching, shifting fish migration patterns, and declining plankton populations that form the base of marine food webs. Urgent action is needed to mitigate these effects and protect ocean ecosystems for future generations.</p>",
-      image: "/dummy-images/marine-ecosystems.jpg",
-      image_alt: "Marine Ecosystems",
-      blog_pdf: "/dummy-pdfs/marine-ecosystems.pdf",
-      category: {
-        id: 3,
-        category_name: "Environment"
-      },
-      user: {
-        id: 103,
-        name: "Robert Chen",
-        email: "robert.chen@example.com"
-      },
-      status: "rejected",
-      date: "2026-08-08",
-      created_at: "2026-08-01T11:45:00Z",
-      rejection_reason: "The research methodology needs more detail. Please provide additional data sources and statistical analysis.",
-      most_view: 0
-    },
-    {
-      id: 4,
-      title: "Blockchain Technology in Supply Chain Management",
-      author: "Dr. Alex Rivera",
-      description: "How blockchain is revolutionizing transparency and efficiency in supply chains",
-      long_description: "<p>Blockchain technology is transforming supply chain management by providing unprecedented transparency, security, and efficiency. This research explores the implementation of blockchain solutions in various industries, from retail to manufacturing, and their impact on operational performance.</p><p>Key benefits identified include enhanced traceability of products, reduced fraud and counterfeiting, streamlined documentation processes, and improved stakeholder trust. Case studies from leading companies demonstrate significant cost savings and operational improvements through blockchain integration.</p>",
-      image: "/dummy-images/blockchain-supplychain.jpg",
-      image_alt: "Blockchain in Supply Chain",
-      blog_pdf: null,
-      category: {
-        id: 4,
-        category_name: "Business"
-      },
-      user: {
-        id: 104,
-        name: "Maria Garcia",
-        email: "maria.garcia@example.com"
-      },
-      status: "pending",
-      date: "2026-08-18",
-      created_at: "2026-08-14T16:20:00Z",
-      rejection_reason: null,
-      most_view: 0
-    },
-    {
-      id: 5,
-      title: "Mental Health in the Digital Age",
-      author: "Dr. Lisa Park",
-      description: "Examining the impact of social media and technology on mental wellbeing",
-      long_description: "<p>The digital age has brought unprecedented connectivity but also new challenges for mental health. This comprehensive study examines the relationship between social media usage, screen time, and mental wellbeing across different age groups.</p><p>Findings indicate that excessive social media use is correlated with increased rates of anxiety and depression, particularly among adolescents and young adults. However, mindful technology use and digital detox strategies show promise in mitigating these negative effects. The research provides practical recommendations for maintaining mental health in an increasingly digital world.</p>",
-      image: "/dummy-images/mental-health.jpg",
-      image_alt: "Mental Health in Digital Age",
-      blog_pdf: "/dummy-pdfs/mental-health.pdf",
-      category: {
-        id: 5,
-        category_name: "Health"
-      },
-      user: {
-        id: 105,
-        name: "David Kim",
-        email: "david.kim@example.com"
-      },
-      status: "pending",
-      date: "2026-08-20",
-      created_at: "2026-08-16T10:00:00Z",
-      rejection_reason: null,
-      most_view: 0
-    },
-    {
-      id: 6,
-      title: "Renewable Energy Innovations for Urban Environments",
-      author: "Prof. Thomas Brown",
-      description: "Sustainable energy solutions for smart cities of the future",
-      long_description: "<p>Urban areas face unique energy challenges that require innovative renewable solutions. This research examines the integration of solar, wind, and other renewable energy sources into urban infrastructure, along with energy storage solutions and smart grid technologies.</p><p>The study presents case studies from leading smart cities worldwide, demonstrating how renewable energy innovations are reducing carbon footprints, lowering energy costs, and improving the quality of urban life. Recommendations are provided for policymakers and urban planners to accelerate the transition to sustainable urban energy systems.</p>",
-      image: "/dummy-images/renewable-energy.jpg",
-      image_alt: "Renewable Energy in Cities",
-      blog_pdf: null,
-      category: {
-        id: 6,
-        category_name: "Energy"
-      },
-      user: {
-        id: 106,
-        name: "Sarah Williams",
-        email: "sarah.williams@example.com"
-      },
-      status: "approved",
-      date: "2026-08-10",
-      created_at: "2026-08-03T13:30:00Z",
-      rejection_reason: null,
-      most_view: 89
-    }
-  ];
-
-  // Fetch submitted blogs (with dummy data fallback)
+  // Fetch submitted blogs
   const fetchSubmittedBlogs = async () => {
     try {
       setLoading(true);
-      
-      // If using dummy data, simulate API delay
-      if (useDummyData) {
-        setTimeout(() => {
-          setSubmittedBlogs(dummyBlogs);
-          setFilteredBlogs(dummyBlogs);
-          updateStats(dummyBlogs);
-          setLoading(false);
-        }, 800);
-        return;
-      }
 
-      // Real API call
-      const response = await axios.get(`${API_URL}api/admin/user-submitted-blogs`, {
+      const response = await axios.get(`${API_URL}api/admin/blogs/user-blog-list`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Cache-Control": "no-cache",
@@ -210,25 +59,17 @@ const UserSubmittedBlogVew = () => {
         },
       });
 
-      if (response.status === 200) {
+      if (response.data.flag === 1) {
         const blogs = response.data.data || [];
         setSubmittedBlogs(blogs);
         setFilteredBlogs(blogs);
         updateStats(blogs);
       } else {
         toast.error(response.data.message || "Failed to fetch submitted blogs");
-        // Fallback to dummy data on API error
-        setSubmittedBlogs(dummyBlogs);
-        setFilteredBlogs(dummyBlogs);
-        updateStats(dummyBlogs);
       }
     } catch (error) {
       console.error("Error fetching submitted blogs:", error);
-      toast.error(error.response?.data?.message || "Failed to fetch submitted blogs. Showing sample data.");
-      // Fallback to dummy data on error
-      setSubmittedBlogs(dummyBlogs);
-      setFilteredBlogs(dummyBlogs);
-      updateStats(dummyBlogs);
+      toast.error(error.response?.data?.message || "Failed to fetch submitted blogs");
     } finally {
       setLoading(false);
     }
@@ -236,15 +77,14 @@ const UserSubmittedBlogVew = () => {
 
   // Update statistics
   const updateStats = (blogs) => {
-    const pending = blogs.filter(b => b.status === 'pending' || !b.status).length;
-    const approved = blogs.filter(b => b.status === 'approved').length;
-    const rejected = blogs.filter(b => b.status === 'rejected').length;
+    const pending = blogs.filter(b => b.status === false || b.status === 0 || b.status === "0").length;
+    const approved = blogs.filter(b => b.status === true || b.status === 1 || b.status === "1").length;
     
     setStats({
       total: blogs.length,
       pending,
       approved,
-      rejected,
+      rejected: 0, // No rejected status in your API
     });
   };
 
@@ -254,9 +94,11 @@ const UserSubmittedBlogVew = () => {
     
     // Apply status filter
     if (statusFilter !== "all") {
-      filtered = filtered.filter(blog => 
-        (blog.status || 'pending') === statusFilter
-      );
+      if (statusFilter === "pending") {
+        filtered = filtered.filter(blog => blog.status === false || blog.status === 0 || blog.status === "0");
+      } else if (statusFilter === "approved") {
+        filtered = filtered.filter(blog => blog.status === true || blog.status === 1 || blog.status === "1");
+      }
     }
     
     // Apply search filter
@@ -265,8 +107,7 @@ const UserSubmittedBlogVew = () => {
       filtered = filtered.filter(blog =>
         blog.title?.toLowerCase().includes(searchLower) ||
         blog.author?.toLowerCase().includes(searchLower) ||
-        blog.user?.name?.toLowerCase().includes(searchLower) ||
-        blog.user?.email?.toLowerCase().includes(searchLower)
+        blog.created_by?.name?.toLowerCase().includes(searchLower)
       );
     }
     
@@ -279,137 +120,116 @@ const UserSubmittedBlogVew = () => {
     setShowModal(true);
   };
 
-  // Handle apply/approve blog
-  const handleApprove = async (blogId) => {
-    if (!window.confirm("Are you sure you want to approve this blog? It will be published on the site.")) {
-      return;
-    }
+  // Handle open update modal
+  const handleOpenUpdate = (blog) => {
+    setUpdateForm({
+      is_update: blog.is_update || "0",
+      comment: blog.comment || "",
+      blogId: blog.id,
+    });
+    setShowUpdateModal(true);
+    setShowModal(false);
+  };
+
+  // Handle update form change
+  const handleUpdateChange = (e) => {
+    const { name, value } = e.target;
+    setUpdateForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Handle update submit
+  const handleUpdateSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!updateForm.blogId) return;
     
     setActionLoading(true);
-    
-    if (useDummyData) {
-      // Simulate API call for dummy data
-      setTimeout(() => {
-        const updatedBlogs = submittedBlogs.map(blog => 
-          blog.id === blogId ? { ...blog, status: 'approved' } : blog
-        );
-        setSubmittedBlogs(updatedBlogs);
-        setFilteredBlogs(updatedBlogs);
-        updateStats(updatedBlogs);
-        toast.success("Blog approved successfully!");
-        setShowModal(false);
-        setActionLoading(false);
-      }, 1500);
-      return;
-    }
-
-    // Real API call
     try {
-      const response = await axios.put(
-        `${API_URL}api/admin/user-submitted-blogs/${blogId}/approve`,
-        {},
+      const response = await axios.post(
+        `${API_URL}api/admin/blogs/comment/${updateForm.blogId}`,
+        {
+          is_update: updateForm.is_update,
+          comment: updateForm.comment,
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
 
-      if (response.status === 200) {
-        toast.success("Blog approved successfully!");
+      if (response.data.flag === 1 || response.status === 200) {
+        toast.success("Blog updated successfully!");
+        setShowUpdateModal(false);
         fetchSubmittedBlogs();
-        setShowModal(false);
       } else {
-        toast.error(response.data.message || "Failed to approve blog");
+        toast.error(response.data.message || "Failed to update blog");
       }
     } catch (error) {
-      console.error("Error approving blog:", error);
-      toast.error(error.response?.data?.message || "Failed to approve blog");
+      console.error("Error updating blog:", error);
+      toast.error(error.response?.data?.message || "Failed to update blog");
     } finally {
       setActionLoading(false);
     }
   };
 
-  // Handle reject blog
-  const handleReject = async (blogId) => {
-    const reason = window.prompt("Please enter a reason for rejection (optional):");
+  // Handle approve/reject blog (status toggle)
+  const handleStatusToggle = async (blogId, currentStatus) => {
+    const newStatus = !currentStatus;
+    const action = newStatus ? "approve" : "reject";
     
-    setActionLoading(true);
-
-    if (useDummyData) {
-      // Simulate API call for dummy data
-      setTimeout(() => {
-        const updatedBlogs = submittedBlogs.map(blog => 
-          blog.id === blogId ? { 
-            ...blog, 
-            status: 'rejected', 
-            rejection_reason: reason || "Not meeting quality standards" 
-          } : blog
-        );
-        setSubmittedBlogs(updatedBlogs);
-        setFilteredBlogs(updatedBlogs);
-        updateStats(updatedBlogs);
-        toast.success("Blog rejected successfully!");
-        setShowModal(false);
-        setActionLoading(false);
-      }, 1500);
+    if (!window.confirm(`Are you sure you want to ${action} this blog?`)) {
       return;
     }
-
-    // Real API call
+    
+    setActionLoading(true);
     try {
-      const response = await axios.put(
-        `${API_URL}api/admin/user-submitted-blogs/${blogId}/reject`,
-        { reason: reason || "Not meeting quality standards" },
+      const response = await axios.post(
+        `${API_URL}api/admin/blogs/status/${blogId}`,
+        { status: newStatus },
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
 
-      if (response.status === 200) {
-        toast.success("Blog rejected successfully!");
+      if (response.data.status === true || response.status === 200) {
+        toast.success(`Blog ${action}d successfully!`);
         fetchSubmittedBlogs();
         setShowModal(false);
       } else {
-        toast.error(response.data.message || "Failed to reject blog");
+        toast.error(response.data.message || `Failed to ${action} blog`);
       }
     } catch (error) {
-      console.error("Error rejecting blog:", error);
-      toast.error(error.response?.data?.message || "Failed to reject blog");
+      console.error(`Error ${action}ing blog:`, error);
+      toast.error(error.response?.data?.message || `Failed to ${action} blog`);
     } finally {
       setActionLoading(false);
     }
-  };
-
-  // Handle update blog (redirect to edit page)
-  const handleUpdate = (blogId) => {
-    // For dummy data, show a toast
-    if (useDummyData) {
-      toast.info("Update functionality will be available with real API integration");
-      return;
-    }
-    window.location.href = `/blog/edit/${blogId}`;
   };
 
   // Get status badge
   const getStatusBadge = (status) => {
-    const statusMap = {
-      pending: { color: 'bg-yellow-100 text-yellow-800', icon: faClock, label: 'Pending' },
-      approved: { color: 'bg-green-100 text-green-800', icon: faCheckCircle, label: 'Approved' },
-      rejected: { color: 'bg-red-100 text-red-800', icon: faTimesCircle, label: 'Rejected' },
-    };
+    const isActive = status === true || status === 1 || status === "1";
     
-    const currentStatus = status || 'pending';
-    const config = statusMap[currentStatus] || statusMap.pending;
-    
-    return (
-      <span className={`px-3 py-1 inline-flex items-center text-xs font-semibold rounded-full ${config.color}`}>
-        <FontAwesomeIcon icon={config.icon} className="mr-1" />
-        {config.label}
-      </span>
-    );
+    if (isActive) {
+      return (
+        <span className="px-3 py-1 inline-flex items-center text-xs font-semibold rounded-full bg-green-100 text-green-800">
+          <FontAwesomeIcon icon={faCheckCircle} className="mr-1" />
+          Approved
+        </span>
+      );
+    } else {
+      return (
+        <span className="px-3 py-1 inline-flex items-center text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+          <FontAwesomeIcon icon={faClock} className="mr-1" />
+          Pending
+        </span>
+      );
+    }
   };
 
   // Format date
@@ -423,13 +243,6 @@ const UserSubmittedBlogVew = () => {
       hour: '2-digit',
       minute: '2-digit',
     });
-  };
-
-  // Toggle between dummy and real data
-  const toggleDataMode = () => {
-    setUseDummyData(!useDummyData);
-    fetchSubmittedBlogs();
-    toast.info(`Switched to ${!useDummyData ? 'dummy' : 'real'} data mode`);
   };
 
   useEffect(() => {
@@ -447,22 +260,11 @@ const UserSubmittedBlogVew = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-800">User Submitted Blogs</h1>
           <p className="text-sm text-gray-500 mt-1">Review and manage blogs submitted by users</p>
-          <div className="mt-1">
-            <span className={`text-xs font-medium px-2 py-1 rounded ${useDummyData ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
-              {useDummyData ? '📊 Using Sample Data' : '🔗 Connected to API'}
-            </span>
-          </div>
         </div>
-        <button
-          onClick={toggleDataMode}
-          className="mt-2 sm:mt-0 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-medium transition-colors"
-        >
-          Switch to {useDummyData ? 'Real' : 'Sample'} Data
-        </button>
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
           <div className="flex items-center justify-between">
             <div>
@@ -495,18 +297,6 @@ const UserSubmittedBlogVew = () => {
             </div>
             <div className="bg-green-100 p-3 rounded-full">
               <FontAwesomeIcon icon={faCheckCircle} className="text-green-600" />
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-red-50 rounded-lg p-4 border border-red-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-red-600 font-medium">Rejected</p>
-              <p className="text-2xl font-bold text-red-900">{stats.rejected}</p>
-            </div>
-            <div className="bg-red-100 p-3 rounded-full">
-              <FontAwesomeIcon icon={faTimesCircle} className="text-red-600" />
             </div>
           </div>
         </div>
@@ -544,16 +334,6 @@ const UserSubmittedBlogVew = () => {
             }`}
           >
             Approved
-          </button>
-          <button
-            onClick={() => setStatusFilter("rejected")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              statusFilter === "rejected"
-                ? "bg-red-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            Rejected
           </button>
         </div>
 
@@ -619,8 +399,7 @@ const UserSubmittedBlogVew = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
                     <div>
-                      <div className="font-medium">{blog.user?.name || 'Unknown'}</div>
-                      <div className="text-xs text-gray-400">{blog.user?.email || ''}</div>
+                      <div className="font-medium">{blog.created_by?.name || 'Unknown'}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
@@ -630,12 +409,12 @@ const UserSubmittedBlogVew = () => {
                     {getStatusBadge(blog.status)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                    {formatDate(blog.created_at || blog.date)}
+                    {formatDate(blog.created_at)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
                     <button
                       onClick={() => handleViewDetails(blog)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition-colors duration-300"
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition-colors duration-300 mr-2"
                     >
                       <FontAwesomeIcon icon={faEye} className="mr-1" />
                       View
@@ -676,6 +455,11 @@ const UserSubmittedBlogVew = () => {
                 <div className="flex items-center gap-3 mt-1">
                   <span className="text-sm text-gray-500">Status:</span>
                   {getStatusBadge(selectedBlog.status)}
+                  {selectedBlog.is_update === "1" && (
+                    <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                      Needs Update
+                    </span>
+                  )}
                 </div>
               </div>
               <button
@@ -725,8 +509,7 @@ const UserSubmittedBlogVew = () => {
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-gray-500 uppercase">Submitted By</label>
-                  <p className="text-gray-900">{selectedBlog.user?.name || 'Unknown'}</p>
-                  <p className="text-sm text-gray-500">{selectedBlog.user?.email || ''}</p>
+                  <p className="text-gray-900">{selectedBlog.created_by?.name || 'Unknown'}</p>
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-gray-500 uppercase">Publication Date</label>
@@ -736,6 +519,18 @@ const UserSubmittedBlogVew = () => {
                   <label className="text-xs font-semibold text-gray-500 uppercase">Submitted Date</label>
                   <p className="text-gray-900">{formatDate(selectedBlog.created_at)}</p>
                 </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase">Needs Update</label>
+                  <p className="text-gray-900">{selectedBlog.is_update === "1" ? "Yes" : "No"}</p>
+                </div>
+                {selectedBlog.comment && (
+                  <div className="md:col-span-2">
+                    <label className="text-xs font-semibold text-gray-500 uppercase">Admin Comment</label>
+                    <p className="text-gray-700 mt-1 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                      {selectedBlog.comment}
+                    </p>
+                  </div>
+                )}
                 {selectedBlog.blog_pdf && (
                   <div className="md:col-span-2">
                     <label className="text-xs font-semibold text-gray-500 uppercase">PDF Attachment</label>
@@ -757,25 +552,37 @@ const UserSubmittedBlogVew = () => {
               </div>
 
               {/* Description */}
-              <div className="mb-4">
-                <label className="text-xs font-semibold text-gray-500 uppercase">Short Description</label>
-                <p className="text-gray-700 mt-1">{selectedBlog.description || 'No description provided'}</p>
-              </div>
+              {selectedBlog.description && (
+                <div className="mb-4">
+                  <label className="text-xs font-semibold text-gray-500 uppercase">Short Description</label>
+                  <p className="text-gray-700 mt-1">{selectedBlog.description}</p>
+                </div>
+              )}
 
               {/* Long Description */}
-              <div className="mb-4">
-                <label className="text-xs font-semibold text-gray-500 uppercase">Detailed Content</label>
-                <div 
-                  className="text-gray-700 mt-1 prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{ __html: selectedBlog.long_description || 'No content provided' }}
-                />
-              </div>
+              {selectedBlog.long_description && (
+                <div className="mb-4">
+                  <label className="text-xs font-semibold text-gray-500 uppercase">Detailed Content</label>
+                  <div 
+                    className="text-gray-700 mt-1 prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{ __html: selectedBlog.long_description }}
+                  />
+                </div>
+              )}
 
               {/* Action Buttons */}
-              {(selectedBlog.status === 'pending' || !selectedBlog.status) && (
-                <div className="border-t border-gray-200 pt-4 mt-4 flex flex-wrap gap-3">
+              <div className="border-t border-gray-200 pt-4 mt-4 flex flex-wrap gap-3">
+                <button
+                  onClick={() => handleOpenUpdate(selectedBlog)}
+                  className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-300 flex items-center"
+                >
+                  <FontAwesomeIcon icon={faEdit} className="mr-2" />
+                  Update
+                </button>
+                
+                {selectedBlog.status === false || selectedBlog.status === 0 || selectedBlog.status === "0" ? (
                   <button
-                    onClick={() => handleApprove(selectedBlog.id)}
+                    onClick={() => handleStatusToggle(selectedBlog.id, selectedBlog.status)}
                     disabled={actionLoading}
                     className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-300 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -784,47 +591,108 @@ const UserSubmittedBlogVew = () => {
                     ) : (
                       <FontAwesomeIcon icon={faCheck} className="mr-2" />
                     )}
-                    Apply / Approve
+                    Approve
                   </button>
+                ) : (
                   <button
-                    onClick={() => handleReject(selectedBlog.id)}
+                    onClick={() => handleStatusToggle(selectedBlog.id, selectedBlog.status)}
                     disabled={actionLoading}
                     className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-300 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <FontAwesomeIcon icon={faTimes} className="mr-2" />
+                    {actionLoading ? (
+                      <FontAwesomeIcon icon={faSpinner} className="animate-spin mr-2" />
+                    ) : (
+                      <FontAwesomeIcon icon={faTimes} className="mr-2" />
+                    )}
                     Reject
                   </button>
-                  <button
-                    onClick={() => handleUpdate(selectedBlog.id)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-300 flex items-center"
-                  >
-                    <FontAwesomeIcon icon={faEye} className="mr-2" />
-                    Update
-                  </button>
-                </div>
-              )}
-
-              {selectedBlog.status === 'approved' && (
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <button
-                    onClick={() => handleUpdate(selectedBlog.id)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-300"
-                  >
-                    Update Blog
-                  </button>
-                </div>
-              )}
-
-              {selectedBlog.status === 'rejected' && (
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <p className="text-sm text-gray-600">
-                      <span className="font-semibold">Rejection Reason:</span> {selectedBlog.rejection_reason || 'No reason provided'}
-                    </p>
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Update Modal */}
+      {showUpdateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-4 rounded-t-xl flex justify-between items-center">
+              <h3 className="text-xl font-bold text-white">Update Blog</h3>
+              <button
+                onClick={() => setShowUpdateModal(false)}
+                className="text-white hover:text-gray-200 transition-colors"
+              >
+                <FontAwesomeIcon icon={faTimesIcon} className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <form onSubmit={handleUpdateSubmit} className="p-6">
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Needs Update
+                </label>
+                <select
+                  name="is_update"
+                  value={updateForm.is_update}
+                  onChange={handleUpdateChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                >
+                  <option value="0">No</option>
+                  <option value="1">Yes - Needs Update</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Select "Yes" if the author needs to make changes to their blog
+                </p>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Comment / Feedback
+                </label>
+                <textarea
+                  name="comment"
+                  value={updateForm.comment}
+                  onChange={handleUpdateChange}
+                  rows="4"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-vertical"
+                  placeholder="Enter feedback or instructions for the author..."
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Provide detailed feedback to help the author improve their blog
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={() => setShowUpdateModal(false)}
+                  className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={actionLoading}
+                  className="px-6 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors duration-300 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {actionLoading ? (
+                    <>
+                      <FontAwesomeIcon icon={faSpinner} className="animate-spin mr-2" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <FontAwesomeIcon icon={faCheck} className="mr-2" />
+                      Save Changes
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

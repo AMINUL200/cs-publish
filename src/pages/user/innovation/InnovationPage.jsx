@@ -284,94 +284,9 @@ const InnovationPage = () => {
         pageTitle="Research And Innovation"
       />
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-red-50">
-        {/* Hero Section with Submit Button */}
-        <div className="bg-gradient-to-r from-amber-600 via-red-800 to-black py-12">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-              <div className="text-center lg:text-left flex-1">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
-                  Discover{" "}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-200">
-                    Innovation
-                  </span>
-                </h1>
-                <h5 className="text-lg md:text-xl text-amber-100 max-w-2xl mx-auto lg:mx-0">
-                  Explore cutting-edge technologies and breakthrough innovations
-                  shaping our future
-                </h5>
-              </div>
-              
-              {/* Submit Innovation Button */}
-              <div className="flex-shrink-0">
-                <button
-                  onClick={handleSubmitInnovation}
-                  className="group relative bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-gray-900 font-bold py-4 px-8 rounded-2xl shadow-2xl hover:shadow-yellow-500/50 transition-all duration-300 flex items-center gap-3 transform hover:scale-105"
-                >
-                  <div className="absolute -inset-1 bg-gradient-to-r from-yellow-300 to-amber-600 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-300"></div>
-                  <div className="relative flex items-center gap-3">
-                    <FontAwesomeIcon icon={faPlus} className="w-5 h-5" />
-                    <span>Submit Innovation</span>
-                    <FontAwesomeIcon icon={faRocket} className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </button>
-                <p className="text-amber-200 text-sm text-center mt-2 flex items-center justify-center gap-1">
-                  <FontAwesomeIcon icon={faLightbulb} className="w-3 h-3" />
-                  Share your breakthrough ideas with the world
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+       
 
-        {/* Info Cards Section */}
-        <div className="container mx-auto px-4 -mt-8 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white rounded-xl shadow-lg p-4 hover:shadow-xl transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className="bg-amber-100 p-3 rounded-lg">
-                  <FontAwesomeIcon icon={faLightbulb} className="w-5 h-5 text-amber-600" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-gray-900">Share Ideas</h4>
-                  <p className="text-xs text-gray-500">Submit your innovations</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white rounded-xl shadow-lg p-4 hover:shadow-xl transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className="bg-blue-100 p-3 rounded-lg">
-                  <FontAwesomeIcon icon={faRocket} className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-gray-900">Get Noticed</h4>
-                  <p className="text-xs text-gray-500">Global recognition</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white rounded-xl shadow-lg p-4 hover:shadow-xl transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className="bg-green-100 p-3 rounded-lg">
-                  <FontAwesomeIcon icon={faFileAlt} className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-gray-900">Easy Process</h4>
-                  <p className="text-xs text-gray-500">Simple submission</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white rounded-xl shadow-lg p-4 hover:shadow-xl transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className="bg-purple-100 p-3 rounded-lg">
-                  <FontAwesomeIcon icon={faClock} className="w-5 h-5 text-purple-600" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-gray-900">Quick Review</h4>
-                  <p className="text-xs text-gray-500">Fast approval process</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      
 
         {/* Recent Innovations Section */}
         <section className="py-16 innovation-section">

@@ -370,11 +370,11 @@ export const sidebarRoutes = [
         title: "List of Innovation",
         allowedRoles: [0],
       },
-      {
-        path: "/user-submit-innovation",
-        title: "User Submit ",
-        allowedRoles: [0],
-      },
+      // {
+      //   path: "/user-submit-innovation",
+      //   title: "User Submit ",
+      //   allowedRoles: [0],
+      // },
     ],
   },
   {

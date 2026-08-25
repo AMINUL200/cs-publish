@@ -171,6 +171,7 @@ import UserAddInnovationPage from "./pages/user/innovation/UserAddInnovationPage
 import UserSubmitInnovation from "./pages/admin/innovation/UserSubmitInnovation";
 import BlogGuidLinePage from "./components/admin/blog/BlogGuidLinePage";
 import UserViewSubmittedBlog from "./pages/user/blog page/UserViewSubmittedBlog";
+import SubmitMentorPage from "./pages/user/mentor hub/SubmitMentorpage";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -322,6 +323,8 @@ function App() {
 
             {/* Mentors route */}
             <Route path="/mentors" element={<MentorsHubPage />} />
+            <Route path="/submit-mentor" element={<SubmitMentorPage />} />
+
             <Route path="/mentors/:id" element={<MentorHubDetails />} />
 
             {/* Research Services */}

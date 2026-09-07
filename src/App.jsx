@@ -67,8 +67,8 @@ import BookStorePage from "./pages/user/books page/BookStorePage";
 import BookDetailsPage from "./pages/user/books page/BookDetailsPage";
 import BookCartPage from "./pages/user/books page/BookCartPage";
 import BookCheckoutPage from "./pages/user/books page/BookCheckoutPage";
-import MentorsHubPage from "./pages/user/mentor hub/MentorsHubPage";
-import MentorHubDetails from "./pages/user/mentor hub/MentorHubDetails";
+import MentorsHubPage from "./pages/user/mentor_hub/MentorsHubPage";
+import MentorHubDetails from "./pages/user/mentor_hub/MentorHubDetails";
 import ResearchAndServicePage from "./pages/user/research service/ResearchAndServicePage";
 import ResearchAndServicePageDetail from "./pages/user/research service/ResearchAndServicePageDetail";
 import AuthorViewSubmitManuscriptDetail from "./pages/user/view submitted manuscript/AuthorViewSubmitManuscriptDetail";
@@ -171,7 +171,7 @@ import UserAddInnovationPage from "./pages/user/innovation/UserAddInnovationPage
 import UserSubmitInnovation from "./pages/admin/innovation/UserSubmitInnovation";
 import BlogGuidLinePage from "./components/admin/blog/BlogGuidLinePage";
 import UserViewSubmittedBlog from "./pages/user/blog page/UserViewSubmittedBlog";
-import SubmitMentorPage from "./pages/user/mentor hub/SubmitMentorpage";
+import SubmitMentorPage from "./pages/user/mentor_hub/SubmitMentorpage";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);

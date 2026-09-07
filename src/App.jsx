@@ -171,7 +171,7 @@ import UserAddInnovationPage from "./pages/user/innovation/UserAddInnovationPage
 import UserSubmitInnovation from "./pages/admin/innovation/UserSubmitInnovation";
 import BlogGuidLinePage from "./components/admin/blog/BlogGuidLinePage";
 import UserViewSubmittedBlog from "./pages/user/blog page/UserViewSubmittedBlog";
-import SubmitMentorPage from "./pages/user/mentor_hub/SubmitMentorpage";
+import SubmitMentorPage from "./pages/user/mentor_hub/SubmitMentorPage";
  
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);

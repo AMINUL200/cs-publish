@@ -409,6 +409,16 @@ export const sidebarRoutes = [
         title: "Mentor Hub",
         allowedRoles: [0],
       },
+      {
+        path: "/handle-mentor-guidelines",
+        title: "Mentor Guidelines",
+        allowedRoles: [0],
+      },
+      {
+        path: "/view-submitted-mentors",
+        title: "View Submitted Mentors",
+        allowedRoles: [0],
+      },
     ],
   },
   {

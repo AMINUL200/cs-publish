@@ -16,6 +16,8 @@ import {
   Youtube,
   Image as ImageIcon,
   Video,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -40,6 +42,7 @@ const AddMentor = () => {
     event_desc: "",
     event_email: "",
     is_upcomming: "0",
+    is_active: "1", // ✅ ADDED: Default active
     media_type: "image",
     youtube_url: "",
     slug: "",
@@ -65,6 +68,78 @@ const AddMentor = () => {
   const [currentYoutubeUrl, setCurrentYoutubeUrl] = useState("");
   const [pdfFile, setPdfFile] = useState(null);
   const [pptFile, setPptFile] = useState(null);
+
+  // ==========================================
+  // NORMALIZE LINKS - Handles all formats
+  // ==========================================
+  const normalizeLinks = (rawData) => {
+    if (!rawData) return [{ key: "", value: "" }];
+
+    let data = rawData;
+
+    // If it's a string, parse it
+    if (typeof data === "string") {
+      try {
+        data = JSON.parse(data);
+      } catch (e) {
+        console.error("Error parsing links string:", e);
+        return [{ key: "", value: "" }];
+      }
+    }
+
+    // If it's not an array, wrap it
+    if (!Array.isArray(data)) {
+      data = [data];
+    }
+
+    const result = [];
+
+    data.forEach((item) => {
+      if (!item) return;
+
+      // If item is a string, try to parse it
+      if (typeof item === "string") {
+        try {
+          const parsed = JSON.parse(item);
+          if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+            if (parsed.key !== undefined && parsed.value !== undefined) {
+              result.push({
+                key: String(parsed.key || ""),
+                value: String(parsed.value || ""),
+              });
+            } else {
+              Object.entries(parsed).forEach(([key, value]) => {
+                result.push({ key, value: String(value || "") });
+              });
+            }
+          }
+        } catch (e) {
+          console.error("Error parsing link item:", e);
+        }
+        return;
+      }
+
+      // If item is an object with key/value properties
+      if (typeof item === "object") {
+        if (item.key !== undefined && item.value !== undefined) {
+          result.push({
+            key: String(item.key || ""),
+            value: String(item.value || ""),
+          });
+        } else {
+          Object.entries(item).forEach(([key, value]) => {
+            result.push({ key, value: String(value || "") });
+          });
+        }
+      }
+    });
+
+    const nonEmpty = result.filter(
+      (link) => link.key.trim() !== "" || link.value.trim() !== ""
+    );
+
+    return nonEmpty.length > 0 ? nonEmpty : [{ key: "", value: "" }];
+  };
 
   // Check if edit mode
   useEffect(() => {
@@ -128,114 +203,18 @@ const AddMentor = () => {
           event_name: mentor.event_name || "",
           event_desc: mentor.event_desc || "",
           event_email: mentor.event_email || "",
-          is_upcomming: mentor.is_upcomming || "0",
+          is_upcomming: mentor.is_upcomming?.toString() || "0",
+          is_active: mentor.is_active?.toString() || "0", // ✅ ADDED
           media_type: mediaType,
           youtube_url: mediaType === "youtube" ? mentor.image_video || "" : "",
           slug: mentor.slug || "",
         });
 
-        // ==========================================
-        // HANDLE SHARE LINKS - Handle double-encoded data
-        // ==========================================
-        let shareLinksData = mentor.share_links;
-        const parsedShareLinks = [];
+        // Handle share links
+        setShareLinks(normalizeLinks(mentor.share_links));
 
-        if (Array.isArray(shareLinksData) && shareLinksData.length > 0) {
-          shareLinksData.forEach((item) => {
-            try {
-              let parsed = item;
-
-              // If it's a string, parse it
-              if (typeof parsed === "string") {
-                parsed = JSON.parse(parsed);
-              }
-
-              // If it's an array, parse each item
-              if (Array.isArray(parsed)) {
-                parsed.forEach((innerItem) => {
-                  if (typeof innerItem === "string") {
-                    try {
-                      const obj = JSON.parse(innerItem);
-                      if (typeof obj === "object" && !Array.isArray(obj)) {
-                        Object.entries(obj).forEach(([key, value]) => {
-                          parsedShareLinks.push({ key, value });
-                        });
-                      }
-                    } catch (e) {
-                      console.error("Error parsing inner share link:", e);
-                    }
-                  }
-                });
-              } else if (typeof parsed === "object" && !Array.isArray(parsed)) {
-                // If it's a direct object
-                Object.entries(parsed).forEach(([key, value]) => {
-                  parsedShareLinks.push({ key, value });
-                });
-              }
-            } catch (e) {
-              console.error("Error parsing share link:", e);
-            }
-          });
-        }
-
-        if (parsedShareLinks.length > 0) {
-          setShareLinks(parsedShareLinks);
-        } else {
-          setShareLinks([{ key: "", value: "" }]);
-        }
-
-        // ==========================================
-        // HANDLE EVENT SOCIAL LINKS - Handle double-encoded data
-        // ==========================================
-        let eventSocialLinksData = mentor.event_social_links;
-        const parsedEventLinks = [];
-
-        if (
-          Array.isArray(eventSocialLinksData) &&
-          eventSocialLinksData.length > 0
-        ) {
-          eventSocialLinksData.forEach((item) => {
-            try {
-              let parsed = item;
-
-              // If it's a string, parse it
-              if (typeof parsed === "string") {
-                parsed = JSON.parse(parsed);
-              }
-
-              // If it's an array, parse each item
-              if (Array.isArray(parsed)) {
-                parsed.forEach((innerItem) => {
-                  if (typeof innerItem === "string") {
-                    try {
-                      const obj = JSON.parse(innerItem);
-                      if (typeof obj === "object" && !Array.isArray(obj)) {
-                        Object.entries(obj).forEach(([key, value]) => {
-                          parsedEventLinks.push({ key, value });
-                        });
-                      }
-                    } catch (e) {
-                      console.error("Error parsing inner event link:", e);
-                    }
-                  }
-                });
-              } else if (typeof parsed === "object" && !Array.isArray(parsed)) {
-                // If it's a direct object
-                Object.entries(parsed).forEach(([key, value]) => {
-                  parsedEventLinks.push({ key, value });
-                });
-              }
-            } catch (e) {
-              console.error("Error parsing event social link:", e);
-            }
-          });
-        }
-
-        if (parsedEventLinks.length > 0) {
-          setEventSocialLinks(parsedEventLinks);
-        } else {
-          setEventSocialLinks([{ key: "", value: "" }]);
-        }
+        // Handle event social links
+        setEventSocialLinks(normalizeLinks(mentor.event_social_links));
       }
     } catch (error) {
       console.error("Error fetching mentor data:", error);
@@ -263,7 +242,6 @@ const AddMentor = () => {
 
     if (file) {
       if (name === "image_video") {
-        // Check if file is image or video
         if (
           !file.type.startsWith("image/") &&
           !file.type.startsWith("video/")
@@ -432,7 +410,7 @@ const AddMentor = () => {
     // Basic validation
     if (!formData.catagory || !formData.title || !formData.event_name) {
       toast.error(
-        "Please fill in required fields: Category, Title, and Event Name",
+        "Please fill in required fields: Category, Title, and Event Name"
       );
       return;
     }
@@ -469,10 +447,22 @@ const AddMentor = () => {
       // Add media_type
       submitData.append("media_type", formData.media_type);
 
+      // ✅ ADDED: Add is_active explicitly (ensures it's always sent)
+      submitData.append("is_active", formData.is_active);
+
+      // Add is_upcomming explicitly
+      submitData.append("is_upcomming", formData.is_upcomming);
+
       // Normal fields
       Object.keys(formData).forEach((key) => {
         // Skip these keys as they're handled separately
-        if (key === "slug" || key === "media_type") return;
+        if (
+          key === "slug" ||
+          key === "media_type" ||
+          key === "is_active" ||
+          key === "is_upcomming"
+        )
+          return;
 
         // Handle files
         if (key === "image_video" || key === "pdf" || key === "ppt") {
@@ -500,11 +490,31 @@ const AddMentor = () => {
       });
 
       // ==========================================
-      // SHARE LINKS - Format for backend
+      // SHARE LINKS - Filter empty rows and send as JSON
       // ==========================================
-      submitData.append("share_links", JSON.stringify(shareLinks));
+      const validShareLinks = shareLinks
+        .filter((link) => link.key?.trim() && link.value?.trim())
+        .map((link) => ({
+          key: link.key.trim(),
+          value: link.value.trim(),
+        }));
 
-      submitData.append("event_social_links", JSON.stringify(eventSocialLinks));
+      submitData.append("share_links", JSON.stringify(validShareLinks));
+
+      // ==========================================
+      // EVENT SOCIAL LINKS - Filter empty rows and send as JSON
+      // ==========================================
+      const validEventSocialLinks = eventSocialLinks
+        .filter((link) => link.key?.trim() && link.value?.trim())
+        .map((link) => ({
+          key: link.key.trim(),
+          value: link.value.trim(),
+        }));
+
+      submitData.append(
+        "event_social_links",
+        JSON.stringify(validEventSocialLinks)
+      );
 
       // Debug log
       console.log("========== FORM DATA ==========");
@@ -526,7 +536,7 @@ const AddMentor = () => {
 
       if (response.data.status) {
         toast.success(
-          `Mentor event ${isEdit ? "updated" : "created"} successfully!`,
+          `Mentor event ${isEdit ? "updated" : "created"} successfully!`
         );
         navigate("/handle-mentor-hub");
       } else {
@@ -540,7 +550,7 @@ const AddMentor = () => {
         error.response?.data?.errors?.slug
       ) {
         toast.error(
-          "A event with this title already exists. Please use a different title.",
+          "An event with this title already exists. Please use a different title."
         );
       } else if (error.response?.data?.errors) {
         const errors = error.response.data.errors;
@@ -552,7 +562,7 @@ const AddMentor = () => {
       } else {
         toast.error(
           error.response?.data?.message ||
-            `Failed to ${isEdit ? "update" : "create"} mentor event`,
+            `Failed to ${isEdit ? "update" : "create"} mentor event`
         );
       }
     } finally {
@@ -984,9 +994,7 @@ const AddMentor = () => {
                 <span>Social Links</span>
               </h2>
 
-              {/* ========================================== */}
               {/* SHARE LINKS */}
-              {/* ========================================== */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Share Links (Key-Value Pairs)
@@ -1031,9 +1039,7 @@ const AddMentor = () => {
                 </button>
               </div>
 
-              {/* ========================================== */}
               {/* EVENT SOCIAL LINKS */}
-              {/* ========================================== */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Event Social Links (Key-Value Pairs)
@@ -1048,7 +1054,7 @@ const AddMentor = () => {
                         handleEventSocialLinkChange(
                           index,
                           "key",
-                          e.target.value,
+                          e.target.value
                         )
                       }
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
@@ -1061,7 +1067,7 @@ const AddMentor = () => {
                         handleEventSocialLinkChange(
                           index,
                           "value",
-                          e.target.value,
+                          e.target.value
                         )
                       }
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
@@ -1094,21 +1100,72 @@ const AddMentor = () => {
                 <span>Event Settings</span>
               </h2>
 
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  name="is_upcomming"
-                  id="is_upcomming"
-                  checked={formData.is_upcomming === "1"}
-                  onChange={handleInputChange}
-                  className="w-4 h-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
-                />
-                <label
-                  htmlFor="is_upcomming"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Mark as Upcoming Event
-                </label>
+              <div className="space-y-4">
+                {/* Upcoming Event Toggle */}
+                <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <input
+                    type="checkbox"
+                    name="is_upcomming"
+                    id="is_upcomming"
+                    checked={formData.is_upcomming === "1"}
+                    onChange={handleInputChange}
+                    className="w-5 h-5 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded cursor-pointer"
+                  />
+                  <label
+                    htmlFor="is_upcomming"
+                    className="text-sm font-medium text-gray-700 cursor-pointer flex-1"
+                  >
+                    <span className="block font-semibold">
+                      Mark as Upcoming Event
+                    </span>
+                    <span className="block text-xs text-gray-500 mt-0.5">
+                      Highlight this event as upcoming on the frontend
+                    </span>
+                  </label>
+                  {formData.is_upcomming === "1" ? (
+                    <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                      Upcoming
+                    </span>
+                  ) : (
+                    <span className="px-3 py-1 bg-gray-200 text-gray-600 text-xs font-semibold rounded-full">
+                      Past
+                    </span>
+                  )}
+                </div>
+
+                {/* Active Status Toggle */}
+                <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <input
+                    type="checkbox"
+                    name="is_active"
+                    id="is_active"
+                    checked={formData.is_active === "1"}
+                    onChange={handleInputChange}
+                    className="w-5 h-5 text-green-600 focus:ring-green-500 border-gray-300 rounded cursor-pointer"
+                  />
+                  <label
+                    htmlFor="is_active"
+                    className="text-sm font-medium text-gray-700 cursor-pointer flex-1"
+                  >
+                    <span className="block font-semibold">
+                      Active Status
+                    </span>
+                    <span className="block text-xs text-gray-500 mt-0.5">
+                      Enable to make this event visible on the website
+                    </span>
+                  </label>
+                  {formData.is_active === "1" ? (
+                    <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full flex items-center gap-1">
+                      <CheckCircle className="w-3 h-3" />
+                      Active
+                    </span>
+                  ) : (
+                    <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full flex items-center gap-1">
+                      <XCircle className="w-3 h-3" />
+                      Inactive
+                    </span>
+                  )}
+                </div>
               </div>
             </section>
 

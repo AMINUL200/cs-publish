@@ -172,6 +172,9 @@ import UserSubmitInnovation from "./pages/admin/innovation/UserSubmitInnovation"
 import BlogGuidLinePage from "./components/admin/blog/BlogGuidLinePage";
 import UserViewSubmittedBlog from "./pages/user/blog page/UserViewSubmittedBlog";
 import SubmitMentorPage from "./pages/user/mentor_hub/SubmitMentorPage";
+import MentorGuidLinePage from "./pages/user/mentor_hub/MentorGuidLinePage";
+import AdminViewSubmittedMentors from "./pages/user/mentor_hub/AdminViewSubmittedMentors";
+import UserViewSubmitMentors from "./pages/user/mentor_hub/UserViewSubmitMentors";
  
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -324,6 +327,8 @@ function App() {
             {/* Mentors route */}
             <Route path="/mentors" element={<MentorsHubPage />} />
             <Route path="/submit-mentor" element={<SubmitMentorPage />} />
+            <Route path="/view-submitted-mentors-list" element={<UserViewSubmitMentors />} />
+
 
             <Route path="/mentors/:id" element={<MentorHubDetails />} />
 
@@ -529,7 +534,9 @@ function App() {
               <Route path="/add-innovation" element={<AddInnovation />} />
 
               <Route path="/handle-mentor-hub" element={<HandleMentorHub />} />
+              <Route path="/handle-mentor-guidelines" element={<MentorGuidLinePage />} />
               <Route path="/add-mentor" element={<AddMentor />} />
+              <Route path="/view-submitted-mentors" element={<AdminViewSubmittedMentors />} />
 
               <Route
                 path="/handle-publication-charge"

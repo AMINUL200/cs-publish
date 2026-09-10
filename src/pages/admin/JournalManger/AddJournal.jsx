@@ -37,7 +37,7 @@ const AddJournal = () => {
     status: "1",
     author_guide: "",
     about_the_journal: "",
-    impact_factor: "", // New field
+    impact_factor: "",
     total_citations: "",
     h_index: "",
     acceptance_rate: "",
@@ -76,7 +76,7 @@ const AddJournal = () => {
       const response = await axios.get(
         `${API_URL}api/admin/categories/groups/${groupId}`,
         {
-          headers: { 
+          headers: {
             Authorization: `Bearer ${token}`,
             "Cache-Control": "no-cache",
             Pragma: "no-cache",
@@ -101,123 +101,128 @@ const AddJournal = () => {
   }, []);
 
   // Validation function - Updated for string values
- // Validation function - Updated for flexible string values
-const validateField = (name, value) => {
-  let error = "";
-  
-  // Decimal fields (numbers with decimals)
-  const decimalFields = [
-    "impact_factor", 
-    "acceptance_rate"
-  ];
-  
-  // Integer fields (whole numbers only)
-  const integerFields = [
-    "h_index",
-    "amount"
-  ];
-  
-  // String fields - allow almost any character, no strict validation
-  const stringFields = [
-    "issn_print_no",
-    "issn_online_no",
-    "total_articles",
-    "total_citations",
-    "ugc_no"
-  ];
+  const validateField = (name, value) => {
+    let error = "";
 
-  if (decimalFields.includes(name)) {
-    // Allow empty or numbers with any number of decimal places
-    if (value && !/^\d*\.?\d*$/.test(value)) {
-      error = "Please enter a valid decimal number (e.g., 22.05, 12.005, 5.234)";
+    // Decimal fields (numbers with decimals)
+    const decimalFields = ["impact_factor", "acceptance_rate"];
+
+    // Integer fields (whole numbers only)
+    const integerFields = ["h_index", "amount"];
+
+    // String fields - allow almost any character, no strict validation
+    const stringFields = [
+      "issn_print_no",
+      "issn_online_no",
+      "total_articles",
+      "total_citations",
+      "ugc_no",
+    ];
+
+    if (decimalFields.includes(name)) {
+      // Allow empty or numbers with any number of decimal places
+      if (value && !/^\d*\.?\d*$/.test(value)) {
+        error =
+          "Please enter a valid decimal number (e.g., 22.05, 12.005, 5.234)";
+      }
+      // Check if it's a valid number format (no multiple dots)
+      if (value && (value.match(/\./g) || []).length > 1) {
+        error = "Please enter a valid number with only one decimal point";
+      }
+    } else if (integerFields.includes(name)) {
+      if (value && !/^\d*$/.test(value)) {
+        error = "Please enter a valid number (digits only)";
+      }
+      // For amount field, check if it's not negative
+      if (name === "amount" && value && parseFloat(value) < 0) {
+        error = "Amount cannot be negative";
+      }
+    } else if (stringFields.includes(name)) {
+      // For string fields - allow any character, no strict validation
+      // Only check if it's not empty and not just spaces
+      if (value && value.trim() === "") {
+        error = "Please enter a valid value";
+      }
     }
-    // Check if it's a valid number format (no multiple dots)
-    if (value && (value.match(/\./g) || []).length > 1) {
-      error = "Please enter a valid number with only one decimal point";
-    }
-  } else if (integerFields.includes(name)) {
-    if (value && !/^\d*$/.test(value)) {
-      error = "Please enter a valid number (digits only)";
-    }
-    // For amount field, check if it's not negative
-    if (name === "amount" && value && parseFloat(value) < 0) {
-      error = "Amount cannot be negative";
-    }
-  } else if (stringFields.includes(name)) {
-    // For string fields - allow any character, no strict validation
-    // Only check if it's not empty and not just spaces
-    if (value && value.trim() === "") {
-      error = "Please enter a valid value";
-    }
-    // Optional: For ISSN, check if it's in a valid format only if user wants
-    // But we'll keep it flexible
-  }
-  
-  return error;
-};
+
+    return error;
+  };
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
-    
+
     // Clear previous error for this field
-    setErrors(prev => ({ ...prev, [name]: "" }));
-    
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+
     if (type === "file") {
       // Validate image file
       const file = files[0];
       if (file) {
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        const validTypes = [
+          "image/jpeg",
+          "image/jpg",
+          "image/png",
+          "image/gif",
+          "image/webp",
+        ];
         const maxSize = 5 * 1024 * 1024; // 5MB
-        
+
         if (!validTypes.includes(file.type)) {
-          setErrors(prev => ({ ...prev, image: "Please upload a valid image file (JPEG, PNG, GIF, WEBP)" }));
+          setErrors((prev) => ({
+            ...prev,
+            image: "Please upload a valid image file (JPEG, PNG, GIF, WEBP)",
+          }));
           return;
         }
         if (file.size > maxSize) {
-          setErrors(prev => ({ ...prev, image: "Image size should be less than 5MB" }));
+          setErrors((prev) => ({
+            ...prev,
+            image: "Image size should be less than 5MB",
+          }));
           return;
         }
-        
+
         // Validate image dimensions
         const img = new Image();
         const objectUrl = URL.createObjectURL(file);
-        
-        img.onload = function() {
+
+        img.onload = function () {
           const width = this.width;
           const height = this.height;
-          
-          // Recommended dimensions: minimum 800px width, 500px height
-          if (width < 800 || height < 500) {
-            setErrors(prev => ({ 
-              ...prev, 
-              image: `Image dimensions should be at least 800x500px. Current: ${width}x${height}px` 
-            }));
-            toast.error(`Image dimensions should be at least 800x500px. Current: ${width}x${height}px`);
-            URL.revokeObjectURL(objectUrl);
-            return;
-          }
-          
-          // Check aspect ratio (between 1.3:1 and 2:1)
+
           const aspectRatio = width / height;
-          if (aspectRatio < 1.3 || aspectRatio > 2.0) {
-            setErrors(prev => ({ 
-              ...prev, 
-              image: `Recommended aspect ratio is between 1.3:1 and 2:1. Current: ${(width/height).toFixed(2)}:1` 
-            }));
-            toast.error(`Recommended aspect ratio is between 1.3:1 and 2:1`);
-            URL.revokeObjectURL(objectUrl);
-            return;
+
+          // Show dimension information only.
+          // Do NOT block image upload based on dimensions.
+          if (width < 800 || height < 500) {
+            toast.info(
+              `Image size: ${width}x${height}px. Recommended minimum is 800x500px.`,
+            );
           }
-          
-          setFormData((prev) => ({ ...prev, [name]: file }));
+
+          // Show aspect ratio information only.
+          if (aspectRatio < 1.3 || aspectRatio > 2.0) {
+            toast.info(
+              `Image aspect ratio: ${aspectRatio.toFixed(
+                2,
+              )}:1. Recommended ratio is between 1.3:1 and 2:1.`,
+            );
+          }
+
+          // Always allow the image to be uploaded
+          setFormData((prev) => ({
+            ...prev,
+            [name]: file,
+          }));
+
           URL.revokeObjectURL(objectUrl);
         };
-        
-        img.onerror = function() {
+
+        img.onerror = function () {
           toast.error("Failed to load image");
           URL.revokeObjectURL(objectUrl);
         };
-        
+
         img.src = objectUrl;
       }
     } else if (
@@ -228,7 +233,7 @@ const validateField = (name, value) => {
       // Validate the field
       const error = validateField(name, value);
       if (error) {
-        setErrors(prev => ({ ...prev, [name]: error }));
+        setErrors((prev) => ({ ...prev, [name]: error }));
       }
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -249,26 +254,29 @@ const validateField = (name, value) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate all fields before submission
     const newErrors = {};
     let hasError = false;
-    
+
     // Check required fields
-    const requiredFields = ['group_id', 'category_id', 'j_title', 'amount'];
-    requiredFields.forEach(field => {
+    const requiredFields = ["group_id", "category_id", "j_title", "amount"];
+    requiredFields.forEach((field) => {
       if (!formData[field]) {
-        newErrors[field] = `${field.replace('_', ' ')} is required`;
+        newErrors[field] = `${field.replace("_", " ")} is required`;
         hasError = true;
       }
     });
-    
+
     // Validate all numeric fields
     const numericFields = [
-      'impact_factor', 'acceptance_rate', 'h_index', 'amount'
+      "impact_factor",
+      "acceptance_rate",
+      "h_index",
+      "amount",
     ];
-    
-    numericFields.forEach(field => {
+
+    numericFields.forEach((field) => {
       if (formData[field]) {
         const error = validateField(field, formData[field]);
         if (error) {
@@ -277,14 +285,17 @@ const validateField = (name, value) => {
         }
       }
     });
-    
+
     // Validate string fields
     const stringFields = [
-      'issn_print_no', 'issn_online_no', 'total_articles', 
-      'total_citations', 'ugc_no'
+      "issn_print_no",
+      "issn_online_no",
+      "total_articles",
+      "total_citations",
+      "ugc_no",
     ];
-    
-    stringFields.forEach(field => {
+
+    stringFields.forEach((field) => {
       if (formData[field]) {
         const error = validateField(field, formData[field]);
         if (error) {
@@ -293,26 +304,26 @@ const validateField = (name, value) => {
         }
       }
     });
-    
+
     // Validate image
     if (!formData.image) {
       newErrors.image = "Please upload an image";
       hasError = true;
     }
-    
+
     if (hasError) {
       setErrors(newErrors);
       // Scroll to first error
       const firstErrorField = Object.keys(newErrors)[0];
       const element = document.querySelector(`[name="${firstErrorField}"]`);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
         element.focus();
       }
       toast.error("Please fix all validation errors before submitting");
-      return;
+      // return;
     }
-    
+
     setHandleLoading(true);
     try {
       const submitData = new FormData();
@@ -368,6 +379,7 @@ const validateField = (name, value) => {
       }
     } catch (err) {
       console.error(err);
+      console.log(err.response?.data);
       toast.error(err.response?.data?.message || "Something went wrong");
     } finally {
       setHandleLoading(false);
@@ -388,7 +400,7 @@ const validateField = (name, value) => {
               name="group_id"
               value={formData.group_id}
               onChange={handleChange}
-              className={`w-full border px-3 py-2 rounded ${errors.group_id ? 'border-red-500' : ''}`}
+              className={`w-full border px-3 py-2 rounded ${errors.group_id ? "border-red-500" : ""}`}
               required
             >
               <option value="">Select Group</option>
@@ -398,7 +410,9 @@ const validateField = (name, value) => {
                 </option>
               ))}
             </select>
-            {errors.group_id && <p className="text-red-500 text-sm mt-1">{errors.group_id}</p>}
+            {errors.group_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.group_id}</p>
+            )}
           </div>
 
           {/* Category ID */}
@@ -408,7 +422,7 @@ const validateField = (name, value) => {
               name="category_id"
               value={formData.category_id}
               onChange={handleChange}
-              className={`w-full border px-3 py-2 rounded ${errors.category_id ? 'border-red-500' : ''}`}
+              className={`w-full border px-3 py-2 rounded ${errors.category_id ? "border-red-500" : ""}`}
               required
             >
               <option value="">Select Category</option>
@@ -418,7 +432,9 @@ const validateField = (name, value) => {
                 </option>
               ))}
             </select>
-            {errors.category_id && <p className="text-red-500 text-sm mt-1">{errors.category_id}</p>}
+            {errors.category_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.category_id}</p>
+            )}
           </div>
         </div>
 
@@ -430,10 +446,12 @@ const validateField = (name, value) => {
             name="j_title"
             value={formData.j_title}
             onChange={handleChange}
-            className={`w-full border px-3 py-2 rounded ${errors.j_title ? 'border-red-500' : ''}`}
+            className={`w-full border px-3 py-2 rounded ${errors.j_title ? "border-red-500" : ""}`}
             required
           />
-          {errors.j_title && <p className="text-red-500 text-sm mt-1">{errors.j_title}</p>}
+          {errors.j_title && (
+            <p className="text-red-500 text-sm mt-1">{errors.j_title}</p>
+          )}
         </div>
 
         {/* Categories */}
@@ -478,12 +496,18 @@ const validateField = (name, value) => {
                 value={formData.impact_factor}
                 onChange={handleChange}
                 placeholder="e.g., 2.5"
-                className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.impact_factor ? 'border-red-500' : ''}`}
+                className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  errors.impact_factor ? "border-red-500" : ""
+                }`}
               />
-              {errors.impact_factor && <p className="text-red-500 text-sm mt-1">{errors.impact_factor}</p>}
+              {errors.impact_factor && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.impact_factor}
+                </p>
+              )}
             </div>
 
-            {/* Total Articles - String */}
+            {/* Quick Press - String (formerly Total Articles) */}
             <div>
               <label className="block mb-1 font-medium">
                 Quick Press
@@ -494,13 +518,19 @@ const validateField = (name, value) => {
                 name="total_articles"
                 value={formData.total_articles}
                 onChange={handleChange}
-                placeholder="e.g., 500 or 500+"
-                className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.total_articles ? 'border-red-500' : ''}`}
+                placeholder="e.g., 500, 500+, Fast, Available"
+                className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  errors.total_articles ? "border-red-500" : ""
+                }`}
               />
-              {errors.total_articles && <p className="text-red-500 text-sm mt-1">{errors.total_articles}</p>}
+              {errors.total_articles && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.total_articles}
+                </p>
+              )}
             </div>
 
-            {/* Total Citations - String */}
+            {/* Indexing - String (formerly Total Citations) */}
             <div>
               <label className="block mb-1 font-medium">
                 Indexing
@@ -511,13 +541,19 @@ const validateField = (name, value) => {
                 name="total_citations"
                 value={formData.total_citations}
                 onChange={handleChange}
-                placeholder="e.g., 1250 or Scopus"
-                className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.total_citations ? 'border-red-500' : ''}`}
+                placeholder="e.g., Scopus, Web of Science, 1250"
+                className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  errors.total_citations ? "border-red-500" : ""
+                }`}
               />
-              {errors.total_citations && <p className="text-red-500 text-sm mt-1">{errors.total_citations}</p>}
+              {errors.total_citations && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.total_citations}
+                </p>
+              )}
             </div>
 
-            {/* H-Index - Integer */}
+            {/* First Decision - Integer (formerly H-Index) */}
             <div>
               <label className="block mb-1 font-medium">
                 First Decision
@@ -529,9 +565,13 @@ const validateField = (name, value) => {
                 value={formData.h_index}
                 onChange={handleChange}
                 placeholder="e.g., 45"
-                className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.h_index ? 'border-red-500' : ''}`}
+                className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  errors.h_index ? "border-red-500" : ""
+                }`}
               />
-              {errors.h_index && <p className="text-red-500 text-sm mt-1">{errors.h_index}</p>}
+              {errors.h_index && (
+                <p className="text-red-500 text-sm mt-1">{errors.h_index}</p>
+              )}
             </div>
 
             {/* Acceptance Rate - Decimal */}
@@ -546,9 +586,15 @@ const validateField = (name, value) => {
                 value={formData.acceptance_rate}
                 onChange={handleChange}
                 placeholder="e.g., 25.5"
-                className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.acceptance_rate ? 'border-red-500' : ''}`}
+                className={`w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  errors.acceptance_rate ? "border-red-500" : ""
+                }`}
               />
-              {errors.acceptance_rate && <p className="text-red-500 text-sm mt-1">{errors.acceptance_rate}</p>}
+              {errors.acceptance_rate && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.acceptance_rate}
+                </p>
+              )}
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">
@@ -683,11 +729,13 @@ const validateField = (name, value) => {
             name="amount"
             value={formData.amount}
             onChange={handleChange}
-            className={`w-full border px-3 py-2 rounded ${errors.amount ? 'border-red-500' : ''}`}
+            className={`w-full border px-3 py-2 rounded ${errors.amount ? "border-red-500" : ""}`}
             placeholder="Enter amount"
             required
           />
-          {errors.amount && <p className="text-red-500 text-sm mt-1">{errors.amount}</p>}
+          {errors.amount && (
+            <p className="text-red-500 text-sm mt-1">{errors.amount}</p>
+          )}
         </div>
 
         {/* Publication Model */}
@@ -717,6 +765,7 @@ const validateField = (name, value) => {
           </div>
         </div>
 
+        {/* Publication Model No - String */}
         <div>
           <label className="block mb-1 font-medium">Publication Model No</label>
           <input
@@ -724,13 +773,15 @@ const validateField = (name, value) => {
             name="issn_print_no"
             value={formData.issn_print_no}
             onChange={handleChange}
-            className={`w-full border px-3 py-2 rounded ${errors.issn_print_no ? 'border-red-500' : ''}`}
-            placeholder="Enter ISSN Print Number (e.g., 1234-5678)"
+            className={`w-full border px-3 py-2 rounded ${errors.issn_print_no ? "border-red-500" : ""}`}
+            placeholder="Enter Publication Model Number"
           />
-          {errors.issn_print_no && <p className="text-red-500 text-sm mt-1">{errors.issn_print_no}</p>}
+          {errors.issn_print_no && (
+            <p className="text-red-500 text-sm mt-1">{errors.issn_print_no}</p>
+          )}
         </div>
 
-        {/* ISSN Online */}
+        {/* Peer Review */}
         <div>
           <label className="block mb-1 font-medium">Peer Review</label>
           <div className="flex items-center gap-4">
@@ -757,6 +808,7 @@ const validateField = (name, value) => {
           </div>
         </div>
 
+        {/* Peer Review No - String */}
         <div>
           <label className="block mb-1 font-medium">Peer Review No</label>
           <input
@@ -764,13 +816,15 @@ const validateField = (name, value) => {
             name="issn_online_no"
             value={formData.issn_online_no}
             onChange={handleChange}
-            className={`w-full border px-3 py-2 rounded ${errors.issn_online_no ? 'border-red-500' : ''}`}
-            placeholder="Enter ISSN Online Number (e.g., 1234-5678)"
+            className={`w-full border px-3 py-2 rounded ${errors.issn_online_no ? "border-red-500" : ""}`}
+            placeholder="Enter Peer Review Number"
           />
-          {errors.issn_online_no && <p className="text-red-500 text-sm mt-1">{errors.issn_online_no}</p>}
+          {errors.issn_online_no && (
+            <p className="text-red-500 text-sm mt-1">{errors.issn_online_no}</p>
+          )}
         </div>
 
-        {/* UGC Approved */}
+        {/* DOI */}
         <div>
           <label className="block mb-1 font-medium">DOI</label>
           <div className="flex items-center gap-4">
@@ -797,6 +851,7 @@ const validateField = (name, value) => {
           </div>
         </div>
 
+        {/* DOI No - String (formerly UGC No) */}
         <div>
           <label className="block mb-1 font-medium">DOI No</label>
           <input
@@ -804,10 +859,12 @@ const validateField = (name, value) => {
             name="ugc_no"
             value={formData.ugc_no}
             onChange={handleChange}
-            className={`w-full border px-3 py-2 rounded ${errors.ugc_no ? 'border-red-500' : ''}`}
-            placeholder="Enter UGC Number or URL (e.g., 10.1234/abcd or https://doi.org/...)"
+            className={`w-full border px-3 py-2 rounded ${errors.ugc_no ? "border-red-500" : ""}`}
+            placeholder="Enter DOI (e.g., 10.1234/abcd or https://doi.org/...)"
           />
-          {errors.ugc_no && <p className="text-red-500 text-sm mt-1">{errors.ugc_no}</p>}
+          {errors.ugc_no && (
+            <p className="text-red-500 text-sm mt-1">{errors.ugc_no}</p>
+          )}
         </div>
 
         {/* Image */}
@@ -819,10 +876,12 @@ const validateField = (name, value) => {
             ref={fileInputRef}
             onChange={handleChange}
             accept="image/*"
-            className={`w-full border px-3 py-2 rounded ${errors.image ? 'border-red-500' : ''}`}
+            className={`w-full border px-3 py-2 rounded ${errors.image ? "border-red-500" : ""}`}
             required
           />
-          {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
+          {errors.image && (
+            <p className="text-red-500 text-sm mt-1">{errors.image}</p>
+          )}
         </div>
 
         {/* Status */}
@@ -856,7 +915,11 @@ const validateField = (name, value) => {
         <button
           type="submit"
           disabled={handleLoading}
-          className={`px-4 py-2 rounded text-white flex items-center justify-center gap-2 ${handleLoading ? "bg-gray-500 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 cursor-pointer"}`}
+          className={`px-4 py-2 rounded text-white flex items-center justify-center gap-2 ${
+            handleLoading
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+          }`}
         >
           {handleLoading ? (
             <>

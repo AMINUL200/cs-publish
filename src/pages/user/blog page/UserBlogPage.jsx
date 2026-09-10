@@ -35,7 +35,7 @@ const UserBlogPage = () => {
         // Extract unique categories
         const uniqueCategories = [
           ...new Map(
-            blogs.map((blog) => [blog.category.id, blog.category]),
+            blogs.map((blog) => [blog.category.id, blog.category])
           ).values(),
         ];
         setCategories(uniqueCategories);
@@ -58,7 +58,7 @@ const UserBlogPage = () => {
       setFilteredBlogs(blogData);
     } else {
       const filtered = blogData.filter(
-        (blog) => blog.category.id.toString() === selectedCategory,
+        (blog) => blog.category.id.toString() === selectedCategory
       );
       setFilteredBlogs(filtered);
     }
@@ -66,7 +66,11 @@ const UserBlogPage = () => {
 
   // Handle submit blog button click
   const handleSubmitBlog = () => {
-    navigate("/submit-blog"); // Adjust the route path as needed
+    if (token) {
+      navigate("/submit-blog");
+    } else {
+      navigate("/signin");
+    }
   };
 
   if (loading) {
@@ -107,8 +111,10 @@ const UserBlogPage = () => {
             {/* Sidebar - Submit Blog & Filters */}
             <div className="lg:w-1/4">
               <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-20">
-                {/* Submit Blog Button - New Section */}
-                {token && (
+                {/* ========================================== */}
+                {/* SUBMIT BLOG CARD — LOGGED IN */}
+                {/* ========================================== */}
+                {token ? (
                   <div className="mb-8 pb-6 border-b border-gray-200">
                     <h3 className="text-xl font-bold text-gray-900 mb-4">
                       Share Your Knowledge
@@ -151,6 +157,69 @@ const UserBlogPage = () => {
                         />
                       </svg>
                       <span>Share your expertise with our community</span>
+                    </div>
+                  </div>
+                ) : (
+                  /* ========================================== */
+                  /* LOGIN PROMPT CARD — NOT LOGGED IN */
+                  /* ========================================== */
+                  <div className="mb-8 pb-6 border-b border-gray-200">
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+                      <div className="flex items-center justify-center mb-3">
+                        <div className="bg-blue-100 p-3 rounded-full">
+                          <svg
+                            className="w-6 h-6 text-blue-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+
+                      <h3 className="text-lg font-bold text-gray-900 mb-2 text-center">
+                        Want to Submit a Blog?
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-4 text-center">
+                        Please login to share your knowledge and contribute to
+                        our research community.
+                      </p>
+
+                      <button
+                        onClick={handleSubmitBlog}
+                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                          />
+                        </svg>
+                        Login to Submit
+                      </button>
+
+                      <div className="mt-3 text-center text-xs text-gray-500">
+                        New here?{" "}
+                        <Link
+                          to="/signup"
+                          className="text-blue-600 hover:text-blue-700 font-medium"
+                        >
+                          Create an account
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -197,7 +266,7 @@ const UserBlogPage = () => {
                           (
                           {
                             blogData.filter(
-                              (blog) => blog.category.id === category.id,
+                              (blog) => blog.category.id === category.id
                             ).length
                           }
                           )
@@ -214,7 +283,7 @@ const UserBlogPage = () => {
                         <strong>
                           {
                             categories.find(
-                              (cat) => cat.id.toString() === selectedCategory,
+                              (cat) => cat.id.toString() === selectedCategory
                             )?.category_name
                           }
                         </strong>
@@ -229,7 +298,7 @@ const UserBlogPage = () => {
                   )}
                 </div>
 
-                {/* Quick Stats - Optional Info Section */}
+                {/* Quick Stats */}
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-blue-50 rounded-xl p-3 text-center">
@@ -264,7 +333,7 @@ const UserBlogPage = () => {
                       <span className="font-semibold text-yellow-600">
                         {
                           categories.find(
-                            (cat) => cat.id.toString() === selectedCategory,
+                            (cat) => cat.id.toString() === selectedCategory
                           )?.category_name
                         }
                       </span>

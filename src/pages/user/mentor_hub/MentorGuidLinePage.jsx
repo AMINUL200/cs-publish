@@ -17,9 +17,9 @@ import {
   faLink,
   faCloud,
 } from "@fortawesome/free-solid-svg-icons";
-import Loader from "../../common/Loader";
+import Loader from "../../../components/common/Loader";
 
-const BlogGuidLinePage = () => {
+const MentorGuidLinePage = () => {
   const { token } = useSelector((state) => state.auth);
   const API_URL = import.meta.env.VITE_API_URL;
   const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
@@ -37,24 +37,27 @@ const BlogGuidLinePage = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   // ==========================================
-  // WORD TEMPLATE STATE ✅ NEW
+  // WORD TEMPLATE STATE
   // ==========================================
   const [selectedWordFile, setSelectedWordFile] = useState(null);
   const [wordPreviewUrl, setWordPreviewUrl] = useState(null);
   const [isWordEditing, setIsWordEditing] = useState(false);
 
   // ==========================================
-  // DRIVE LINK STATE ✅ NEW
+  // DRIVE LINK STATE
   // ==========================================
   const [driveLink, setDriveLink] = useState("");
   const [isDriveEditing, setIsDriveEditing] = useState(false);
   const [driveLinkError, setDriveLinkError] = useState("");
 
-  // Fetch current guideline PDF
+  // ==========================================
+  // FETCH MENTOR GUIDELINE DATA
+  // API: api/mentor-guideline-pdf/1
+  // ==========================================
   const fetchGuidelinePdf = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}api/blog-pdf/1`, {
+      const response = await axios.get(`${API_URL}api/blog-pdf/2`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Cache-Control": "no-cache",
@@ -72,11 +75,11 @@ const BlogGuidLinePage = () => {
         setPdfData(null);
       }
     } catch (error) {
-      console.error("Error fetching guideline PDF:", error);
+      console.error("Error fetching mentor guideline:", error);
       if (error.response?.status === 404) {
         setPdfData(null);
       } else {
-        toast.error("Failed to fetch guideline PDF");
+        toast.error("Failed to fetch mentor guideline");
       }
     } finally {
       setLoading(false);
@@ -108,7 +111,7 @@ const BlogGuidLinePage = () => {
   };
 
   // ==========================================
-  // HANDLE WORD FILE SELECTION ✅ NEW
+  // HANDLE WORD FILE SELECTION
   // ==========================================
   const handleWordFileSelect = (e) => {
     const file = e.target.files[0];
@@ -143,7 +146,7 @@ const BlogGuidLinePage = () => {
   };
 
   // ==========================================
-  // HANDLE DRIVE LINK CHANGE ✅ NEW
+  // HANDLE DRIVE LINK CHANGE
   // ==========================================
   const handleDriveLinkChange = (e) => {
     const value = e.target.value;
@@ -164,15 +167,15 @@ const BlogGuidLinePage = () => {
   };
 
   // ==========================================
-  // HANDLE FILE UPLOAD/UPDATE (PDF + WORD + DRIVE)
+  // HANDLE UPLOAD/UPDATE (PDF + WORD + DRIVE)
+  // API: api/mentor-guideline-pdf/1
   // ==========================================
   const handleUpload = async () => {
     // Check if any changes exist
     const hasPdfChange = selectedFile !== null;
     const hasWordChange = selectedWordFile !== null;
     const hasDriveChange =
-      isDriveEditing &&
-      driveLink !== (pdfData?.drive || "");
+      isDriveEditing && driveLink !== (pdfData?.drive || "");
 
     if (!hasPdfChange && !hasWordChange && !hasDriveChange) {
       toast.error("Please make at least one change to update");
@@ -198,18 +201,18 @@ const BlogGuidLinePage = () => {
         formData.append("pdf", selectedFile);
       }
 
-      // ✅ Append Word file if selected
+      // Append Word file if selected
       if (selectedWordFile) {
         formData.append("word", selectedWordFile);
       }
 
-      // ✅ Append Drive link (always send, even if empty to allow clearing)
+      // Append Drive link (always send when changed, even if empty to allow clearing)
       if (hasDriveChange) {
         formData.append("drive", driveLink || "");
       }
 
       const response = await axios.post(
-        `${API_URL}api/admin/blogs/blog-pdf/1`,
+        `${API_URL}api/admin/blogs/blog-pdf/2`,
         formData,
         {
           headers: {
@@ -220,7 +223,9 @@ const BlogGuidLinePage = () => {
       );
 
       if (response.data.status) {
-        toast.success(response.data.message || "Resources updated successfully!");
+        toast.success(
+          response.data.message || "Mentor resources updated successfully!"
+        );
 
         // Refresh data
         await fetchGuidelinePdf();
@@ -248,7 +253,9 @@ const BlogGuidLinePage = () => {
     } catch (error) {
       console.error("Error uploading:", error);
       console.log("Error response:", error.response);
-      toast.error(error.response?.data?.message || "Failed to update resources");
+      toast.error(
+        error.response?.data?.message || "Failed to update resources"
+      );
     } finally {
       setUploading(false);
     }
@@ -323,11 +330,11 @@ const BlogGuidLinePage = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">
-          Blog Submission Resources
+          Mentor Submission Resources
         </h1>
         <p className="text-gray-600 mt-1">
-          Manage the guideline PDF, Word template, and Drive link that users
-          will see when submitting blogs
+          Manage the guideline PDF, Word template, and Drive link that mentors
+          will see when submitting events
         </p>
       </div>
 
@@ -353,7 +360,7 @@ const BlogGuidLinePage = () => {
                   <p className="text-xs text-gray-500">
                     {pdfData?.pdf
                       ? "Update the existing guideline PDF"
-                      : "Upload guideline PDF for users"}
+                      : "Upload guideline PDF for mentors"}
                   </p>
                 </div>
               </div>
@@ -373,10 +380,10 @@ const BlogGuidLinePage = () => {
                       accept=".pdf"
                       onChange={handleFileSelect}
                       className="hidden"
-                      id="pdf-upload"
+                      id="mentor-pdf-upload"
                     />
                     <label
-                      htmlFor="pdf-upload"
+                      htmlFor="mentor-pdf-upload"
                       className="cursor-pointer flex flex-col items-center justify-center"
                     >
                       <div className="bg-purple-100 p-4 rounded-full mb-3">
@@ -424,7 +431,8 @@ const BlogGuidLinePage = () => {
                           setSelectedFile(null);
                           setPreviewUrl(null);
                           setIsEditing(false);
-                          const input = document.getElementById("pdf-upload");
+                          const input =
+                            document.getElementById("mentor-pdf-upload");
                           if (input) input.value = "";
                         }}
                         className="text-gray-400 hover:text-red-500 transition-colors ml-2"
@@ -477,7 +485,7 @@ const BlogGuidLinePage = () => {
           </div>
 
           {/* ========================================== */}
-          {/* WORD TEMPLATE SECTION ✅ NEW */}
+          {/* WORD TEMPLATE SECTION */}
           {/* ========================================== */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
             <div className="p-6">
@@ -495,7 +503,7 @@ const BlogGuidLinePage = () => {
                   <p className="text-xs text-gray-500">
                     {pdfData?.word
                       ? "Update the existing Word template"
-                      : "Upload a Word template for users"}
+                      : "Upload a Word template for mentors"}
                   </p>
                 </div>
               </div>
@@ -515,10 +523,10 @@ const BlogGuidLinePage = () => {
                       accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                       onChange={handleWordFileSelect}
                       className="hidden"
-                      id="word-upload"
+                      id="mentor-word-upload"
                     />
                     <label
-                      htmlFor="word-upload"
+                      htmlFor="mentor-word-upload"
                       className="cursor-pointer flex flex-col items-center justify-center"
                     >
                       <div className="bg-blue-100 p-4 rounded-full mb-3">
@@ -558,7 +566,8 @@ const BlogGuidLinePage = () => {
                           setSelectedWordFile(null);
                           setWordPreviewUrl(null);
                           setIsWordEditing(false);
-                          const input = document.getElementById("word-upload");
+                          const input =
+                            document.getElementById("mentor-word-upload");
                           if (input) input.value = "";
                         }}
                         className="text-gray-400 hover:text-red-500 transition-colors ml-2"
@@ -592,7 +601,9 @@ const BlogGuidLinePage = () => {
                         <p className="text-sm font-medium text-gray-900 truncate">
                           {getFileName(pdfData.word)}
                         </p>
-                        <p className="text-xs text-gray-500">Current template</p>
+                        <p className="text-xs text-gray-500">
+                          Current template
+                        </p>
                       </div>
                     </div>
                     <a
@@ -611,7 +622,7 @@ const BlogGuidLinePage = () => {
           </div>
 
           {/* ========================================== */}
-          {/* DRIVE LINK SECTION ✅ NEW */}
+          {/* DRIVE LINK SECTION */}
           {/* ========================================== */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
             <div className="p-6">
@@ -672,7 +683,9 @@ const BlogGuidLinePage = () => {
                         <p className="text-sm font-medium text-gray-900 truncate">
                           {pdfData.drive}
                         </p>
-                        <p className="text-xs text-gray-500">Current drive link</p>
+                        <p className="text-xs text-gray-500">
+                          Current drive link
+                        </p>
                       </div>
                     </div>
                     <a
@@ -756,7 +769,7 @@ const BlogGuidLinePage = () => {
                 </div>
               </div>
 
-              {/* Word Status ✅ NEW */}
+              {/* Word Status */}
               <div className="bg-indigo-50 rounded-lg p-3 border border-indigo-100">
                 <div className="flex items-start">
                   <div className="bg-indigo-100 p-2 rounded-lg mr-3">
@@ -778,7 +791,7 @@ const BlogGuidLinePage = () => {
                 </div>
               </div>
 
-              {/* Drive Status ✅ NEW */}
+              {/* Drive Status */}
               <div className="bg-green-50 rounded-lg p-3 border border-green-100">
                 <div className="flex items-start">
                   <div className="bg-green-100 p-2 rounded-lg mr-3">
@@ -800,7 +813,7 @@ const BlogGuidLinePage = () => {
                 </div>
               </div>
 
-              {/* What Users See */}
+              {/* What Mentors See */}
               <div className="bg-purple-50 rounded-lg p-3 border border-purple-100">
                 <div className="flex items-start">
                   <div className="bg-purple-100 p-2 rounded-lg mr-3">
@@ -811,11 +824,11 @@ const BlogGuidLinePage = () => {
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-purple-800">
-                      What Users See
+                      What Mentors See
                     </h4>
                     <p className="text-xs text-purple-600">
-                      These resources appear as downloadable options when users
-                      submit blogs
+                      These resources appear as downloadable options when
+                      mentors submit events
                     </p>
                   </div>
                 </div>
@@ -894,4 +907,4 @@ const BlogGuidLinePage = () => {
   );
 };
 
-export default BlogGuidLinePage;
+export default MentorGuidLinePage;

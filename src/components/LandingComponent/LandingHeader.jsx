@@ -103,6 +103,11 @@ const LandingHeader = ({
       label: "My Blog",
       path: "/view-submit-blog",
     },
+    {
+      icon: Package,
+      label: "Submit Mentor",
+      path: "/view-submitted-mentors-list",
+    },
    
   ];
 

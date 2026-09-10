@@ -5,17 +5,15 @@ import {
   faEye,
   faFilter,
   faSearch,
-  faPlayCircle,
   faPlus,
   faUserGraduate,
   faChalkboardTeacher,
   faFileAlt,
-  faClock,
   faRocket,
+  faSignInAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import { Link, useNavigate } from "react-router-dom";
-import MediaRenderer from "../../../components/common/MediaRenderer";
 import Loader from "../../../components/common/Loader";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -33,9 +31,90 @@ const MentorsHubPage = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
-  // Handle submit mentor button click
+  // ==========================================
+  // HANDLE SUBMIT MENTOR
+  // ==========================================
   const handleSubmitMentor = () => {
-    navigate("/submit-mentor");
+    if (token) {
+      navigate("/submit-mentor");
+    } else {
+      navigate("/signin", { state: { from: "/submit-mentor" } });
+    }
+  };
+
+  // ==========================================
+  // DETECT MEDIA TYPE FROM URL
+  // ==========================================
+  const getMediaType = (url) => {
+    if (!url) return "image";
+
+    const lowerUrl = url.toLowerCase();
+
+    // YouTube
+    if (
+      lowerUrl.includes("youtube.com") ||
+      lowerUrl.includes("youtu.be") ||
+      lowerUrl.includes("youtube-nocookie.com")
+    ) {
+      return "youtube";
+    }
+
+    // Video files
+    if (
+      lowerUrl.includes(".mp4") ||
+      lowerUrl.includes(".webm") ||
+      lowerUrl.includes(".ogg") ||
+      lowerUrl.includes(".mov")
+    ) {
+      return "video";
+    }
+
+    // Default to image
+    return "image";
+  };
+
+  // ==========================================
+  // EXTRACT YOUTUBE VIDEO ID
+  // ==========================================
+  const getYoutubeVideoId = (url) => {
+    if (!url) return null;
+    const regExp =
+      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+
+  // ==========================================
+  // GET YOUTUBE THUMBNAIL
+  // ==========================================
+  const getYoutubeThumbnail = (url) => {
+    const videoId = getYoutubeVideoId(url);
+    return videoId
+      ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+      : null;
+  };
+
+  // ==========================================
+  // BUILD MEDIA URL PROPERLY
+  // ==========================================
+  const getMediaUrl = (imageVideo) => {
+    if (!imageVideo) return null;
+
+    // If it's already a full URL (YouTube, external, etc.), use as-is
+    if (
+      imageVideo.startsWith("http://") ||
+      imageVideo.startsWith("https://")
+    ) {
+      return imageVideo;
+    }
+
+    // If it's a /tmp/ path, it's invalid
+    if (imageVideo.startsWith("/tmp/")) {
+      return null;
+    }
+
+    // Otherwise prefix with STORAGE_URL
+    return `${STORAGE_URL}${imageVideo}`;
   };
 
   // Fetch real data from API
@@ -57,23 +136,30 @@ const MentorsHubPage = () => {
           const allArticles = [...latestArticles, ...mostViewedArticles];
           const uniqueArticles = allArticles.filter(
             (article, index, self) =>
-              index === self.findIndex((a) => a.slug === article.slug),
+              index === self.findIndex((a) => a.slug === article.slug)
           );
 
-          const transformedArticles = uniqueArticles.map((article, index) => ({
-            id: index + 1,
-            title: article.title,
-            media: {
-              type: getMediaType(article.image_video),
-              url: `${STORAGE_URL}${article.image_video}`,
-            },
-            category: article.catagory,
-            views: Math.floor(Math.random() * 2000) + 500,
-            comments: Math.floor(Math.random() * 50) + 5,
-            excerpt: article.description,
-            slug: article.slug,
-            created_at: article.created_at,
-          }));
+          const transformedArticles = uniqueArticles.map((article, index) => {
+            const mediaType = getMediaType(article.image_video);
+            const mediaUrl = getMediaUrl(article.image_video);
+
+            return {
+              id: index + 1,
+              title: article.title,
+              media: {
+                type: mediaType,
+                url: mediaUrl,
+                rawUrl: article.image_video, // Keep raw for YouTube links
+                altTag: article.image_alt_tag,
+              },
+              category: article.catagory,
+              views: Math.floor(Math.random() * 2000) + 500,
+              comments: Math.floor(Math.random() * 50) + 5,
+              excerpt: article.description,
+              slug: article.slug,
+              created_at: article.created_at,
+            };
+          });
 
           setArticles(transformedArticles);
         } else {
@@ -82,7 +168,7 @@ const MentorsHubPage = () => {
       } catch (error) {
         console.error("Error fetching mentors data:", error);
         setError(
-          error.response?.data?.message || "Failed to load mentors hub data",
+          error.response?.data?.message || "Failed to load mentors hub data"
         );
       } finally {
         setLoading(false);
@@ -93,30 +179,13 @@ const MentorsHubPage = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Function to determine media type based on URL
-  const getMediaType = (url) => {
-    if (!url) return "image";
-
-    if (url.includes("youtube.com") || url.includes("youtu.be")) {
-      return "youtube";
-    } else if (
-      url.includes(".mp4") ||
-      url.includes(".webm") ||
-      url.includes(".ogg")
-    ) {
-      return "video";
-    } else {
-      return "image";
-    }
-  };
-
   // Get unique categories from articles
   const categories = useMemo(() => {
     const uniqueCategories = [
       ...new Set(articles.map((article) => article.category)),
     ];
     return uniqueCategories.filter(
-      (category) => category && category.trim() !== "",
+      (category) => category && category.trim() !== ""
     );
   }, [articles]);
 
@@ -159,6 +228,120 @@ const MentorsHubPage = () => {
       month: "short",
       day: "numeric",
     });
+  };
+
+  // ==========================================
+  // RENDER MEDIA (FIXED SIZE + PROPER HANDLING)
+  // ==========================================
+  const renderMedia = (article) => {
+    const { media } = article;
+    const mediaType = media.type;
+    const mediaUrl = media.url;
+
+    // No media - show placeholder
+    if (!mediaUrl) {
+      return (
+        <div className="w-full h-48 bg-gradient-to-br from-yellow-50 to-amber-50 flex items-center justify-center">
+          <FontAwesomeIcon
+            icon={faFileAlt}
+            className="w-12 h-12 text-gray-400"
+          />
+        </div>
+      );
+    }
+
+    // YouTube video
+    if (mediaType === "youtube") {
+      const thumbnailUrl = getYoutubeThumbnail(media.rawUrl);
+      const embedUrl = getYoutubeVideoId(media.rawUrl)
+        ? `https://www.youtube.com/embed/${getYoutubeVideoId(media.rawUrl)}`
+        : null;
+
+      return (
+        <div className="relative w-full h-48 overflow-hidden group">
+          {thumbnailUrl ? (
+            <>
+              <img
+                src={thumbnailUrl}
+                alt={media.altTag || article.title}
+                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                onError={(e) => {
+                  e.target.src =
+                    "https://via.placeholder.com/400x200?text=Video";
+                }}
+              />
+              {/* Play button overlay */}
+              <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center group-hover:bg-opacity-50 transition-all pointer-events-none">
+                <div className="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <svg
+                    className="w-6 h-6 text-white ml-0.5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
+              {/* YouTube badge */}
+              <div className="absolute top-3 left-3 bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1 z-10">
+                <svg
+                  className="w-3 h-3"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
+                </svg>
+                YouTube
+              </div>
+            </>
+          ) : (
+            <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+              <FontAwesomeIcon
+                icon={faFileAlt}
+                className="w-12 h-12 text-gray-400"
+              />
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Video file
+    if (mediaType === "video") {
+      return (
+        <div className="relative w-full h-48 overflow-hidden bg-black">
+          <video
+            src={mediaUrl}
+            className="w-full h-48 object-cover"
+            muted
+            playsInline
+            onMouseOver={(e) => e.target.play()}
+            onMouseOut={(e) => {
+              e.target.pause();
+              e.target.currentTime = 0;
+            }}
+          />
+          <div className="absolute top-3 left-3 bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold">
+            Video
+          </div>
+        </div>
+      );
+    }
+
+    // Image (default)
+    return (
+      <div className="relative w-full h-48 overflow-hidden group">
+        <img
+          src={mediaUrl}
+          alt={media.altTag || article.title}
+          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+          onError={(e) => {
+            e.target.src =
+              "https://via.placeholder.com/400x200?text=Event+Image";
+          }}
+        />
+      </div>
+    );
   };
 
   if (loading) {
@@ -208,7 +391,7 @@ const MentorsHubPage = () => {
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-center items-center gap-2 ">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-center items-center gap-2">
             {/* Search Bar */}
             <div className="relative max-w-2xl text-center flex-1">
               <FontAwesomeIcon
@@ -239,12 +422,16 @@ const MentorsHubPage = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar - Submit Mentor & Categories */}
             <div
-              className={`lg:w-64 ${showFilters ? "block" : "hidden lg:block"}`}
+              className={`lg:w-64 ${
+                showFilters ? "block" : "hidden lg:block"
+              }`}
             >
               <div className="space-y-6">
-                {/* Submit Mentor Card */}
-
-                {token && (
+                {/* ========================================== */}
+                {/* SUBMIT MENTOR CARD - Different for login/guest */}
+                {/* ========================================== */}
+                {token ? (
+                  // LOGGED IN USER - Submit Mentor Card
                   <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg shadow-md p-6 border border-yellow-200">
                     <div className="flex items-center gap-2 mb-3">
                       <FontAwesomeIcon
@@ -295,6 +482,66 @@ const MentorsHubPage = () => {
 
                     <p className="text-xs text-gray-400 text-center mt-2">
                       Join our growing community of mentors
+                    </p>
+                  </div>
+                ) : (
+                  // NOT LOGGED IN - Login Prompt Card
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-md p-6 border border-blue-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <FontAwesomeIcon
+                        icon={faSignInAlt}
+                        className="w-5 h-5 text-blue-600"
+                      />
+                      <h3 className="text-lg font-bold text-gray-900">
+                        Want to Become a Mentor?
+                      </h3>
+                    </div>
+
+                    <p className="text-sm text-gray-600 mb-4">
+                      Login to share your expertise, create mentor events, and
+                      inspire our community.
+                    </p>
+
+                    <div className="space-y-2 mb-4 text-xs text-gray-500">
+                      <div className="flex items-center gap-2">
+                        <FontAwesomeIcon
+                          icon={faRocket}
+                          className="w-3 h-3 text-blue-600"
+                        />
+                        <span>Reach thousands of learners</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <FontAwesomeIcon
+                          icon={faChalkboardTeacher}
+                          className="w-3 h-3 text-blue-600"
+                        />
+                        <span>Build your mentor profile</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <FontAwesomeIcon
+                          icon={faFileAlt}
+                          className="w-3 h-3 text-blue-600"
+                        />
+                        <span>Share valuable resources</span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleSubmitMentor}
+                      className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                    >
+                      <FontAwesomeIcon icon={faSignInAlt} className="w-4 h-4" />
+                      Please Login to Submit
+                    </button>
+
+                    <p className="text-xs text-gray-400 text-center mt-2">
+                      New here?{" "}
+                      <Link
+                        to="/signup"
+                        className="text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        Create an account
+                      </Link>
                     </p>
                   </div>
                 )}
@@ -396,38 +643,23 @@ const MentorsHubPage = () => {
                   {filteredArticles.map((article) => (
                     <div
                       key={article.id}
-                      className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group"
+                      className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group flex flex-col"
                     >
-                      {/* Article Media */}
-                      <div className="relative overflow-hidden">
-                        <MediaRenderer
-                          media={article.media}
-                          className="w-full h-48 object-cover"
-                        />
-                        <div className="absolute top-3 left-3">
-                          <span className="inline-block px-2 py-1 bg-white bg-opacity-90 text-xs font-medium text-gray-700 rounded">
-                            {article.category}
-                          </span>
-                        </div>
-                        <div className="absolute top-3 right-3">
-                          <span className="inline-block px-2 py-1 bg-black bg-opacity-70 text-xs font-medium text-white rounded">
-                            {formatDate(article.created_at)}
-                          </span>
-                        </div>
-                      </div>
+                      {/* Article Media - Fixed Size */}
+                      {renderMedia(article)}
 
                       {/* Article Content */}
-                      <div className="p-6">
+                      <div className="p-6 flex-1 flex flex-col">
                         <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-yellow-600 transition-colors">
                           {article.title}
                         </h3>
 
-                        <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                        <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-1">
                           {article.excerpt}
                         </p>
 
                         {/* Stats and Button */}
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                           <div className="flex items-center gap-4 text-sm text-gray-500">
                             <div className="flex items-center gap-1">
                               <FontAwesomeIcon

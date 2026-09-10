@@ -15,7 +15,10 @@ import {
   Search,
   Filter,
   Download,
-  ExternalLink
+  ExternalLink,
+  Youtube,
+  Image as ImageIcon,
+  Video
 } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -39,14 +42,13 @@ const HandleMentorHub = () => {
       const response = await axios.get(`${API_URL}api/events`, {
         headers: {
           Authorization: `Bearer ${token}`,
-           "Cache-Control": "no-cache",
+          "Cache-Control": "no-cache",
           Pragma: "no-cache",
         },
       });
 
       if (response.data.status) {
         setMentors(response.data.data);
-        // console.log("Fetched mentors:", response.data.data);
       } else {
         throw new Error("Failed to fetch mentors data");
       }
@@ -71,7 +73,7 @@ const HandleMentorHub = () => {
 
     try {
       setDeleteLoading(id);
-      const response = await axios.delete(`${API_URL}api/events/delete/${id}`, {
+      const response = await axios.post(`${API_URL}api/admin/events/delete/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -79,13 +81,14 @@ const HandleMentorHub = () => {
 
       if (response.data.status) {
         toast.success("Mentor event deleted successfully");
-        fetchMentors(); // Refresh the list
+        fetchMentors();
       } else {
         throw new Error(response.data.message || "Delete failed");
       }
     } catch (error) {
       console.error("Error deleting mentor:", error);
-      toast.error(error.response?.data?.message || "Failed to delete mentor");
+      console.log(error);
+      toast.error(error?.message || "Failed to delete mentor");
     } finally {
       setDeleteLoading(null);
     }
@@ -110,6 +113,151 @@ const HandleMentorHub = () => {
     });
   };
 
+  // ==========================================
+  // Extract YouTube video ID for embed/thumbnail
+  // ==========================================
+  const getYoutubeVideoId = (url) => {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+
+  // Get YouTube thumbnail URL
+  const getYoutubeThumbnail = (url) => {
+    const videoId = getYoutubeVideoId(url);
+    return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
+  };
+
+  // ==========================================
+  // Determine media preview URL based on media_type
+  // ==========================================
+  const getMediaPreviewUrl = (mentor) => {
+    const mediaType = mentor.media_type;
+
+    // YouTube video
+    if (mediaType === "youtube") {
+      return getYoutubeThumbnail(mentor.image_video);
+    }
+
+    // Regular image or video file
+    if (mediaType === "image" || mediaType === "video" || !mediaType) {
+      if (!mentor.image_video) return null;
+      
+      // If image_video is a full URL (http/https), use it directly
+      if (mentor.image_video.startsWith("http://") || mentor.image_video.startsWith("https://")) {
+        return mentor.image_video;
+      }
+      
+      // If it's a relative path, prefix with STORAGE_URL
+      // Check if it's a valid storage path (not a tmp path)
+      if (mentor.image_video.startsWith("/tmp/")) {
+        return null;
+      }
+      
+      return `${STORAGE_URL}${mentor.image_video}`;
+    }
+
+    return null;
+  };
+
+  // ==========================================
+  // Render Media Preview (Image / YouTube / Video)
+  // ==========================================
+  const renderMediaPreview = (mentor) => {
+    const mediaType = mentor.media_type;
+    const previewUrl = getMediaPreviewUrl(mentor);
+
+    // No media available
+    if (!previewUrl) {
+      return (
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-yellow-50 to-red-50">
+          <FileText className="w-12 h-12 text-gray-400" />
+        </div>
+      );
+    }
+
+    // YouTube video - show thumbnail with play button overlay
+    if (mediaType === "youtube") {
+      return (
+        <a
+          href={mentor.image_video}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative block w-full h-full group"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <img
+            src={previewUrl}
+            alt={mentor.image_alt_tag || mentor.title}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.target.src = "https://via.placeholder.com/400x200?text=YouTube+Video";
+            }}
+          />
+          {/* Play button overlay */}
+          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center group-hover:bg-opacity-50 transition-all">
+            <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+              <svg
+                className="w-8 h-8 text-white ml-1"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </div>
+          {/* YouTube badge */}
+          <div className="absolute top-3 left-3 bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
+            <Youtube className="w-3 h-3" />
+            YouTube
+          </div>
+        </a>
+      );
+    }
+
+    // Video file
+    if (mediaType === "video") {
+      return (
+        <div className="relative w-full h-full group">
+          <video
+            src={previewUrl}
+            className="w-full h-full object-cover"
+            muted
+            onMouseOver={(e) => e.target.play()}
+            onMouseOut={(e) => {
+              e.target.pause();
+              e.target.currentTime = 0;
+            }}
+          />
+          {/* Video badge */}
+          <div className="absolute top-3 left-3 bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
+            <Video className="w-3 h-3" />
+            Video
+          </div>
+        </div>
+      );
+    }
+
+    // Default: Image
+    return (
+      <div className="relative w-full h-full">
+        <img
+          src={previewUrl}
+          alt={mentor.image_alt_tag || mentor.title}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.target.src = "https://via.placeholder.com/400x200?text=Event+Image";
+          }}
+        />
+        <div className="absolute top-3 left-3 bg-gray-700 text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
+          <ImageIcon className="w-3 h-3" />
+          Image
+        </div>
+      </div>
+    );
+  };
+
   // Filter mentors based on search and filter
   const filteredMentors = mentors.filter((mentor) => {
     const matchesSearch = 
@@ -125,15 +273,40 @@ const HandleMentorHub = () => {
     return matchesSearch && matchesFilter;
   });
 
-  // Get social links count
+  // ==========================================
+  // Get social links count - Handles all formats
+  // ==========================================
   const getSocialLinksCount = (mentor) => {
     let count = 0;
-    if (mentor.share_links && typeof mentor.share_links === 'object') {
-      count += Object.keys(mentor.share_links).length;
+
+    // Handle share_links
+    const shareLinks = mentor.share_links;
+    if (Array.isArray(shareLinks)) {
+      count += shareLinks.filter(
+        (link) =>
+          link &&
+          typeof link === "object" &&
+          link.key &&
+          link.value
+      ).length;
+    } else if (shareLinks && typeof shareLinks === "object") {
+      count += Object.keys(shareLinks).length;
     }
-    if (mentor.event_social_links && typeof mentor.event_social_links === 'object') {
-      count += Object.keys(mentor.event_social_links).length;
+
+    // Handle event_social_links
+    const eventLinks = mentor.event_social_links;
+    if (Array.isArray(eventLinks)) {
+      count += eventLinks.filter(
+        (link) =>
+          link &&
+          typeof link === "object" &&
+          link.key &&
+          link.value
+      ).length;
+    } else if (eventLinks && typeof eventLinks === "object") {
+      count += Object.keys(eventLinks).length;
     }
+
     return count;
   };
 
@@ -244,7 +417,7 @@ const HandleMentorHub = () => {
           </div>
           <div className="bg-white rounded-lg shadow p-4 border-l-4 border-red-600">
             <div className="text-2xl font-bold text-gray-900">
-              {mentors.filter(m => m.is_upcomming === "1").length}
+              {mentors.filter(m => m.is_upcomming === "1" || m.is_upcomming === 1).length}
             </div>
             <div className="text-gray-600 text-sm">Upcoming Events</div>
           </div>
@@ -289,36 +462,25 @@ const HandleMentorHub = () => {
                 key={mentor.id}
                 className="bg-white rounded-lg shadow hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden"
               >
-                {/* Image/Video Section */}
-                <div className="relative h-48 bg-gray-100">
-                  {mentor.image_video ? (
-                    <img
-                      src={`${STORAGE_URL}${mentor.image_video}`}
-                      alt={mentor.image_alt_tag || mentor.title}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src = 'https://via.placeholder.com/400x200?text=Event+Image';
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-yellow-50 to-red-50">
-                      <FileText className="w-12 h-12 text-gray-400" />
-                    </div>
-                  )}
+                {/* ========================================== */}
+                {/* Media Preview (Image / YouTube / Video) */}
+                {/* ========================================== */}
+                <div className="relative h-48 bg-gray-100 overflow-hidden">
+                  {renderMediaPreview(mentor)}
                   
                   {/* Status Badge */}
-                  <div className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-semibold ${
-                    mentor.is_upcomming === "1" 
+                  <div className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-semibold z-10 ${
+                    mentor.is_upcomming === "1" || mentor.is_upcomming === 1
                       ? "bg-green-500 text-white" 
                       : "bg-gray-500 text-white"
                   }`}>
-                    {mentor.is_upcomming === "1" ? "Upcoming" : "Past"}
+                    {mentor.is_upcomming === "1" || mentor.is_upcomming === 1 ? "Upcoming" : "Past"}
                   </div>
 
                   {/* View Count */}
-                  <div className="absolute top-3 left-3 bg-black bg-opacity-75 text-white px-2 py-1 rounded-full text-xs">
+                  <div className="absolute top-3 right-3 mt-8 bg-black bg-opacity-75 text-white px-2 py-1 rounded-full text-xs z-10">
                     <Eye className="w-3 h-3 inline mr-1" />
-                    {mentor.view_count}
+                    {mentor.view_count || 0}
                   </div>
                 </div>
 
@@ -366,6 +528,13 @@ const HandleMentorHub = () => {
                           <Download className="w-4 h-4" />
                           <span>{(mentor.pdf ? 1 : 0) + (mentor.ppt ? 1 : 0)}</span>
                         </div>
+                      )}
+
+                      {/* Active Status */}
+                      {mentor.is_active === 1 || mentor.is_active === "1" ? (
+                        <span className="w-2 h-2 bg-green-500 rounded-full" title="Active"></span>
+                      ) : (
+                        <span className="w-2 h-2 bg-gray-400 rounded-full" title="Inactive"></span>
                       )}
                     </div>
                   </div>

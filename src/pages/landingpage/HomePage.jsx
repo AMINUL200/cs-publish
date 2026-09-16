@@ -173,11 +173,11 @@ const HomePage = () => {
         loading={loading.partner}
         error={error.partner}
       />
-      <LandingOurTeam
+      {/* <LandingOurTeam
         ourTeamData={ourTeamData}
         loading={loading.team}
         error={error.team}
-      />
+      /> */}
       <FloatingSubmitButton />
     </>
   );

@@ -176,6 +176,11 @@ export const sidebarRoutes = [
         allowedRoles: [0],
       },
       {
+        path: "/articlemanager/template",
+        title: "Manage Template",
+        allowedRoles: [0],
+      },
+      {
         path: "/articlemanager/view-manuscript",
         title: "View Manuscript",
         allowedRoles: [0],

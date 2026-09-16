@@ -175,6 +175,7 @@ import SubmitMentorPage from "./pages/user/mentor_hub/SubmitMentorPage";
 import MentorGuidLinePage from "./pages/user/mentor_hub/MentorGuidLinePage";
 import AdminViewSubmittedMentors from "./pages/user/mentor_hub/AdminViewSubmittedMentors";
 import UserViewSubmitMentors from "./pages/user/mentor_hub/UserViewSubmitMentors";
+import ManageTemplate from "./pages/Articlemanager/ManageTemplate";
  
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -415,6 +416,7 @@ function App() {
                 path="/articlemanager/checklist"
                 element={<ChecklistPage />}
               />
+              <Route path="/articlemanager/template" element={<ManageTemplate />} />
               <Route
                 path="/articlemanager/view-manuscript"
                 element={<ViewSubmittedManuscript />}

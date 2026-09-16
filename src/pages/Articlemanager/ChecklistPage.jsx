@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlus,
   faCheck,
   faTimes,
-  faEye,
   faSearch,
   faEdit,
   faTrash,
@@ -19,57 +18,63 @@ const ChecklistPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [newItem, setNewItem] = useState({
-    checklist_item: "",
-    status: 1, // Default to enabled
-  });
+  const [newItem, setNewItem] = useState({ checklist_item: "", status: 1 });
   const [editingItem, setEditingItem] = useState({
     checklist_item: "",
-    status: "1",
+    status: 1, // ✅ Keep as number for consistency
   });
   const [checklistItems, setChecklistItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [addListLoading, setAddListLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteLoadingId, setDeleteLoadingId] = useState(null); // ✅ Track which id
   const [updateLoading, setUpdateLoading] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL;
 
-  const fetchChecklistItems = async () => {
+  const authHeaders = {
+    Authorization: `Bearer ${token}`,
+  };
+
+  // ✅ Memoized fetch
+  const fetchChecklistItems = useCallback(async () => {
     try {
       const response = await axios.get(
         `${API_URL}api/admin/checklist-settings`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            ...authHeaders,
             "Content-Type": "application/json",
             "Cache-Control": "no-cache",
             Pragma: "no-cache",
           },
-        },
+        }
       );
-      console.log(response.data);
 
       if (response.data.flag === 1) {
-        setChecklistItems(response.data.data);
+        // ✅ Normalize status to number so table comparison works
+        const normalized = response.data.data.map((it) => ({
+          ...it,
+          status: Number(it.status),
+        }));
+        setChecklistItems(normalized);
       } else {
         toast.error("Failed to fetch checklist items");
       }
     } catch (err) {
-      toast.error(err.message);
-      console.log(err);
+      toast.error(err?.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_URL, token]);
 
   useEffect(() => {
     fetchChecklistItems();
-  }, []);
+  }, [fetchChecklistItems]);
 
   const filteredItems = checklistItems.filter((item) =>
-    item.checklist_item.toLowerCase().includes(searchTerm.toLowerCase()),
+    item.checklist_item?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // ---------------- ADD ----------------
   const handleAddItem = async () => {
     if (newItem.checklist_item.trim() === "") return;
 
@@ -80,71 +85,83 @@ const ChecklistPage = () => {
         newItem,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            ...authHeaders,
             "Content-Type": "multipart/form-data",
           },
-        },
+        }
       );
 
-      fetchChecklistItems();
+      // ✅ Check response before success toast
+      if (response.data.flag === 1 || response.data.status === "success") {
+        toast.success(response.data.message || "Item added successfully");
+        fetchChecklistItems();
+        setNewItem({ checklist_item: "", status: 1 });
+        setShowModal(false);
+      } else {
+        toast.error(response.data.message || "Failed to add item");
+      }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message || error.message);
     } finally {
-      setNewItem({
-        checklist_item: "",
-        status: 1,
-      });
       setAddListLoading(false);
-      setShowModal(false);
     }
   };
 
+  // ---------------- DELETE ----------------
   const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this item?")) return;
+
     try {
-      setDeleteLoading(true);
+      setDeleteLoadingId(id);
       const response = await axios.delete(
         `${API_URL}api/admin/checklist-settings/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        },
+        { headers: authHeaders }
       );
+
       if (response.data.status === "success") {
         toast.success(response.data.message);
+        setChecklistItems((prev) => prev.filter((it) => it.id !== id)); // ✅ Optimistic
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.log(error.message);
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message || error.message);
     } finally {
-      setDeleteLoading(false);
-      fetchChecklistItems();
+      setDeleteLoadingId(null);
     }
   };
 
+  // ---------------- EDIT (open modal) ----------------
   const handleEditItem = async (id) => {
-    const response = await axios.get(
-      `${API_URL}api/admin/checklist-settings/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-          "Cache-Control": "no-cache",
-          Pragma: "no-cache",
-        },
-      },
-    );
-    setEditingItem(response.data.data);
-    setShowEditModal(true);
+    try {
+      const response = await axios.get(
+        `${API_URL}api/admin/checklist-settings/${id}`,
+        {
+          headers: {
+            ...authHeaders,
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
+        }
+      );
+
+      if (response.data.flag === 1 || response.data.data) {
+        setEditingItem({
+          ...response.data.data,
+          status: Number(response.data.data.status), // ✅ normalize
+        });
+        setShowEditModal(true);
+      } else {
+        toast.error("Failed to load item");
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message);
+    }
   };
 
+  // ---------------- UPDATE ----------------
   const handleUpdateItem = async (id) => {
     if (editingItem.checklist_item.trim() === "") return;
-    console.log("id ", id);
-    console.log("editingitemdata", editingItem);
 
     try {
       setUpdateLoading(true);
@@ -153,29 +170,26 @@ const ChecklistPage = () => {
         editingItem,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            ...authHeaders,
             "Content-Type": "application/json",
           },
-        },
+        }
       );
-      console.log("response datat ", response.data.data);
-
-      if (response.data.falg === 1) {
-        toast.success("list update successfully");
+      console.log("Update response:", response.data.falg);
+      // ✅ FIXED: "flag" not "falg"
+      if (response.data.falg === 1 || response.data.status === "success") {
+        toast.success(response.data.message || "Item updated successfully");
         fetchChecklistItems();
+        setShowEditModal(false);
+        setEditingItem({ checklist_item: "", status: 1 });
       } else {
-        toast.error("list not update");
+        toast.error(response.data.message || "Failed to update item");
       }
     } catch (error) {
-      toast.error(error.message);
-      console.log(error);
+      toast.error(error);
+      console.log("Update error details:",error);
     } finally {
       setUpdateLoading(false);
-      setShowEditModal(false);
-      setEditingItem({
-        checklist_item: "",
-        status: "1",
-      });
     }
   };
 
@@ -198,18 +212,10 @@ const ChecklistPage = () => {
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="
-                            pl-10 pr-4 py-2 border border-gray-300 rounded-lg 
-                            focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                            outline-none transition-all duration-200
-                            w-full shadow-sm
-                        "
+            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200 w-full shadow-sm"
           />
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <FontAwesomeIcon
-              icon={faSearch}
-              className="h-4 w-4 text-gray-400"
-            />
+            <FontAwesomeIcon icon={faSearch} className="h-4 w-4 text-gray-400" />
           </div>
         </div>
 
@@ -226,18 +232,14 @@ const ChecklistPage = () => {
         <table className="min-w-full w-[700px] bg-white border border-gray-200">
           <thead className="bg-gray-50 border-2">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider border-2">
-                Id
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider border-2">
-                Checklist Items
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider border-2">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider border-2">
-                Actions
-              </th>
+              {["Id", "Checklist Items", "Status", "Actions"].map((h) => (
+                <th
+                  key={h}
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider border-2"
+                >
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 border-2">
@@ -251,7 +253,7 @@ const ChecklistPage = () => {
                     {item.checklist_item}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap border-2">
-                    {item.status === "1" ? (
+                    {Number(item.status) === 1 ? (
                       <span className="px-2 inline-flex justify-center items-center text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                         <FontAwesomeIcon icon={faCheck} className="mr-1" />
                         Enabled
@@ -272,24 +274,23 @@ const ChecklistPage = () => {
                       Edit
                     </button>
                     <button
-                      onClick={() => {
-                        handleDelete(item.id);
-                      }}
-                      disabled={deleteLoading}
-                      className={` text-white p-2 rounded  ${deleteLoading ? "bg-gray-500 hover:bg-gray-700 cursor-not-allowed" : "cursor-pointer bg-red-500 hover:bg-red-600"}`}
+                      onClick={() => handleDelete(item.id)}
+                      disabled={deleteLoadingId === item.id}
+                      className={`text-white p-2 rounded ${
+                        deleteLoadingId === item.id
+                          ? "bg-gray-500 cursor-not-allowed"
+                          : "cursor-pointer bg-red-500 hover:bg-red-600"
+                      }`}
                     >
                       <FontAwesomeIcon icon={faTrash} className="mr-1" />
-                      Delete
+                      {deleteLoadingId === item.id ? "Deleting..." : "Delete"}
                     </button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td
-                  colSpan="4"
-                  className="px-6 py-4 text-center text-sm text-gray-500"
-                >
+                <td colSpan="4" className="px-6 py-4 text-center text-sm text-gray-500">
                   No items found matching your search criteria
                 </td>
               </tr>
@@ -302,7 +303,7 @@ const ChecklistPage = () => {
         Showing {filteredItems.length} of {checklistItems.length} items
       </div>
 
-      {/* Modal for adding new item */}
+      {/* ---------------- ADD MODAL ---------------- */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
@@ -369,7 +370,7 @@ const ChecklistPage = () => {
                 onClick={handleAddItem}
                 disabled={!newItem.checklist_item.trim() || addListLoading}
               >
-                {addListLoading ? (
+                {addListLoading && (
                   <svg
                     className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                     xmlns="http://www.w3.org/2000/svg"
@@ -383,14 +384,14 @@ const ChecklistPage = () => {
                       r="10"
                       stroke="currentColor"
                       strokeWidth="4"
-                    ></circle>
+                    />
                     <path
                       className="opacity-75"
                       fill="currentColor"
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
+                    />
                   </svg>
-                ) : null}
+                )}
                 {addListLoading ? "Adding..." : "Add Item"}
               </button>
             </div>
@@ -398,7 +399,7 @@ const ChecklistPage = () => {
         </div>
       )}
 
-      {/* Modal for editing item */}
+      {/* ---------------- EDIT MODAL ---------------- */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
@@ -439,9 +440,9 @@ const ChecklistPage = () => {
                   <input
                     type="radio"
                     className="form-radio h-4 w-4 text-blue-600"
-                    checked={editingItem.status === "1"}
+                    checked={Number(editingItem.status) === 1}
                     onChange={() =>
-                      setEditingItem({ ...editingItem, status: "1" })
+                      setEditingItem({ ...editingItem, status: 1 })
                     }
                   />
                   <span className="ml-2">Enabled</span>
@@ -450,9 +451,9 @@ const ChecklistPage = () => {
                   <input
                     type="radio"
                     className="form-radio h-4 w-4 text-blue-600"
-                    checked={editingItem.status === "0"}
+                    checked={Number(editingItem.status) === 0}
                     onChange={() =>
-                      setEditingItem({ ...editingItem, status: "0" })
+                      setEditingItem({ ...editingItem, status: 0 })
                     }
                   />
                   <span className="ml-2">Disabled</span>
@@ -468,13 +469,13 @@ const ChecklistPage = () => {
                 Cancel
               </button>
               <button
-                className={`px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300 ${updateLoading ? "cursor-not-allowed" : "cursor-pointer"} `}
-                onClick={() => {
-                  handleUpdateItem(editingItem.id);
-                }}
+                className={`px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300 ${
+                  updateLoading ? "cursor-not-allowed" : "cursor-pointer"
+                }`}
+                onClick={() => handleUpdateItem(editingItem.id)}
                 disabled={!editingItem.checklist_item.trim() || updateLoading}
               >
-                Update Item
+                {updateLoading ? "Updating..." : "Update Item"}
               </button>
             </div>
           </div>

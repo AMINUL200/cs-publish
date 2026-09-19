@@ -84,15 +84,15 @@ const StepperForm = () => {
           manuscript_file: null,
           copyright_form: null,
           supplementary_files: null,
-          figures: Array.isArray(data.figures) 
-            ? data.figures.filter(f => !(f instanceof File))
+          figures: Array.isArray(data.figures)
+            ? data.figures.filter((f) => !(f instanceof File))
             : [],
         },
         authors: authorsData,
         step: currentStep,
         timestamp: new Date().toISOString(),
       };
-      
+
       localStorage.setItem(STORAGE_KEY, JSON.stringify(draftData));
     } catch (error) {
       console.error("Error saving draft:", error);
@@ -102,11 +102,11 @@ const StepperForm = () => {
   // ✅ Helper function to load draft from localStorage
   const loadDraft = () => {
     if (isUpdateMode) return null;
-    
+
     try {
       const draft = localStorage.getItem(STORAGE_KEY);
       if (!draft) return null;
-      
+
       const parsedDraft = JSON.parse(draft);
       return parsedDraft;
     } catch (error) {
@@ -124,13 +124,13 @@ const StepperForm = () => {
   // ✅ Function to restore draft on load
   const restoreDraft = () => {
     if (isUpdateMode) return false;
-    
+
     const draft = loadDraft();
     if (!draft) return false;
 
     try {
       // Restore form data (excluding files)
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         journal_id: draft.formData.journal_id || "",
         article_type: draft.formData.article_type || "",
@@ -149,10 +149,15 @@ const StepperForm = () => {
         discussion: draft.formData.discussion || "",
         conclusion: draft.formData.conclusion || "",
         author_contributions: draft.formData.author_contributions || "",
-        conflict_of_interest_statement: draft.formData.conflict_of_interest_statement || "",
+        conflict_of_interest_statement:
+          draft.formData.conflict_of_interest_statement || "",
         references: draft.formData.references || "",
-        keywords: Array.isArray(draft.formData.keywords) ? draft.formData.keywords : [],
-        figures: Array.isArray(draft.formData.figures) ? draft.formData.figures : [],
+        keywords: Array.isArray(draft.formData.keywords)
+          ? draft.formData.keywords
+          : [],
+        figures: Array.isArray(draft.formData.figures)
+          ? draft.formData.figures
+          : [],
         // Files should be null (user needs to reselect)
         manuscript_file: null,
         copyright_form: null,
@@ -255,7 +260,12 @@ const StepperForm = () => {
   const nextStep = () => {
     // ✅ Basic validation before moving to next step
     if (step === 1) {
-      if (!formData.journal_id || !formData.article_type || !formData.username || !formData.email) {
+      if (
+        !formData.journal_id ||
+        !formData.article_type ||
+        !formData.username ||
+        !formData.email
+      ) {
         toast.error("Please fill all required fields in Step 1");
         return;
       }
@@ -274,7 +284,7 @@ const StepperForm = () => {
     if (!isUpdateMode) {
       saveDraft(formData, authors, step + 1);
     }
-    
+
     setStep((prev) => prev + 1);
   };
 
@@ -597,11 +607,7 @@ const StepperForm = () => {
         navigate("/dashboard");
       }
     } catch (error) {
-      toast.error(
-        isUpdateMode
-          ? "Update failed. Check console for details."
-          : "Submission failed. Check console for details.",
-      );
+      toast.error(error.message || "Submission failed");
       console.error("Submission error:", error.response?.data || error.message);
       // ✅ Keep draft if submission fails
     } finally {
@@ -660,7 +666,7 @@ const StepperForm = () => {
   useEffect(() => {
     // Don't save if in update mode or if no data yet
     if (isUpdateMode || loading) return;
-    
+
     // Save draft whenever formData or authors change
     saveDraft(formData, authors, step);
   }, [formData, authors, step, isUpdateMode, loading]);

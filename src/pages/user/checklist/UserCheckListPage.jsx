@@ -10,6 +10,7 @@ import axios from "axios";
 
 const UserCheckListPage = () => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const storageUrl = import.meta.env.VITE_STORAGE_URL;
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
@@ -84,8 +85,8 @@ const UserCheckListPage = () => {
   const buildFileUrl = (path) => {
     if (!path) return "#";
     if (path.startsWith("http")) return path;
-    const base = API_URL?.replace(/\/$/, "") || "";
-    return `${base}/${path.replace(/^\//, "")}`;
+    const base = storageUrl  || "";
+    return `${base}/${path}`;
   };
 
   // unique journals derived from templates

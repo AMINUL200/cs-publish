@@ -218,6 +218,7 @@ const UpdateBlog = () => {
       submitData.append("long_description", formData.long_description);
       submitData.append("image_alt", formData.image_alt);
       submitData.append("date", formData.date);
+      // submitData.append("status", true);
 
       if (formData.image) {
         submitData.append("image", formData.image);
@@ -238,7 +239,7 @@ const UpdateBlog = () => {
           },
         }
       );
-
+      console.log("Update Blog Response:", response); // Log the response data for debugging
       if (response.status === 200) {
         toast.success(response.data.message);
         navigate("/blog/view");

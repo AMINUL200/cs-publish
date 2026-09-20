@@ -176,7 +176,7 @@ import MentorGuidLinePage from "./pages/user/mentor_hub/MentorGuidLinePage";
 import AdminViewSubmittedMentors from "./pages/user/mentor_hub/AdminViewSubmittedMentors";
 import UserViewSubmitMentors from "./pages/user/mentor_hub/UserViewSubmitMentors";
 import ManageTemplate from "./pages/Articlemanager/ManageTemplate";
- 
+
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
 
@@ -291,7 +291,10 @@ function App() {
             <Route path="/about-journal/:id" element={<AboutJournal />} />
             <Route path="/quick-press/:id" element={<QuickPress />} />
             <Route path="/editorial-board/:id" element={<JournalEditorial />} />
-            <Route path="/editorial-board/:id/:slug" element={<JournalEditorialDetails />} />
+            <Route
+              path="/editorial-board/:id/:slug"
+              element={<JournalEditorialDetails />}
+            />
 
             <Route path="/my-subscription" element={<MySubscription />} />
 
@@ -306,14 +309,20 @@ function App() {
             <Route path="/about" element={<UserProfilePage />} />
             <Route path="/blog" element={<UserBlogPage />} />
             <Route path="/submit-blog" element={<UserSubmitBlogPage />} />
-            <Route path="/view-submit-blog" element={<UserViewSubmittedBlog />} />
+            <Route
+              path="/view-submit-blog"
+              element={<UserViewSubmittedBlog />}
+            />
 
             <Route path="/blog/:id" element={<BlogDetails />} />
             <Route path="/cms/:slug" element={<CmsTemplate />} />
             <Route path="/cms-page/:slug" element={<CmsPage />} />
 
             <Route path="/innovation" element={<InnovationPage />} />
-            <Route path="/submit-innovation" element={<UserAddInnovationPage />} />
+            <Route
+              path="/submit-innovation"
+              element={<UserAddInnovationPage />}
+            />
             <Route
               path="/innovation/:slug"
               element={<InnoVationDetailsPage />}
@@ -328,8 +337,10 @@ function App() {
             {/* Mentors route */}
             <Route path="/mentors" element={<MentorsHubPage />} />
             <Route path="/submit-mentor" element={<SubmitMentorPage />} />
-            <Route path="/view-submitted-mentors-list" element={<UserViewSubmitMentors />} />
-
+            <Route
+              path="/view-submitted-mentors-list"
+              element={<UserViewSubmitMentors />}
+            />
 
             <Route path="/mentors/:id" element={<MentorHubDetails />} />
 
@@ -410,13 +421,16 @@ function App() {
 
               {/* Add more protected routes here */}
 
-              {/* Admin */}
+              {/* -----------Admin-------------- */}
               <Route path="/permission/editor" element={<EditorPermission />} />
               <Route
                 path="/articlemanager/checklist"
                 element={<ChecklistPage />}
               />
-              <Route path="/articlemanager/template" element={<ManageTemplate />} />
+              <Route
+                path="/articlemanager/template"
+                element={<ManageTemplate />}
+              />
               <Route
                 path="/articlemanager/view-manuscript"
                 element={<ViewSubmittedManuscript />}
@@ -426,7 +440,10 @@ function App() {
               {/* blog */}
               <Route path="/blog/add" element={<AddBlog />} />
               <Route path="/blog/view" element={<ViewBlog />} />
-              <Route path="/user-submitted-blog" element={<UserSubmittedBlogVew />} />
+              <Route
+                path="/user-submitted-blog"
+                element={<UserSubmittedBlogVew />}
+              />
               <Route path="/blog/guid-line" element={<BlogGuidLinePage />} />
               <Route path="/blog/view/:id" element={<UpdateBlog />} />
               <Route path="/blog/categories" element={<BlogCategories />} />
@@ -457,7 +474,10 @@ function App() {
 
               <Route path="/setting/teams" element={<HandleTeams />} />
               <Route path="/setting/add-team" element={<AddTeam />} />
-              <Route path="/setting/add-team-category" element={<MangeTeamCategory />} />
+              <Route
+                path="/setting/add-team-category"
+                element={<MangeTeamCategory />}
+              />
 
               <Route path="/setting/handle-faqs" element={<HandleFaqs />} />
 
@@ -494,7 +514,10 @@ function App() {
               <Route path="/handle-volume" element={<HandleVolume />} />
               {/* Journal ways editorial */}
               <Route path="/manage-editorial" element={<ManageEditorial />} />
-              <Route path="/manage-editorial-category" element={<MangeEDitorialCategory />} />
+              <Route
+                path="/manage-editorial-category"
+                element={<MangeEDitorialCategory />}
+              />
 
               {/* Payment */}
               <Route
@@ -532,13 +555,22 @@ function App() {
               <Route path="/add-cms-page" element={<AddNewCmsPage />} />
               <Route path="/list-cms-page" element={<ViewCmsPageList />} />
               <Route path="/handle-innovation" element={<HandleInnovation />} />
-              <Route path="/user-submit-innovation" element={<UserSubmitInnovation />} />
+              <Route
+                path="/user-submit-innovation"
+                element={<UserSubmitInnovation />}
+              />
               <Route path="/add-innovation" element={<AddInnovation />} />
 
               <Route path="/handle-mentor-hub" element={<HandleMentorHub />} />
-              <Route path="/handle-mentor-guidelines" element={<MentorGuidLinePage />} />
+              <Route
+                path="/handle-mentor-guidelines"
+                element={<MentorGuidLinePage />}
+              />
               <Route path="/add-mentor" element={<AddMentor />} />
-              <Route path="/view-submitted-mentors" element={<AdminViewSubmittedMentors />} />
+              <Route
+                path="/view-submitted-mentors"
+                element={<AdminViewSubmittedMentors />}
+              />
 
               <Route
                 path="/handle-publication-charge"
@@ -589,7 +621,7 @@ function App() {
 
               {/* ------------------------------------------ Admin Route End--------------------- */}
 
-              {/* Editor */}
+              {/*------------- Editor ------------- */}
               <Route
                 path="/permission/assigned-manuscript-reviewer"
                 element={<ReviewerPermission />}
@@ -611,7 +643,7 @@ function App() {
                 element={<AssignedManuscript />}
               />
 
-              {/* Reviewer */}
+              {/*------------- Reviewer ------------- */}
               <Route path="/list-journals" element={<ReviewerDashboard />} />
               <Route
                 path="/view-manuscript/:id"
@@ -619,7 +651,7 @@ function App() {
               />
               <Route path="/submit-review/:id" element={<ReviewSubmission />} />
 
-              {/* author */}
+              {/*------------- Author ------------- */}
               <Route
                 path="/confirmation/new-paper"
                 element={<UserCheckListPage />}
@@ -636,6 +668,12 @@ function App() {
                 path="/confirmation/view-manuscript/:id"
                 element={<AuthorViewSubmitManuscriptDetail />}
               />
+
+              {/* <Route
+                path="/view-submit-blog"
+                element={<UserViewSubmittedBlog />}
+              /> */}
+
               {/* demo */}
               {/* <Route
                 path="/confirmation/view-details-manuscript"

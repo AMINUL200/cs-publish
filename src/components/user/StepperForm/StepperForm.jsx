@@ -607,9 +607,32 @@ const StepperForm = () => {
         navigate("/dashboard");
       }
     } catch (error) {
-      toast.error(error.message || "Submission failed");
       console.error("Submission error:", error.response?.data || error.message);
-      // ✅ Keep draft if submission fails
+
+      const responseData = error.response?.data;
+
+      // Laravel validation errors
+      if (responseData?.errors) {
+        Object.values(responseData.errors).forEach((messages) => {
+          if (Array.isArray(messages)) {
+            messages.forEach((message) => {
+              toast.error(message);
+            });
+          } else {
+            toast.error(messages);
+          }
+        });
+      }
+      // Normal API error message
+      else if (responseData?.message) {
+        toast.error(responseData.message);
+      }
+      // Axios/network error
+      else {
+        toast.error(error.message || "Submission failed");
+      }
+
+      // Keep draft if submission fails
     } finally {
       setSubmitLoading(false);
     }

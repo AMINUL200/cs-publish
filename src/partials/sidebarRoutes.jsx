@@ -37,6 +37,18 @@ export const sidebarRoutes = [
     icon: <FontAwesomeIcon icon={faUser} />,
     allowedRoles: [1, 2, 3, 4, 5],
   },
+  {
+    path: "/view-submit-blog",
+    title: "View Submitted Blog",
+    icon: <FontAwesomeIcon icon={faUser} />,
+    allowedRoles: [ 2],
+  },
+  {
+    path: "/view-submitted-mentors-list",
+    title: "View Submitted Mentors",
+    icon: <FontAwesomeIcon icon={faUser} />,
+    allowedRoles: [ 2],
+  },
   // Admin only routes
   {
     title: "User Management",

@@ -230,7 +230,7 @@ const ManageTemplate = () => {
 
     const fd = new FormData();
     fd.append("journal_id", editingItem.journal_id);
-    fd.append("_method", "PUT"); // Laravel method spoofing
+    // fd.append("_method", "PUT"); // Laravel method spoofing
     if (editingItem.copyright_file)
       fd.append("copyright_file", editingItem.copyright_file);
     if (editingItem.template_file)

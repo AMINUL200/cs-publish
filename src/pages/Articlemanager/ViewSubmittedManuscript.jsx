@@ -53,7 +53,7 @@ const ViewSubmittedManuscript = () => {
           Pragma: "no-cache",
                 }
             });
-
+            console.log('Fetched manuscripts:', res);
             if (res.data.success === true) {
                 setManuscripts(res.data.data);
             } else {
@@ -62,6 +62,7 @@ const ViewSubmittedManuscript = () => {
         } catch (error) {
             console.error('Error fetching manuscripts:', error);
             toast.error(error.response?.data?.message || 'Failed to fetch manuscripts');
+            console.log('Error response:', error);
         } finally {
             setLoading(false);
         }

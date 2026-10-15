@@ -64,6 +64,8 @@ const EditorManageReviewer = () => {
           created_at: reviewer.created_at,
           last_login: reviewer.last_login || reviewer.created_at
         }));
+
+        console.log("Transformed Reviewers:", transformedReviewers);
         
         setReviewers(transformedReviewers);
       }
@@ -170,7 +172,7 @@ const EditorManageReviewer = () => {
   //  console.log(typeof status);
    
     
-    return status === '0'
+    return status === 0
       ? <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Active</span>
       : <span className="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">Inactive</span>;
   };

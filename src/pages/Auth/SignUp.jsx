@@ -50,7 +50,7 @@ const SignUp = () => {
     { value: "4", label: "User" },
   ];
 
-  const titleOptions = ["Mr", "Mrs", "Miss", "Dr", "Prof"];
+  const titleOptions = ["Mr.", "Mrs.", "Miss.", "Dr.", "Prof."];
   const genderOptions = ["Male", "Female", "Other"];
 
   // Check if current user type is reviewer

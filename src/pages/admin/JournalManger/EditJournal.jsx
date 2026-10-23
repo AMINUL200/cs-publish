@@ -30,9 +30,11 @@ const EditJournal = () => {
         j_title: "",
         j_categories: "",
         j_description: "",
+        small_desc: "", // NEW
         editorial_board: "",
         editor: "",
         amount: "",
+        submission_guideline: "", // NEW
         issn_print: "1",
         issn_print_no: "",
         issn_online: "1",
@@ -131,9 +133,11 @@ const EditJournal = () => {
                     j_title: j.j_title || "",
                     j_categories: j.j_categories || "",
                     j_description: j.j_description || "",
+                    small_desc: j.small_desc || "", // NEW
                     editorial_board: j.editorial_board || "",
                     editor: j.editor || "",
                     amount: j.amount || "",
+                    submission_guideline: j.submission_guideline || "", // NEW
                     issn_print: j.issn_print ? "1" : "0",
                     issn_print_no: j.issn_print_no || "",
                     issn_online: j.issn_online ? "1" : "0",
@@ -436,6 +440,53 @@ const EditJournal = () => {
                     />
                 </div>
 
+                {/* Small Description - Rich Text Editor (NEW) */}
+                <div>
+                    <label className="block mb-1 font-medium">Small Description</label>
+                    <Editor
+                        apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
+                        value={formData.small_desc}
+                        init={{
+                            height: 400,
+                            menubar: false,
+                            plugins: [
+                                "advlist",
+                                "autolink",
+                                "link",
+                                "lists",
+                                "charmap",
+                                "preview",
+                                "searchreplace",
+                                "visualblocks",
+                                "code",
+                                "fullscreen",
+                                "help",
+                                "wordcount",
+                            ],
+                            toolbar:
+                                "undo redo | blocks | " +
+                                "bold italic underline | link | " +
+                                "alignleft aligncenter alignright alignjustify | " +
+                                "bullist numlist outdent indent | " +
+                                "removeformat | help | code",
+                            content_style:
+                                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                            link_context_toolbar: true,
+                            link_assume_external_targets: true,
+                            link_title: false,
+                            default_link_target: "_blank",
+                            link_list: [
+                                { title: "Home Page", value: "/" },
+                                { title: "About Page", value: "/about" },
+                                { title: "Contact Page", value: "/contact" },
+                            ],
+                        }}
+                        onEditorChange={(content) =>
+                            handleEditorChange(content, "small_desc")
+                        }
+                    />
+                </div>
+
                 {/* Journal Metrics Section */}
                 <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                     <h2 className="text-lg font-semibold mb-4 text-gray-700">Journal Metrics</h2>
@@ -681,6 +732,53 @@ const EditJournal = () => {
                         required
                     />
                     {errors.amount && <p className="text-red-500 text-sm mt-1">{errors.amount}</p>}
+                </div>
+
+                {/* Submission Guideline - Rich Text Editor (NEW) */}
+                <div>
+                    <label className="block mb-1 font-medium">Submission Guideline</label>
+                    <Editor
+                        apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
+                        value={formData.submission_guideline}
+                        init={{
+                            height: 400,
+                            menubar: false,
+                            plugins: [
+                                "advlist",
+                                "autolink",
+                                "link",
+                                "lists",
+                                "charmap",
+                                "preview",
+                                "searchreplace",
+                                "visualblocks",
+                                "code",
+                                "fullscreen",
+                                "help",
+                                "wordcount",
+                            ],
+                            toolbar:
+                                "undo redo | blocks | " +
+                                "bold italic underline | link | " +
+                                "alignleft aligncenter alignright alignjustify | " +
+                                "bullist numlist outdent indent | " +
+                                "removeformat | help | code",
+                            content_style:
+                                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                            link_context_toolbar: true,
+                            link_assume_external_targets: true,
+                            link_title: false,
+                            default_link_target: "_blank",
+                            link_list: [
+                                { title: "Home Page", value: "/" },
+                                { title: "About Page", value: "/about" },
+                                { title: "Contact Page", value: "/contact" },
+                            ],
+                        }}
+                        onEditorChange={(content) =>
+                            handleEditorChange(content, "submission_guideline")
+                        }
+                    />
                 </div>
 
                 {/* Publication Model */}

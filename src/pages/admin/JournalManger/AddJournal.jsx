@@ -24,6 +24,7 @@ const AddJournal = () => {
     j_title: "",
     j_categories: "",
     j_description: "",
+    small_desc: "", // NEW
     editorial_board: "",
     editor: "",
     issn_print: "1", // default true
@@ -33,6 +34,7 @@ const AddJournal = () => {
     ugc_approved: "1",
     ugc_no: "",
     amount: "",
+    submission_guideline: "", // NEW
     image: null,
     status: "1",
     author_guide: "",
@@ -351,6 +353,7 @@ const AddJournal = () => {
           j_title: "",
           j_categories: "",
           j_description: "",
+          small_desc: "", // NEW
           editorial_board: "",
           editor: "",
           issn_print: "1",
@@ -360,6 +363,7 @@ const AddJournal = () => {
           ugc_approved: "1",
           ugc_no: "",
           amount: "",
+          submission_guideline: "", // NEW
           image: null,
           status: "1",
           author_guide: "",
@@ -475,6 +479,53 @@ const AddJournal = () => {
             onChange={handleChange}
             className="w-full border px-3 py-2 rounded"
             rows="4"
+          />
+        </div>
+
+        {/* Small Description - Rich Text Editor (NEW) */}
+        <div>
+          <label className="block mb-1 font-medium">Small Description</label>
+          <Editor
+            apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
+            value={formData.small_desc}
+            init={{
+              height: 400,
+              menubar: false,
+              plugins: [
+                "advlist",
+                "autolink",
+                "link",
+                "lists",
+                "charmap",
+                "preview",
+                "searchreplace",
+                "visualblocks",
+                "code",
+                "fullscreen",
+                "help",
+                "wordcount",
+              ],
+              toolbar:
+                "undo redo | blocks | " +
+                "bold italic underline | link | " +
+                "alignleft aligncenter alignright alignjustify | " +
+                "bullist numlist outdent indent | " +
+                "removeformat | help | code",
+              content_style:
+                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+              link_context_toolbar: true,
+              link_assume_external_targets: true,
+              link_title: false,
+              default_link_target: "_blank",
+              link_list: [
+                { title: "Home Page", value: "/" },
+                { title: "About Page", value: "/about" },
+                { title: "Contact Page", value: "/contact" },
+              ],
+            }}
+            onEditorChange={(content) =>
+              handleEditorChange(content, "small_desc")
+            }
           />
         </div>
 
@@ -736,6 +787,55 @@ const AddJournal = () => {
           {errors.amount && (
             <p className="text-red-500 text-sm mt-1">{errors.amount}</p>
           )}
+        </div>
+
+        {/* Submission Guideline - Rich Text Editor (NEW) */}
+        <div>
+          <label className="block mb-1 font-medium">
+            Submission Guideline
+          </label>
+          <Editor
+            apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
+            value={formData.submission_guideline}
+            init={{
+              height: 400,
+              menubar: false,
+              plugins: [
+                "advlist",
+                "autolink",
+                "link",
+                "lists",
+                "charmap",
+                "preview",
+                "searchreplace",
+                "visualblocks",
+                "code",
+                "fullscreen",
+                "help",
+                "wordcount",
+              ],
+              toolbar:
+                "undo redo | blocks | " +
+                "bold italic underline | link | " +
+                "alignleft aligncenter alignright alignjustify | " +
+                "bullist numlist outdent indent | " +
+                "removeformat | help | code",
+              content_style:
+                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+              link_context_toolbar: true,
+              link_assume_external_targets: true,
+              link_title: false,
+              default_link_target: "_blank",
+              link_list: [
+                { title: "Home Page", value: "/" },
+                { title: "About Page", value: "/about" },
+                { title: "Contact Page", value: "/contact" },
+              ],
+            }}
+            onEditorChange={(content) =>
+              handleEditorChange(content, "submission_guideline")
+            }
+          />
         </div>
 
         {/* Publication Model */}

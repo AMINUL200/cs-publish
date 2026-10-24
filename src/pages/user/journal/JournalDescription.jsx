@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Calendar,
   Users,
@@ -26,18 +26,19 @@ import {
   Book,
   Award,
   DollarSign,
-  Image as ImageIcon
-} from 'lucide-react';
-import axios from 'axios';
-import { useParams } from 'react-router-dom';
-import { IndianRupee } from 'lucide-react';
+  Image as ImageIcon,
+} from "lucide-react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import { IndianRupee } from "lucide-react";
+import { toast } from "react-toastify";
 
 const JournalDescription = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [journalData, setJournalData] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
   const API_URL = import.meta.env.VITE_API_URL;
   const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
@@ -46,17 +47,20 @@ const JournalDescription = () => {
     const fetchJournalData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${API_URL}api/about_the_journal/${id}`,{
-          headers: {
-            "Cache-Control": "no-cache",
-            Pragma: "no-cache",
+        const response = await axios.get(
+          `${API_URL}api/about_the_journal/${id}`,
+          {
+            headers: {
+              "Cache-Control": "no-cache",
+              Pragma: "no-cache",
+            },
           },
-        });
+        );
         console.log(response);
-        
+
         setJournalData(response.data.data);
       } catch (error) {
-        console.error('Error fetching journal data:', error);
+        console.error("Error fetching journal data:", error);
       } finally {
         setLoading(false);
       }
@@ -67,10 +71,10 @@ const JournalDescription = () => {
 
   // Format date
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -78,12 +82,12 @@ const JournalDescription = () => {
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: journalData?.j_title || 'Journal',
-        text: `Check out ${journalData?.j_title || 'this journal'}`,
+        title: journalData?.j_title || "Journal",
+        text: `Check out ${journalData?.j_title || "this journal"}`,
         url: window.location.href,
       });
     } else {
-      alert('Share URL copied to clipboard!');
+      alert("Share URL copied to clipboard!");
       navigator.clipboard.writeText(window.location.href);
     }
   };
@@ -93,7 +97,11 @@ const JournalDescription = () => {
   };
 
   const handleEmail = () => {
-    window.location.href = `mailto:?subject=${encodeURIComponent(journalData?.j_title || 'Journal')}&body=${encodeURIComponent(`Check out this journal: ${window.location.href}`)}`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(journalData?.j_title || "Journal")}&body=${encodeURIComponent(`Check out this journal: ${window.location.href}`)}`;
+  };
+
+  const handleSubmitButtonClick = () => {
+    toast.info("Please Login as Author to Submit Paper");
   };
 
   // Loading state
@@ -124,8 +132,12 @@ const JournalDescription = () => {
     return (
       <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Journal not found</h1>
-          <p className="text-gray-600">The journal you're looking for doesn't exist or has been removed.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Journal not found
+          </h1>
+          <p className="text-gray-600">
+            The journal you're looking for doesn't exist or has been removed.
+          </p>
         </div>
       </div>
     );
@@ -137,11 +149,20 @@ const JournalDescription = () => {
         {/* Breadcrumb */}
         <div className="mb-6">
           <nav className="flex items-center text-sm text-gray-600">
-            <a href="/journals" className="hover:text-[#ffba00]">Journals</a>
+            <a href="/journals" className="hover:text-[#ffba00]">
+              Journals
+            </a>
             <ChevronRight className="w-4 h-4 mx-2" />
-            <a href={`/journals/${journalData.j_categories?.toLowerCase()}`} className="hover:text-[#ffba00]">{journalData.j_categories || 'Category'}</a>
+            <a
+              href={`/journals/${journalData.j_categories?.toLowerCase()}`}
+              className="hover:text-[#ffba00]"
+            >
+              {journalData.j_categories || "Category"}
+            </a>
             <ChevronRight className="w-4 h-4 mx-2" />
-            <span className="font-medium text-gray-900">{journalData.j_title}</span>
+            <span className="font-medium text-gray-900">
+              {journalData.j_title}
+            </span>
           </nav>
         </div>
 
@@ -158,7 +179,8 @@ const JournalDescription = () => {
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center"><ImageIcon class="w-12 h-12 text-gray-400" /></div>';
+                      e.target.parentElement.innerHTML =
+                        '<div class="w-full h-full flex items-center justify-center"><ImageIcon class="w-12 h-12 text-gray-400" /></div>';
                     }}
                   />
                 ) : (
@@ -174,31 +196,39 @@ const JournalDescription = () => {
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <h1 className="text-3xl font-bold text-gray-900">{journalData.j_title}</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">
+                      {journalData.j_title}
+                    </h1>
                     {journalData.j_categories && (
                       <span className="px-3 py-1 bg-[#ffba00]/10 text-[#ffba00] text-sm font-medium rounded-full">
                         {journalData.j_categories}
                       </span>
                     )}
                   </div>
-                  
+
                   <div className="flex flex-wrap gap-4 mb-4">
                     {journalData.issn_print && journalData.issn_print_no && (
                       <div className="flex items-center gap-2">
                         <Book className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-700">Publication Model: {journalData.issn_print_no}</span>
+                        <span className="text-sm text-gray-700">
+                          Publication Model: {journalData.issn_print_no}
+                        </span>
                       </div>
                     )}
                     {journalData.issn_online && journalData.issn_online_no && (
                       <div className="flex items-center gap-2">
                         <Globe className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-700">Peer Review: {journalData.issn_online_no}</span>
+                        <span className="text-sm text-gray-700">
+                          Peer Review: {journalData.issn_online_no}
+                        </span>
                       </div>
                     )}
                     {journalData.amount && (
                       <div className="flex items-center gap-2">
                         <IndianRupee className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-700">APC: {journalData.amount}</span>
+                        <span className="text-sm text-gray-700">
+                          APC: {journalData.amount}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -206,14 +236,14 @@ const JournalDescription = () => {
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-3">
-                  <button 
+                  <button
                     onClick={() => setIsBookmarked(!isBookmarked)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg ${isBookmarked ? 'bg-[#ffba00] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg ${isBookmarked ? "bg-[#ffba00] text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
                   >
                     <Bookmark className="w-4 h-4" />
-                    {isBookmarked ? 'Saved' : 'Save Journal'}
+                    {isBookmarked ? "Saved" : "Save Journal"}
                   </button>
-                  <button 
+                  <button
                     onClick={handleShare}
                     className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
                   >
@@ -248,14 +278,17 @@ const JournalDescription = () => {
           </div>
 
           {/* Journal Description - Moved here after header */}
-          {journalData.j_description && (
+          {journalData.small_desc && (
             <div className="mt-6 pt-6 border-t border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              {/* <h2 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-[#ffba00]" />
                 About the Journal
-              </h2>
+              </h2> */}
               <div className="prose max-w-none text-gray-700">
-                <p className="whitespace-pre-line">{journalData.j_description}</p>
+                <p
+                  className="whitespace-pre-line"
+                  dangerouslySetInnerHTML={{ __html: journalData.small_desc }}
+                />
               </div>
             </div>
           )}
@@ -263,38 +296,51 @@ const JournalDescription = () => {
           {/* Simple Stats based on available data */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 mt-6 border-t border-b border-gray-200">
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">{journalData?.total_articles}+</div>
+              <div className="text-2xl font-bold text-gray-900">
+                {journalData?.total_articles}+
+              </div>
               <div className="text-sm text-gray-600">Quick Press</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">{journalData?.total_citations}</div>
+              <div className="text-2xl font-bold text-gray-900">
+                {journalData?.total_citations}
+              </div>
               <div className="text-sm text-gray-600">Indexing</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">{journalData?.h_index}</div>
+              <div className="text-2xl font-bold text-gray-900">
+                {journalData?.h_index}
+              </div>
               <div className="text-sm text-gray-600">First Decision</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">{journalData?.acceptance_rate}</div>
+              <div className="text-2xl font-bold text-gray-900">
+                {journalData?.acceptance_rate}
+              </div>
               <div className="text-sm text-gray-600">Acceptance Rate</div>
             </div>
           </div>
 
           {/* Tabs */}
           <div className="flex flex-wrap gap-2 mt-6 border-b border-gray-200">
-            {['overview', 'aims-scope', 'submission', 'author-guide'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
-                  activeTab === tab
-                    ? 'bg-[#ffba00] text-white'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                }`}
-              >
-                {tab.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-              </button>
-            ))}
+            {["overview", "aims-scope", "submission", "author-guide"].map(
+              (tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+                    activeTab === tab
+                      ? "bg-[#ffba00] text-white"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  }`}
+                >
+                  {tab
+                    .split("-")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ")}
+                </button>
+              ),
+            )}
           </div>
         </div>
 
@@ -303,10 +349,12 @@ const JournalDescription = () => {
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Tab Content */}
-            {activeTab === 'overview' && (
+            {activeTab === "overview" && (
               <div className="space-y-8">
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Journal Overview</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                    Journal Overview
+                  </h2>
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {journalData.editor && (
@@ -318,14 +366,16 @@ const JournalDescription = () => {
                           <p className="text-gray-700">{journalData.editor}</p>
                         </div>
                       )}
-                      
+
                       {journalData.j_categories && (
                         <div>
                           <h3 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
                             <Tag className="w-4 h-4" />
                             Category
                           </h3>
-                          <p className="text-gray-700">{journalData.j_categories}</p>
+                          <p className="text-gray-700">
+                            {journalData.j_categories}
+                          </p>
                         </div>
                       )}
                     </div>
@@ -337,9 +387,11 @@ const JournalDescription = () => {
                           <BookOpen className="w-4 h-4" />
                           About the Journal
                         </h3>
-                        <div 
+                        <div
                           className="prose max-w-none text-gray-700"
-                          dangerouslySetInnerHTML={{ __html: journalData.about_the_journal }}
+                          dangerouslySetInnerHTML={{
+                            __html: journalData.about_the_journal,
+                          }}
                         />
                       </div>
                     )}
@@ -347,29 +399,39 @@ const JournalDescription = () => {
                     {/* ISSN Information */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t">
                       <div>
-                        <h3 className="font-medium text-gray-900 mb-2">Publication Model</h3>
+                        <h3 className="font-medium text-gray-900 mb-2">
+                          Publication Model
+                        </h3>
                         <div className="space-y-2">
                           {journalData.issn_print && (
                             <p className="text-gray-700">
-                              <span className="font-medium">Publication Model:</span> {journalData.issn_print_no}
+                              <span className="font-medium">
+                                Publication Model:
+                              </span>{" "}
+                              {journalData.issn_print_no}
                             </p>
                           )}
                           {journalData.issn_online && (
                             <p className="text-gray-700">
-                              <span className="font-medium">Peer Review:</span> {journalData.issn_online_no}
+                              <span className="font-medium">Peer Review:</span>{" "}
+                              {journalData.issn_online_no}
                             </p>
                           )}
                         </div>
                       </div>
                       {journalData.ugc_approved && (
                         <div>
-                          <h3 className="font-medium text-gray-900 mb-2">Approval Status</h3>
+                          <h3 className="font-medium text-gray-900 mb-2">
+                            Approval Status
+                          </h3>
                           <div className="flex items-center gap-2">
                             <CheckCircle className="w-5 h-5 text-green-500" />
                             <div>
                               <p className="text-gray-700 font-medium">DOI</p>
                               {journalData.ugc_no && (
-                                <p className="text-sm text-gray-600">DOI No: {journalData.ugc_no}</p>
+                                <p className="text-sm text-gray-600">
+                                  DOI No: {journalData.ugc_no}
+                                </p>
                               )}
                             </div>
                           </div>
@@ -386,12 +448,18 @@ const JournalDescription = () => {
               </div>
             )}
 
-            {activeTab === 'aims-scope' && (
+            {activeTab === "aims-scope" && (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Aims and Scope</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  Aims and Scope
+                </h2>
                 <div className="prose max-w-none">
                   {journalData.about_the_journal ? (
-                    <div dangerouslySetInnerHTML={{ __html: journalData.about_the_journal }} />
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: journalData.about_the_journal,
+                      }}
+                    />
                   ) : (
                     <p className="text-gray-700">{journalData.j_description}</p>
                   )}
@@ -399,42 +467,60 @@ const JournalDescription = () => {
               </div>
             )}
 
-            {activeTab === 'submission' && (
+            {activeTab === "submission" && (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Submission Guidelines</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  Submission Guidelines
+                </h2>
                 <div className="space-y-4">
-                  <p className="text-gray-700">
-                    Submit your manuscript through our online submission system. All submissions undergo rigorous peer review.
-                  </p>
-                  
+                  <p
+                    className="text-gray-700"
+                    dangerouslySetInnerHTML={{
+                      __html: journalData.submission_guideline,
+                    }}
+                  />
+
                   {journalData.amount && (
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <h3 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
                         <IndianRupee className="w-4 h-4" />
                         Article Processing Charge (APC)
                       </h3>
-                      <p className="text-2xl font-bold text-[#ffba00]">{journalData.amount}</p>
-                      <p className="text-sm text-gray-600 mt-1">One-time publication fee</p>
+                      <p className="text-2xl font-bold text-[#ffba00]">
+                        {journalData.amount}
+                      </p>
+                      <p className="text-sm text-gray-600 mt-1">
+                        One-time publication fee
+                      </p>
                     </div>
                   )}
-                  
-                  <button className="mt-4 px-6 py-3 bg-[#ffba00] text-white font-semibold rounded-lg hover:bg-[#e6a800] transition-colors">
+
+                  <button
+                    onClick={() => handleSubmitButtonClick()}
+                    className="mt-4 px-6 py-3 bg-[#ffba00] text-white font-semibold rounded-lg hover:bg-[#e6a800] transition-colors"
+                  >
                     Submit Manuscript
                   </button>
                 </div>
               </div>
             )}
 
-            {activeTab === 'author-guide' && (
+            {activeTab === "author-guide" && (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Author Guide</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  Author Guide
+                </h2>
                 {journalData.author_guide ? (
-                  <div 
+                  <div
                     className="prose max-w-none"
-                    dangerouslySetInnerHTML={{ __html: journalData.author_guide }}
+                    dangerouslySetInnerHTML={{
+                      __html: journalData.author_guide,
+                    }}
                   />
                 ) : (
-                  <p className="text-gray-700">Author guide is not available at the moment.</p>
+                  <p className="text-gray-700">
+                    Author guide is not available at the moment.
+                  </p>
                 )}
               </div>
             )}
@@ -447,15 +533,21 @@ const JournalDescription = () => {
               <div className="bg-gradient-to-r from-[#ffba00] to-orange-500 rounded-2xl p-6 text-white">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h2 className="text-xl font-semibold mb-2">Publication Fees</h2>
+                    <h2 className="text-xl font-semibold mb-2">
+                      Publication Fees
+                    </h2>
                     <div className="flex items-center gap-2 mb-1">
                       <IndianRupee className="w-5 h-5" />
-                      <span className="text-3xl font-bold">{journalData.amount}</span>
+                      <span className="text-3xl font-bold">
+                        {journalData.amount}
+                      </span>
                     </div>
-                    <p className="text-sm opacity-90">Article Processing Charge</p>
+                    <p className="text-sm opacity-90">
+                      Article Processing Charge
+                    </p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-3 mt-4">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-5 h-5" />
@@ -470,12 +562,18 @@ const JournalDescription = () => {
                     <span>Rigorous Peer Review</span>
                   </div>
                 </div>
-                
+
                 <div className="flex gap-3 mt-6">
-                  <button className="flex-1 py-3 bg-white text-[#ffba00] font-semibold rounded-lg hover:bg-gray-100 transition-colors">
+                  <button
+                    onClick={() => handleSubmitButtonClick()}
+                    className="flex-1 py-3 bg-white text-[#ffba00] font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+                  >
                     Submit Paper
                   </button>
-                  <button className="flex-1 py-3 bg-white/20 border border-white font-semibold rounded-lg hover:bg-white/30 transition-colors">
+                  <button
+                    onClick={() => setActiveTab("submission")}
+                    className="flex-1 py-3 bg-white/20 border border-white font-semibold rounded-lg hover:bg-white/30 transition-colors"
+                  >
                     View Guide
                   </button>
                 </div>
@@ -484,24 +582,32 @@ const JournalDescription = () => {
 
             {/* Quick Info Card */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Journal Information</h3>
+              <h3 className="font-semibold text-gray-900 mb-4">
+                Journal Information
+              </h3>
               <div className="space-y-3">
                 {journalData.j_categories && (
                   <div className="flex justify-between py-2 border-b">
                     <span className="text-gray-600">Category</span>
-                    <span className="font-medium text-gray-900">{journalData.j_categories}</span>
+                    <span className="font-medium text-gray-900">
+                      {journalData.j_categories}
+                    </span>
                   </div>
                 )}
                 {journalData.issn_print && journalData.issn_print_no && (
                   <div className="flex justify-between py-2 border-b">
                     <span className="text-gray-600">Publication Model</span>
-                    <span className="font-medium text-gray-900">{journalData.issn_print_no}</span>
+                    <span className="font-medium text-gray-900">
+                      {journalData.issn_print_no}
+                    </span>
                   </div>
                 )}
                 {journalData.issn_online && journalData.issn_online_no && (
                   <div className="flex justify-between py-2 border-b">
                     <span className="text-gray-600">Peer Review</span>
-                    <span className="font-medium text-gray-900">{journalData.issn_online_no}</span>
+                    <span className="font-medium text-gray-900">
+                      {journalData.issn_online_no}
+                    </span>
                   </div>
                 )}
                 {journalData.ugc_approved && (
@@ -512,14 +618,14 @@ const JournalDescription = () => {
                 )}
                 <div className="flex justify-between py-2">
                   <span className="text-gray-600">Status</span>
-                  <span className={`font-medium ${journalData.status ? 'text-green-600' : 'text-red-600'}`}>
-                    {journalData.status ? 'Active' : 'Inactive'}
+                  <span
+                    className={`font-medium ${journalData.status ? "text-green-600" : "text-red-600"}`}
+                  >
+                    {journalData.status ? "Active" : "Inactive"}
                   </span>
                 </div>
               </div>
             </div>
-
-            
           </div>
         </div>
       </div>

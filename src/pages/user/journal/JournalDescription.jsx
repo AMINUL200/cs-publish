@@ -457,7 +457,7 @@ const JournalDescription = () => {
                   {journalData.about_the_journal ? (
                     <div
                       dangerouslySetInnerHTML={{
-                        __html: journalData.about_the_journal,
+                        __html: journalData.j_description,
                       }}
                     />
                   ) : (

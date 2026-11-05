@@ -11,7 +11,41 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
+import { Editor } from "@tinymce/tinymce-react";
 import axios from "axios";
+
+// ✅ FIXED: no height:"100%", fixed 400px, resize disabled
+const editorInit = {
+  height: 400,          // ✅ fixed pixel height — no longer overflows
+  menubar: false,
+  resize: false,        // ✅ prevent user drag-resize breaking layout
+  plugins: [
+    "advlist",
+    "autolink",
+    "link",
+    "lists",
+    "charmap",
+    "preview",
+    "searchreplace",
+    "visualblocks",
+    "code",
+    "fullscreen",
+    "help",
+    "wordcount",
+  ],
+  toolbar:
+    "undo redo | blocks | " +
+    "bold italic underline | link | " +
+    "alignleft aligncenter alignright alignjustify | " +
+    "bullist numlist outdent indent | " +
+    "removeformat | help | code | fullscreen",
+  content_style:
+    "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+  link_context_toolbar: true,
+  link_assume_external_targets: true,
+  link_title: false,
+  default_link_target: "_blank",
+};
 
 const ChecklistPage = () => {
   const { token } = useSelector((state) => state.auth);
@@ -20,13 +54,14 @@ const ChecklistPage = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [newItem, setNewItem] = useState({ checklist_item: "", status: 1 });
   const [editingItem, setEditingItem] = useState({
+    id: null,
     checklist_item: "",
-    status: 1, // ✅ Keep as number for consistency
+    status: 1,
   });
   const [checklistItems, setChecklistItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [addListLoading, setAddListLoading] = useState(false);
-  const [deleteLoadingId, setDeleteLoadingId] = useState(null); // ✅ Track which id
+  const [deleteLoadingId, setDeleteLoadingId] = useState(null);
   const [updateLoading, setUpdateLoading] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -34,7 +69,7 @@ const ChecklistPage = () => {
     Authorization: `Bearer ${token}`,
   };
 
-  // ✅ Memoized fetch
+  // ---------------- FETCH ----------------
   const fetchChecklistItems = useCallback(async () => {
     try {
       const response = await axios.get(
@@ -50,7 +85,6 @@ const ChecklistPage = () => {
       );
 
       if (response.data.flag === 1) {
-        // ✅ Normalize status to number so table comparison works
         const normalized = response.data.data.map((it) => ({
           ...it,
           status: Number(it.status),
@@ -60,7 +94,7 @@ const ChecklistPage = () => {
         toast.error("Failed to fetch checklist items");
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || err.message);
+      toast.error(err?.response?.data?.message || err.message || "Fetch failed");
     } finally {
       setLoading(false);
     }
@@ -76,7 +110,9 @@ const ChecklistPage = () => {
 
   // ---------------- ADD ----------------
   const handleAddItem = async () => {
-    if (newItem.checklist_item.trim() === "") return;
+    if (newItem.checklist_item.trim() === "") {
+      return toast.error("Please enter a checklist item");
+    }
 
     try {
       setAddListLoading(true);
@@ -91,7 +127,6 @@ const ChecklistPage = () => {
         }
       );
 
-      // ✅ Check response before success toast
       if (response.data.flag === 1 || response.data.status === "success") {
         toast.success(response.data.message || "Item added successfully");
         fetchChecklistItems();
@@ -101,7 +136,9 @@ const ChecklistPage = () => {
         toast.error(response.data.message || "Failed to add item");
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || error.message);
+      toast.error(
+        error?.response?.data?.message || error.message || "Something went wrong"
+      );
     } finally {
       setAddListLoading(false);
     }
@@ -120,18 +157,20 @@ const ChecklistPage = () => {
 
       if (response.data.status === "success") {
         toast.success(response.data.message);
-        setChecklistItems((prev) => prev.filter((it) => it.id !== id)); // ✅ Optimistic
+        setChecklistItems((prev) => prev.filter((it) => it.id !== id));
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || error.message);
+      toast.error(
+        error?.response?.data?.message || error.message || "Delete failed"
+      );
     } finally {
       setDeleteLoadingId(null);
     }
   };
 
-  // ---------------- EDIT (open modal) ----------------
+  // ---------------- EDIT ----------------
   const handleEditItem = async (id) => {
     try {
       const response = await axios.get(
@@ -146,28 +185,45 @@ const ChecklistPage = () => {
       );
 
       if (response.data.flag === 1 || response.data.data) {
+        const data = response.data.data;
+        // ✅ Keep ONLY the fields we need — no created_at, updated_at, etc.
         setEditingItem({
-          ...response.data.data,
-          status: Number(response.data.data.status), // ✅ normalize
+          id: data.id,
+          checklist_item: data.checklist_item,
+          status: Number(data.status),
         });
         setShowEditModal(true);
       } else {
         toast.error("Failed to load item");
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || error.message);
+      toast.error(
+        error?.response?.data?.message || error.message || "Failed to load item"
+      );
     }
   };
 
   // ---------------- UPDATE ----------------
-  const handleUpdateItem = async (id) => {
-    if (editingItem.checklist_item.trim() === "") return;
+  const handleUpdateItem = async () => {
+    if (editingItem.checklist_item.trim() === "") {
+      return toast.error("Please enter a checklist item");
+    }
+    if (!editingItem.id) {
+      return toast.error("Invalid item id");
+    }
 
     try {
       setUpdateLoading(true);
+
+      // ✅ Send ONLY what the API expects — no extra fields
+      const payload = {
+        checklist_item: editingItem.checklist_item,
+        status: editingItem.status,
+      };
+
       const response = await axios.put(
-        `${API_URL}api/admin/checklist-settings/${id}`,
-        editingItem,
+        `${API_URL}api/admin/checklist-settings/${editingItem.id}`,
+        payload,
         {
           headers: {
             ...authHeaders,
@@ -175,22 +231,35 @@ const ChecklistPage = () => {
           },
         }
       );
-      console.log("Update response:", response.data.falg);
-      // ✅ FIXED: "flag" not "falg"
+      console.log("Update response:", response.data);
+
       if (response.data.falg === 1 || response.data.status === "success") {
         toast.success(response.data.message || "Item updated successfully");
         fetchChecklistItems();
         setShowEditModal(false);
-        setEditingItem({ checklist_item: "", status: 1 });
+        setEditingItem({ id: null, checklist_item: "", status: 1 });
       } else {
         toast.error(response.data.message || "Failed to update item");
       }
     } catch (error) {
-      toast.error(error);
-      console.log("Update error details:",error);
+      console.log("Update error:", error?.response?.data || error);
+      // ✅ FIXED: always pass a string to toast
+      toast.error(
+        error?.response?.data?.message ||
+          error?.response?.data?.errors
+            ? JSON.stringify(error.response.data.errors)
+            : error.message || "Update failed"
+      );
     } finally {
       setUpdateLoading(false);
     }
+  };
+
+  // ---------------- STRIP HTML ----------------
+  const stripHtml = (html) => {
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    return div.textContent || div.innerText || "";
   };
 
   if (loading) {
@@ -250,7 +319,7 @@ const ChecklistPage = () => {
                     {item.id}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500 border-2">
-                    {item.checklist_item}
+                    <p dangerouslySetInnerHTML={{__html: item.checklist_item}}></p>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap border-2">
                     {Number(item.status) === 1 ? (
@@ -290,7 +359,10 @@ const ChecklistPage = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="px-6 py-4 text-center text-sm text-gray-500">
+                <td
+                  colSpan="4"
+                  className="px-6 py-4 text-center text-sm text-gray-500"
+                >
                   No items found matching your search criteria
                 </td>
               </tr>
@@ -303,64 +375,78 @@ const ChecklistPage = () => {
         Showing {filteredItems.length} of {checklistItems.length} items
       </div>
 
-      {/* ---------------- ADD MODAL ---------------- */}
+      {/* ============================================================ */}
+      {/* ADD MODAL — full screen, editor fixed height, footer always visible */}
+      {/* ============================================================ */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full h-full max-w-[95vw] max-h-[95vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b shrink-0">
               <h2 className="text-xl font-bold">Add New Checklist Item</h2>
               <button
                 onClick={() => setShowModal(false)}
                 className="text-gray-500 hover:text-gray-700"
+                aria-label="Close"
               >
                 <FontAwesomeIcon icon={faXmark} size="lg" />
               </button>
             </div>
 
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Checklist Item
-              </label>
-              <textarea
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows={3}
-                value={newItem.checklist_item}
-                onChange={(e) =>
-                  setNewItem({ ...newItem, checklist_item: e.target.value })
-                }
-                placeholder="Enter checklist item description"
-              />
-            </div>
+            {/* Body — scrollable if needed, but editor has fixed height */}
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-0">
+              <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                  Checklist Item
+                </label>
+                {/* ✅ fixed-height wrapper — editor cannot expand */}
+                <div className="w-full">
+                  <Editor
+                    apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
+                    value={newItem.checklist_item}
+                    init={editorInit}
+                    onEditorChange={(content) =>
+                      setNewItem((prev) => ({
+                        ...prev,
+                        checklist_item: content,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
 
-            <div className="mb-6">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Status
-              </label>
-              <div className="flex items-center space-x-4">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    className="form-radio h-4 w-4 text-blue-600"
-                    checked={newItem.status === 1}
-                    onChange={() => setNewItem({ ...newItem, status: 1 })}
-                  />
-                  <span className="ml-2">Enabled</span>
+              {/* Status */}
+              <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                  Status
                 </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    className="form-radio h-4 w-4 text-blue-600"
-                    checked={newItem.status === 0}
-                    onChange={() => setNewItem({ ...newItem, status: 0 })}
-                  />
-                  <span className="ml-2">Disabled</span>
-                </label>
+                <div className="flex items-center space-x-4">
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      className="form-radio h-4 w-4 text-blue-600"
+                      checked={newItem.status === 1}
+                      onChange={() => setNewItem({ ...newItem, status: 1 })}
+                    />
+                    <span className="ml-2">Enabled</span>
+                  </label>
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      className="form-radio h-4 w-4 text-blue-600"
+                      checked={newItem.status === 0}
+                      onChange={() => setNewItem({ ...newItem, status: 0 })}
+                    />
+                    <span className="ml-2">Disabled</span>
+                  </label>
+                </div>
               </div>
             </div>
 
-            <div className="flex justify-end space-x-3">
+            {/* Footer — always visible */}
+            <div className="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50 shrink-0">
               <button
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
                 onClick={() => setShowModal(false)}
               >
                 Cancel
@@ -388,7 +474,7 @@ const ChecklistPage = () => {
                     <path
                       className="opacity-75"
                       fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                     />
                   </svg>
                 )}
@@ -399,71 +485,81 @@ const ChecklistPage = () => {
         </div>
       )}
 
-      {/* ---------------- EDIT MODAL ---------------- */}
+      {/* ============================================================ */}
+      {/* EDIT MODAL — same layout */}
+      {/* ============================================================ */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full h-full max-w-[95vw] max-h-[95vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b shrink-0">
               <h2 className="text-xl font-bold">Edit Checklist Item</h2>
               <button
                 onClick={() => setShowEditModal(false)}
                 className="text-gray-500 hover:text-gray-700"
+                aria-label="Close"
               >
                 <FontAwesomeIcon icon={faXmark} size="lg" />
               </button>
             </div>
 
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Checklist Item
-              </label>
-              <textarea
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows={3}
-                value={editingItem.checklist_item}
-                onChange={(e) =>
-                  setEditingItem({
-                    ...editingItem,
-                    checklist_item: e.target.value,
-                  })
-                }
-                placeholder="Enter checklist item description"
-              />
-            </div>
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-0">
+              <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                  Checklist Item
+                </label>
+                <div className="w-full">
+                  <Editor
+                    apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
+                    value={editingItem.checklist_item}
+                    init={editorInit}
+                    onEditorChange={(content) =>
+                      setEditingItem((prev) => ({
+                        ...prev,
+                        checklist_item: content,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
 
-            <div className="mb-6">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Status
-              </label>
-              <div className="flex items-center space-x-4">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    className="form-radio h-4 w-4 text-blue-600"
-                    checked={Number(editingItem.status) === 1}
-                    onChange={() =>
-                      setEditingItem({ ...editingItem, status: 1 })
-                    }
-                  />
-                  <span className="ml-2">Enabled</span>
+              {/* Status */}
+              <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                  Status
                 </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    className="form-radio h-4 w-4 text-blue-600"
-                    checked={Number(editingItem.status) === 0}
-                    onChange={() =>
-                      setEditingItem({ ...editingItem, status: 0 })
-                    }
-                  />
-                  <span className="ml-2">Disabled</span>
-                </label>
+                <div className="flex items-center space-x-4">
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      className="form-radio h-4 w-4 text-blue-600"
+                      checked={Number(editingItem.status) === 1}
+                      onChange={() =>
+                        setEditingItem({ ...editingItem, status: 1 })
+                      }
+                    />
+                    <span className="ml-2">Enabled</span>
+                  </label>
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      className="form-radio h-4 w-4 text-blue-600"
+                      checked={Number(editingItem.status) === 0}
+                      onChange={() =>
+                        setEditingItem({ ...editingItem, status: 0 })
+                      }
+                    />
+                    <span className="ml-2">Disabled</span>
+                  </label>
+                </div>
               </div>
             </div>
 
-            <div className="flex justify-end space-x-3">
+            {/* Footer — always visible */}
+            <div className="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50 shrink-0">
               <button
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
                 onClick={() => setShowEditModal(false)}
               >
                 Cancel
@@ -472,7 +568,7 @@ const ChecklistPage = () => {
                 className={`px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300 ${
                   updateLoading ? "cursor-not-allowed" : "cursor-pointer"
                 }`}
-                onClick={() => handleUpdateItem(editingItem.id)}
+                onClick={handleUpdateItem}
                 disabled={!editingItem.checklist_item.trim() || updateLoading}
               >
                 {updateLoading ? "Updating..." : "Update Item"}

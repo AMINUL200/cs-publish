@@ -671,8 +671,8 @@ const ReviewerManuscriptView = () => {
                     <label
                       htmlFor={`check-${item.id}`}
                       className="ml-2 text-sm text-gray-700"
+                      dangerouslySetInnerHTML={{__html:item.question}}
                     >
-                      {item.question}
                     </label>
                   </div>
                 ))}

@@ -199,8 +199,8 @@ const UserCheckListPage = () => {
                       <label
                         htmlFor={`check-${item.id}`}
                         className="text-sm cursor-pointer select-none"
+                        dangerouslySetInnerHTML={{ __html: item.checklist_item }}
                       >
-                        {item.checklist_item}
                       </label>
                     </div>
                   ))

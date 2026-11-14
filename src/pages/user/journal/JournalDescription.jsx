@@ -27,6 +27,8 @@ import {
   Award,
   DollarSign,
   Image as ImageIcon,
+  FileType,
+  ShieldCheck,
 } from "lucide-react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
@@ -93,11 +95,12 @@ const JournalDescription = () => {
   };
 
   const TAB_LABELS = {
-  overview: "Overview",
-  "aims-scope": "Aims & Scope",
-  submission: "Submission",
-  "author-guide": "Author Guide",
-};
+    overview: "Overview",
+    "aims-scope": "Aims & Scope",
+    submission: "Submission",
+    "author-guide": "Author Guide",
+    ethics: "Ethics",
+  };
 
   const handlePrint = () => {
     window.print();
@@ -109,6 +112,23 @@ const JournalDescription = () => {
 
   const handleSubmitButtonClick = () => {
     toast.info("Please Login as Author to Submit Paper");
+  };
+
+  // Build file URL (handles full URLs and relative storage paths)
+  const getFileUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith("http")) return path;
+    return `${STORAGE_URL}${path}`;
+  };
+
+  // Get filename from path
+  const getFileName = (path) => {
+    if (!path) return "File";
+    try {
+      return decodeURIComponent(path.split("/").pop() || "File");
+    } catch {
+      return "File";
+    }
   };
 
   // Loading state
@@ -287,10 +307,6 @@ const JournalDescription = () => {
           {/* Journal Description - Moved here after header */}
           {journalData.small_desc && (
             <div className="mt-6 pt-6 border-t border-gray-200">
-              {/* <h2 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-[#ffba00]" />
-                About the Journal
-              </h2> */}
               <div className="prose max-w-none text-gray-700">
                 <p
                   className="whitespace-pre-line"
@@ -330,22 +346,35 @@ const JournalDescription = () => {
 
           {/* Tabs */}
           <div className="flex flex-wrap gap-2 mt-6 border-b border-gray-200">
-            {["overview", "aims-scope", "submission", "author-guide"].map(
+            {["overview", "aims-scope", "submission", "author-guide", "ethics"].map(
               (tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+                  className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors flex items-center gap-2 ${
                     activeTab === tab
                       ? "bg-[#ffba00] text-white"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   }`}
                 >
+                  {tab === "ethics" && <ShieldCheck className="w-4 h-4" />}
                   {TAB_LABELS[tab] ||
                     tab
                       .split("-")
                       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
                       .join(" ")}
+                  {tab === "ethics" &&
+                    journalData.athics?.length > 0 && (
+                      <span
+                        className={`ml-1 px-2 py-0.5 text-xs rounded-full ${
+                          activeTab === tab
+                            ? "bg-white/20"
+                            : "bg-gray-200 text-gray-700"
+                        }`}
+                      >
+                        {journalData.athics.length}
+                      </span>
+                    )}
                 </button>
               ),
             )}
@@ -529,6 +558,94 @@ const JournalDescription = () => {
                   <p className="text-gray-700">
                     Author guide is not available at the moment.
                   </p>
+                )}
+              </div>
+            )}
+
+            {/* ========================================== */}
+            {/* ETHICS TAB */}
+            {/* ========================================== */}
+            {activeTab === "ethics" && (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="bg-[#ffba00]/10 p-3 rounded-xl">
+                    <ShieldCheck className="w-6 h-6 text-[#ffba00]" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      Ethics & Guidelines
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      Download the ethics documents for this journal
+                    </p>
+                  </div>
+                </div>
+
+                {!journalData.athics || journalData.athics.length === 0 ? (
+                  <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                    <ShieldCheck className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500">
+                      No ethics documents available for this journal.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {journalData.athics.map((athics) => (
+                      <div
+                        key={athics.id}
+                        className="border border-gray-200 rounded-xl p-4 hover:border-[#ffba00] hover:shadow-md transition-all bg-white"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          {/* Info */}
+                          <div className="flex items-start gap-3 flex-1 min-w-0">
+                            <div className="bg-[#ffba00]/10 p-2.5 rounded-lg flex-shrink-0">
+                              <FileText className="w-5 h-5 text-[#ffba00]" />
+                            </div>
+                            <div className="min-w-0">
+                              <h3 className="font-semibold text-gray-900 truncate">
+                                {athics.athics_name}
+                              </h3>
+                              <p className="text-xs text-gray-500 mt-1">
+                                Added: {formatDate(athics.created_at)}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Download Buttons */}
+                          <div className="flex flex-wrap gap-2 flex-shrink-0">
+                            {athics.word_document && (
+                              <a
+                                href={getFileUrl(athics.word_document)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download
+                                className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-lg text-sm font-medium transition-colors"
+                                title={`Download ${getFileName(athics.word_document)}`}
+                              >
+                                <FileType className="w-4 h-4" />
+                                <span>Word</span>
+                                <Download className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+                            {athics.pdf_document && (
+                              <a
+                                href={getFileUrl(athics.pdf_document)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download
+                                className="inline-flex items-center gap-2 px-3 py-2 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded-lg text-sm font-medium transition-colors"
+                                title={`Download ${getFileName(athics.pdf_document)}`}
+                              >
+                                <FileText className="w-4 h-4" />
+                                <span>PDF</span>
+                                <Download className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             )}

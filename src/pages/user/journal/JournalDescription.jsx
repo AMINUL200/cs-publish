@@ -92,6 +92,13 @@ const JournalDescription = () => {
     }
   };
 
+  const TAB_LABELS = {
+  overview: "Overview",
+  "aims-scope": "Aims & Scope",
+  submission: "Submission",
+  "author-guide": "Author Guide",
+};
+
   const handlePrint = () => {
     window.print();
   };
@@ -334,10 +341,11 @@ const JournalDescription = () => {
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   }`}
                 >
-                  {tab
-                    .split("-")
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ")}
+                  {TAB_LABELS[tab] ||
+                    tab
+                      .split("-")
+                      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                      .join(" ")}
                 </button>
               ),
             )}
@@ -454,14 +462,14 @@ const JournalDescription = () => {
                   Aims and Scope
                 </h2>
                 <div className="prose max-w-none">
-                  {journalData.about_the_journal ? (
+                  {journalData.aims_scope ? (
                     <div
                       dangerouslySetInnerHTML={{
-                        __html: journalData.j_description,
+                        __html: journalData.aims_scope,
                       }}
                     />
                   ) : (
-                    <p className="text-gray-700">{journalData.j_description}</p>
+                    <p className="text-gray-700">{journalData.aims_scope}</p>
                   )}
                 </div>
               </div>

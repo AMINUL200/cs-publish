@@ -5,6 +5,43 @@ import Loader from "../../../components/common/Loader";
 import { toast } from "react-toastify";
 import { Editor } from "@tinymce/tinymce-react";
 
+// ✅ Shared TinyMCE config — reused by all rich-text fields
+const EDITOR_INIT = {
+  height: 400,
+  menubar: false,
+  plugins: [
+    "advlist",
+    "autolink",
+    "link",
+    "lists",
+    "charmap",
+    "preview",
+    "searchreplace",
+    "visualblocks",
+    "code",
+    "fullscreen",
+    "help",
+    "wordcount",
+  ],
+  toolbar:
+    "undo redo | blocks | " +
+    "bold italic underline | link | " +
+    "alignleft aligncenter alignright alignjustify | " +
+    "bullist numlist outdent indent | " +
+    "removeformat | help | code | fullscreen",
+  content_style:
+    "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+  link_context_toolbar: true,
+  link_assume_external_targets: true,
+  link_title: false,
+  default_link_target: "_blank",
+  link_list: [
+    { title: "Home Page", value: "/" },
+    { title: "About Page", value: "/about" },
+    { title: "Contact Page", value: "/contact" },
+  ],
+};
+
 const AddJournal = () => {
   const { token } = useSelector((state) => state.auth);
   const API_URL = import.meta.env.VITE_API_URL;
@@ -24,17 +61,18 @@ const AddJournal = () => {
     j_title: "",
     j_categories: "",
     j_description: "",
-    small_desc: "", // NEW
+    small_desc: "",
+    aims_scope: "", // ✅ NEW
     editorial_board: "",
     editor: "",
-    issn_print: "1", // default true
+    issn_print: "1",
     issn_print_no: "",
     issn_online: "1",
     issn_online_no: "",
     ugc_approved: "1",
     ugc_no: "",
     amount: "",
-    submission_guideline: "", // NEW
+    submission_guideline: "",
     image: null,
     status: "1",
     author_guide: "",
@@ -83,7 +121,7 @@ const AddJournal = () => {
             "Cache-Control": "no-cache",
             Pragma: "no-cache",
           },
-        },
+        }
       );
       if (response.status === 200) {
         setCategoryOptions(response.data.data);
@@ -106,13 +144,8 @@ const AddJournal = () => {
   const validateField = (name, value) => {
     let error = "";
 
-    // Decimal fields (numbers with decimals)
     const decimalFields = ["impact_factor", "acceptance_rate"];
-
-    // Integer fields (whole numbers only)
     const integerFields = ["h_index", "amount"];
-
-    // String fields - allow almost any character, no strict validation
     const stringFields = [
       "issn_print_no",
       "issn_online_no",
@@ -122,12 +155,10 @@ const AddJournal = () => {
     ];
 
     if (decimalFields.includes(name)) {
-      // Allow empty or numbers with any number of decimal places
       if (value && !/^\d*\.?\d*$/.test(value)) {
         error =
           "Please enter a valid decimal number (e.g., 22.05, 12.005, 5.234)";
       }
-      // Check if it's a valid number format (no multiple dots)
       if (value && (value.match(/\./g) || []).length > 1) {
         error = "Please enter a valid number with only one decimal point";
       }
@@ -135,13 +166,10 @@ const AddJournal = () => {
       if (value && !/^\d*$/.test(value)) {
         error = "Please enter a valid number (digits only)";
       }
-      // For amount field, check if it's not negative
       if (name === "amount" && value && parseFloat(value) < 0) {
         error = "Amount cannot be negative";
       }
     } else if (stringFields.includes(name)) {
-      // For string fields - allow any character, no strict validation
-      // Only check if it's not empty and not just spaces
       if (value && value.trim() === "") {
         error = "Please enter a valid value";
       }
@@ -153,11 +181,9 @@ const AddJournal = () => {
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
 
-    // Clear previous error for this field
     setErrors((prev) => ({ ...prev, [name]: "" }));
 
     if (type === "file") {
-      // Validate image file
       const file = files[0];
       if (file) {
         const validTypes = [
@@ -184,39 +210,29 @@ const AddJournal = () => {
           return;
         }
 
-        // Validate image dimensions
         const img = new Image();
         const objectUrl = URL.createObjectURL(file);
 
         img.onload = function () {
           const width = this.width;
           const height = this.height;
-
           const aspectRatio = width / height;
 
-          // Show dimension information only.
-          // Do NOT block image upload based on dimensions.
           if (width < 800 || height < 500) {
             toast.info(
-              `Image size: ${width}x${height}px. Recommended minimum is 800x500px.`,
+              `Image size: ${width}x${height}px. Recommended minimum is 800x500px.`
             );
           }
 
-          // Show aspect ratio information only.
           if (aspectRatio < 1.3 || aspectRatio > 2.0) {
             toast.info(
               `Image aspect ratio: ${aspectRatio.toFixed(
-                2,
-              )}:1. Recommended ratio is between 1.3:1 and 2:1.`,
+                2
+              )}:1. Recommended ratio is between 1.3:1 and 2:1.`
             );
           }
 
-          // Always allow the image to be uploaded
-          setFormData((prev) => ({
-            ...prev,
-            [name]: file,
-          }));
-
+          setFormData((prev) => ({ ...prev, [name]: file }));
           URL.revokeObjectURL(objectUrl);
         };
 
@@ -232,7 +248,6 @@ const AddJournal = () => {
     ) {
       setFormData((prev) => ({ ...prev, [name]: value }));
     } else {
-      // Validate the field
       const error = validateField(name, value);
       if (error) {
         setErrors((prev) => ({ ...prev, [name]: error }));
@@ -257,11 +272,9 @@ const AddJournal = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate all fields before submission
     const newErrors = {};
     let hasError = false;
 
-    // Check required fields
     const requiredFields = ["group_id", "category_id", "j_title", "amount"];
     requiredFields.forEach((field) => {
       if (!formData[field]) {
@@ -270,7 +283,6 @@ const AddJournal = () => {
       }
     });
 
-    // Validate all numeric fields
     const numericFields = [
       "impact_factor",
       "acceptance_rate",
@@ -288,7 +300,6 @@ const AddJournal = () => {
       }
     });
 
-    // Validate string fields
     const stringFields = [
       "issn_print_no",
       "issn_online_no",
@@ -307,7 +318,6 @@ const AddJournal = () => {
       }
     });
 
-    // Validate image
     if (!formData.image) {
       newErrors.image = "Please upload an image";
       hasError = true;
@@ -315,7 +325,6 @@ const AddJournal = () => {
 
     if (hasError) {
       setErrors(newErrors);
-      // Scroll to first error
       const firstErrorField = Object.keys(newErrors)[0];
       const element = document.querySelector(`[name="${firstErrorField}"]`);
       if (element) {
@@ -323,16 +332,13 @@ const AddJournal = () => {
         element.focus();
       }
       toast.error("Please fix all validation errors before submitting");
-      // return;
     }
 
     setHandleLoading(true);
     try {
       const submitData = new FormData();
 
-      // Append all form data to FormData object
       Object.entries(formData).forEach(([key, value]) => {
-        // Skip null or undefined values
         if (value !== null && value !== undefined) {
           submitData.append(key, value);
         }
@@ -353,7 +359,8 @@ const AddJournal = () => {
           j_title: "",
           j_categories: "",
           j_description: "",
-          small_desc: "", // NEW
+          small_desc: "",
+          aims_scope: "", // ✅ NEW
           editorial_board: "",
           editor: "",
           issn_print: "1",
@@ -363,7 +370,7 @@ const AddJournal = () => {
           ugc_approved: "1",
           ugc_no: "",
           amount: "",
-          submission_guideline: "", // NEW
+          submission_guideline: "",
           image: null,
           status: "1",
           author_guide: "",
@@ -404,7 +411,9 @@ const AddJournal = () => {
               name="group_id"
               value={formData.group_id}
               onChange={handleChange}
-              className={`w-full border px-3 py-2 rounded ${errors.group_id ? "border-red-500" : ""}`}
+              className={`w-full border px-3 py-2 rounded ${
+                errors.group_id ? "border-red-500" : ""
+              }`}
               required
             >
               <option value="">Select Group</option>
@@ -426,7 +435,9 @@ const AddJournal = () => {
               name="category_id"
               value={formData.category_id}
               onChange={handleChange}
-              className={`w-full border px-3 py-2 rounded ${errors.category_id ? "border-red-500" : ""}`}
+              className={`w-full border px-3 py-2 rounded ${
+                errors.category_id ? "border-red-500" : ""
+              }`}
               required
             >
               <option value="">Select Category</option>
@@ -450,7 +461,9 @@ const AddJournal = () => {
             name="j_title"
             value={formData.j_title}
             onChange={handleChange}
-            className={`w-full border px-3 py-2 rounded ${errors.j_title ? "border-red-500" : ""}`}
+            className={`w-full border px-3 py-2 rounded ${
+              errors.j_title ? "border-red-500" : ""
+            }`}
             required
           />
           {errors.j_title && (
@@ -482,49 +495,28 @@ const AddJournal = () => {
           />
         </div>
 
-        {/* Small Description - Rich Text Editor (NEW) */}
+        {/* Small Description - Rich Text Editor */}
         <div>
           <label className="block mb-1 font-medium">Small Description</label>
           <Editor
             apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
             value={formData.small_desc}
-            init={{
-              height: 400,
-              menubar: false,
-              plugins: [
-                "advlist",
-                "autolink",
-                "link",
-                "lists",
-                "charmap",
-                "preview",
-                "searchreplace",
-                "visualblocks",
-                "code",
-                "fullscreen",
-                "help",
-                "wordcount",
-              ],
-              toolbar:
-                "undo redo | blocks | " +
-                "bold italic underline | link | " +
-                "alignleft aligncenter alignright alignjustify | " +
-                "bullist numlist outdent indent | " +
-                "removeformat | help | code",
-              content_style:
-                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-              link_context_toolbar: true,
-              link_assume_external_targets: true,
-              link_title: false,
-              default_link_target: "_blank",
-              link_list: [
-                { title: "Home Page", value: "/" },
-                { title: "About Page", value: "/about" },
-                { title: "Contact Page", value: "/contact" },
-              ],
-            }}
+            init={EDITOR_INIT}
             onEditorChange={(content) =>
               handleEditorChange(content, "small_desc")
+            }
+          />
+        </div>
+
+        {/* ✅ Aims & Scope - Rich Text Editor (NEW) */}
+        <div>
+          <label className="block mb-1 font-medium">Aims &amp; Scope</label>
+          <Editor
+            apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
+            value={formData.aims_scope}
+            init={EDITOR_INIT}
+            onEditorChange={(content) =>
+              handleEditorChange(content, "aims_scope")
             }
           />
         </div>
@@ -535,7 +527,7 @@ const AddJournal = () => {
             Journal Metrics
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            {/* Impact Factor - Decimal */}
+            {/* Impact Factor */}
             <div>
               <label className="block mb-1 font-medium">
                 Impact Factor
@@ -558,7 +550,7 @@ const AddJournal = () => {
               )}
             </div>
 
-            {/* Quick Press - String (formerly Total Articles) */}
+            {/* Quick Press */}
             <div>
               <label className="block mb-1 font-medium">
                 Quick Press
@@ -581,7 +573,7 @@ const AddJournal = () => {
               )}
             </div>
 
-            {/* Indexing - String (formerly Total Citations) */}
+            {/* Indexing */}
             <div>
               <label className="block mb-1 font-medium">
                 Indexing
@@ -604,7 +596,7 @@ const AddJournal = () => {
               )}
             </div>
 
-            {/* First Decision - Integer (formerly H-Index) */}
+            {/* First Decision */}
             <div>
               <label className="block mb-1 font-medium">
                 First Decision
@@ -625,7 +617,7 @@ const AddJournal = () => {
               )}
             </div>
 
-            {/* Acceptance Rate - Decimal */}
+            {/* Acceptance Rate */}
             <div>
               <label className="block mb-1 font-medium">
                 Acceptance Rate (%)
@@ -660,41 +652,7 @@ const AddJournal = () => {
           <Editor
             apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
             value={formData.about_the_journal}
-            init={{
-              height: 400,
-              menubar: false,
-              plugins: [
-                "advlist",
-                "autolink",
-                "link",
-                "lists",
-                "charmap",
-                "preview",
-                "searchreplace",
-                "visualblocks",
-                "code",
-                "fullscreen",
-                "help",
-                "wordcount",
-              ],
-              toolbar:
-                "undo redo | blocks | " +
-                "bold italic underline | link | " +
-                "alignleft aligncenter alignright alignjustify | " +
-                "bullist numlist outdent indent | " +
-                "removeformat | help | code",
-              content_style:
-                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-              link_context_toolbar: true,
-              link_assume_external_targets: true,
-              link_title: false,
-              default_link_target: "_blank",
-              link_list: [
-                { title: "Home Page", value: "/" },
-                { title: "About Page", value: "/about" },
-                { title: "Contact Page", value: "/contact" },
-              ],
-            }}
+            init={EDITOR_INIT}
             onEditorChange={(content) =>
               handleEditorChange(content, "about_the_journal")
             }
@@ -707,41 +665,7 @@ const AddJournal = () => {
           <Editor
             apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
             value={formData.author_guide}
-            init={{
-              height: 400,
-              menubar: false,
-              plugins: [
-                "advlist",
-                "autolink",
-                "link",
-                "lists",
-                "charmap",
-                "preview",
-                "searchreplace",
-                "visualblocks",
-                "code",
-                "fullscreen",
-                "help",
-                "wordcount",
-              ],
-              toolbar:
-                "undo redo | blocks | " +
-                "bold italic underline | link | " +
-                "alignleft aligncenter alignright alignjustify | " +
-                "bullist numlist outdent indent | " +
-                "removeformat | help | code",
-              content_style:
-                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-              link_context_toolbar: true,
-              link_assume_external_targets: true,
-              link_title: false,
-              default_link_target: "_blank",
-              link_list: [
-                { title: "Home Page", value: "/" },
-                { title: "About Page", value: "/about" },
-                { title: "Contact Page", value: "/contact" },
-              ],
-            }}
+            init={EDITOR_INIT}
             onEditorChange={(content) =>
               handleEditorChange(content, "author_guide")
             }
@@ -772,7 +696,7 @@ const AddJournal = () => {
           />
         </div>
 
-        {/* Amount - Integer */}
+        {/* Amount */}
         <div>
           <label className="block mb-1 font-medium">Amount</label>
           <input
@@ -780,7 +704,9 @@ const AddJournal = () => {
             name="amount"
             value={formData.amount}
             onChange={handleChange}
-            className={`w-full border px-3 py-2 rounded ${errors.amount ? "border-red-500" : ""}`}
+            className={`w-full border px-3 py-2 rounded ${
+              errors.amount ? "border-red-500" : ""
+            }`}
             placeholder="Enter amount"
             required
           />
@@ -789,7 +715,7 @@ const AddJournal = () => {
           )}
         </div>
 
-        {/* Submission Guideline - Rich Text Editor (NEW) */}
+        {/* Submission Guideline - Rich Text Editor */}
         <div>
           <label className="block mb-1 font-medium">
             Submission Guideline
@@ -797,41 +723,7 @@ const AddJournal = () => {
           <Editor
             apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
             value={formData.submission_guideline}
-            init={{
-              height: 400,
-              menubar: false,
-              plugins: [
-                "advlist",
-                "autolink",
-                "link",
-                "lists",
-                "charmap",
-                "preview",
-                "searchreplace",
-                "visualblocks",
-                "code",
-                "fullscreen",
-                "help",
-                "wordcount",
-              ],
-              toolbar:
-                "undo redo | blocks | " +
-                "bold italic underline | link | " +
-                "alignleft aligncenter alignright alignjustify | " +
-                "bullist numlist outdent indent | " +
-                "removeformat | help | code",
-              content_style:
-                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-              link_context_toolbar: true,
-              link_assume_external_targets: true,
-              link_title: false,
-              default_link_target: "_blank",
-              link_list: [
-                { title: "Home Page", value: "/" },
-                { title: "About Page", value: "/about" },
-                { title: "Contact Page", value: "/contact" },
-              ],
-            }}
+            init={EDITOR_INIT}
             onEditorChange={(content) =>
               handleEditorChange(content, "submission_guideline")
             }
@@ -865,7 +757,7 @@ const AddJournal = () => {
           </div>
         </div>
 
-        {/* Publication Model No - String */}
+        {/* Publication Model No */}
         <div>
           <label className="block mb-1 font-medium">Publication Model No</label>
           <input
@@ -873,7 +765,9 @@ const AddJournal = () => {
             name="issn_print_no"
             value={formData.issn_print_no}
             onChange={handleChange}
-            className={`w-full border px-3 py-2 rounded ${errors.issn_print_no ? "border-red-500" : ""}`}
+            className={`w-full border px-3 py-2 rounded ${
+              errors.issn_print_no ? "border-red-500" : ""
+            }`}
             placeholder="Enter Publication Model Number"
           />
           {errors.issn_print_no && (
@@ -908,7 +802,7 @@ const AddJournal = () => {
           </div>
         </div>
 
-        {/* Peer Review No - String */}
+        {/* Peer Review No */}
         <div>
           <label className="block mb-1 font-medium">Peer Review No</label>
           <input
@@ -916,7 +810,9 @@ const AddJournal = () => {
             name="issn_online_no"
             value={formData.issn_online_no}
             onChange={handleChange}
-            className={`w-full border px-3 py-2 rounded ${errors.issn_online_no ? "border-red-500" : ""}`}
+            className={`w-full border px-3 py-2 rounded ${
+              errors.issn_online_no ? "border-red-500" : ""
+            }`}
             placeholder="Enter Peer Review Number"
           />
           {errors.issn_online_no && (
@@ -951,7 +847,7 @@ const AddJournal = () => {
           </div>
         </div>
 
-        {/* DOI No - String (formerly UGC No) */}
+        {/* DOI No */}
         <div>
           <label className="block mb-1 font-medium">DOI No</label>
           <input
@@ -959,7 +855,9 @@ const AddJournal = () => {
             name="ugc_no"
             value={formData.ugc_no}
             onChange={handleChange}
-            className={`w-full border px-3 py-2 rounded ${errors.ugc_no ? "border-red-500" : ""}`}
+            className={`w-full border px-3 py-2 rounded ${
+              errors.ugc_no ? "border-red-500" : ""
+            }`}
             placeholder="Enter DOI (e.g., 10.1234/abcd or https://doi.org/...)"
           />
           {errors.ugc_no && (
@@ -976,7 +874,9 @@ const AddJournal = () => {
             ref={fileInputRef}
             onChange={handleChange}
             accept="image/*"
-            className={`w-full border px-3 py-2 rounded ${errors.image ? "border-red-500" : ""}`}
+            className={`w-full border px-3 py-2 rounded ${
+              errors.image ? "border-red-500" : ""
+            }`}
             required
           />
           {errors.image && (

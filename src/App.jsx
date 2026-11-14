@@ -176,6 +176,7 @@ import MentorGuidLinePage from "./pages/user/mentor_hub/MentorGuidLinePage";
 import AdminViewSubmittedMentors from "./pages/user/mentor_hub/AdminViewSubmittedMentors";
 import UserViewSubmitMentors from "./pages/user/mentor_hub/UserViewSubmitMentors";
 import ManageTemplate from "./pages/Articlemanager/ManageTemplate";
+import ManageEthics from "./pages/admin/JournalManger/ManageEthics";
 
 function App() {
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -511,6 +512,12 @@ function App() {
                 path="/article-manger/journal/edit-journal/:id"
                 element={<EditJournal />}
               />
+
+              <Route path="/article-manger/journal/ethics/" element={<ManageEthics />} />
+
+
+
+
               <Route path="/handle-volume" element={<HandleVolume />} />
               {/* Journal ways editorial */}
               <Route path="/manage-editorial" element={<ManageEditorial />} />

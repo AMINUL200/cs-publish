@@ -1,6 +1,13 @@
-import { faEdit, faTrash, faSearch, faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEdit,
+  faTrash,
+  faSearch,
+  faPlus,
+  faFileAlt,
+  faEllipsisV,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
@@ -17,6 +24,9 @@ const ViewJournal = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+
+  const dropdownRef = useRef(null);
 
   // Fetch journals
   const fetchJournals = async () => {
@@ -24,7 +34,7 @@ const ViewJournal = () => {
       const response = await axios.get(`${API_URL}api/admin/journals`, {
         headers: {
           Authorization: `Bearer ${token}`,
-           "Cache-Control": "no-cache",
+          "Cache-Control": "no-cache",
           Pragma: "no-cache",
         },
       });
@@ -32,7 +42,6 @@ const ViewJournal = () => {
       if (response.status === 200 && response.data.success) {
         setJournalData(response.data.data);
         console.log(response.data.data);
-        
       } else {
         toast.error(response.data.message || "Failed to fetch journals");
       }
@@ -47,6 +56,23 @@ const ViewJournal = () => {
   useEffect(() => {
     fetchJournals();
   }, [token]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        setOpenDropdownId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Filter by title or category
   const filteredJournals = journalData.filter((journal) => {
@@ -76,12 +102,26 @@ const ViewJournal = () => {
       toast.error("Error while deleting journal");
     } finally {
       setDeleteLoading(false);
+      setOpenDropdownId(null);
     }
   };
 
   // Navigate to edit
   const handleNavigate = (id) => {
+    setOpenDropdownId(null);
     navigate(`/article-manger/journal/edit-journal/${id}`);
+  };
+
+  // Navigate to articles page with journal ID
+  const handleViewArticles = (id) => {
+    setOpenDropdownId(null);
+    navigate(`/article-manger/journal/ethics/?journal_id=${id}`);
+  };
+
+  // Toggle dropdown
+  const toggleDropdown = (id, e) => {
+    e.stopPropagation();
+    setOpenDropdownId((prev) => (prev === id ? null : id));
   };
 
   if (loading) return <Loader />;
@@ -117,7 +157,7 @@ const ViewJournal = () => {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto">
+      <div className="overflow-visible">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -169,39 +209,78 @@ const ViewJournal = () => {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                     ₹{journal.amount }
+                    ₹{journal.amount}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
                     {journal.status ? "Active" : "Inactive"}
                   </td>
                   <td className="text-center px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-2">
-                    <button
-                      onClick={() => handleNavigate(journal.id)}
-                      disabled={deleteLoading}
-                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded mr-2 transition-colors duration-300 cursor-pointer"
-                    >
-                      <FontAwesomeIcon icon={faEdit} className="mr-1" />
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(journal.id)}
-                      disabled={deleteLoading}
-                      className={`text-white px-3 py-1 rounded transition-colors duration-300 ${
-                        deleteLoading
-                          ? "bg-gray-500 cursor-not-allowed"
-                          : "bg-red-500 hover:bg-red-600 cursor-pointer"
-                      }`}
-                    >
-                      <FontAwesomeIcon icon={faTrash} className="mr-1" />
-                      Delete
-                    </button>
+                    <div className="relative inline-block">
+                      {/* Three Dot Button */}
+                      <button
+                        onClick={(e) => toggleDropdown(journal.id, e)}
+                        className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                        aria-label="Open actions menu"
+                      >
+                        <FontAwesomeIcon
+                          icon={faEllipsisV}
+                          className="text-gray-600"
+                        />
+                      </button>
+
+                      {/* Dropdown Menu */}
+                      {openDropdownId === journal.id && (
+                        <div
+                          className="absolute right-0 z-50 mt-2 w-44 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden"
+                          style={{ top: "100%" }}
+                        >
+                          {/* Articles */}
+                          <button
+                            onClick={() => handleViewArticles(journal.id)}
+                            className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-3 transition-colors duration-150 border-b border-gray-100"
+                          >
+                            <FontAwesomeIcon
+                              icon={faFileAlt}
+                              className="text-blue-500"
+                            />
+                            Ethics
+                          </button>
+
+                          {/* Edit */}
+                          <button
+                            onClick={() => handleNavigate(journal.id)}
+                            disabled={deleteLoading}
+                            className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 flex items-center gap-3 transition-colors duration-150 border-b border-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <FontAwesomeIcon
+                              icon={faEdit}
+                              className="text-green-500"
+                            />
+                            Edit
+                          </button>
+
+                          {/* Delete */}
+                          <button
+                            onClick={() => handleDelete(journal.id)}
+                            disabled={deleteLoading}
+                            className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-3 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <FontAwesomeIcon
+                              icon={faTrash}
+                              className="text-red-500"
+                            />
+                            {deleteLoading ? "Deleting..." : "Delete"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan="6"
+                  colSpan="7"
                   className="px-6 py-4 text-center text-sm text-gray-500"
                 >
                   No journals found matching your search criteria.
@@ -215,8 +294,8 @@ const ViewJournal = () => {
       {/* Footer */}
       <div className="flex items-center justify-between mt-4 text-sm text-gray-600">
         <div>
-          Showing {filteredJournals.length > 0 ? 1 : 0} to {filteredJournals.length} of{" "}
-          {journalData.length} rows
+          Showing {filteredJournals.length > 0 ? 1 : 0} to{" "}
+          {filteredJournals.length} of {journalData.length} rows
         </div>
       </div>
     </div>

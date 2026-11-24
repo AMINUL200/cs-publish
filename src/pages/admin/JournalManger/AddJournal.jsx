@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import Loader from "../../../components/common/Loader";
 import { toast } from "react-toastify";
 import { Editor } from "@tinymce/tinymce-react";
-
 // ✅ Shared TinyMCE config — reused by all rich-text fields
 const EDITOR_INIT = {
   height: 400,
@@ -41,19 +40,17 @@ const EDITOR_INIT = {
     { title: "Contact Page", value: "/contact" },
   ],
 };
-
 const AddJournal = () => {
   const { token } = useSelector((state) => state.auth);
   const API_URL = import.meta.env.VITE_API_URL;
   const fileInputRef = useRef(null);
-
+  const imageRequestRef = useRef(0);
+  const [imageValidating, setImageValidating] = useState(false);
   const [groupOptions, setGroupOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
-
   const [loading, setLoading] = useState(true);
   const [handleLoading, setHandleLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
   // formData state
   const [formData, setFormData] = useState({
     group_id: "",
@@ -83,7 +80,6 @@ const AddJournal = () => {
     acceptance_rate: "",
     total_articles: "",
   });
-
   // fetch groups
   const fetchGroupData = async () => {
     try {
@@ -106,7 +102,6 @@ const AddJournal = () => {
       setLoading(false);
     }
   };
-
   const fetchCategoryData = async (groupId) => {
     if (!groupId) {
       setCategoryOptions([]);
@@ -135,15 +130,12 @@ const AddJournal = () => {
       setCategoryOptions([]);
     }
   };
-
   useEffect(() => {
     fetchGroupData();
   }, []);
-
   // Validation function - Updated for string values
   const validateField = (name, value) => {
     let error = "";
-
     const decimalFields = ["impact_factor", "acceptance_rate"];
     const integerFields = ["h_index", "amount"];
     const stringFields = [
@@ -153,7 +145,6 @@ const AddJournal = () => {
       "total_citations",
       "ugc_no",
     ];
-
     if (decimalFields.includes(name)) {
       if (value && !/^\d*\.?\d*$/.test(value)) {
         error =
@@ -174,75 +165,62 @@ const AddJournal = () => {
         error = "Please enter a valid value";
       }
     }
-
     return error;
   };
-
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
-
     setErrors((prev) => ({ ...prev, [name]: "" }));
-
     if (type === "file") {
-      const file = files[0];
-      if (file) {
-        const validTypes = [
-          "image/jpeg",
-          "image/jpg",
-          "image/png",
-          "image/gif",
-          "image/webp",
-        ];
-        const maxSize = 5 * 1024 * 1024; // 5MB
+      const input = e.target;
+      const file = files?.[0];
+      const requestId = ++imageRequestRef.current;
+      setFormData((prev) => ({ ...prev, image: null }));
+      setImageValidating(false);
+      if (!file) return;
 
-        if (!validTypes.includes(file.type)) {
-          setErrors((prev) => ({
-            ...prev,
-            image: "Please upload a valid image file (JPEG, PNG, GIF, WEBP)",
-          }));
-          return;
-        }
-        if (file.size > maxSize) {
-          setErrors((prev) => ({
-            ...prev,
-            image: "Image size should be less than 5MB",
-          }));
-          return;
-        }
+      const rejectImage = (message) => {
+        if (requestId !== imageRequestRef.current) return;
+        setErrors((prev) => ({ ...prev, image: message }));
+        setImageValidating(false);
+        input.value = "";
+        toast.error(message);
+      };
 
-        const img = new Image();
-        const objectUrl = URL.createObjectURL(file);
-
-        img.onload = function () {
-          const width = this.width;
-          const height = this.height;
-          const aspectRatio = width / height;
-
-          if (width < 800 || height < 500) {
-            toast.info(
-              `Image size: ${width}x${height}px. Recommended minimum is 800x500px.`
-            );
-          }
-
-          if (aspectRatio < 1.3 || aspectRatio > 2.0) {
-            toast.info(
-              `Image aspect ratio: ${aspectRatio.toFixed(
-                2
-              )}:1. Recommended ratio is between 1.3:1 and 2:1.`
-            );
-          }
-
-          setFormData((prev) => ({ ...prev, [name]: file }));
-          URL.revokeObjectURL(objectUrl);
-        };
-
-        img.onerror = function () {
-          toast.error("Failed to load image");
-          URL.revokeObjectURL(objectUrl);
-        };
-
-        img.src = objectUrl;
+      const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
+      if (!validTypes.includes(file.type)) {
+        rejectImage("Please upload a valid image file (JPEG, PNG, GIF, WEBP)");
+        return;
       }
+      if (file.size > 5 * 1024 * 1024) {
+        rejectImage("Image size must not exceed 5MB");
+        return;
+      }
+
+      setImageValidating(true);
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        if (requestId !== imageRequestRef.current) return;
+        const width = img.naturalWidth;
+        const height = img.naturalHeight;
+        if (width < 500 || height < 800) {
+          rejectImage(`Image dimensions should be at least 500x800px. Current: ${width}x${height}px`);
+          return;
+        }
+        const aspectRatio = width / height;
+        if (aspectRatio < 1 / 2 || aspectRatio > 1 / 1.3) {
+          rejectImage(`Portrait aspect ratio must be between 1:2 and 1:1.3. Current: 1:${(height / width).toFixed(2)}`);
+          return;
+        }
+        setFormData((prev) => ({ ...prev, image: file }));
+        setImageValidating(false);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        rejectImage("Failed to load image");
+      };
+      img.src = objectUrl;
     } else if (
       ["issn_print", "issn_online", "ugc_approved", "status"].includes(name)
     ) {
@@ -254,13 +232,11 @@ const AddJournal = () => {
       }
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
-
     if (name === "group_id") {
       fetchCategoryData(value);
       setFormData((prev) => ({ ...prev, category_id: "" }));
     }
   };
-
   // Handle editor changes for rich text fields
   const handleEditorChange = (content, fieldName) => {
     setFormData((prev) => ({
@@ -268,13 +244,11 @@ const AddJournal = () => {
       [fieldName]: content,
     }));
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    if (imageValidating || handleLoading) return;
     const newErrors = {};
     let hasError = false;
-
     const requiredFields = ["group_id", "category_id", "j_title", "amount"];
     requiredFields.forEach((field) => {
       if (!formData[field]) {
@@ -282,14 +256,12 @@ const AddJournal = () => {
         hasError = true;
       }
     });
-
     const numericFields = [
       "impact_factor",
       "acceptance_rate",
       "h_index",
       "amount",
     ];
-
     numericFields.forEach((field) => {
       if (formData[field]) {
         const error = validateField(field, formData[field]);
@@ -299,7 +271,6 @@ const AddJournal = () => {
         }
       }
     });
-
     const stringFields = [
       "issn_print_no",
       "issn_online_no",
@@ -307,7 +278,6 @@ const AddJournal = () => {
       "total_citations",
       "ugc_no",
     ];
-
     stringFields.forEach((field) => {
       if (formData[field]) {
         const error = validateField(field, formData[field]);
@@ -317,12 +287,10 @@ const AddJournal = () => {
         }
       }
     });
-
     if (!formData.image) {
-      newErrors.image = "Please upload an image";
+      newErrors.image = errors.image || "Please upload a valid portrait image";
       hasError = true;
     }
-
     if (hasError) {
       setErrors(newErrors);
       const firstErrorField = Object.keys(newErrors)[0];
@@ -332,25 +300,22 @@ const AddJournal = () => {
         element.focus();
       }
       toast.error("Please fix all validation errors before submitting");
+      return;
     }
-
     setHandleLoading(true);
     try {
       const submitData = new FormData();
-
       Object.entries(formData).forEach(([key, value]) => {
         if (value !== null && value !== undefined) {
           submitData.append(key, value);
         }
       });
-
       const res = await axios.post(`${API_URL}api/admin/journals`, submitData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
-
       if (res.status === 201) {
         toast.success(res.data.message || "Journal added successfully");
         setFormData({
@@ -396,9 +361,7 @@ const AddJournal = () => {
       setHandleLoading(false);
     }
   };
-
   if (loading) return <Loader />;
-
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm ">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Add Journal</h1>
@@ -427,7 +390,6 @@ const AddJournal = () => {
               <p className="text-red-500 text-sm mt-1">{errors.group_id}</p>
             )}
           </div>
-
           {/* Category ID */}
           <div>
             <label className="block mb-1 font-medium">Category</label>
@@ -452,7 +414,6 @@ const AddJournal = () => {
             )}
           </div>
         </div>
-
         {/* Title */}
         <div>
           <label className="block mb-1 font-medium">Journal Title</label>
@@ -470,7 +431,6 @@ const AddJournal = () => {
             <p className="text-red-500 text-sm mt-1">{errors.j_title}</p>
           )}
         </div>
-
         {/* Categories */}
         <div>
           <label className="block mb-1 font-medium">Journal Categories</label>
@@ -482,7 +442,6 @@ const AddJournal = () => {
             className="w-full border px-3 py-2 rounded"
           />
         </div>
-
         {/* Description */}
         <div>
           <label className="block mb-1 font-medium">Description</label>
@@ -494,7 +453,6 @@ const AddJournal = () => {
             rows="4"
           />
         </div>
-
         {/* Small Description - Rich Text Editor */}
         <div>
           <label className="block mb-1 font-medium">Small Description</label>
@@ -507,7 +465,6 @@ const AddJournal = () => {
             }
           />
         </div>
-
         {/* ✅ Aims & Scope - Rich Text Editor (NEW) */}
         <div>
           <label className="block mb-1 font-medium">Aims &amp; Scope</label>
@@ -520,7 +477,6 @@ const AddJournal = () => {
             }
           />
         </div>
-
         {/* Journal Metrics Section */}
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
           <h2 className="text-lg font-semibold mb-4 text-gray-700">
@@ -549,7 +505,6 @@ const AddJournal = () => {
                 </p>
               )}
             </div>
-
             {/* Quick Press */}
             <div>
               <label className="block mb-1 font-medium">
@@ -572,7 +527,6 @@ const AddJournal = () => {
                 </p>
               )}
             </div>
-
             {/* Indexing */}
             <div>
               <label className="block mb-1 font-medium">
@@ -595,7 +549,6 @@ const AddJournal = () => {
                 </p>
               )}
             </div>
-
             {/* First Decision */}
             <div>
               <label className="block mb-1 font-medium">
@@ -616,7 +569,6 @@ const AddJournal = () => {
                 <p className="text-red-500 text-sm mt-1">{errors.h_index}</p>
               )}
             </div>
-
             {/* Acceptance Rate */}
             <div>
               <label className="block mb-1 font-medium">
@@ -645,7 +597,6 @@ const AddJournal = () => {
             and selectivity.
           </p>
         </div>
-
         {/* About the Journal - Rich Text Editor */}
         <div>
           <label className="block mb-1 font-medium">About the Journal</label>
@@ -658,7 +609,6 @@ const AddJournal = () => {
             }
           />
         </div>
-
         {/* Author Guide - Rich Text Editor */}
         <div>
           <label className="block mb-1 font-medium">Author Guide</label>
@@ -671,7 +621,6 @@ const AddJournal = () => {
             }
           />
         </div>
-
         {/* Editorial Board */}
         <div>
           <label className="block mb-1 font-medium">Editorial Board</label>
@@ -683,7 +632,6 @@ const AddJournal = () => {
             className="w-full border px-3 py-2 rounded"
           />
         </div>
-
         {/* Editor */}
         <div>
           <label className="block mb-1 font-medium">Editor</label>
@@ -695,7 +643,6 @@ const AddJournal = () => {
             className="w-full border px-3 py-2 rounded"
           />
         </div>
-
         {/* Amount */}
         <div>
           <label className="block mb-1 font-medium">Amount</label>
@@ -714,7 +661,6 @@ const AddJournal = () => {
             <p className="text-red-500 text-sm mt-1">{errors.amount}</p>
           )}
         </div>
-
         {/* Submission Guideline - Rich Text Editor */}
         <div>
           <label className="block mb-1 font-medium">
@@ -729,7 +675,6 @@ const AddJournal = () => {
             }
           />
         </div>
-
         {/* Publication Model */}
         <div>
           <label className="block mb-1 font-medium">Publication Model</label>
@@ -756,7 +701,6 @@ const AddJournal = () => {
             </label>
           </div>
         </div>
-
         {/* Publication Model No */}
         <div>
           <label className="block mb-1 font-medium">Publication Model No</label>
@@ -774,7 +718,6 @@ const AddJournal = () => {
             <p className="text-red-500 text-sm mt-1">{errors.issn_print_no}</p>
           )}
         </div>
-
         {/* Peer Review */}
         <div>
           <label className="block mb-1 font-medium">Peer Review</label>
@@ -801,7 +744,6 @@ const AddJournal = () => {
             </label>
           </div>
         </div>
-
         {/* Peer Review No */}
         <div>
           <label className="block mb-1 font-medium">Peer Review No</label>
@@ -819,7 +761,6 @@ const AddJournal = () => {
             <p className="text-red-500 text-sm mt-1">{errors.issn_online_no}</p>
           )}
         </div>
-
         {/* DOI */}
         <div>
           <label className="block mb-1 font-medium">DOI</label>
@@ -846,7 +787,6 @@ const AddJournal = () => {
             </label>
           </div>
         </div>
-
         {/* DOI No */}
         <div>
           <label className="block mb-1 font-medium">DOI No</label>
@@ -864,7 +804,6 @@ const AddJournal = () => {
             <p className="text-red-500 text-sm mt-1">{errors.ugc_no}</p>
           )}
         </div>
-
         {/* Image */}
         <div>
           <label className="block mb-1 font-medium">Image</label>
@@ -873,17 +812,21 @@ const AddJournal = () => {
             name="image"
             ref={fileInputRef}
             onChange={handleChange}
-            accept="image/*"
+            accept="image/jpeg,image/png,image/gif,image/webp"
+            disabled={handleLoading}
             className={`w-full border px-3 py-2 rounded ${
               errors.image ? "border-red-500" : ""
             }`}
             required
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Portrait image: minimum 500 × 800px, ratio 1:2 to 1:1.3, maximum 5MB. Recommended: 800 × 1200px.
+          </p>
+          {imageValidating && <p className="text-sm text-blue-600">Validating image...</p>}
           {errors.image && (
             <p className="text-red-500 text-sm mt-1">{errors.image}</p>
           )}
         </div>
-
         {/* Status */}
         <div>
           <label className="block mb-1 font-medium">Status</label>
@@ -910,13 +853,12 @@ const AddJournal = () => {
             </label>
           </div>
         </div>
-
         {/* Submit */}
         <button
           type="submit"
-          disabled={handleLoading}
+          disabled={handleLoading || imageValidating}
           className={`px-4 py-2 rounded text-white flex items-center justify-center gap-2 ${
-            handleLoading
+            handleLoading || imageValidating
               ? "bg-gray-500 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
           }`}
@@ -953,5 +895,4 @@ const AddJournal = () => {
     </div>
   );
 };
-
 export default AddJournal;

@@ -228,40 +228,51 @@ const EditJournal = () => {
         const objectUrl = URL.createObjectURL(file);
 
         img.onload = function () {
-          const width = this.width;
-          const height = this.height;
+          const width = this.naturalWidth;
+          const height = this.naturalHeight;
 
-          if (width < 800 || height < 500) {
+          // Minimum portrait image dimensions
+          if (width < 500 || height < 800) {
+            const message = `Image dimensions should be at least 500x800px. Current: ${width}x${height}px`;
+
             setErrors((prev) => ({
               ...prev,
-              image: `Image dimensions should be at least 800x500px. Current: ${width}x${height}px`,
+              image: message,
             }));
-            toast.error(
-              `Image dimensions should be at least 800x500px. Current: ${width}x${height}px`
-            );
+
+            toast.error(message);
             URL.revokeObjectURL(objectUrl);
             return;
           }
 
+          // Portrait aspect ratio validation
           const aspectRatio = width / height;
-          if (aspectRatio < 1.3 || aspectRatio > 2.0) {
+
+          if (aspectRatio < 1 / 2 || aspectRatio > 1 / 1.3) {
             setErrors((prev) => ({
               ...prev,
-              image: `Recommended aspect ratio is between 1.3:1 and 2:1. Current: ${(
-                width / height
-              ).toFixed(2)}:1`,
+              image: `Portrait aspect ratio must be between 1:2 and 1:1.3. Current: 1:${(
+                height / width
+              ).toFixed(2)}`,
             }));
-            toast.error(`Recommended aspect ratio is between 1.3:1 and 2:1`);
+
+            toast.error("Portrait aspect ratio must be between 1:2 and 1:1.3");
+
             URL.revokeObjectURL(objectUrl);
             return;
           }
 
-          setFormData((prev) => ({ ...prev, [name]: file }));
+          setFormData((prev) => ({
+            ...prev,
+            [name]: file,
+          }));
 
           const reader = new FileReader();
+
           reader.onloadend = () => {
             setImagePreview(reader.result);
           };
+
           reader.readAsDataURL(file);
           URL.revokeObjectURL(objectUrl);
         };
@@ -381,7 +392,7 @@ const EditJournal = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       if (res.status === 200) {
@@ -691,9 +702,7 @@ const EditJournal = () => {
 
         {/* Submission Guideline - Rich Text Editor */}
         <div>
-          <label className="block mb-1 font-medium">
-            Submission Guideline
-          </label>
+          <label className="block mb-1 font-medium">Submission Guideline</label>
           <Editor
             apiKey={import.meta.env.VITE_TEXT_EDITOR_API_KEY}
             value={formData.submission_guideline}
@@ -850,7 +859,7 @@ const EditJournal = () => {
                 <img
                   src={imagePreview}
                   alt="Journal preview"
-                  className="w-32 h-32 object-cover rounded-lg border shadow-sm"
+                  className="w-32 h-auto aspect-[5/8] object-contain bg-gray-50 rounded-lg border shadow-sm"
                 />
                 <button
                   type="button"
